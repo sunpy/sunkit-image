@@ -1,13 +1,6 @@
 A toolbox for Solar Physics image processing.
 ---------------------------------------------
 
-.. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
-    :target: http://www.astropy.org
-    :alt: Powered by Astropy Badge
-
-
-
-
 License
 -------
 
