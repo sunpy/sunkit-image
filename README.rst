@@ -1,5 +1,8 @@
-A toolbox for Solar Physics image processing.
----------------------------------------------
+A toolbox for Solar Physics image processing
+--------------------------------------------
+
+This is an experimental library for various solar physics specific image
+processing routines.
 
 License
 -------
