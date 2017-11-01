@@ -82,28 +82,10 @@ matrix:
 
 install:
 
-    # We now use the ci-helpers package to set up our testing environment.
-    # This is done by using Miniconda and then using conda and pip to install
-    # dependencies. Which dependencies are installed using conda and pip is
-    # determined by the CONDA_DEPENDENCIES and PIP_DEPENDENCIES variables,
-    # which should be space-delimited lists of package names. See the README
-    # in https://github.com/astropy/ci-helpers for information about the full
-    # list of environment variables that can be used to customize your
-    # environment. In some cases, ci-helpers may not offer enough flexibility
-    # in how to install a package, in which case you can have additional
-    # commands in the install: section below.
-
     - git clone --depth 1 git://github.com/astropy/ci-helpers.git
     - source ci-helpers/travis/setup_conda.sh
-
-    # As described above, using ci-helpers, you should be able to set up an
-    # environment with dependencies installed using conda and pip, but in some
-    # cases this may not provide enough flexibility in how to install a
-    # specific dependency (and it will not be able to install non-Python
-    # dependencies). Therefore, you can also include commands below (as
-    # well as at the start of the install section or in the before_install
-    # section if they are needed before setting up conda) to install any
-    # other dependencies.
+    # Temp fix for https://github.com/astropy/astropy/pull/6605
+    - conda remove --force hypothesis
 
 script:
    - $MAIN_CMD $SETUP_CMD
