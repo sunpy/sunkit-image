@@ -85,7 +85,7 @@ install:
     - git clone --depth 1 git://github.com/astropy/ci-helpers.git
     - source ci-helpers/travis/setup_conda.sh
     # Temp fix for https://github.com/astropy/astropy/pull/6605
-    - conda remove --force hypothesis
+    # - conda remove --force hypothesis
 
 script:
    - $MAIN_CMD $SETUP_CMD
