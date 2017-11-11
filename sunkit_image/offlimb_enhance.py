@@ -9,43 +9,81 @@ import sunpy.map
 from sunkit_image.utils.utils import find_pixel_radii
 
 
-def fit_radial_intensity(m, r, degree=1,
-                         annular_function=np.mean,
-                         **annular_function_kwargs):
+def bin_edge_summary(r, binfit='center'):
+    """
+
+    """
+    if binfit == 'center':
+        rfit = 0.5*(r[0:-1] + r[1:])
+    elif binfit == 'left':
+        rfit = r[0:-1]
+    elif binfit == 'right':
+        rfit = r[1:]
+    else:
+        raise ValueError('Keyword "binfit" must have value "center", "left" or "right"')
+    return rfit
+
+
+def fit_radial_intensity(smap, r, fit_range=[1.0, 1.5]*u.R_sun, degree=1, binfit='center',
+                         summary=np.mean,
+                         **summary_kwargs):
     """
     Fits a polynomial function to the natural logarithm of an estimate of the
     intensity as a function of radius.
 
-
     Parameters
     ----------
-    m
-    rmin
-    fit_rmax
-    rsun_step_size
-    degree
-    annular_function
-    annular_function_kwargs
+
 
     Returns
     -------
 
     """
-    map_r = find_pixel_radii(m).to(u.R_sun).value
-    radial_emission = np.zeros(shape=r.size-1)
-    for i in range(0, r.size):
-        lower_radius = r[i]
-        upper_radius = r[i+1]
-        radial_emission[i] = annular_function(m.data[(map_r > lower_radius) * (map_r < upper_radius)], **annular_function_kwargs)
 
-    return np.polyfit(r,
-                        np.log(radial_emission[rsun_array < fit_rmax]), degree)
+    # Get the emission as a function of intensity.
+    radial_emission = get_intensity_summary(smap, r, summary=summary, **summary_kwargs)
+
+    # The radial emission is found by calculating a summary statistic of the
+    # intensity in bins with bin edges defined by the input 'r'. If 'r' has N
+    # values, the radial emission returned has N-1 values.  In order to perform
+    # the fit a summary of the bins must be calculated.
+    rfit = bin_edge_summary(r, binfit=binfit)
+
+    # Calculate which radii are to be fit.
+    fit_here = fit_range[0] < rfit < fit_range[1]
+
+    # Return the values of a polynomial fit to the log of the radial emission
+    return np.polyfit(rfit[fit_here], np.log(radial_emission[fit_here]), degree)
 
 
-class FitRadialIntensity:
-    def __init__(self, m, r, degree=1,
-                         annular_function=np.mean,
-                         **annular_function_kwargs):
+def get_intensity_summary(smap, r, scale=None, summary=np.mean, **summary_kwargs):
+    """
+    Get a summary statistic of the intensity in a map as a function of radius.
+
+    Parameters
+    ----------
+    smap : sunpy.map.Map
+        A sunpy map.
+
+    r : `~astropy.units.Quantity`
+        A one-dimensional array of bin edges.
+
+    scale : `~astropy.units.Quantity`
+        The radius of the Sun expressed in map units.  For example, in typical
+        helioprojective Cartesian maps the solar radius is expressed in units
+        of arcseconds.
+
+    Returns
+    -------
+    intensity summary : `~numpy.array`
+        A summary statistic of the radial intensity in the bins defined by the
+        bin edges.  If "r" has N bins, the returned array has N-1 values.
+    """
+    # Get the radial distance of every pixel from the center of the Sun.
+    map_r = find_pixel_radii(smap, scale=scale).to(u.R_sun).value
+
+    # Calculate the summary statistic in the radial bins.
+    return np.asarray([summary(smap.data[(map_r > r[i]) * (map_r < r[i+1])], **summary_kwargs) for i in range(0, r.size-1)])
 
 
 
