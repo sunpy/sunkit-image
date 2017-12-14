@@ -27,6 +27,30 @@ def _radial_bins(r, map_r):
         return r.to(u.R_sun)
 
 
+def bin_edge_summary(r, binfit='left'):
+    """
+
+    Parameters
+    ----------
+    r
+    binfit
+
+    Returns
+    -------
+
+    """
+    if binfit == 'center':
+        rfit = 0.5 * (r[0:-1] + r[1:])
+    elif binfit == 'left':
+        rfit = r[0:-1]
+    elif binfit == 'right':
+        rfit = r[1:]
+    else:
+        raise ValueError(
+            'Keyword "binfit" must have value "center", "left" or "right"')
+    return rfit
+
+
 def find_pixel_radii(smap, scale=None):
     """
     Find the distance of every pixel in a map from the center of the Sun.
@@ -66,19 +90,40 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / scale)
 
 
-def bin_edge_summary(r, binfit='left'):
+def get_intensity_summary(smap, r, scale=None, summary=np.mean, **summary_kwargs):
     """
+    Get a summary statistic of the intensity in a map as a function of radius.
 
+    Parameters
+    ----------
+    smap : sunpy.map.Map
+        A sunpy map.
+
+    r : `~astropy.units.Quantity`
+        A one-dimensional array of bin edges.
+
+    scale : None, `~astropy.units.Quantity`
+        The radius of the Sun expressed in map units.  For example, in typical
+        helioprojective Cartesian maps the solar radius is expressed in units
+        of arcseconds.
+
+    Returns
+    -------
+    intensity summary : `~numpy.array`
+        A summary statistic of the radial intensity in the bins defined by the
+        bin edges.  If "r" has N bins, the returned array has N-1 values.
     """
-    if binfit == 'center':
-        rfit = 0.5*(r[0:-1] + r[1:])
-    elif binfit == 'left':
-        rfit = r[0:-1]
-    elif binfit == 'right':
-        rfit = r[1:]
+    if scale is None:
+        s = smap.rsun_obs
     else:
-        raise ValueError('Keyword "binfit" must have value "center", "left" or "right"')
-    return rfit
+        s = scale
+
+    # Get the radial distance of every pixel from the center of the Sun.
+    map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
+
+    # Calculate the summary statistic in the radial bins.
+    return np.asarray([summary(smap.data[(map_r > r[i].to(u.R_sun)) * (map_r < r[i+1].to(u.R_sun))], **summary_kwargs) for i in range(0, r.size-1)])
+
 
 
 def fit_radial_intensity(smap, r, fit_range=None, degree=1,
@@ -139,42 +184,7 @@ def fit_radial_intensity(smap, r, fit_range=None, degree=1,
     return np.polyfit(rfit[fit_here], np.log(radial_emission[fit_here]), degree)
 
 
-def get_intensity_summary(smap, r, scale=None, summary=np.mean, **summary_kwargs):
-    """
-    Get a summary statistic of the intensity in a map as a function of radius.
-
-    Parameters
-    ----------
-    smap : sunpy.map.Map
-        A sunpy map.
-
-    r : `~astropy.units.Quantity`
-        A one-dimensional array of bin edges.
-
-    scale : None, `~astropy.units.Quantity`
-        The radius of the Sun expressed in map units.  For example, in typical
-        helioprojective Cartesian maps the solar radius is expressed in units
-        of arcseconds.
-
-    Returns
-    -------
-    intensity summary : `~numpy.array`
-        A summary statistic of the radial intensity in the bins defined by the
-        bin edges.  If "r" has N bins, the returned array has N-1 values.
-    """
-    if scale is None:
-        s = smap.rsun_obs
-    else:
-        s = scale
-
-    # Get the radial distance of every pixel from the center of the Sun.
-    map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
-
-    # Calculate the summary statistic in the radial bins.
-    return np.asarray([summary(smap.data[(map_r > r[i].to(u.R_sun)) * (map_r < r[i+1].to(u.R_sun))], **summary_kwargs) for i in range(0, r.size-1)])
-
-
-def compensate(radii, p, normalize=True, normalization_radius=1*u.R_sun):
+def intensity_fit(radii, p, normalize=True, normalization_radius=1*u.R_sun):
     """
     Calculate the compensation factors at the input radii.
 
@@ -199,7 +209,7 @@ def compensate(radii, p, normalize=True, normalization_radius=1*u.R_sun):
         polynomial = np.poly1d(p)(these_radii) - np.poly1d(p)(nr)
     else:
         polynomial = np.poly1d(p)(these_radii)
-    return 1 / np.exp(polynomial)
+    return np.exp(polynomial)
 
 
 def offlimb_intensity_enhance(smap, solar_radius=None, r=None, degree=1,
@@ -255,8 +265,8 @@ def offlimb_intensity_enhance(smap, solar_radius=None, r=None, degree=1,
                                           **annular_function_kwargs)
 
     # Calculate the compensation function
-    compensation = compensate(map_r, fit_polynomial, normalize=True,
-                              normalization_radius=normalization_radius)
+    compensation = 1 / intensity_fit(map_r, fit_polynomial, normalize=True,
+                                     normalization_radius=normalization_radius)
     compensation[map_r < normalization_radius] = 1
 
     return sunpy.map.Map(smap.data * compensation, smap.meta)
