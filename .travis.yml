@@ -62,7 +62,7 @@ matrix:
         # Do a PEP8 test with pycodestyle
         - os: linux
           stage: Initial tests
-          env: MAIN_CMD='pycodestyle ndcube --count' SETUP_CMD=''
+          env: MAIN_CMD='pycodestyle sunkit_image --count' SETUP_CMD=''
 
         # Do a coverage test.
         - os: linux
