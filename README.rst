@@ -7,7 +7,7 @@
    :target: http://www.sunpy.org
 .. |Latest Version| image:: https://img.shields.io/pypi/v/sunkit-image.svg
    :target: https://pypi.python.org/pypi/sunkit-image/
-.. |Build Status| image:: https://secure.travis-ci.org/sunpy/sunpy.svg
+.. |Build Status| image:: https://secure.travis-ci.org/sunpy/sunkit-image.svg
    :target: http://travis-ci.org/sunpy/sunkit-image
 .. |Build status| image:: https://ci.appveyor.com/api/projects/status/github/sunpy/sunkit-image?branch=master&svg=true
    :target: https://ci.appveyor.com/project/sunpy/sunkit-image
