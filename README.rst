@@ -1,21 +1,18 @@
 `Sunkit Image`
 ==============
 
-|Latest Version| |Build Status| |Build status| |codecov| |Research
-software impact| |Powered by NumFOCUS|
+|Latest Version| |Build Status| |Build status| |codecov| |Powered by NumFOCUS| |Powered by Sunpy|
 
-.. _SunPy: http://sunpy.org
-
+.. |Powered by Sunpy| image:: http://img.shields.io/badge/powered%20by-SunPy-orange.svg?style=flat
+   :target: http://www.sunpy.org
 .. |Latest Version| image:: https://img.shields.io/pypi/v/sunkit-image.svg
    :target: https://pypi.python.org/pypi/sunkit-image/
 .. |Build Status| image:: https://secure.travis-ci.org/sunpy/sunpy.svg
    :target: http://travis-ci.org/sunpy/sunkit-image
-.. |Build status| image:: https://ci.appveyor.com/api/projects/status/xow461iejsjvp9vl?svg=true
+.. |Build status| image:: https://ci.appveyor.com/api/projects/status/github/sunpy/sunkit-image?branch=master&svg=true
    :target: https://ci.appveyor.com/project/sunpy/sunkit-image
 .. |codecov| image:: https://codecov.io/gh/sunpy/sunpy/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/sunpy/sunkit-image
-.. |Research software impact| image:: http://depsy.org/api/package/pypi/sunpy/badge.svg
-   :target: http://depsy.org/package/python/sunkit-image
 .. |Powered by NumFOCUS| image:: https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A
    :target: http://numfocus.org
 
