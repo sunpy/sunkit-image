@@ -52,6 +52,9 @@ conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
 setup_cfg = dict(conf.items('metadata'))
 
 # -- General configuration ----------------------------------------------------
+#
+intersphinx_mapping.pop('h5py', None)
+intersphinx_mapping['sunpy'] = ("http://docs.sunpy.org/en/stable", None)
 
 # By default, highlight as Python 3.
 highlight_language = 'python3'
@@ -112,16 +115,10 @@ release = package.__version__
 # name of a builtin theme or the name of a custom theme in html_theme_path.
 #html_theme = None
 
-try:
-    from sunpy_sphinx_theme.conf import *
-
-    html_sidebars = {'**': ['docsidebar.html']}
-
-except ImportError:
-    html_theme = 'default'
+from sunpy_sphinx_theme.conf import *
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {'**': ['docsidebar.html']}
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -130,7 +127,7 @@ except ImportError:
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-# html_favicon = ''
+html_favicon = ''
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -143,6 +140,12 @@ html_title = '{0} v{1}'.format(project, release)
 # Output file base name for HTML help builder.
 htmlhelp_basename = project + 'doc'
 
+extensions.remove('astropy_helpers.extern.numpydoc')
+extensions.append('sphinx.ext.napoleon')
+# Disable having a separate return type row
+napoleon_use_rtype = False
+# Disable google style docstrings
+napoleon_google_docstring = False
 
 # -- Options for LaTeX output -------------------------------------------------
 
@@ -177,4 +180,3 @@ if eval(setup_cfg.get('edit_on_github')):
 
 # -- Resolving issue number to links in changelog -----------------------------
 github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
-
