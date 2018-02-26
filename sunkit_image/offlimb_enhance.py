@@ -6,59 +6,7 @@ import astropy.units as u
 
 import sunpy.map
 
-from sunkit_image.utils.utils import find_pixel_radii, bin_edge_summary
-
-
-def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
-    """
-    Get a summary statistic of the intensity in a map as a function of radius.
-
-    Parameters
-    ----------
-    smap : sunpy.map.Map
-        A sunpy map.
-
-    radial_bin_edges : `~astropy.units.Quantity`
-        A two-dimensional array of bin edges of size [2, nbins] where nbins is
-        the number of bins.
-
-    Keywords
-    --------
-    scale : None, `~astropy.units.Quantity`
-        A length scale against which radial distances are measured, expressed
-        in the map spatial units. For example, in AIA helioprojective
-        Cartesian maps a useful length scale is the solar radius and is
-        expressed in units of arcseconds.
-
-    summary : `function`
-        ???
-
-    summary_kwargs :`dict`
-        ???
-
-    Returns
-    -------
-    intensity summary : `~numpy.array`
-        A summary statistic of the radial intensity in the bins defined by the
-        bin edges.
-    """
-    if scale is None:
-        s = smap.rsun_obs
-    else:
-        s = scale
-
-    # Get the radial distance of every pixel from the center of the Sun.
-    map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
-
-    # Number of radial bins
-    nbins = radial_bin_edges.shape[1]
-
-    # Upper and lower edges
-    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
-    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
-
-    # Calculate the summary statistic in the radial bins.
-    return np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)])
+from sunkit_image.utils.utils import find_pixel_radii, bin_edge_summary, get_radial_intensity_summary
 
 
 def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
@@ -147,7 +95,16 @@ def intensity_enhance(smap, radial_bin_edges,
                       normalization_radius=1*u.R_sun,
                       **summary_kwargs):
     """
-    Returns a map with the off-limb emission enhanced.
+    Returns a map with the off-limb emission enhanced.  The enhancement
+    is calculated as follows.  A summary statistic of the radial dependence
+    of the off-limb emission is calculated.  Since the UV and EUV emission
+    intensity drops of quickly off the solar limb, it makes sense to fit the
+    log of the intensity statistic using some appropriate function.  The
+    function we use here is a polynomial.  To calculate the enhancement,
+    the fitted function is normalized to its value at the normalization
+    radius from the center of the Sun (a sensible choice is the solar
+    radius).  The offlimb emission is then divided by this normalized
+    function.
 
     Parameters
     ----------
@@ -205,12 +162,12 @@ def intensity_enhance(smap, radial_bin_edges,
     return sunpy.map.Map(smap.data * compensation, smap.meta)
 
 
-def nrgf(smap, radial_bin_edges,
-         scale=None,
-         intensity_summary=np.mean,
-         width_function=np.std,
-         application_radius=1*u.R_sun,
-         **intensity_summary_kwargs):
+def normalizing_radial_gradient_filter(smap, radial_bin_edges,
+                                       scale=None,
+                                       intensity_summary=np.mean,
+                                       width_function=np.std,
+                                       application_radius=1*u.R_sun,
+                                       **intensity_summary_kwargs):
     """
     Implementation of the normalizing radial gradient filter of
     Morgan, Habbal & Woo, 2006, Sol. Phys., 236, 263.

@@ -11,7 +11,6 @@ import astropy.units as u
 from sunpy.coordinates import frames
 
 
-
 def _equally_spaced_bins(inner_radius=1, outer_radius=2, nbins=100):
     """
     Define a set of equally spaced bins between the specified inner and outer
@@ -105,3 +104,55 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / smap.rsun_obs)
     else:
         return u.R_sun * (radii / scale)
+
+
+def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
+    """
+    Get a summary statistic of the intensity in a map as a function of radius.
+
+    Parameters
+    ----------
+    smap : sunpy.map.Map
+        A sunpy map.
+
+    radial_bin_edges : `~astropy.units.Quantity`
+        A two-dimensional array of bin edges of size [2, nbins] where nbins is
+        the number of bins.
+
+    Keywords
+    --------
+    scale : None, `~astropy.units.Quantity`
+        A length scale against which radial distances are measured, expressed
+        in the map spatial units. For example, in AIA helioprojective
+        Cartesian maps a useful length scale is the solar radius and is
+        expressed in units of arcseconds.
+
+    summary : `function`
+        ???
+
+    summary_kwargs :`dict`
+        ???
+
+    Returns
+    -------
+    intensity summary : `~numpy.array`
+        A summary statistic of the radial intensity in the bins defined by the
+        bin edges.
+    """
+    if scale is None:
+        s = smap.rsun_obs
+    else:
+        s = scale
+
+    # Get the radial distance of every pixel from the center of the Sun.
+    map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
+
+    # Number of radial bins
+    nbins = radial_bin_edges.shape[1]
+
+    # Upper and lower edges
+    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
+    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
+
+    # Calculate the summary statistic in the radial bins.
+    return np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)])
