@@ -8,7 +8,7 @@ import pytest
 
 import numpy as np
 
-from sunkit_image.utils.utils import _equally_spaced_bins, bin_edge_summary
+from sunkit_image.utils.utils import _equally_spaced_bins, bin_edge_summary, find_pixel_radii, get_radial_intensity_summary
 
 
 def test_equally_spaced_bins():
@@ -82,3 +82,12 @@ def test_bin_edge_summary():
         bin_edge_summary(np.arange(0, 10), 'center')
     with pytest.raises(ValueError):
         bin_edge_summary(np.zeros((3, 4)), 'center')
+
+
+def test_find_pixel_radii():
+    pass
+
+
+def test_get_radial_intensity_summary():
+    pass
+
