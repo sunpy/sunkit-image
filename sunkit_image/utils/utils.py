@@ -11,18 +11,18 @@ import astropy.units as u
 from sunpy.coordinates import frames
 
 
-def _equally_spaced_bins(inner_radius=1, outer_radius=2, nbins=100):
+def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     """
     Define a set of equally spaced bins between the specified inner and outer
-    radii.
+    values.  The inner value must be strictly less than the outer value.
 
     Parameters
     ----------
-    inner_radius : `float`
-        The inner radius of the bins.
+    inner_value : `float`
+        The inner value of the bins.
 
-    outer_radius : `float`
-        The outer radius of the bins.
+    outer_value : `float`
+        The outer value of the bins.
 
     nbins : `int`
         Number of bins
@@ -31,10 +31,16 @@ def _equally_spaced_bins(inner_radius=1, outer_radius=2, nbins=100):
     -------
     An array of size [2, nbins] containing the bin edges.
     """
+    if inner_value >= outer_value:
+        raise ValueError('The inner value must be strictly less than the outer value.')
+
+    if nbins <= 0:
+        raise ValueError('The number of bins must be strictly greater than 0.')
+
     bin_edges = np.zeros((2, nbins))
     bin_edges[0, :] = np.arange(0, nbins)
     bin_edges[1, :] = np.arange(1, nbins+1)
-    return bin_edges * (outer_radius - inner_radius) / nbins
+    return inner_value + bin_edges * (outer_value - inner_value) / nbins
 
 
 def bin_edge_summary(r, binfit):
@@ -55,16 +61,21 @@ def bin_edge_summary(r, binfit):
     A one dimensional array of values that summarize the location of the bins.
 
     """
+    if r.ndim != 2:
+        raise ValueError('The bin edges must be two-dimensional with shape (2, nbins).')
+    if r.shape[0] != 2:
+        raise ValueError('The bin edges must be two-dimensional with shape (2, nbins).')
+
     if binfit == 'center':
-        rfit = 0.5 * (r[0, :] + r[1, :])
+        summary = 0.5 * (r[0, :] + r[1, :])
     elif binfit == 'left':
-        rfit = r[0, :]
+        summary = r[0, :]
     elif binfit == 'right':
-        rfit = r[1, :]
+        summary = r[1, :]
     else:
         raise ValueError(
             'Keyword "binfit" must have value "center", "left" or "right"')
-    return rfit
+    return summary
 
 
 def find_pixel_radii(smap, scale=None):
