@@ -29,7 +29,7 @@ def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
 
     Returns
     -------
-    An array of size [2, nbins] containing the bin edges.
+    An array of shape (2, nbins) containing the bin edges.
     """
     if inner_value >= outer_value:
         raise ValueError('The inner value must be strictly less than the outer value.')
@@ -50,7 +50,7 @@ def bin_edge_summary(r, binfit):
     Parameters
     ----------
     r :  `numpy.ndarray` like
-        An array of bin edges of size [2, nbins] where nbins is the number of
+        An array of bin edges of shape (2, nbins) where nbins is the number of
         bins.
 
     binfit : 'center' | 'left' | 'right'
@@ -127,7 +127,7 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
         A sunpy map.
 
     radial_bin_edges : `~astropy.units.Quantity`
-        A two-dimensional array of bin edges of size [2, nbins] where nbins is
+        A two-dimensional array of bin edges of shape (2, nbins) where nbins is
         the number of bins.
 
     Keywords
