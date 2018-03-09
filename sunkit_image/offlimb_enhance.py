@@ -93,6 +93,7 @@ def intensity_enhance(smap, radial_bin_edges,
                       summary=np.mean,
                       degree=1,
                       normalization_radius=1*u.R_sun,
+                      fit_range=[1, 1.5]*u.R_sun,
                       **summary_kwargs):
     """
     Returns a map with the off-limb emission enhanced.  The enhancement
@@ -147,11 +148,19 @@ def intensity_enhance(smap, radial_bin_edges,
     radial_intensity = get_radial_intensity_summary(smap, radial_bin_edges, scale=scale, summary=summary, **summary_kwargs)
 
     # Summarize the radial bins
-    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges)
+    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(u.R_sun)
+
+    # Fit range
+    if fit_range[0] >= fit_range[1]:
+        raise ValueError('The fit range must be strictly increasing.')
+
+    fit_here = fit_range[0].to(u.R_sun) <= radial_bin_summary <= fit_range[1].to(u.R_sun)
 
     # Fits a polynomial function to the natural logarithm of an estimate of
     # the intensity as a function of radius.
-    polynomial = fit_polynomial_to_log_radial_intensity(radial_bin_summary, radial_intensity, degree)
+    polynomial = fit_polynomial_to_log_radial_intensity(radial_bin_summary[fit_here],
+                                                        radial_intensity[fit_here],
+                                                        degree)
 
     # Calculate the compensation function
     compensation = 1 / normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
