@@ -88,7 +88,7 @@ def find_pixel_radii(smap, scale=None):
     smap :
         A sunpy map object.
 
-    scale :
+    scale : `~astropy.units.Quantity`
         The radius of the Sun expressed in map units.  For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds.
@@ -130,19 +130,18 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
         A two-dimensional array of bin edges of shape (2, nbins) where nbins is
         the number of bins.
 
-    Keywords
-    --------
     scale : None, `~astropy.units.Quantity`
         A length scale against which radial distances are measured, expressed
         in the map spatial units. For example, in AIA helioprojective
         Cartesian maps a useful length scale is the solar radius and is
         expressed in units of arcseconds.
 
-    summary : `function`
-        ???
+    summary : `~function`
+        A function that returns a summary statistic of the distribution of intensity,
+        at a given radius, for example `~numpy.std`.
 
-    summary_kwargs :`dict`
-        ???
+    summary_kwargs :`~dict`
+        Keywords applicable to the summary function.
 
     Returns
     -------
