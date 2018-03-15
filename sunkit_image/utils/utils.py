@@ -88,10 +88,10 @@ def find_pixel_radii(smap, scale=None):
     smap :
         A sunpy map object.
 
-    scale : `~astropy.units.Quantity`
+    scale : None | `~astropy.units.Quantity`
         The radius of the Sun expressed in map units.  For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
-        of arcseconds.
+        of arcseconds.  If None then the map is queried for the scale.
 
     Returns
     -------
