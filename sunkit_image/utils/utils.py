@@ -137,14 +137,23 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / scale)
 
 
-def map_pixels_relative_to_radius(smap, comparison='<', scale=None, radius=None):
+def map_coordinates_relative_to_radius(smap, comparison='<', scale=None, radius=None):
     """
-    Find the pixels that are below the value of radius.
+    Return the co-ordinates that satisfy the comparison relative to the radius.
 
     Parameters
     ----------
     smap :
         A sunpy map object.
+
+    comparison : `~str`
+        A string as
+
+    scale : None | `~astropy.units.Quantity`
+        The radius of the Sun expressed in map units.  For example, in typical
+        helioprojective Cartesian maps the solar radius is expressed in units
+        of arcseconds.  If None then the map is queried for the scale.
+
 
     radius : None | `~astropy.units.Quantity`
         The radius of the Sun expressed in map units.  For example, in typical
@@ -159,16 +168,16 @@ def map_pixels_relative_to_radius(smap, comparison='<', scale=None, radius=None)
         entry in the input map data.
     """
     # Calculate the truth values of each of the map pixels using the comparison
-    locations = map_pixel_locations_relative_to_radius(smap, comparison=comparison, scale=scale, radius=radius)
+    condition = map_pixels_condition_relative_to_radius(smap, comparison=comparison, scale=scale, radius=radius)
 
     # Return the coordinates of all the map pixels
     coords = all_coordinates_from_map(smap)
 
-    # Convert only those coordinates from the location list
-    return smap.world_to_pixel(coords[locations])
+    # Return the co-ordinates that satisfy the condition
+    return coords[condition]
 
 
-def map_pixel_locations_relative_to_radius(smap, comparison='<', scale=None, radius=None):
+def map_pixels_condition_relative_to_radius(smap, comparison='<', scale=None, radius=None):
     """
 
     :param smap:
