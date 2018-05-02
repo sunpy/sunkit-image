@@ -11,6 +11,27 @@ import astropy.units as u
 from sunpy.coordinates import frames
 
 
+def _pixels_from_map(smap):
+    """
+
+    :param smap:
+    :return:
+    """
+    return np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
+
+
+def _from_pixels_to_coordinate(smap, x, y, coordinate_system):
+    """
+
+    :param smap:
+    :param x:
+    :param y:
+    :param coordinate_system:
+    :return:
+    """
+    return smap.pixel_to_world(x, y).transform_to(coordinate_system)
+
+
 def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     """
     Define a set of equally spaced bins between the specified inner and outer
@@ -101,10 +122,10 @@ def find_pixel_radii(smap, scale=None):
         entry in the input map data.
     """
     # Calculate all the x and y coordinates of every pixel in the map.
-    x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
+    x, y = _pixels_from_map(smap)
 
     # Calculate the helioprojective Cartesian co-ordinates of every pixel.
-    coords = smap.pixel_to_world(x, y).transform_to(frames.Helioprojective)
+    coords = _from_pixels_to_coordinate(smap, x, y, frames.Helioprojective)
 
     # Calculate the radii of every pixel in helioprojective Cartesian
     # co-ordinate distance units.
@@ -115,6 +136,81 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / smap.rsun_obs)
     else:
         return u.R_sun * (radii / scale)
+
+
+def map_pixels_relative_to_radius(smap, comparison='<', scale=None, radius=None):
+    """
+    Find the pixels that are below the value of radius.
+
+    Parameters
+    ----------
+    smap :
+        A sunpy map object.
+
+    radius : None | `~astropy.units.Quantity`
+        The radius of the Sun expressed in map units.  For example, in typical
+        helioprojective Cartesian maps the solar radius is expressed in units
+        of arcseconds.  If None then the map is queried for the scale.
+
+    Returns
+    -------
+    radii : `~astropy.units.Quantity`
+        An array the same shape as the input map.  Each entry in the array
+        gives the distance in solar radii of the pixel in the corresponding
+        entry in the input map data.
+    """
+    # Calculate all the x and y coordinates of every pixel in the map.
+    x, y = _pixels_from_map(smap)
+
+    # Calculate the truth values of each of the map pixels using the comparison
+    locations = map_pixel_locations_relative_to_radius(smap, comparison=comparison, scale=scale, radius=radius)
+
+    # Return the coordinates of all the pixels
+    coords = _from_pixels_to_coordinate(smap, x, y, frames.Helioprojective)
+
+    # Convert only those coordinates from the location list
+    return smap.world_to_pixel(coords[locations])
+
+
+def map_pixel_locations_relative_to_radius(smap, comparison='<', scale=None, radius=None):
+    """
+
+    :param smap:
+    :param comparison:
+    :param scale:
+    :param radius:
+    :return:
+    """
+
+    # Get the pixel scale
+    if scale is None:
+        map_scale = smap.rsun_obs
+    else:
+        map_scale = scale
+
+    # Find which pixels
+    map_pixel_radii = find_pixel_radii(smap, scale=map_scale)
+
+    # Get the radius below which
+    if radius is None:
+        comparison_radius = 1.0 * u.R_sun
+    else:
+        comparison_radius = radius
+
+    # Find where the pixels are relative to the radius
+    if comparison == '<':
+        locations = map_pixel_radii < comparison_radius
+    elif comparison == '<=':
+        locations = map_pixel_radii <= comparison_radius
+    elif comparison == '>':
+        locations = map_pixel_radii > comparison_radius
+    elif comparison == '>=':
+        locations = map_pixel_radii >= comparison_radius
+    else:
+        raise ValueError('Comparison operator not understood')
+
+    # Return results
+    return locations
 
 
 def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
