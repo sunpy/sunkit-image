@@ -11,8 +11,9 @@ import astropy.units as u
 from sunpy.coordinates import frames
 
 
-def _pixels_from_map(smap):
+def all_pixels_from_map(smap):
     """
+    Returns pixel pair indices of every pixel in a map.
 
     :param smap:
     :return:
@@ -20,15 +21,15 @@ def _pixels_from_map(smap):
     return np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
 
 
-def _from_pixels_to_coordinate(smap, x, y, coordinate_system):
+def all_coordinates_from_map(smap, coordinate_system=frames.Helioprojective):
     """
+    Returns the co-ordinates of every pixel in a map.
 
     :param smap:
-    :param x:
-    :param y:
     :param coordinate_system:
     :return:
     """
+    x, y = all_pixels_from_map(smap)
     return smap.pixel_to_world(x, y).transform_to(coordinate_system)
 
 
@@ -121,11 +122,9 @@ def find_pixel_radii(smap, scale=None):
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
     """
-    # Calculate all the x and y coordinates of every pixel in the map.
-    x, y = _pixels_from_map(smap)
 
     # Calculate the helioprojective Cartesian co-ordinates of every pixel.
-    coords = _from_pixels_to_coordinate(smap, x, y, frames.Helioprojective)
+    coords = all_coordinates_from_map(smap)
 
     # Calculate the radii of every pixel in helioprojective Cartesian
     # co-ordinate distance units.
@@ -159,14 +158,11 @@ def map_pixels_relative_to_radius(smap, comparison='<', scale=None, radius=None)
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
     """
-    # Calculate all the x and y coordinates of every pixel in the map.
-    x, y = _pixels_from_map(smap)
-
     # Calculate the truth values of each of the map pixels using the comparison
     locations = map_pixel_locations_relative_to_radius(smap, comparison=comparison, scale=scale, radius=radius)
 
-    # Return the coordinates of all the pixels
-    coords = _from_pixels_to_coordinate(smap, x, y, frames.Helioprojective)
+    # Return the coordinates of all the map pixels
+    coords = all_coordinates_from_map(smap)
 
     # Convert only those coordinates from the location list
     return smap.world_to_pixel(coords[locations])
