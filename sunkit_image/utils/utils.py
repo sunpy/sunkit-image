@@ -218,6 +218,41 @@ def map_pixels_condition_relative_to_radius(smap, comparison='<', scale=None, ra
     return locations
 
 
+def map_pixels_condition_annulus(smap, comparison=('>', '<'), scale=None, radii=None):
+    """
+    Find which pixels are in an annular region.
+
+    :param smap:
+    :param scale:
+    :param radii:
+    :return:
+    """
+
+    # Get the pixel scale
+    if scale is None:
+        map_scale = smap.rsun_obs
+    else:
+        map_scale = scale
+
+    # Get the radius below which
+    if radii is None:
+        annulus_radii = (1.0, 2.0) * u.R_sun
+    elif radii[0] >= radii[1]:
+        raise ValueError('Inner radius of annulus must be strictly less than the outer radius of the annulus')
+    else:
+        annulus_radii = radii
+
+    greater_than_inner_radius = map_pixels_condition_relative_to_radius(smap,
+                                                                        comparison=comparison[0],
+                                                                        scale=map_scale,
+                                                                        radius=annulus_radii[0])
+    less_than_outer_radius = map_pixels_condition_relative_to_radius(smap,
+                                                                     comparison=comparison[1],
+                                                                     scale=None,
+                                                                     radius=annulus_radii[1])
+
+    return np.logical_and(greater_than_inner_radius, less_than_outer_radius)
+
 def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
     """
     Get a summary statistic of the intensity in a map as a function of radius.
