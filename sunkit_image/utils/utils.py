@@ -10,6 +10,11 @@ import astropy.units as u
 
 from sunpy.coordinates import frames
 
+# Comparison operations that are allowed to be used
+# when comparing the distance of a pixel in a map from
+# the center of a map.
+permitted_comparisons = (np.equal, np.not_equal, np.less, np.less_equal, np.greater, np.greater_equal)
+
 
 def all_pixel_indices_from_map(smap):
     """
@@ -24,13 +29,26 @@ def all_pixel_indices_from_map(smap):
     -------
     out : `~numpy.array`
         A numpy array with the all the pixel indices built from the
-        dimensions of the map.
+        dimensions of the map. The array is three dimensional.  The
+        first dimension has size 2, the second and third dimensions
+        are the same as the shape of the array holding the map image
+        data.
+
+    Example
+    -------
+    >>> import astropy.units as u
+    >>> from sunpy.map import Map
+    >>> from sunpy.data.sample import AIA_171_IMAGE
+    >>> from sunkit_image.utils.utils import all_pixel_indices_from_map
+    >>> smap = Map(AIA_171_IMAGE).submap((0, 0)*u.pix, (50, 60)*u.pix)
+    >>> all_pixel_indices_from_map(smap).shape
+    (2, 60, 50)
 
     """
     return np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
 
 
-def all_coordinates_from_map(smap, coordinate_system=frames.Helioprojective):
+def all_coordinates_from_map(smap):
     """
     Returns the co-ordinates of every pixel in a map.
 
@@ -39,16 +57,15 @@ def all_coordinates_from_map(smap, coordinate_system=frames.Helioprojective):
     smap : `~sunpy.map.Map`
         A SunPy map.
 
-    coordinate_system : `~sunpy.coordinates.frames`
-        A co-ordinate frame.
-
     Returns
     -------
     out : `~astropy.coordinates.SkyCoord`
-        An array of sky coordinates in the coordinate system "coordinate_system".
+        An array of sky coordinates in the coordinate system of the input map.
+        The array has the same shape as the same as the shape of the array
+        holding the map image data.
     """
     x, y = all_pixel_indices_from_map(smap)
-    return smap.pixel_to_world(x, y).transform_to(coordinate_system)
+    return smap.pixel_to_world(x, y)
 
 
 def find_pixel_radii(smap, scale=None):
@@ -75,7 +92,7 @@ def find_pixel_radii(smap, scale=None):
     """
 
     # Calculate the helioprojective Cartesian co-ordinates of every pixel.
-    coords = all_coordinates_from_map(smap)
+    coords = all_coordinates_from_map(smap).transform_to(frames.Helioprojective)
 
     # Calculate the radii of every pixel in helioprojective Cartesian
     # co-ordinate distance units.
@@ -88,19 +105,20 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / scale)
 
 
-def pixels_satisfying_condition_relative_to_radius(smap, comparison='<', scale=None, radius=None):
+def locations_satisfying_condition_relative_to_radius(smap, comparison=np.less, scale=None, radius=None):
     """
-    Return which pixels in a map satisfy or fail the comparison of their distance from the
-    center of the Sun with the input radius. Pixels that satisfy the comparison are
-    flagged as True. Pixels that do not satisfy the comparison are flagged as False.
+    Return which locations in a map satisfy or fail the comparison of their distance from the
+    center of the Sun with the input radius. Locations that satisfy the comparison are
+    flagged as True. Locations that do not satisfy the comparison are flagged as False.
 
     Parameters
     ----------
     smap : `~sunpy.map.Map`
         A SunPy map.
 
-    comparison : '<' | '<=' | '>' | '>='
-
+    comparison : `~numpy.equal` | `~numpy.not_equal` | `~numpy.less` | `~numpy.less_equal` | `~numpy.greater` | `~numpy.greater_equal`
+        The comparison operator applied.  The comparison is applied with the
+        map locations on the left hand side of the inequality.
 
     scale : None | `~astropy.units.Quantity`
         The radius of the Sun expressed in map units.  For example, in typical
@@ -108,10 +126,16 @@ def pixels_satisfying_condition_relative_to_radius(smap, comparison='<', scale=N
         of arcseconds.  If None then the map is queried for the scale.
 
     radius : None | `~astropy.units.Quantity`
-
+        The radius used in the right hand side of the inequality. Must be
+        in a unit convertible to solar radii.
 
     Returns
     -------
+    locations : `~numpy.array`
+        A numpy array of the same shape as the input map data with
+        Boolean entries.  Locations that satisfy the comparison are
+        flagged as True. Locations that do not satisfy the comparison
+        are flagged as False.
 
     """
 
@@ -128,29 +152,21 @@ def pixels_satisfying_condition_relative_to_radius(smap, comparison='<', scale=N
     if radius is None:
         comparison_radius = 1.0 * u.R_sun
     else:
-        comparison_radius = radius
+        comparison_radius = radius.to(u.R_sun)
 
     # Find where the pixels are relative to the radius
-    if comparison == '<':
-        locations = map_pixel_radii < comparison_radius
-    elif comparison == '<=':
-        locations = map_pixel_radii <= comparison_radius
-    elif comparison == '>':
-        locations = map_pixel_radii > comparison_radius
-    elif comparison == '>=':
-        locations = map_pixel_radii >= comparison_radius
+    if comparison in permitted_comparisons:
+        return comparison(map_pixel_radii, comparison_radius)
     else:
-        raise ValueError('Comparison operator not understood')
-
-    # Return results
-    return locations
+        names = ", ".join(["numpy.{:s}".format(n.__name__) for n in permitted_comparisons])
+        raise ValueError('Comparison operator must be one of the following numpy function: {:s}'.format(names))
 
 
-def pixels_satisfying_annulus_condition(smap, comparison=('>', '<'), scale=None, radii=None):
+def locations_satisfying_radial_conditions(smap, comparison=(np.greater, np.less), scale=None, radii=None):
     """
-    Find which pixels are in an annular region.  Pixels that are in the annular region
-    are flagged as True.  Pixels that are not in the annular region are flagged as
-    False.
+    Find locations that satisfy a pair of radial distance comparisons
+    simultaneously: such locations are flagged as True.  Other locations
+    are flagged False.
 
     Parameters
     ----------
@@ -163,14 +179,27 @@ def pixels_satisfying_annulus_condition(smap, comparison=('>', '<'), scale=None,
         of arcseconds.  If None then the map is queried for the scale.
 
     comparison : `~tuple`
+        The comparison operators applied.  Two comparisons are applied. Each
+        comparison has the map locations on the left hand side of the inequality.
+        The truth values of each comparison are combined using a logical AND
+        operation. The permitted comparison operators are those permitted by
+        `~sunkit_image.utils.utils.locations_satisfying_condition_relative_to_radius`.
 
+    scale : None | `~astropy.units.Quantity`
+        The radius of the Sun expressed in map units.  For example, in typical
+        helioprojective Cartesian maps the solar radius is expressed in units
+        of arcseconds.  If None then the map is queried for the scale.
 
-    radii :
-
+    radii : None | `~astropy.units.Quantity`
+        The radii used in the right hand side of the inequality.
 
     Returns
     -------
-
+    locations : `~numpy.array`
+        A numpy array of the same shape as the input map data with
+        Boolean entries.  Locations that satisfy the comparisons are
+        flagged as True. Locations that do not satisfy the comparisons
+        are flagged as False.
     """
 
     # Get the pixel scale
@@ -179,24 +208,28 @@ def pixels_satisfying_annulus_condition(smap, comparison=('>', '<'), scale=None,
     else:
         map_scale = scale
 
-    # Get the radius below which
+    # Get the radii to calculate
     if radii is None:
-        annulus_radii = (1.0, 2.0) * u.R_sun
-    elif radii[0] >= radii[1]:
-        raise ValueError('Inner radius of annulus must be strictly less than the outer radius of the annulus')
+        condition_radii = (1.0, 2.0) * u.R_sun
+    elif len(radii) != 2:
+        raise ValueError('The number of radii must be equal to 2.')
     else:
-        annulus_radii = radii
+        condition_radii = radii
 
-    greater_than_inner_radius = pixels_satisfying_condition_relative_to_radius(smap,
-                                                                               comparison=comparison[0],
-                                                                               scale=map_scale,
-                                                                               radius=annulus_radii[0])
-    less_than_outer_radius = pixels_satisfying_condition_relative_to_radius(smap,
-                                                                            comparison=comparison[1],
-                                                                            scale=None,
-                                                                            radius=annulus_radii[1])
+    # Get the number of comparison operators
+    if len(comparison) != 2:
+        raise ValueError('The number of comparison operators must be equal to 2.')
 
-    return np.logical_and(greater_than_inner_radius, less_than_outer_radius)
+    condition1 = locations_satisfying_condition_relative_to_radius(smap,
+                                                                   comparison=comparison[0],
+                                                                   scale=map_scale,
+                                                                   radius=condition_radii[0])
+    condition2 = locations_satisfying_condition_relative_to_radius(smap,
+                                                                   comparison=comparison[1],
+                                                                   scale=None,
+                                                                   radius=condition_radii[1])
+
+    return np.logical_and(condition1, condition2)
 
 
 def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
@@ -246,7 +279,8 @@ def bin_edge_summary(r, binfit):
 
     Returns
     -------
-    A one dimensional array of values that summarize the location of the bins.
+    summary : `~numpy.array`
+        A one dimensional array of values that summarize the location of the bins.
 
     """
     if r.ndim != 2:
@@ -266,7 +300,9 @@ def bin_edge_summary(r, binfit):
     return summary
 
 
-def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
+def get_radial_intensity_summary(smap, radial_bin_edges,
+                                 comparison=(np.greater, np.less),
+                                 scale=None, summary=np.mean, **summary_kwargs):
     """
     Get a summary statistic of the intensity in a map as a function of radius.
 
@@ -298,20 +334,17 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
         A summary statistic of the radial intensity in the bins defined by the
         bin edges.
     """
-    if scale is None:
-        s = smap.rsun_obs
-    else:
-        s = scale
-
-    # Get the radial distance of every pixel from the center of the Sun.
-    map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
 
     # Number of radial bins
     nbins = radial_bin_edges.shape[1]
 
-    # Upper and lower edges
-    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
-    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
+    # Find the pixels in all the radial bins
+    annuli = list()
+    for i in range(0, nbins):
+        annuli.append(locations_satisfying_radial_conditions(smap,
+                                                             comparison=comparison,
+                                                             scale=scale,
+                                                             radii=radial_bin_edges[:, i]))
 
     # Calculate the summary statistic in the radial bins.
-    return np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)])
+    return np.asarray([summary(smap.data[annuli[i]], **summary_kwargs) for i in range(0, nbins)])
