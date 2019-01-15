@@ -46,16 +46,25 @@ jobs:
     docker:
       - image: continuumio/miniconda3
     steps:
+      - restore_cache:
+          keys: sample-data-v1
       - checkout
       - run: *skip-check
       - run: *merge-check
       - run: *apt-install
       - run:
+          name: Install sunpy master
+          command: pip install git+git://github.com/sunpy/sunpy
+      - run:
           name: Install dependencies
-          command: pip install --progress-bar off -e .[all]
+          command: pip install --progress-bar off -e .[all,dev]
       - run:
           name: Run tests
-          command: PYTHONHASHSEED=42 pytest -n 4
+          command: PYTHONHASHSEED=42 pytest --remote-data=any ./
+      - save_cache:
+          key: sample-data-v1
+          paths:
+            - ~/sunpy/data/sample_data
 
     environment:
           MPLBACKEND: agg
@@ -65,6 +74,8 @@ jobs:
     docker:
       - image: continuumio/miniconda3
     steps:
+      - restore_cache:
+          keys: sample-data-v1
       - checkout
       - run: *skip-check
       - run: *merge-check

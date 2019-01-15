@@ -6,6 +6,7 @@ import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 import sunpy.map
+import sunpy.data.sample
 from sunpy.data.sample import AIA_171_IMAGE
 from sunkit_image.utils.utils import (
     _equally_spaced_bins,
@@ -16,6 +17,7 @@ from sunkit_image.utils.utils import (
 
 
 @pytest.fixture
+@pytest.mark.remote_data
 def smap():
     return sunpy.map.Map(AIA_171_IMAGE)
 
@@ -93,6 +95,7 @@ def test_bin_edge_summary():
         bin_edge_summary(np.zeros((3, 4)), "center")
 
 
+@pytest.mark.remote_data
 def test_find_pixel_radii(smap):
     # The known maximum radius
     known_maximum_pixel_radius = 1.84183121

@@ -7,8 +7,6 @@ sunkit-image
    :target: https://www.sunpy.org
 .. |Latest Version| image:: https://img.shields.io/pypi/v/sunkit-image.svg
    :target: https://pypi.python.org/pypi/sunkit-image/
-.. |Build Status| image:: https://secure.travis-ci.org/sunpy/sunkit-image.svg
-   :target: http://travis-ci.org/sunpy/sunkit-image
 .. |codecov| image:: https://codecov.io/gh/sunpy/sunpy/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/sunpy/sunkit-image
 .. |Powered by NumFOCUS| image:: https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A
@@ -21,14 +19,20 @@ Installation
 ------------
 
 If you want help develop sunkit-image you will need to install it from GitHub.
+You will also need the master version of SunPy (until 1.0 is launched).
 The best way to do this is to create a new conda environment::
 
     $ conda config --append channels conda-forge
     $ conda create -n sunkit-dev sunpy
     $ source activate sunkit-dev
+    $ conda remove --force sunpy
+    $ git clone https://github.com/sunpy/sunpy.git sunpy
+    $ cd sunpy
+    $ pip install -e .[all,dev]
+    $ cd ..
     $ git clone https://github.com/sunpy/sunkit-image.git sunkit-image
     $ cd sunkit-image
-    $ pip install -e .
+    $ pip install -e .[all,dev]
 
 For detailed (general) installation instructions, see the `installation guide`_ in
 the SunPy docs.
@@ -63,7 +67,7 @@ This project is Copyright (c) SunPy Developers and licensed under the terms of t
 .. _installation guide: https://docs.sunpy.org/en/stable/guide/installation/index.html
 .. _SunPy Matrix Channel: https://riot.im/app/#/room/#sunpy:matrix.org
 .. _SunPy mailing list: https://groups.google.com/forum/#!forum/sunpy
-.. _Developer’s Guide: https://docs.sunpy.org/en/latest/dev_guide/index.html
+.. _`Developer’s Guide`: https://docs.sunpy.org/en/latest/dev_guide/index.html
 .. _`#sunpy:matrix.org`: https://riot.im/app/#/room/#sunpy:matrix.org
 .. _issues page: https://github.com/sunpy/sunkit-image/issues
 .. _contributing guide: https://docs.sunpy.org/en/stable/dev_guide/newcomers.html#newcomers

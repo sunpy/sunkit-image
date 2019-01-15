@@ -14,19 +14,28 @@ from sunkit_image.utils.utils import (
 )
 
 
+__all__ = [
+    "fit_polynomial_to_log_radial_intensity",
+    "calculate_fit_radial_intensity",
+    "normalize_fit_radial_intensity",
+    "intensity_enhance",
+    "normalizing_radial_gradient_filter",
+]
+
+
 def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
     """
     Fits a polynomial of degree "degree" to the log of the radial intensity.
 
     Parameters
     ----------
-    radii : `~astropy.units.Quantity`
+    radii : `astropy.units.Quantity`
 
 
-    intensity : `~numpy.ndarray`
+    intensity : `numpy.ndarray`
 
 
-    degree : `~int`
+    degree : `int`
 
 
     Returns
@@ -46,17 +55,17 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
     Parameters
     ----------
-    radii : `~astropy.units.Quantity`
+    radii : `astropy.units.Quantity`
         The radii at which the fitted intensity is calculated, nominally in
         units of solar radii.
 
-    polynomial : `~numpy.ndarray`
+    polynomial : `numpy.ndarray`
         A polynomial of degree "degree" that fits the log of the intensity
         profile as a function of the radius.
 
     Returns
     -------
-    fitted intensity : `~numpy.ndarray`
+    fitted intensity : `numpy.ndarray`
         An array with the same shape as radii which expresses the fitted
         intensity value.
     """
@@ -121,7 +130,7 @@ def intensity_enhance(
     smap : `sunpy.map.Map`
         A SunPy map
 
-    radial_bin_edges : `~astropy.units.Quantity`
+    radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of size [2, nbins] where nbins is
         the number of bins.
 
@@ -130,23 +139,23 @@ def intensity_enhance(
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds.  If None, then the map scale is used.
 
-    summarize_bin_edges : `~str`
+    summarize_bin_edges : `str`
         How to summarize the bin edges.
 
-    summary : `~function`
+    summary : `function`
         A function that returns a summary statistic of the radial intensity,
         for example `~numpy.mean` and `~numpy.median`.
 
-    degree : `~int`
+    degree : `int`
         Degree of the polynomial fit to the log of the intensity as a function of
         radius.
 
-    normalization_radius : `~astropy.units.Quantity`
+    normalization_radius : `astropy.units.Quantity`
         The radius at which the enhancement has value 1.  For most cases
         the value of the enhancement will increase as a function of
         radius.
 
-    fit_range : `~astropy.units.Quantity`
+    fit_range : `astropy.units.Quantity`
         Array like with 2 elements defining the range of radii over which the
         polynomial function is fit.  The preferred units are solar radii.
 
@@ -220,7 +229,7 @@ def normalizing_radial_gradient_filter(
     smap : `sunpy.map.Map`
         A SunPy map
 
-    radial_bin_edges : `~astropy.units.Quantity`
+    radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of size [2, nbins] where nbins is
         the number of bins.
 
@@ -229,21 +238,21 @@ def normalizing_radial_gradient_filter(
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds.  If None, then the map scale is used.
 
-    intensity_summary :`~function`
+    intensity_summary :`function`
         A function that returns a summary statistic of the radial intensity,
         for example `~numpy.mean` and `~numpy.median`.
 
-    intensity_summary_kwargs : None | `~dict`
+    intensity_summary_kwargs : None | `dict`
         Keywords applicable to the summary function.
 
-    width_function : `~function`
+    width_function : `function`
         A function that returns a summary statistic of the distribution of intensity,
         at a given radius, for example `~numpy.std`.
 
-    width_function_kwargs : `~function`
+    width_function_kwargs : `function`
         Keywords applicable to the width function.
 
-    application_radius : `~astropy.units.Quantity`
+    application_radius : `astropy.units.Quantity`
         The NRGF is applied to emission at radii above the application_radius.
 
     Returns
