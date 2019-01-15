@@ -21,21 +21,26 @@ class UnsupportedPythonError(Exception):
     pass
 
 
-if sys.version_info < tuple((int(val) for val in __minimum_python_version__.split('.'))):
-    raise UnsupportedPythonError(f"sunpy does not support Python < {__minimum_python_version__}")
+if sys.version_info < tuple(
+    (int(val) for val in __minimum_python_version__.split("."))
+):
+    raise UnsupportedPythonError(
+        f"sunpy does not support Python < {__minimum_python_version__}"
+    )
 
 # this indicates whether or not we are in the package's setup.py
 try:
     _SUNPY_SETUP_
 except NameError:
     import builtins
+
     builtins._SUNPY_SETUP_ = False
 
 try:
     from .version import version as __version__
 except ImportError:
-    __version__ = ''
+    __version__ = ""
 try:
     from .version import githash as __githash__
 except ImportError:
-    __githash__ = ''
+    __githash__ = ""
