@@ -1,8 +1,7 @@
 """
-This bootstrap module contains code for ensuring that the astropy_helpers
-package will be importable by the time the setup.py script runs.  It also
-includes some workarounds to ensure that a recent-enough version of setuptools
-is being used for the installation.
+This bootstrap module contains code for ensuring that the astropy_helpers package will be importable
+by the time the setup.py script runs.  It also includes some workarounds to ensure that a recent-
+enough version of setuptools is being used for the installation.
 
 This module should be the first thing imported in the setup.py of distributions
 that make use of the utilities in astropy_helpers.  If the distribution ships
@@ -38,13 +37,22 @@ latest version of this module.
 
 import contextlib
 import errno
-import imp
 import io
 import locale
 import os
 import re
 import subprocess as sp
 import sys
+
+__minimum_python_version__ = (3, 6)
+
+if sys.version_info < __minimum_python_version__:
+    print(
+        "ERROR: Python {} or later is required by astropy-helpers".format(
+            __minimum_python_version__
+        )
+    )
+    sys.exit(1)
 
 try:
     from ConfigParser import ConfigParser, RawConfigParser
@@ -59,35 +67,16 @@ _str_types = (str, bytes)
 # issues with either missing or misbehaving pacakges (including making sure
 # setuptools itself is installed):
 
+# Check that setuptools 1.0 or later is present
+from distutils.version import LooseVersion
 
-# Some pre-setuptools checks to ensure that either distribute or setuptools >=
-# 0.7 is used (over pre-distribute setuptools) if it is available on the path;
-# otherwise the latest setuptools will be downloaded and bootstrapped with
-# ``ez_setup.py``.  This used to be included in a separate file called
-# setuptools_bootstrap.py; but it was combined into ah_bootstrap.py
 try:
-    import pkg_resources
-    _setuptools_req = pkg_resources.Requirement.parse('setuptools>=0.7')
-    # This may raise a DistributionNotFound in which case no version of
-    # setuptools or distribute is properly installed
-    _setuptools = pkg_resources.get_distribution('setuptools')
-    if _setuptools not in _setuptools_req:
-        # Older version of setuptools; check if we have distribute; again if
-        # this results in DistributionNotFound we want to give up
-        _distribute = pkg_resources.get_distribution('distribute')
-        if _setuptools != _distribute:
-            # It's possible on some pathological systems to have an old version
-            # of setuptools and distribute on sys.path simultaneously; make
-            # sure distribute is the one that's used
-            sys.path.insert(1, _distribute.location)
-            _distribute.activate()
-            imp.reload(pkg_resources)
-except:
-    # There are several types of exceptions that can occur here; if all else
-    # fails bootstrap and use the bootstrapped version
-    from ez_setup import use_setuptools
-    use_setuptools()
+    import setuptools
 
+    assert LooseVersion(setuptools.__version__) >= LooseVersion("1.0")
+except (ImportError, AssertionError):
+    print("ERROR: setuptools 1.0 or later is required by astropy-helpers")
+    sys.exit(1)
 
 # typing as a dependency for 1.6.1+ Sphinx causes issues when imported after
 # initializing submodule with ah_boostrap.py
@@ -95,7 +84,7 @@ except:
 # https://github.com/astropy/astropy-helpers/issues/302
 
 try:
-    import typing   # noqa
+    import typing  # noqa
 except ImportError:
     pass
 
@@ -106,7 +95,7 @@ except ImportError:
 # later cause the TemporaryDirectory class defined in it to stop working when
 # used later on by setuptools
 try:
-    import setuptools.py31compat   # noqa
+    import setuptools.py31compat  # noqa
 except ImportError:
     pass
 
@@ -120,7 +109,8 @@ except ImportError:
 # issue)
 try:
     import matplotlib
-    matplotlib.use('Agg')
+
+    matplotlib.use("Agg")
     import matplotlib.pyplot
 except:
     # Ignore if this fails for *any* reason*
@@ -135,46 +125,57 @@ import pkg_resources
 
 from setuptools import Distribution
 from setuptools.package_index import PackageIndex
-from setuptools.sandbox import run_setup
 
 from distutils import log
 from distutils.debug import DEBUG
 
 
 # TODO: Maybe enable checking for a specific version of astropy_helpers?
-DIST_NAME = 'astropy-helpers'
-PACKAGE_NAME = 'astropy_helpers'
+DIST_NAME = "astropy-helpers"
+PACKAGE_NAME = "astropy_helpers"
 UPPER_VERSION_EXCLUSIVE = None
 
 # Defaults for other options
 DOWNLOAD_IF_NEEDED = True
-INDEX_URL = 'https://pypi.python.org/simple'
+INDEX_URL = "https://pypi.python.org/simple"
 USE_GIT = True
 OFFLINE = False
 AUTO_UPGRADE = True
 
 # A list of all the configuration options and their required types
 CFG_OPTIONS = [
-    ('auto_use', bool), ('path', str), ('download_if_needed', bool),
-    ('index_url', str), ('use_git', bool), ('offline', bool),
-    ('auto_upgrade', bool)
+    ("auto_use", bool),
+    ("path", str),
+    ("download_if_needed", bool),
+    ("index_url", str),
+    ("use_git", bool),
+    ("offline", bool),
+    ("auto_upgrade", bool),
 ]
 
 
 class _Bootstrapper(object):
     """
-    Bootstrapper implementation.  See ``use_astropy_helpers`` for parameter
-    documentation.
+    Bootstrapper implementation.
+
+    See ``use_astropy_helpers`` for parameter documentation.
     """
 
-    def __init__(self, path=None, index_url=None, use_git=None, offline=None,
-                 download_if_needed=None, auto_upgrade=None):
+    def __init__(
+        self,
+        path=None,
+        index_url=None,
+        use_git=None,
+        offline=None,
+        download_if_needed=None,
+        auto_upgrade=None,
+    ):
 
         if path is None:
             path = PACKAGE_NAME
 
         if not (isinstance(path, _str_types) or path is False):
-            raise TypeError('path must be a string or False')
+            raise TypeError("path must be a string or False")
 
         if not isinstance(path, str):
             fs_encoding = sys.getfilesystemencoding()
@@ -191,15 +192,14 @@ class _Bootstrapper(object):
             download_if_needed = False
             auto_upgrade = False
 
-        self.download = (download_if_needed
-                         if download_if_needed is not None
-                         else DOWNLOAD_IF_NEEDED)
-        self.auto_upgrade = (auto_upgrade
-                             if auto_upgrade is not None else AUTO_UPGRADE)
+        self.download = (
+            download_if_needed if download_if_needed is not None else DOWNLOAD_IF_NEEDED
+        )
+        self.auto_upgrade = auto_upgrade if auto_upgrade is not None else AUTO_UPGRADE
 
         # If this is a release then the .git directory will not exist so we
         # should not use git.
-        git_dir_exists = os.path.exists(os.path.join(os.path.dirname(__file__), '.git'))
+        git_dir_exists = os.path.exists(os.path.join(os.path.dirname(__file__), ".git"))
         if use_git is None and not git_dir_exists:
             use_git = False
 
@@ -217,7 +217,7 @@ class _Bootstrapper(object):
         config = cls.parse_config()
         config.update(cls.parse_command_line(argv))
 
-        auto_use = config.pop('auto_use', False)
+        auto_use = config.pop("auto_use", False)
         bootstrapper = cls(**config)
 
         if auto_use:
@@ -230,13 +230,13 @@ class _Bootstrapper(object):
 
     @classmethod
     def parse_config(cls):
-        if not os.path.exists('setup.cfg'):
+        if not os.path.exists("setup.cfg"):
             return {}
 
         cfg = ConfigParser()
 
         try:
-            cfg.read('setup.cfg')
+            cfg.read("setup.cfg")
         except Exception as e:
             if DEBUG:
                 raise
@@ -244,22 +244,23 @@ class _Bootstrapper(object):
             log.error(
                 "Error reading setup.cfg: {0!r}\n{1} will not be "
                 "automatically bootstrapped and package installation may fail."
-                "\n{2}".format(e, PACKAGE_NAME, _err_help_msg))
+                "\n{2}".format(e, PACKAGE_NAME, _err_help_msg)
+            )
             return {}
 
-        if not cfg.has_section('ah_bootstrap'):
+        if not cfg.has_section("ah_bootstrap"):
             return {}
 
         config = {}
 
         for option, type_ in CFG_OPTIONS:
-            if not cfg.has_option('ah_bootstrap', option):
+            if not cfg.has_option("ah_bootstrap", option):
                 continue
 
             if type_ is bool:
-                value = cfg.getboolean('ah_bootstrap', option)
+                value = cfg.getboolean("ah_bootstrap", option)
             else:
-                value = cfg.get('ah_bootstrap', option)
+                value = cfg.get("ah_bootstrap", option)
 
             config[option] = value
 
@@ -278,30 +279,30 @@ class _Bootstrapper(object):
         # of the same name then we will break that.  However there's a catch22
         # here that we can't just do full argument parsing right here, because
         # we don't yet know *how* to parse all possible command-line arguments.
-        if '--no-git' in argv:
-            config['use_git'] = False
-            argv.remove('--no-git')
+        if "--no-git" in argv:
+            config["use_git"] = False
+            argv.remove("--no-git")
 
-        if '--offline' in argv:
-            config['offline'] = True
-            argv.remove('--offline')
+        if "--offline" in argv:
+            config["offline"] = True
+            argv.remove("--offline")
 
-        if '--auto-use' in argv:
-            config['auto_use'] = True
-            argv.remove('--auto-use')
+        if "--auto-use" in argv:
+            config["auto_use"] = True
+            argv.remove("--auto-use")
 
-        if '--no-auto-use' in argv:
-            config['auto_use'] = False
-            argv.remove('--no-auto-use')
+        if "--no-auto-use" in argv:
+            config["auto_use"] = False
+            argv.remove("--no-auto-use")
 
-        if '--use-system-astropy-helpers' in argv:
-            config['auto_use'] = False
-            argv.remove('--use-system-astropy-helpers')
+        if "--use-system-astropy-helpers" in argv:
+            config["auto_use"] = False
+            argv.remove("--use-system-astropy-helpers")
 
         return config
 
     def run(self):
-        strategies = ['local_directory', 'local_file', 'index']
+        strategies = ["local_directory", "local_file", "index"]
         dist = None
 
         # First, remove any previously imported versions of astropy_helpers;
@@ -310,7 +311,7 @@ class _Bootstrapper(object):
         # the case of setup_requires
         for key in list(sys.modules):
             try:
-                if key == PACKAGE_NAME or key.startswith(PACKAGE_NAME + '.'):
+                if key == PACKAGE_NAME or key.startswith(PACKAGE_NAME + "."):
                     del sys.modules[key]
             except AttributeError:
                 # Sometimes mysterious non-string things can turn up in
@@ -321,7 +322,7 @@ class _Bootstrapper(object):
         self.is_submodule = self._check_submodule()
 
         for strategy in strategies:
-            method = getattr(self, 'get_{0}_dist'.format(strategy))
+            method = getattr(self, "get_{0}_dist".format(strategy))
             dist = method()
             if dist is not None:
                 break
@@ -329,7 +330,8 @@ class _Bootstrapper(object):
             raise _AHBootstrapSystemExit(
                 "No source found for the {0!r} package; {0} must be "
                 "available and importable as a prerequisite to building "
-                "or installing this package.".format(PACKAGE_NAME))
+                "or installing this package.".format(PACKAGE_NAME)
+            )
 
         # This is a bit hacky, but if astropy_helpers was loaded from a
         # directory/submodule its Distribution object gets a "precedence" of
@@ -360,33 +362,37 @@ class _Bootstrapper(object):
     @property
     def config(self):
         """
-        A `dict` containing the options this `_Bootstrapper` was configured
-        with.
+        A `dict` containing the options this `_Bootstrapper` was configured with.
         """
 
-        return dict((optname, getattr(self, optname))
-                    for optname, _ in CFG_OPTIONS if hasattr(self, optname))
+        return dict(
+            (optname, getattr(self, optname))
+            for optname, _ in CFG_OPTIONS
+            if hasattr(self, optname)
+        )
 
     def get_local_directory_dist(self):
         """
-        Handle importing a vendored package from a subdirectory of the source
-        distribution.
+        Handle importing a vendored package from a subdirectory of the source distribution.
         """
 
         if not os.path.isdir(self.path):
             return
 
-        log.info('Attempting to import astropy_helpers from {0} {1!r}'.format(
-                 'submodule' if self.is_submodule else 'directory',
-                 self.path))
+        log.info(
+            "Attempting to import astropy_helpers from {0} {1!r}".format(
+                "submodule" if self.is_submodule else "directory", self.path
+            )
+        )
 
         dist = self._directory_import()
 
         if dist is None:
             log.warn(
-                'The requested path {0!r} for importing {1} does not '
-                'exist, or does not contain a copy of the {1} '
-                'package.'.format(self.path, PACKAGE_NAME))
+                "The requested path {0!r} for importing {1} does not "
+                "exist, or does not contain a copy of the {1} "
+                "package.".format(self.path, PACKAGE_NAME)
+            )
         elif self.auto_upgrade and not self.is_submodule:
             # A version of astropy-helpers was found on the available path, but
             # check to see if a bugfix release is available on PyPI
@@ -398,15 +404,17 @@ class _Bootstrapper(object):
 
     def get_local_file_dist(self):
         """
-        Handle importing from a source archive; this also uses setup_requires
-        but points easy_install directly to the source archive.
+        Handle importing from a source archive; this also uses setup_requires but points
+        easy_install directly to the source archive.
         """
 
         if not os.path.isfile(self.path):
             return
 
-        log.info('Attempting to unpack and import astropy_helpers from '
-                 '{0!r}'.format(self.path))
+        log.info(
+            "Attempting to unpack and import astropy_helpers from "
+            "{0!r}".format(self.path)
+        )
 
         try:
             dist = self._do_download(find_links=[self.path])
@@ -415,8 +423,9 @@ class _Bootstrapper(object):
                 raise
 
             log.warn(
-                'Failed to import {0} from the specified archive {1!r}: '
-                '{2}'.format(PACKAGE_NAME, self.path, str(e)))
+                "Failed to import {0} from the specified archive {1!r}: "
+                "{2}".format(PACKAGE_NAME, self.path, str(e))
+            )
             dist = None
 
         if dist is not None and self.auto_upgrade:
@@ -430,12 +439,13 @@ class _Bootstrapper(object):
 
     def get_index_dist(self):
         if not self.download:
-            log.warn('Downloading {0!r} disabled.'.format(DIST_NAME))
+            log.warn("Downloading {0!r} disabled.".format(DIST_NAME))
             return None
 
         log.warn(
             "Downloading {0!r}; run setup.py with the --offline option to "
-            "force offline installation.".format(DIST_NAME))
+            "force offline installation.".format(DIST_NAME)
+        )
 
         try:
             dist = self._do_download()
@@ -443,8 +453,9 @@ class _Bootstrapper(object):
             if DEBUG:
                 raise
             log.warn(
-                'Failed to download and/or install {0!r} from {1!r}:\n'
-                '{2}'.format(DIST_NAME, self.index_url, str(e)))
+                "Failed to download and/or install {0!r} from {1!r}:\n"
+                "{2}".format(DIST_NAME, self.index_url, str(e))
+            )
             dist = None
 
         # No need to run auto-upgrade here since we've already presumably
@@ -453,8 +464,7 @@ class _Bootstrapper(object):
 
     def _directory_import(self):
         """
-        Import astropy_helpers from the given path, which will be added to
-        sys.path.
+        Import astropy_helpers from the given path, which will be added to sys.path.
 
         Must return True if the import succeeded, and False otherwise.
         """
@@ -473,11 +483,12 @@ class _Bootstrapper(object):
         if dist is None:
             # We didn't find an egg-info/dist-info in the given path, but if a
             # setup.py exists we can generate it
-            setup_py = os.path.join(path, 'setup.py')
+            setup_py = os.path.join(path, "setup.py")
             if os.path.isfile(setup_py):
-                with _silence():
-                    run_setup(os.path.join(path, 'setup.py'),
-                              ['egg_info'])
+                # We use subprocess instead of run_setup from setuptools to
+                # avoid segmentation faults - see the following for more details:
+                # https://github.com/cython/cython/issues/2104
+                sp.check_output([sys.executable, "setup.py", "egg_info"], cwd=path)
 
                 for dist in pkg_resources.find_distributions(path, True):
                     # There should be only one...
@@ -485,9 +496,9 @@ class _Bootstrapper(object):
 
         return dist
 
-    def _do_download(self, version='', find_links=None):
+    def _do_download(self, version="", find_links=None):
         if find_links:
-            allow_hosts = ''
+            allow_hosts = ""
             index_url = None
         else:
             allow_hosts = None
@@ -500,24 +511,24 @@ class _Bootstrapper(object):
         class _Distribution(Distribution):
             def get_option_dict(self, command_name):
                 opts = Distribution.get_option_dict(self, command_name)
-                if command_name == 'easy_install':
+                if command_name == "easy_install":
                     if find_links is not None:
-                        opts['find_links'] = ('setup script', find_links)
+                        opts["find_links"] = ("setup script", find_links)
                     if index_url is not None:
-                        opts['index_url'] = ('setup script', index_url)
+                        opts["index_url"] = ("setup script", index_url)
                     if allow_hosts is not None:
-                        opts['allow_hosts'] = ('setup script', allow_hosts)
+                        opts["allow_hosts"] = ("setup script", allow_hosts)
                 return opts
 
         if version:
-            req = '{0}=={1}'.format(DIST_NAME, version)
+            req = "{0}=={1}".format(DIST_NAME, version)
         else:
             if UPPER_VERSION_EXCLUSIVE is None:
                 req = DIST_NAME
             else:
-                req = '{0}<{1}'.format(DIST_NAME, UPPER_VERSION_EXCLUSIVE)
+                req = "{0}<{1}".format(DIST_NAME, UPPER_VERSION_EXCLUSIVE)
 
-        attrs = {'setup_requires': [req]}
+        attrs = {"setup_requires": [req]}
 
         # NOTE: we need to parse the config file (e.g. setup.cfg) to make sure
         # it honours the options set in the [easy_install] section, and we need
@@ -546,13 +557,13 @@ class _Bootstrapper(object):
             if DEBUG:
                 raise
 
-            msg = 'Error retrieving {0} from {1}:\n{2}'
+            msg = "Error retrieving {0} from {1}:\n{2}"
             if find_links:
                 source = find_links[0]
             elif index_url != INDEX_URL:
                 source = index_url
             else:
-                source = 'PyPI'
+                source = "PyPI"
 
             raise Exception(msg.format(DIST_NAME, source, repr(e)))
 
@@ -562,7 +573,8 @@ class _Bootstrapper(object):
         next_version = _next_version(dist.parsed_version)
 
         req = pkg_resources.Requirement.parse(
-            '{0}>{1},<{2}'.format(DIST_NAME, dist.version, next_version))
+            "{0}>{1},<{2}".format(DIST_NAME, dist.version, next_version)
+        )
 
         package_index = PackageIndex(index_url=self.index_url)
 
@@ -575,12 +587,13 @@ class _Bootstrapper(object):
         """
         Check if the given path is a git submodule.
 
-        See the docstrings for ``_check_submodule_using_git`` and
-        ``_check_submodule_no_git`` for further details.
+        See the docstrings for ``_check_submodule_using_git`` and ``_check_submodule_no_git`` for
+        further details.
         """
 
-        if (self.path is None or
-                (os.path.exists(self.path) and not os.path.isdir(self.path))):
+        if self.path is None or (
+            os.path.exists(self.path) and not os.path.isdir(self.path)
+        ):
             return False
 
         if self.use_git:
@@ -590,19 +603,21 @@ class _Bootstrapper(object):
 
     def _check_submodule_using_git(self):
         """
-        Check if the given path is a git submodule.  If so, attempt to initialize
-        and/or update the submodule if needed.
+        Check if the given path is a git submodule.  If so, attempt to initialize and/or update the
+        submodule if needed.
 
         This function makes calls to the ``git`` command in subprocesses.  The
-        ``_check_submodule_no_git`` option uses pure Python to check if the given
-        path looks like a git submodule, but it cannot perform updates.
+        ``_check_submodule_no_git`` option uses pure Python to check if the given path looks like a
+        git submodule, but it cannot perform updates.
         """
 
-        cmd = ['git', 'submodule', 'status', '--', self.path]
+        cmd = ["git", "submodule", "status", "--", self.path]
 
         try:
-            log.info('Running `{0}`; use the --no-git option to disable git '
-                     'commands'.format(' '.join(cmd)))
+            log.info(
+                "Running `{0}`; use the --no-git option to disable git "
+                "commands".format(" ".join(cmd))
+            )
             returncode, stdout, stderr = run_cmd(cmd)
         except _CommandNotFound:
             # The git command simply wasn't found; this is most likely the
@@ -623,12 +638,14 @@ class _Bootstrapper(object):
             # which only occurs with a malformatted locale setting which can
             # happen sometimes on OSX.  See again
             # https://github.com/astropy/astropy/issues/2749
-            perl_warning = ('perl: warning: Falling back to the standard locale '
-                            '("C").')
+            perl_warning = (
+                "perl: warning: Falling back to the standard locale " '("C").'
+            )
             if not stderr.strip().endswith(perl_warning):
                 # Some other unknown error condition occurred
-                log.warn('git submodule command failed '
-                         'unexpectedly:\n{0}'.format(stderr))
+                log.warn(
+                    "git submodule command failed " "unexpectedly:\n{0}".format(stderr)
+                )
                 return False
 
         # Output of `git submodule status` is as follows:
@@ -647,35 +664,34 @@ class _Bootstrapper(object):
         # only if the submodule is initialized.  We ignore this information for
         # now
         _git_submodule_status_re = re.compile(
-            '^(?P<status>[+-U ])(?P<commit>[0-9a-f]{40}) '
-            '(?P<submodule>\S+)( .*)?$')
+            "^(?P<status>[+-U ])(?P<commit>[0-9a-f]{40}) " "(?P<submodule>\S+)( .*)?$"
+        )
 
         # The stdout should only contain one line--the status of the
         # requested submodule
         m = _git_submodule_status_re.match(stdout)
         if m:
             # Yes, the path *is* a git submodule
-            self._update_submodule(m.group('submodule'), m.group('status'))
+            self._update_submodule(m.group("submodule"), m.group("status"))
             return True
         else:
             log.warn(
-                'Unexpected output from `git submodule status`:\n{0}\n'
-                'Will attempt import from {1!r} regardless.'.format(
-                    stdout, self.path))
+                "Unexpected output from `git submodule status`:\n{0}\n"
+                "Will attempt import from {1!r} regardless.".format(stdout, self.path)
+            )
             return False
 
     def _check_submodule_no_git(self):
         """
-        Like ``_check_submodule_using_git``, but simply parses the .gitmodules file
-        to determine if the supplied path is a git submodule, and does not exec any
-        subprocesses.
+        Like ``_check_submodule_using_git``, but simply parses the .gitmodules file to determine if
+        the supplied path is a git submodule, and does not exec any subprocesses.
 
-        This can only determine if a path is a submodule--it does not perform
-        updates, etc.  This function may need to be updated if the format of the
-        .gitmodules file is changed between git versions.
+        This can only determine if a path is a submodule--it does not perform updates, etc.  This
+        function may need to be updated if the format of the .gitmodules file is changed between git
+        versions.
         """
 
-        gitmodules_path = os.path.abspath('.gitmodules')
+        gitmodules_path = os.path.abspath(".gitmodules")
 
         if not os.path.isfile(gitmodules_path):
             return False
@@ -694,7 +710,7 @@ class _Bootstrapper(object):
                 line = line.lstrip()
 
                 # comments can start with either # or ;
-                if line and line[0] in (':', ';'):
+                if line and line[0] in (":", ";"):
                     continue
 
                 gitmodules_fileobj.write(line)
@@ -706,16 +722,17 @@ class _Bootstrapper(object):
         try:
             cfg.readfp(gitmodules_fileobj)
         except Exception as exc:
-            log.warn('Malformatted .gitmodules file: {0}\n'
-                     '{1} cannot be assumed to be a git submodule.'.format(
-                         exc, self.path))
+            log.warn(
+                "Malformatted .gitmodules file: {0}\n"
+                "{1} cannot be assumed to be a git submodule.".format(exc, self.path)
+            )
             return False
 
         for section in cfg.sections():
-            if not cfg.has_option(section, 'path'):
+            if not cfg.has_option(section, "path"):
                 continue
 
-            submodule_path = cfg.get(section, 'path').rstrip(os.sep)
+            submodule_path = cfg.get(section, "path").rstrip(os.sep)
 
             if submodule_path == self.path.rstrip(os.sep):
                 return True
@@ -723,43 +740,49 @@ class _Bootstrapper(object):
         return False
 
     def _update_submodule(self, submodule, status):
-        if status == ' ':
+        if status == " ":
             # The submodule is up to date; no action necessary
             return
-        elif status == '-':
+        elif status == "-":
             if self.offline:
                 raise _AHBootstrapSystemExit(
                     "Cannot initialize the {0} submodule in --offline mode; "
                     "this requires being able to clone the submodule from an "
-                    "online repository.".format(submodule))
-            cmd = ['update', '--init']
-            action = 'Initializing'
-        elif status == '+':
-            cmd = ['update']
-            action = 'Updating'
+                    "online repository.".format(submodule)
+                )
+            cmd = ["update", "--init"]
+            action = "Initializing"
+        elif status == "+":
+            cmd = ["update"]
+            action = "Updating"
             if self.offline:
-                cmd.append('--no-fetch')
-        elif status == 'U':
+                cmd.append("--no-fetch")
+        elif status == "U":
             raise _AHBootstrapSystemExit(
-                'Error: Submodule {0} contains unresolved merge conflicts.  '
-                'Please complete or abandon any changes in the submodule so that '
-                'it is in a usable state, then try again.'.format(submodule))
+                "Error: Submodule {0} contains unresolved merge conflicts.  "
+                "Please complete or abandon any changes in the submodule so that "
+                "it is in a usable state, then try again.".format(submodule)
+            )
         else:
-            log.warn('Unknown status {0!r} for git submodule {1!r}.  Will '
-                     'attempt to use the submodule as-is, but try to ensure '
-                     'that the submodule is in a clean state and contains no '
-                     'conflicts or errors.\n{2}'.format(status, submodule,
-                                                        _err_help_msg))
+            log.warn(
+                "Unknown status {0!r} for git submodule {1!r}.  Will "
+                "attempt to use the submodule as-is, but try to ensure "
+                "that the submodule is in a clean state and contains no "
+                "conflicts or errors.\n{2}".format(status, submodule, _err_help_msg)
+            )
             return
 
         err_msg = None
-        cmd = ['git', 'submodule'] + cmd + ['--', submodule]
-        log.warn('{0} {1} submodule with: `{2}`'.format(
-            action, submodule, ' '.join(cmd)))
+        cmd = ["git", "submodule"] + cmd + ["--", submodule]
+        log.warn(
+            "{0} {1} submodule with: `{2}`".format(action, submodule, " ".join(cmd))
+        )
 
         try:
-            log.info('Running `{0}`; use the --no-git option to disable git '
-                     'commands'.format(' '.join(cmd)))
+            log.info(
+                "Running `{0}`; use the --no-git option to disable git "
+                "commands".format(" ".join(cmd))
+            )
             returncode, stdout, stderr = run_cmd(cmd)
         except OSError as e:
             err_msg = str(e)
@@ -768,21 +791,21 @@ class _Bootstrapper(object):
                 err_msg = stderr
 
         if err_msg is not None:
-            log.warn('An unexpected error occurred updating the git submodule '
-                     '{0!r}:\n{1}\n{2}'.format(submodule, err_msg,
-                                               _err_help_msg))
+            log.warn(
+                "An unexpected error occurred updating the git submodule "
+                "{0!r}:\n{1}\n{2}".format(submodule, err_msg, _err_help_msg)
+            )
+
 
 class _CommandNotFound(OSError):
     """
-    An exception raised when a command run with run_cmd is not found on the
-    system.
+    An exception raised when a command run with run_cmd is not found on the system.
     """
 
 
 def run_cmd(cmd):
     """
-    Run a command in a subprocess, given as a list of command-line
-    arguments.
+    Run a command in a subprocess, given as a list of command-line arguments.
 
     Returns a ``(returncode, stdout, stderr)`` tuple.
     """
@@ -798,38 +821,38 @@ def run_cmd(cmd):
             raise
 
         if e.errno == errno.ENOENT:
-            msg = 'Command not found: `{0}`'.format(' '.join(cmd))
+            msg = "Command not found: `{0}`".format(" ".join(cmd))
             raise _CommandNotFound(msg, cmd)
         else:
             raise _AHBootstrapSystemExit(
-                'An unexpected error occurred when running the '
-                '`{0}` command:\n{1}'.format(' '.join(cmd), str(e)))
-
+                "An unexpected error occurred when running the "
+                "`{0}` command:\n{1}".format(" ".join(cmd), str(e))
+            )
 
     # Can fail of the default locale is not configured properly.  See
     # https://github.com/astropy/astropy/issues/2749.  For the purposes under
     # consideration 'latin1' is an acceptable fallback.
     try:
-        stdio_encoding = locale.getdefaultlocale()[1] or 'latin1'
+        stdio_encoding = locale.getdefaultlocale()[1] or "latin1"
     except ValueError:
         # Due to an OSX oddity locale.getdefaultlocale() can also crash
         # depending on the user's locale/language settings.  See:
         # http://bugs.python.org/issue18378
-        stdio_encoding = 'latin1'
+        stdio_encoding = "latin1"
 
     # Unlikely to fail at this point but even then let's be flexible
     if not isinstance(stdout, str):
-        stdout = stdout.decode(stdio_encoding, 'replace')
+        stdout = stdout.decode(stdio_encoding, "replace")
     if not isinstance(stderr, str):
-        stderr = stderr.decode(stdio_encoding, 'replace')
+        stderr = stderr.decode(stdio_encoding, "replace")
 
     return (p.returncode, stdout, stderr)
 
 
 def _next_version(version):
     """
-    Given a parsed version from pkg_resources.parse_version, returns a new
-    version string with the next minor version.
+    Given a parsed version from pkg_resources.parse_version, returns a new version string with the
+    next minor version.
 
     Examples
     ========
@@ -837,16 +860,16 @@ def _next_version(version):
     '1.3.0'
     """
 
-    if hasattr(version, 'base_version'):
+    if hasattr(version, "base_version"):
         # New version parsing from setuptools >= 8.0
         if version.base_version:
-            parts = version.base_version.split('.')
+            parts = version.base_version.split(".")
         else:
             parts = []
     else:
         parts = []
         for part in version:
-            if part.startswith('*'):
+            if part.startswith("*"):
                 break
             parts.append(part)
 
@@ -857,14 +880,16 @@ def _next_version(version):
 
     major, minor, micro = parts[:3]
 
-    return '{0}.{1}.{2}'.format(major, minor + 1, 0)
+    return "{0}.{1}.{2}".format(major, minor + 1, 0)
 
 
 class _DummyFile(object):
-    """A noop writeable object."""
+    """
+    A noop writeable object.
+    """
 
-    errors = ''  # Required for Python 3.x
-    encoding = 'utf-8'
+    errors = ""  # Required for Python 3.x
+    encoding = "utf-8"
 
     def write(self, s):
         pass
@@ -877,9 +902,12 @@ class _DummyFile(object):
 def _verbose():
     yield
 
+
 @contextlib.contextmanager
 def _silence():
-    """A context manager that silences sys.stdout and sys.stderr."""
+    """
+    A context manager that silences sys.stdout and sys.stderr.
+    """
 
     old_stdout = sys.stdout
     old_stderr = sys.stderr
@@ -911,11 +939,11 @@ root of the extracted source code.
 class _AHBootstrapSystemExit(SystemExit):
     def __init__(self, *args):
         if not args:
-            msg = 'An unknown problem occurred bootstrapping astropy_helpers.'
+            msg = "An unknown problem occurred bootstrapping astropy_helpers."
         else:
             msg = args[0]
 
-        msg += '\n' + _err_help_msg
+        msg += "\n" + _err_help_msg
 
         super(_AHBootstrapSystemExit, self).__init__(msg, *args[1:])
 
@@ -925,10 +953,9 @@ BOOTSTRAPPER = _Bootstrapper.main()
 
 def use_astropy_helpers(**kwargs):
     """
-    Ensure that the `astropy_helpers` module is available and is importable.
-    This supports automatic submodule initialization if astropy_helpers is
-    included in a project as a git submodule, or will download it from PyPI if
-    necessary.
+    Ensure that the `astropy_helpers` module is available and is importable. This supports automatic
+    submodule initialization if astropy_helpers is included in a project as a git submodule, or will
+    download it from PyPI if necessary.
 
     Parameters
     ----------

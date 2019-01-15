@@ -1,18 +1,18 @@
-#
-# Tests for the utilities
-#
-
-from __future__ import absolute_import, division, print_function
-
 import pytest
 
 import numpy as np
 
 import astropy.units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 import sunpy.map
 from sunpy.data.sample import AIA_171_IMAGE
-from sunkit_image.utils.utils import _equally_spaced_bins, bin_edge_summary, find_pixel_radii, get_radial_intensity_summary
+from sunkit_image.utils.utils import (
+    _equally_spaced_bins,
+    bin_edge_summary,
+    find_pixel_radii,
+    get_radial_intensity_summary,
+)
 
 
 @pytest.fixture
@@ -67,30 +67,30 @@ def test_equally_spaced_bins():
 def test_bin_edge_summary():
     esb = _equally_spaced_bins()
 
-    center = bin_edge_summary(esb, 'center')
+    center = bin_edge_summary(esb, "center")
     assert center.shape == (100,)
     assert center[0] == 1.005
     assert center[99] == 1.995
 
-    left = bin_edge_summary(esb, 'left')
+    left = bin_edge_summary(esb, "left")
     assert left.shape == (100,)
     assert left[0] == 1.0
     assert left[99] == 1.99
 
-    right = bin_edge_summary(esb, 'right')
+    right = bin_edge_summary(esb, "right")
     assert right.shape == (100,)
     assert right[0] == 1.01
     assert right[99] == 2.0
 
     # Correct selection of summary type
     with pytest.raises(ValueError):
-        bin_edge_summary(esb, 'should raise the error')
+        bin_edge_summary(esb, "should raise the error")
 
     # The correct shape of bin edges are passed in
     with pytest.raises(ValueError):
-        bin_edge_summary(np.arange(0, 10), 'center')
+        bin_edge_summary(np.arange(0, 10), "center")
     with pytest.raises(ValueError):
-        bin_edge_summary(np.zeros((3, 4)), 'center')
+        bin_edge_summary(np.zeros((3, 4)), "center")
 
 
 def test_find_pixel_radii(smap):
@@ -108,13 +108,13 @@ def test_find_pixel_radii(smap):
     assert pixel_radii.unit == u.R_sun
 
     # Make sure the maximum
-    assert (np.max(pixel_radii)).value == known_maximum_pixel_radius
+    assert_quantity_allclose((np.max(pixel_radii)).value, known_maximum_pixel_radius)
 
     # Test that the new scale is used
-    pixel_radii = find_pixel_radii(smap, scale=2*smap.rsun_obs)
-    assert np.max(pixel_radii) == known_maximum_pixel_radius / 2
+    pixel_radii = find_pixel_radii(smap, scale=2 * smap.rsun_obs)
+    assert_quantity_allclose(np.max(pixel_radii).value, known_maximum_pixel_radius / 2)
 
 
 def test_get_radial_intensity_summary():
+    # TODO: do this.
     pass
-

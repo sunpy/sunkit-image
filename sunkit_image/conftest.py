@@ -1,46 +1,93 @@
-# this contains imports plugins that configure py.test for astropy tests.
-# by importing them here in conftest.py they are discoverable by py.test
-# no matter how it is invoked within the source tree.
+import json
+import pathlib
+import warnings
+import importlib
 
-from astropy.tests.pytest_plugins import *
+import pytest
+from pkg_resources import parse_version
 
-## Uncomment the following line to treat all DeprecationWarnings as
-## exceptions. For Astropy v2.0 or later, there are 2 additional keywords,
-## as follow (although default should work for most cases).
-## To ignore some packages that produce deprecation warnings on import
-## (in addition to 'compiler', 'scipy', 'pygments', 'ipykernel', and
-## 'setuptools'), add:
-##     modules_to_ignore_on_import=['module_1', 'module_2']
-## To ignore some specific deprecation warning messages for Python version
-## MAJOR.MINOR or later, add:
-##     warnings_to_ignore_by_pyver={(MAJOR, MINOR): ['Message to ignore']}
-# enable_deprecations_as_exceptions()
+# Force MPL to use non-gui backends for testing.
+try:
+    import matplotlib
+except ImportError:
+    pass
+else:
+    matplotlib.use("Agg")
 
-## Uncomment and customize the following lines to add/remove entries from
-## the list of packages for which version numbers are displayed when running
-## the tests. Making it pass for KeyError is essential in some cases when
-## the package uses other astropy affiliated packages.
-# try:
-#     PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
-#     PYTEST_HEADER_MODULES['scikit-image'] = 'skimage'
-#     del PYTEST_HEADER_MODULES['h5py']
-# except (NameError, KeyError):  # NameError is needed to support Astropy < 1.0
-#     pass
+# isort:imports-firstparty
+import sunpy.tests.helpers
+from sunpy.tests.hash import HASH_LIBRARY_NAME
+from sunpy.tests.helpers import new_hash_library, generate_figure_webpage
+from sunpy.util.exceptions import SunpyDeprecationWarning
 
-## Uncomment the following lines to display the version number of the
-## package rather than the version number of Astropy in the top line when
-## running the tests.
-# import os
-#
-## This is to figure out the package version, rather than
-## using Astropy's
-# try:
-#     from .version import version
-# except ImportError:
-#     version = 'dev'
-#
-# try:
-#     packagename = os.path.basename(os.path.dirname(__file__))
-#     TESTED_VERSIONS[packagename] = version
-# except NameError:   # Needed to support Astropy <= 1.0.0
-#     pass
+# Don't actually import pytest_remotedata because that can do things to the
+# entrypoints code in pytest.
+remotedata_spec = importlib.util.find_spec("pytest_remotedata")
+HAVE_REMOTEDATA = remotedata_spec is not None
+
+
+def pytest_addoption(parser):
+    parser.addoption("--figure_dir", action="store", default="./figure_test_images")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def figure_base_dir(request):
+    sunpy.tests.helpers.figure_base_dir = pathlib.Path(
+        request.config.getoption("--figure_dir")
+    )
+
+
+def pytest_runtest_setup(item):
+    """
+    pytest hook to skip all tests that have the mark 'remotedata' if the pytest_remotedata plugin is
+    not installed.
+    """
+    if isinstance(item, pytest.Function):
+        if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
+            pytest.skip(
+                "skipping remotedata tests as pytest-remotedata is not installed"
+            )
+
+
+def pytest_unconfigure(config):
+
+    # If at least one figure test has been run, print result image directory
+    if len(new_hash_library) > 0:
+        # Write the new hash library in JSON
+        figure_base_dir = pathlib.Path(config.getoption("--figure_dir"))
+        hashfile = figure_base_dir / HASH_LIBRARY_NAME
+        with open(hashfile, "w") as outfile:
+            json.dump(
+                new_hash_library,
+                outfile,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+            )
+
+        """
+        Turn on internet when generating the figure comparison webpage.
+        """
+        if HAVE_REMOTEDATA:
+            from pytest_remotedata.disable_internet import (
+                turn_on_internet,
+                turn_off_internet,
+            )
+        else:
+
+            def turn_on_internet():
+                pass
+
+            def turn_off_internet():
+                pass
+
+        turn_on_internet()
+        generate_figure_webpage(new_hash_library)
+        turn_off_internet()
+
+        print("All images from image tests can be found in {0}".format(figure_base_dir))
+        print("The corresponding hash library is {0}".format(hashfile))
+
+
+def pytest_sessionstart(session):
+    warnings.simplefilter("error", SunpyDeprecationWarning)

@@ -1,9 +1,6 @@
-#
-# This file contains a collection of functions of general utility
-#
-
-from __future__ import print_function, division
-
+"""
+This package contains a collection of functions of general utility.
+"""
 import numpy as np
 
 import astropy.units as u
@@ -13,8 +10,8 @@ from sunpy.coordinates import frames
 
 def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     """
-    Define a set of equally spaced bins between the specified inner and outer
-    values.  The inner value must be strictly less than the outer value.
+    Define a set of equally spaced bins between the specified inner and outer values.  The inner
+    value must be strictly less than the outer value.
 
     Parameters
     ----------
@@ -32,14 +29,14 @@ def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     An array of shape (2, nbins) containing the bin edges.
     """
     if inner_value >= outer_value:
-        raise ValueError('The inner value must be strictly less than the outer value.')
+        raise ValueError("The inner value must be strictly less than the outer value.")
 
     if nbins <= 0:
-        raise ValueError('The number of bins must be strictly greater than 0.')
+        raise ValueError("The number of bins must be strictly greater than 0.")
 
     bin_edges = np.zeros((2, nbins))
     bin_edges[0, :] = np.arange(0, nbins)
-    bin_edges[1, :] = np.arange(1, nbins+1)
+    bin_edges[1, :] = np.arange(1, nbins + 1)
     return inner_value + bin_edges * (outer_value - inner_value) / nbins
 
 
@@ -59,29 +56,27 @@ def bin_edge_summary(r, binfit):
     Returns
     -------
     A one dimensional array of values that summarize the location of the bins.
-
     """
     if r.ndim != 2:
-        raise ValueError('The bin edges must be two-dimensional with shape (2, nbins).')
+        raise ValueError("The bin edges must be two-dimensional with shape (2, nbins).")
     if r.shape[0] != 2:
-        raise ValueError('The bin edges must be two-dimensional with shape (2, nbins).')
+        raise ValueError("The bin edges must be two-dimensional with shape (2, nbins).")
 
-    if binfit == 'center':
+    if binfit == "center":
         summary = 0.5 * (r[0, :] + r[1, :])
-    elif binfit == 'left':
+    elif binfit == "left":
         summary = r[0, :]
-    elif binfit == 'right':
+    elif binfit == "right":
         summary = r[1, :]
     else:
-        raise ValueError(
-            'Keyword "binfit" must have value "center", "left" or "right"')
+        raise ValueError('Keyword "binfit" must have value "center", "left" or "right"')
     return summary
 
 
 def find_pixel_radii(smap, scale=None):
     """
-    Find the distance of every pixel in a map from the center of the Sun.
-    The answer is returned in units of solar radii.
+    Find the distance of every pixel in a map from the center of the Sun. The answer is returned in
+    units of solar radii.
 
     Parameters
     ----------
@@ -117,7 +112,9 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / scale)
 
 
-def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
+def get_radial_intensity_summary(
+    smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs
+):
     """
     Get a summary statistic of the intensity in a map as a function of radius.
 
@@ -165,4 +162,9 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
     upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
 
     # Calculate the summary statistic in the radial bins.
-    return np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)])
+    return np.asarray(
+        [
+            summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs)
+            for i in range(0, nbins)
+        ]
+    )

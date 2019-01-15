@@ -1,15 +1,12 @@
-Documentation
-=============
+sunkit-image Documentation
+==========================
 
-This is the documentation for sunkit-image.
+Welcome to the sunkit-image documentation. sunkit-image is a community-developed,
+free and open-source solar data image analysis environment for Python.
 
+We have a documentation :any:`index <genindex>` and a :any:`module <modindex>` list.
 
 .. toctree::
   :maxdepth: 2
 
-  sunkit_image/index.rst
-
-.. note:: The layout of this directory is simply a suggestion.  To follow
-          traditional practice, do *not* edit this page, but instead place
-          all documentation for the package inside ``sunkit_image/``.
-          You can follow this practice or choose your own layout.
+.. automodapi:: sunkit_image

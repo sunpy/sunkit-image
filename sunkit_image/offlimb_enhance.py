@@ -1,12 +1,17 @@
-from __future__ import print_function, division
-
+"""
+This package contains functions that can be used to enchance the regions off the solar limb.
+"""
 import numpy as np
 
 import astropy.units as u
 
 import sunpy.map
 
-from sunkit_image.utils.utils import find_pixel_radii, bin_edge_summary, get_radial_intensity_summary
+from sunkit_image.utils.utils import (
+    find_pixel_radii,
+    bin_edge_summary,
+    get_radial_intensity_summary,
+)
 
 
 def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
@@ -35,9 +40,9 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
 
 def calculate_fit_radial_intensity(radii, polynomial):
     """
-    Calculates the fit value of the radial intensity at the values "radii". The
-    function assumes that the polynomial is the best fit to the observed log of
-    the intensity as a function of radius.
+    Calculates the fit value of the radial intensity at the values "radii". The function assumes
+    that the polynomial is the best fit to the observed log of the intensity as a function of
+    radius.
 
     Parameters
     ----------
@@ -60,9 +65,9 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
 def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
-    Normalizes the fitted radial intensity to the value at the normalization
-    radius. The function assumes that the polynomial is the best fit to the
-    observed log of the intensity as a function of radius.
+    Normalizes the fitted radial intensity to the value at the normalization radius. The function
+    assumes that the polynomial is the best fit to the observed log of the intensity as a function
+    of radius.
 
     Parameters
     ----------
@@ -82,30 +87,31 @@ def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     normalized intensity : `numpy.ndarray`
         An array with the same shape as radii which expresses the fitted
         intensity value normalized to its value at the normalization radius.
-
     """
-    return calculate_fit_radial_intensity(radii, polynomial) / calculate_fit_radial_intensity(normalization_radius, polynomial)
+    return calculate_fit_radial_intensity(
+        radii, polynomial
+    ) / calculate_fit_radial_intensity(normalization_radius, polynomial)
 
 
-def intensity_enhance(smap, radial_bin_edges,
-                      scale=None,
-                      summarize_bin_edges='center',
-                      summary=np.mean,
-                      degree=1,
-                      normalization_radius=1*u.R_sun,
-                      fit_range=[1, 1.5]*u.R_sun,
-                      **summary_kwargs):
+def intensity_enhance(
+    smap,
+    radial_bin_edges,
+    scale=None,
+    summarize_bin_edges="center",
+    summary=np.mean,
+    degree=1,
+    normalization_radius=1 * u.R_sun,
+    fit_range=[1, 1.5] * u.R_sun,
+    **summary_kwargs
+):
     """
-    Returns a map with the off-limb emission enhanced.  The enhancement
-    is calculated as follows.  A summary statistic of the radial dependence
-    of the off-limb emission is calculated.  Since the UV and EUV emission
-    intensity drops of quickly off the solar limb, it makes sense to fit the
-    log of the intensity statistic using some appropriate function.  The
-    function we use here is a polynomial.  To calculate the enhancement,
-    the fitted function is normalized to its value at the normalization
-    radius from the center of the Sun (a sensible choice is the solar
-    radius).  The offlimb emission is then divided by this normalized
-    function.
+    Returns a map with the off-limb emission enhanced.  The enhancement is calculated as follows.  A
+    summary statistic of the radial dependence of the off-limb emission is calculated.  Since the UV
+    and EUV emission intensity drops of quickly off the solar limb, it makes sense to fit the log of
+    the intensity statistic using some appropriate function.  The function we use here is a
+    polynomial.  To calculate the enhancement, the fitted function is normalized to its value at the
+    normalization radius from the center of the Sun (a sensible choice is the solar radius).  The
+    offlimb emission is then divided by this normalized function.
 
     Note that after enhancement plot settings such as the image normalization
     may have to be changed in order to obtain a good-looking plot.
@@ -151,33 +157,40 @@ def intensity_enhance(smap, radial_bin_edges,
     -------
     new_map : `sunpy.map.Map`
         A SunPy map that has the emission above the normalization radius enhanced.
-
     """
 
     # Get the radii for every pixel
     map_r = find_pixel_radii(smap).to(u.R_sun)
 
     # Get the radial intensity distribution
-    radial_intensity = get_radial_intensity_summary(smap, radial_bin_edges, scale=scale, summary=summary, **summary_kwargs)
+    radial_intensity = get_radial_intensity_summary(
+        smap, radial_bin_edges, scale=scale, summary=summary, **summary_kwargs
+    )
 
     # Summarize the radial bins
-    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(u.R_sun)
+    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(
+        u.R_sun
+    )
 
     # Fit range
     if fit_range[0] >= fit_range[1]:
-        raise ValueError('The fit range must be strictly increasing.')
+        raise ValueError("The fit range must be strictly increasing.")
 
-    fit_here = np.logical_and(fit_range[0].to(u.R_sun).value <= radial_bin_summary.to(u.R_sun).value,
-                              radial_bin_summary.to(u.R_sun).value <= fit_range[1].to(u.R_sun).value)
+    fit_here = np.logical_and(
+        fit_range[0].to(u.R_sun).value <= radial_bin_summary.to(u.R_sun).value,
+        radial_bin_summary.to(u.R_sun).value <= fit_range[1].to(u.R_sun).value,
+    )
 
     # Fits a polynomial function to the natural logarithm of an estimate of
     # the intensity as a function of radius.
-    polynomial = fit_polynomial_to_log_radial_intensity(radial_bin_summary[fit_here],
-                                                        radial_intensity[fit_here],
-                                                        degree)
+    polynomial = fit_polynomial_to_log_radial_intensity(
+        radial_bin_summary[fit_here], radial_intensity[fit_here], degree
+    )
 
     # Calculate the enhancement
-    enhancement = 1 / normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
+    enhancement = 1 / normalize_fit_radial_intensity(
+        map_r, polynomial, normalization_radius
+    )
     enhancement[map_r < normalization_radius] = 1
 
     # Return a map with the intensity enhanced above the normalization radius
@@ -185,17 +198,19 @@ def intensity_enhance(smap, radial_bin_edges,
     return sunpy.map.Map(smap.data * enhancement, smap.meta)
 
 
-def normalizing_radial_gradient_filter(smap, radial_bin_edges,
-                                       scale=None,
-                                       intensity_summary=np.mean,
-                                       intensity_summary_kwargs=None,
-                                       width_function=np.std,
-                                       width_function_kwargs=None,
-                                       application_radius=1*u.R_sun):
+def normalizing_radial_gradient_filter(
+    smap,
+    radial_bin_edges,
+    scale=None,
+    intensity_summary=np.mean,
+    intensity_summary_kwargs=None,
+    width_function=np.std,
+    width_function_kwargs=None,
+    application_radius=1 * u.R_sun,
+):
     """
-    Implementation of the normalizing radial gradient filter (NRGF) of
-    Morgan, Habbal & Woo, 2006, Sol. Phys., 236, 263.
-    https://link.springer.com/article/10.1007%2Fs11207-006-0113-6
+    Implementation of the normalizing radial gradient filter (NRGF) of Morgan, Habbal & Woo, 2006,
+    Sol. Phys., 236, 263. https://link.springer.com/article/10.1007%2Fs11207-006-0113-6.
 
     Note that after applying the NRGF plot settings such as the image normalization
     may have to be changed in order to obtain a good-looking plot.
@@ -235,31 +250,40 @@ def normalizing_radial_gradient_filter(smap, radial_bin_edges,
     -------
     new_map : `sunpy.map.Map`
         A SunPy map that has had the NRGF applied to it.
-
     """
 
     # Get the radii for every pixel
     map_r = find_pixel_radii(smap).to(u.R_sun)
 
     # Radial intensity
-    radial_intensity = get_radial_intensity_summary(smap, radial_bin_edges,
-                                                    scale=scale,
-                                                    summary=intensity_summary,
-                                                    **intensity_summary_kwargs)
+    radial_intensity = get_radial_intensity_summary(
+        smap,
+        radial_bin_edges,
+        scale=scale,
+        summary=intensity_summary,
+        **intensity_summary_kwargs
+    )
 
     # An estimate of the width of the intensity distribution in each radial bin.
-    radial_intensity_distribution_summary = get_radial_intensity_summary(smap, radial_bin_edges,
-                                                                         scale=scale,
-                                                                         summary=width_function,
-                                                                         **width_function_kwargs)
+    radial_intensity_distribution_summary = get_radial_intensity_summary(
+        smap,
+        radial_bin_edges,
+        scale=scale,
+        summary=width_function,
+        **width_function_kwargs
+    )
 
     # Storage for the filtered data
     data = np.zeros_like(smap.data)
 
     # Calculate the filter for each radial bin.
     for i in range(0, radial_bin_edges.shape[1]):
-        here = np.logical_and(map_r > radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
+        here = np.logical_and(
+            map_r > radial_bin_edges[0, i], map_r < radial_bin_edges[1, i]
+        )
         here = np.logical_and(here, map_r > application_radius)
-        data[here] = (smap.data[here] - radial_intensity[i]) / radial_intensity_distribution_summary[i]
+        data[here] = (
+            smap.data[here] - radial_intensity[i]
+        ) / radial_intensity_distribution_summary[i]
 
     return sunpy.map.Map(data, smap.meta)
