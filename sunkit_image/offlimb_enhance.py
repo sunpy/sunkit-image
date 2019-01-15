@@ -1,5 +1,6 @@
-from __future__ import print_function, division
-
+"""
+This package contains functions that can be used to enchance the regions off the solar limb.
+"""
 import numpy as np
 
 import astropy.units as u
@@ -35,9 +36,9 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
 
 def calculate_fit_radial_intensity(radii, polynomial):
     """
-    Calculates the fit value of the radial intensity at the values "radii". The
-    function assumes that the polynomial is the best fit to the observed log of
-    the intensity as a function of radius.
+    Calculates the fit value of the radial intensity at the values "radii". The function assumes
+    that the polynomial is the best fit to the observed log of the intensity as a function of
+    radius.
 
     Parameters
     ----------
@@ -60,9 +61,9 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
 def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
-    Normalizes the fitted radial intensity to the value at the normalization
-    radius. The function assumes that the polynomial is the best fit to the
-    observed log of the intensity as a function of radius.
+    Normalizes the fitted radial intensity to the value at the normalization radius. The function
+    assumes that the polynomial is the best fit to the observed log of the intensity as a function
+    of radius.
 
     Parameters
     ----------
@@ -82,7 +83,6 @@ def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     normalized intensity : `numpy.ndarray`
         An array with the same shape as radii which expresses the fitted
         intensity value normalized to its value at the normalization radius.
-
     """
     return calculate_fit_radial_intensity(radii, polynomial) / calculate_fit_radial_intensity(normalization_radius, polynomial)
 
@@ -96,16 +96,13 @@ def intensity_enhance(smap, radial_bin_edges,
                       fit_range=[1, 1.5]*u.R_sun,
                       **summary_kwargs):
     """
-    Returns a map with the off-limb emission enhanced.  The enhancement
-    is calculated as follows.  A summary statistic of the radial dependence
-    of the off-limb emission is calculated.  Since the UV and EUV emission
-    intensity drops of quickly off the solar limb, it makes sense to fit the
-    log of the intensity statistic using some appropriate function.  The
-    function we use here is a polynomial.  To calculate the enhancement,
-    the fitted function is normalized to its value at the normalization
-    radius from the center of the Sun (a sensible choice is the solar
-    radius).  The offlimb emission is then divided by this normalized
-    function.
+    Returns a map with the off-limb emission enhanced.  The enhancement is calculated as follows.  A
+    summary statistic of the radial dependence of the off-limb emission is calculated.  Since the UV
+    and EUV emission intensity drops of quickly off the solar limb, it makes sense to fit the log of
+    the intensity statistic using some appropriate function.  The function we use here is a
+    polynomial.  To calculate the enhancement, the fitted function is normalized to its value at the
+    normalization radius from the center of the Sun (a sensible choice is the solar radius).  The
+    offlimb emission is then divided by this normalized function.
 
     Note that after enhancement plot settings such as the image normalization
     may have to be changed in order to obtain a good-looking plot.
@@ -151,7 +148,6 @@ def intensity_enhance(smap, radial_bin_edges,
     -------
     new_map : `sunpy.map.Map`
         A SunPy map that has the emission above the normalization radius enhanced.
-
     """
 
     # Get the radii for every pixel
@@ -193,9 +189,8 @@ def normalizing_radial_gradient_filter(smap, radial_bin_edges,
                                        width_function_kwargs=None,
                                        application_radius=1*u.R_sun):
     """
-    Implementation of the normalizing radial gradient filter (NRGF) of
-    Morgan, Habbal & Woo, 2006, Sol. Phys., 236, 263.
-    https://link.springer.com/article/10.1007%2Fs11207-006-0113-6
+    Implementation of the normalizing radial gradient filter (NRGF) of Morgan, Habbal & Woo, 2006,
+    Sol. Phys., 236, 263. https://link.springer.com/article/10.1007%2Fs11207-006-0113-6.
 
     Note that after applying the NRGF plot settings such as the image normalization
     may have to be changed in order to obtain a good-looking plot.
@@ -235,7 +230,6 @@ def normalizing_radial_gradient_filter(smap, radial_bin_edges,
     -------
     new_map : `sunpy.map.Map`
         A SunPy map that has had the NRGF applied to it.
-
     """
 
     # Get the radii for every pixel

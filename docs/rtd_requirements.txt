@@ -1,0 +1,8 @@
+# This file is used on ReadTheDocs to build the
+# documentation and is separate of tox.ini and setup.cfg
+sunpy
+sphinx
+sunpy-sphinx-theme
+sphinx-gallery
+sphinx-astropy
+git+https://github.com/hawkowl/towncrier

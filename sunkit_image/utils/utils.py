@@ -1,9 +1,6 @@
-#
-# This file contains a collection of functions of general utility
-#
-
-from __future__ import print_function, division
-
+"""
+This package contains a collection of functions of general utility.
+"""
 import numpy as np
 
 import astropy.units as u
@@ -13,8 +10,8 @@ from sunpy.coordinates import frames
 
 def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     """
-    Define a set of equally spaced bins between the specified inner and outer
-    values.  The inner value must be strictly less than the outer value.
+    Define a set of equally spaced bins between the specified inner and outer values.  The inner
+    value must be strictly less than the outer value.
 
     Parameters
     ----------
@@ -59,7 +56,6 @@ def bin_edge_summary(r, binfit):
     Returns
     -------
     A one dimensional array of values that summarize the location of the bins.
-
     """
     if r.ndim != 2:
         raise ValueError('The bin edges must be two-dimensional with shape (2, nbins).')
@@ -80,8 +76,8 @@ def bin_edge_summary(r, binfit):
 
 def find_pixel_radii(smap, scale=None):
     """
-    Find the distance of every pixel in a map from the center of the Sun.
-    The answer is returned in units of solar radii.
+    Find the distance of every pixel in a map from the center of the Sun. The answer is returned in
+    units of solar radii.
 
     Parameters
     ----------

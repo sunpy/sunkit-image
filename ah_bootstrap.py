@@ -1,8 +1,7 @@
 """
-This bootstrap module contains code for ensuring that the astropy_helpers
-package will be importable by the time the setup.py script runs.  It also
-includes some workarounds to ensure that a recent-enough version of setuptools
-is being used for the installation.
+This bootstrap module contains code for ensuring that the astropy_helpers package will be importable
+by the time the setup.py script runs.  It also includes some workarounds to ensure that a recent-
+enough version of setuptools is being used for the installation.
 
 This module should be the first thing imported in the setup.py of distributions
 that make use of the utilities in astropy_helpers.  If the distribution ships
@@ -38,13 +37,19 @@ latest version of this module.
 
 import contextlib
 import errno
-import imp
 import io
 import locale
 import os
 import re
 import subprocess as sp
 import sys
+
+__minimum_python_version__ = (3, 6)
+
+if sys.version_info < __minimum_python_version__:
+    print("ERROR: Python {} or later is required by astropy-helpers".format(
+        __minimum_python_version__))
+    sys.exit(1)
 
 try:
     from ConfigParser import ConfigParser, RawConfigParser
@@ -59,35 +64,15 @@ _str_types = (str, bytes)
 # issues with either missing or misbehaving pacakges (including making sure
 # setuptools itself is installed):
 
+# Check that setuptools 1.0 or later is present
+from distutils.version import LooseVersion
 
-# Some pre-setuptools checks to ensure that either distribute or setuptools >=
-# 0.7 is used (over pre-distribute setuptools) if it is available on the path;
-# otherwise the latest setuptools will be downloaded and bootstrapped with
-# ``ez_setup.py``.  This used to be included in a separate file called
-# setuptools_bootstrap.py; but it was combined into ah_bootstrap.py
 try:
-    import pkg_resources
-    _setuptools_req = pkg_resources.Requirement.parse('setuptools>=0.7')
-    # This may raise a DistributionNotFound in which case no version of
-    # setuptools or distribute is properly installed
-    _setuptools = pkg_resources.get_distribution('setuptools')
-    if _setuptools not in _setuptools_req:
-        # Older version of setuptools; check if we have distribute; again if
-        # this results in DistributionNotFound we want to give up
-        _distribute = pkg_resources.get_distribution('distribute')
-        if _setuptools != _distribute:
-            # It's possible on some pathological systems to have an old version
-            # of setuptools and distribute on sys.path simultaneously; make
-            # sure distribute is the one that's used
-            sys.path.insert(1, _distribute.location)
-            _distribute.activate()
-            imp.reload(pkg_resources)
-except:
-    # There are several types of exceptions that can occur here; if all else
-    # fails bootstrap and use the bootstrapped version
-    from ez_setup import use_setuptools
-    use_setuptools()
-
+    import setuptools
+    assert LooseVersion(setuptools.__version__) >= LooseVersion('1.0')
+except (ImportError, AssertionError):
+    print("ERROR: setuptools 1.0 or later is required by astropy-helpers")
+    sys.exit(1)
 
 # typing as a dependency for 1.6.1+ Sphinx causes issues when imported after
 # initializing submodule with ah_boostrap.py
@@ -135,7 +120,6 @@ import pkg_resources
 
 from setuptools import Distribution
 from setuptools.package_index import PackageIndex
-from setuptools.sandbox import run_setup
 
 from distutils import log
 from distutils.debug import DEBUG
@@ -163,8 +147,9 @@ CFG_OPTIONS = [
 
 class _Bootstrapper(object):
     """
-    Bootstrapper implementation.  See ``use_astropy_helpers`` for parameter
-    documentation.
+    Bootstrapper implementation.
+
+    See ``use_astropy_helpers`` for parameter documentation.
     """
 
     def __init__(self, path=None, index_url=None, use_git=None, offline=None,
@@ -360,8 +345,7 @@ class _Bootstrapper(object):
     @property
     def config(self):
         """
-        A `dict` containing the options this `_Bootstrapper` was configured
-        with.
+        A `dict` containing the options this `_Bootstrapper` was configured with.
         """
 
         return dict((optname, getattr(self, optname))
@@ -369,8 +353,7 @@ class _Bootstrapper(object):
 
     def get_local_directory_dist(self):
         """
-        Handle importing a vendored package from a subdirectory of the source
-        distribution.
+        Handle importing a vendored package from a subdirectory of the source distribution.
         """
 
         if not os.path.isdir(self.path):
@@ -398,8 +381,8 @@ class _Bootstrapper(object):
 
     def get_local_file_dist(self):
         """
-        Handle importing from a source archive; this also uses setup_requires
-        but points easy_install directly to the source archive.
+        Handle importing from a source archive; this also uses setup_requires but points
+        easy_install directly to the source archive.
         """
 
         if not os.path.isfile(self.path):
@@ -453,8 +436,7 @@ class _Bootstrapper(object):
 
     def _directory_import(self):
         """
-        Import astropy_helpers from the given path, which will be added to
-        sys.path.
+        Import astropy_helpers from the given path, which will be added to sys.path.
 
         Must return True if the import succeeded, and False otherwise.
         """
@@ -475,9 +457,10 @@ class _Bootstrapper(object):
             # setup.py exists we can generate it
             setup_py = os.path.join(path, 'setup.py')
             if os.path.isfile(setup_py):
-                with _silence():
-                    run_setup(os.path.join(path, 'setup.py'),
-                              ['egg_info'])
+                # We use subprocess instead of run_setup from setuptools to
+                # avoid segmentation faults - see the following for more details:
+                # https://github.com/cython/cython/issues/2104
+                sp.check_output([sys.executable, 'setup.py', 'egg_info'], cwd=path)
 
                 for dist in pkg_resources.find_distributions(path, True):
                     # There should be only one...
@@ -575,8 +558,8 @@ class _Bootstrapper(object):
         """
         Check if the given path is a git submodule.
 
-        See the docstrings for ``_check_submodule_using_git`` and
-        ``_check_submodule_no_git`` for further details.
+        See the docstrings for ``_check_submodule_using_git`` and ``_check_submodule_no_git`` for
+        further details.
         """
 
         if (self.path is None or
@@ -590,12 +573,12 @@ class _Bootstrapper(object):
 
     def _check_submodule_using_git(self):
         """
-        Check if the given path is a git submodule.  If so, attempt to initialize
-        and/or update the submodule if needed.
+        Check if the given path is a git submodule.  If so, attempt to initialize and/or update the
+        submodule if needed.
 
         This function makes calls to the ``git`` command in subprocesses.  The
-        ``_check_submodule_no_git`` option uses pure Python to check if the given
-        path looks like a git submodule, but it cannot perform updates.
+        ``_check_submodule_no_git`` option uses pure Python to check if the given path looks like a
+        git submodule, but it cannot perform updates.
         """
 
         cmd = ['git', 'submodule', 'status', '--', self.path]
@@ -666,13 +649,12 @@ class _Bootstrapper(object):
 
     def _check_submodule_no_git(self):
         """
-        Like ``_check_submodule_using_git``, but simply parses the .gitmodules file
-        to determine if the supplied path is a git submodule, and does not exec any
-        subprocesses.
+        Like ``_check_submodule_using_git``, but simply parses the .gitmodules file to determine if
+        the supplied path is a git submodule, and does not exec any subprocesses.
 
-        This can only determine if a path is a submodule--it does not perform
-        updates, etc.  This function may need to be updated if the format of the
-        .gitmodules file is changed between git versions.
+        This can only determine if a path is a submodule--it does not perform updates, etc.  This
+        function may need to be updated if the format of the .gitmodules file is changed between git
+        versions.
         """
 
         gitmodules_path = os.path.abspath('.gitmodules')
@@ -774,15 +756,13 @@ class _Bootstrapper(object):
 
 class _CommandNotFound(OSError):
     """
-    An exception raised when a command run with run_cmd is not found on the
-    system.
+    An exception raised when a command run with run_cmd is not found on the system.
     """
 
 
 def run_cmd(cmd):
     """
-    Run a command in a subprocess, given as a list of command-line
-    arguments.
+    Run a command in a subprocess, given as a list of command-line arguments.
 
     Returns a ``(returncode, stdout, stderr)`` tuple.
     """
@@ -828,8 +808,8 @@ def run_cmd(cmd):
 
 def _next_version(version):
     """
-    Given a parsed version from pkg_resources.parse_version, returns a new
-    version string with the next minor version.
+    Given a parsed version from pkg_resources.parse_version, returns a new version string with the
+    next minor version.
 
     Examples
     ========
@@ -861,7 +841,9 @@ def _next_version(version):
 
 
 class _DummyFile(object):
-    """A noop writeable object."""
+    """
+    A noop writeable object.
+    """
 
     errors = ''  # Required for Python 3.x
     encoding = 'utf-8'
@@ -879,7 +861,9 @@ def _verbose():
 
 @contextlib.contextmanager
 def _silence():
-    """A context manager that silences sys.stdout and sys.stderr."""
+    """
+    A context manager that silences sys.stdout and sys.stderr.
+    """
 
     old_stdout = sys.stdout
     old_stderr = sys.stderr
@@ -925,10 +909,9 @@ BOOTSTRAPPER = _Bootstrapper.main()
 
 def use_astropy_helpers(**kwargs):
     """
-    Ensure that the `astropy_helpers` module is available and is importable.
-    This supports automatic submodule initialization if astropy_helpers is
-    included in a project as a git submodule, or will download it from PyPI if
-    necessary.
+    Ensure that the `astropy_helpers` module is available and is importable. This supports automatic
+    submodule initialization if astropy_helpers is included in a project as a git submodule, or will
+    download it from PyPI if necessary.
 
     Parameters
     ----------

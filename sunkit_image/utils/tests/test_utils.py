@@ -1,14 +1,9 @@
-#
-# Tests for the utilities
-#
-
-from __future__ import absolute_import, division, print_function
-
 import pytest
 
 import numpy as np
 
 import astropy.units as u
+from astropy.tests.helper import assert_quantity_allclose
 
 import sunpy.map
 from sunpy.data.sample import AIA_171_IMAGE
@@ -108,13 +103,13 @@ def test_find_pixel_radii(smap):
     assert pixel_radii.unit == u.R_sun
 
     # Make sure the maximum
-    assert (np.max(pixel_radii)).value == known_maximum_pixel_radius
+    assert_quantity_allclose((np.max(pixel_radii)).value, known_maximum_pixel_radius)
 
     # Test that the new scale is used
     pixel_radii = find_pixel_radii(smap, scale=2*smap.rsun_obs)
-    assert np.max(pixel_radii) == known_maximum_pixel_radius / 2
+    assert_quantity_allclose(np.max(pixel_radii).value, known_maximum_pixel_radius / 2)
 
 
 def test_get_radial_intensity_summary():
+    #TODO: do this.
     pass
-
