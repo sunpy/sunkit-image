@@ -5,6 +5,7 @@ include ez_setup.py
 include ah_bootstrap.py
 include setup.cfg
 include sunkit_image/tests/coveragerc
+include pyproject.toml
 
 recursive-include sunkit_image *.pyx *.c *.pxd
 recursive-include docs *

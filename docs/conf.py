@@ -87,11 +87,7 @@ needs_sphinx = "1.6"
 check_sphinx_version(needs_sphinx)
 
 # Add any custom intersphinx for SunPy
-intersphinx_mapping.pop("h5py", None)
-intersphinx_mapping["sqlalchemy"] = ("http://docs.sqlalchemy.org/en/latest/", None)
-intersphinx_mapping["pandas"] = ("http://pandas.pydata.org/pandas-docs/stable/", None)
-intersphinx_mapping["skimage"] = ("http://scikit-image.org/docs/stable/", None)
-intersphinx_mapping["drms"] = ("http://docs.sunpy.org/projects/drms/en/stable/", None)
+intersphinx_mapping["sunpy"] = ("http://docs.sunpy.org/en/stable/", None)
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -211,12 +207,6 @@ if has_sphinx_gallery:
             "generated", "gallery"
         ),  # path to save gallery generated examples
         "default_thumb_file": path.joinpath("logo", "sunpy_icon_128x128.png"),
-        "reference_url": {
-            "sunpy": "https://docs.sunpy.org/en/stable/",
-            "astropy": "http://docs.astropy.org/en/stable/",
-            "matplotlib": "https://matplotlib.org/",
-            "numpy": "http://docs.scipy.org/doc/numpy/",
-        },
         "abort_on_example_error": True,
         "plot_gallery": True,
     }
