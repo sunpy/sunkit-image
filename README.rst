@@ -1,7 +1,7 @@
 sunkit-image
 ============
 
-|Latest Version| |Build Status| |codecov| |Powered by NumFOCUS| |Powered by Sunpy|
+|Latest Version| |codecov| |Powered by NumFOCUS| |Powered by Sunpy|
 
 .. |Powered by Sunpy| image:: http://img.shields.io/badge/powered%20by-SunPy-orange.svg?style=flat
    :target: https://www.sunpy.org
