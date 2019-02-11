@@ -2,13 +2,14 @@
 This package contains a collection of functions of general utility.
 """
 import numpy as np
-
 import astropy.units as u
 
 from sunpy.coordinates import frames
 
+__all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii"]
 
-def _equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
+
+def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     """
     Define a set of equally spaced bins between the specified inner and outer values.  The inner
     value must be strictly less than the outer value.

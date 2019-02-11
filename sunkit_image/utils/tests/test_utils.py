@@ -1,19 +1,14 @@
-import pytest
-
 import numpy as np
-
+import pytest
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 import sunpy.map
 import sunpy.data.sample
 from sunpy.data.sample import AIA_171_IMAGE
-from sunkit_image.utils.utils import (
-    _equally_spaced_bins,
-    bin_edge_summary,
-    find_pixel_radii,
-    get_radial_intensity_summary,
-)
+
+from sunkit_image.utils.utils import (bin_edge_summary, find_pixel_radii,
+                                      equally_spaced_bins, get_radial_intensity_summary)
 
 
 @pytest.fixture
@@ -24,7 +19,7 @@ def smap():
 
 def test_equally_spaced_bins():
     # test the default
-    esb = _equally_spaced_bins()
+    esb = equally_spaced_bins()
     assert esb.shape == (2, 100)
     assert esb[0, 0] == 1.0
     assert esb[1, 0] == 1.01
@@ -32,7 +27,7 @@ def test_equally_spaced_bins():
     assert esb[1, 99] == 2.00
 
     # Bins are 0.015 wide
-    esb2 = _equally_spaced_bins(inner_value=0.5)
+    esb2 = equally_spaced_bins(inner_value=0.5)
     assert esb2.shape == (2, 100)
     assert esb2[0, 0] == 0.5
     assert esb2[1, 0] == 0.515
@@ -40,7 +35,7 @@ def test_equally_spaced_bins():
     assert esb2[1, 99] == 2.00
 
     # Bins are 0.2 wide
-    esb2 = _equally_spaced_bins(outer_value=3.0)
+    esb2 = equally_spaced_bins(outer_value=3.0)
     assert esb2.shape == (2, 100)
     assert esb2[0, 0] == 1.0
     assert esb2[1, 0] == 1.02
@@ -48,7 +43,7 @@ def test_equally_spaced_bins():
     assert esb2[1, 99] == 3.00
 
     # Bins are 0.01 wide
-    esb2 = _equally_spaced_bins(nbins=1000)
+    esb2 = equally_spaced_bins(nbins=1000)
     assert esb2.shape == (2, 1000)
     assert esb2[0, 0] == 1.0
     assert esb2[1, 0] == 1.001
@@ -57,17 +52,17 @@ def test_equally_spaced_bins():
 
     # The radii have the correct relative sizes
     with pytest.raises(ValueError):
-        _equally_spaced_bins(inner_value=1.0, outer_value=1.0)
+        equally_spaced_bins(inner_value=1.0, outer_value=1.0)
     with pytest.raises(ValueError):
-        _equally_spaced_bins(inner_value=1.5, outer_value=1.0)
+        equally_spaced_bins(inner_value=1.5, outer_value=1.0)
 
     # The number of bins is strictly greater than 0
     with pytest.raises(ValueError):
-        _equally_spaced_bins(nbins=0)
+        equally_spaced_bins(nbins=0)
 
 
 def test_bin_edge_summary():
-    esb = _equally_spaced_bins()
+    esb = equally_spaced_bins()
 
     center = bin_edge_summary(esb, "center")
     assert center.shape == (100,)
