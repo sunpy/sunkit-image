@@ -1,7 +1,4 @@
 """
-sunkit-image
-============
-
 An open-source Python library for Solar Physics image processing.
 
 Web Links
@@ -9,6 +6,8 @@ Web Links
 Homepage: https://sunpy.org
 
 Documentation: http://docs.sunpy.org/projects/sunkit-image/en/stable/
+
+Source code: https://github.com/sunpy/sunkit-image/
 """
 
 __all__ = []

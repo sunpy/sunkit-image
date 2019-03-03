@@ -1,5 +1,5 @@
 """
-This package contains a collection of functions of general utility.
+This module contains a collection of functions of general utility.
 """
 import numpy as np
 import astropy.units as u

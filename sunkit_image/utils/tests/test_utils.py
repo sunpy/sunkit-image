@@ -7,8 +7,12 @@ import sunpy.map
 import sunpy.data.sample
 from sunpy.data.sample import AIA_171_IMAGE
 
-from sunkit_image.utils.utils import (bin_edge_summary, find_pixel_radii,
-                                      equally_spaced_bins, get_radial_intensity_summary)
+from sunkit_image.utils.utils import (
+    bin_edge_summary,
+    find_pixel_radii,
+    equally_spaced_bins,
+    get_radial_intensity_summary,
+)
 
 
 @pytest.fixture
@@ -114,5 +118,5 @@ def test_find_pixel_radii(smap):
 
 
 def test_get_radial_intensity_summary():
-    # TODO: do this.
+    # TODO: Write some tests.
     pass

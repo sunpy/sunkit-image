@@ -1,5 +1,5 @@
 """
-This package implements a class for noise level estimation.
+This module implements a class for noise level estimation.
 """
 
 import numpy as np
@@ -10,7 +10,6 @@ from scipy.ndimage import correlate
 __all__ = ["NoiseLevelEstimation"]
 
 
-# TODO: Unconvert this class?
 class NoiseLevelEstimation:
     def __init__(self, img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
         """
