@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "numpy", "sunpy"]
+requires = ["setuptools", "wheel"]
 
 [ tool.sunpy-bot ]
   # disable astropy checks
@@ -47,7 +47,7 @@ requires = ["setuptools", "wheel", "numpy", "sunpy"]
 """
 
 [tool.towncrier]
-    package = "sunkit-image"
+    package = "sunkit_image"
     filename = "CHANGELOG.rst"
     directory = "changelog/"
     issue_format = "`#{issue} <https://github.com/sunpy/sunkit-image/pull/{issue}>`__"

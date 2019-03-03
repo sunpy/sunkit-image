@@ -1,10 +1,9 @@
 import os
 
-import pytest
 import numpy as np
-from numpy.testing import assert_allclose
-
+import pytest
 import astropy.units as u
+from numpy.testing import assert_allclose
 
 import sunpy
 import sunpy.map

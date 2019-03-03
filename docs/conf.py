@@ -110,14 +110,14 @@ linkcheck_anchors = False
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
 rst_epilog += """
-.. sunkit-image
+.. sunkit_image
 .. _SunPy: https://sunpy.org
 .. _`SunPy mailing list`: https://groups.google.com/group/sunpy
 .. _`SunPy dev mailing list`: https://groups.google.com/group/sunpy-dev
 """
 
 # -- Project information ------------------------------------------------------
-project = u"sunkit-image"
+project = u"sunkit_image"
 author = u"The SunPy Community"
 copyright = u"{}, {}".format(datetime.datetime.now().year, author)
 
