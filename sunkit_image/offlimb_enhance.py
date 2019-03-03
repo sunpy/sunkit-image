@@ -303,7 +303,8 @@ def normalizing_radial_gradient_filter(
 def fourier_normalizing_radial_gradient_filter(
     smap,
     radial_bin_edges,
-    order=30,
+    order,
+    attenuation_coefficients,
     ratio_mix=[15, 1],
     scale=None,
     intensity_summary=np.nanmean,
@@ -333,6 +334,11 @@ def fourier_normalizing_radial_gradient_filter(
 
     order : `~int`
         Order (Number) of fourier coefficients.
+
+    attenuation_coefficients : `~float`
+        A two dimensional array of shape [2, order + 1]. The first row contain attenuation coefficients
+        for mean calculations. The second row contains attenuation coefficients for standard deviation
+        calculation.
 
     ratio_mix : `~float`
         The ratio in which the original image and filtered image are mixed.
@@ -424,13 +430,13 @@ def fourier_normalizing_radial_gradient_filter(
                 average_segments[0, j] = intensity_summary(smap.data[annulus_segment])
                 std_dev[0, j] = width_function(smap.data[annulus_segment])
 
-        # Calculating the fourier coefficients
-        fourier_coefficient_a_0 = np.sum(average_segments) * (2 / number_angular_segments)
-        fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (2 / number_angular_segments)
-        fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (2 / number_angular_segments)
-        fourier_coefficient_c_0 = np.sum(std_dev) * (2 / number_angular_segments)
-        fourier_coefficients_c_k = np.matmul(std_dev, cos_matrix) * (2 / number_angular_segments)
-        fourier_coefficients_d_k = np.matmul(std_dev, sin_matrix) * (2 / number_angular_segments)
+        # Calculating the fourier coefficients multiplied with the attenuation coefficients
+        fourier_coefficient_a_0 = np.sum(average_segments) * (2 / number_angular_segments) * (attenuation_coefficients[0, 1])
+        fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (2 / number_angular_segments) * attenuation_coefficients[0][1:]
+        fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (2 / number_angular_segments) * attenuation_coefficients[0][1:]
+        fourier_coefficient_c_0 = np.sum(std_dev) * (2 / number_angular_segments) * attenuation_coefficients[1, 1]
+        fourier_coefficients_c_k = np.matmul(std_dev, cos_matrix) * (2 / number_angular_segments) * attenuation_coefficients[1][1:]
+        fourier_coefficients_d_k = np.matmul(std_dev, sin_matrix) * (2 / number_angular_segments) * attenuation_coefficients[1][1:]
 
         # To calculate the multiples of angles of each pixel for finding the fourier approximation
         # at that point. See equations 6.8 and 6.9 of the doctoral thesis.
