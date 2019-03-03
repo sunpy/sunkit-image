@@ -314,56 +314,44 @@ def fourier_normalizing_radial_gradient_filter(
     number_angular_segments=130,
 ):
     """
-    Implementation of the fourier normalizing radial gradient filter (FNRGF) of Morgan, Habbal & Druckmüllerová, 2011,
-    Astrophysical Journal 737, 88. https://iopscience.iop.org/article/10.1088/0004-637X/737/2/88/pdf.
+    Implementation of the fourier normalizing radial gradient filter (FNRGF). 
 
-    The implementation is highly inspired by https://dspace.vutbr.cz/bitstream/handle/11012/34520/DoctoralThesis.pdf.
+    ..note ::
 
-    Note that after applying the FNRGF plot settings such as the image normalization
-    may have to be changed in order to obtain a good-looking plot.
+        After applying the filter, current plot settings such as the image normalization
+        may have to be changed in order to obtain a good-looking plot
 
     Parameters
     ----------
     smap : `sunpy.map.Map`
         A SunPy map
-
     radial_bin_edges : `~astropy.units.Quantity`
         A two-dimensional array of bin edges of size [2, nbins] where nbins is
         the number of bins.
-
     order : `~int`
         Order (Number) of fourier coefficients.
-
     attenuation_coefficients : `~float`
         A two dimensional array of shape [2, order + 1]. The first row contain attenuation coefficients
         for mean calculations. The second row contains attenuation coefficients for standard deviation
         calculation.
-
     ratio_mix : `~float`
         The ratio in which the original image and filtered image are mixed.
-
     scale : None | `astropy.units.Quantity`
         The radius of the Sun expressed in map units.  For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds.  If None, then the map scale is used.
-
     intensity_summary :`~function`
         A function that returns a summary statistic of the radial intensity,
         for example `~numpy.mean` and `~numpy.median`.
-
     intensity_summary_kwargs : None | `~dict`
         Keywords applicable to the summary function.
-
     width_function : `~function`
         A function that returns a summary statistic of the distribution of intensity,
         at a given radius, for example `~numpy.std`.
-
     width_function_kwargs : `~function`
         Keywords applicable to the width function.
-
     application_radius : `~astropy.units.Quantity`
         The FNRGF is applied to emission at radii above the application_radius.
-
     number_angular_segments : `~int`
         Number of angular segments in a circular annulus. Default value is 130. It should always be
         even.
@@ -372,6 +360,16 @@ def fourier_normalizing_radial_gradient_filter(
     -------
     new_map : `sunpy.map.Map`
         A SunPy map that has had the FNRGF applied to it.
+
+    References
+    ----------
+    * Morgan, Habbal & Druckmüllerová, 2011, Astrophysical Journal 737, 88.
+      https://iopscience.iop.org/article/10.1088/0004-637X/737/2/88/pdf.
+    * The implementation is highly inspired by this doctoral thesis.
+      DRUCKMÜLLEROVÁ, H. Application of adaptive filters in processing of solar corona
+      images. Brno: Vysoké učenı́ technické v Brně, Fakulta strojnı́ho inženýrstvı́, 2014. 120 s.
+      Vedoucı́ dizertačnı́ práce doc. PaedDr. Dalibor Martišek, Ph.D.
+      https://dspace.vutbr.cz/bitstream/handle/11012/34520/DoctoralThesis.pdf.
     """
 
     # Get the radii for every pixel
