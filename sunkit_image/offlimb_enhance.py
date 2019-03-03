@@ -399,7 +399,7 @@ def fourier_normalizing_radial_gradient_filter(
         segment_angle = 2*np.pi / number_angular_segments
 
         # Storage of mean and standard deviation of each segment in a circular ring
-        E = np.zeros((1, number_angular_segments))
+        average_segments = np.zeros((1, number_angular_segments))
         std_dev = np.zeros((1, number_angular_segments))
 
         # Calculating sin and cos of the angles to be multiplied with the means and standard
@@ -418,16 +418,16 @@ def fourier_normalizing_radial_gradient_filter(
 
             # Finding mean and standard deviation in each segnment. If takes care of the empty slices.
             if np.sum([annulus_segment > 0]) == 0:
-                E[0, j] = 0
+                average_segments[0, j] = 0
                 std_dev[0, j] = 0
             else:
-                E[0, j] = intensity_summary(smap.data[annulus_segment])
+                average_segments[0, j] = intensity_summary(smap.data[annulus_segment])
                 std_dev[0, j] = width_function(smap.data[annulus_segment])
 
         # Calculating the fourier coefficients
-        fourier_coefficient_a_0 = np.sum(E) * (2 / number_angular_segments)
-        fourier_coefficients_a_k = np.matmul(E, cos_matrix) * (2 / number_angular_segments)
-        fourier_coefficients_b_k = np.matmul(E, sin_matrix) * (2 / number_angular_segments)
+        fourier_coefficient_a_0 = np.sum(average_segments) * (2 / number_angular_segments)
+        fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (2 / number_angular_segments)
+        fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (2 / number_angular_segments)
         fourier_coefficient_c_0 = np.sum(std_dev) * (2 / number_angular_segments)
         fourier_coefficients_c_k = np.matmul(std_dev, cos_matrix) * (2 / number_angular_segments)
         fourier_coefficients_d_k = np.matmul(std_dev, sin_matrix) * (2 / number_angular_segments)
