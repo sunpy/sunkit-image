@@ -1,6 +1,6 @@
-****************************
-sunkit-image offlimb_enhance
-****************************
+***************
+offlimb_enhance
+***************
 
 This package implements offlimb enhancement routines for solar physics data.
 

@@ -1,7 +1,7 @@
 import os
+import re
 import glob
 import fnmatch
-import re
 
 from astropy.utils.data import get_pkg_data_filename
 
@@ -32,7 +32,6 @@ def get_test_filepath(filename, **kwargs):
 
     This is a wrapper around `~astropy.utils.data.get_pkg_data_filename` which
     sets the ``package`` kwarg to be 'sunkit_image.data`.
-
     """
     return get_pkg_data_filename(filename, package="sunkit_image.data", **kwargs)
 
@@ -47,7 +46,6 @@ def test_data_filenames():
     ------
     get_all_test_filepath : `list`
         The name of all test files in ``data/test`` directory.
-
     """
     test_data_filenames_list = []
     excludes = ["*.pyc", "*" + os.path.sep + "__*__", "*.py"]

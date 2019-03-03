@@ -14,13 +14,22 @@ apt-run: &apt-install
   name: Install apt packages
   command: |
     apt update
-    apt install -y graphviz build-essential
+    apt install -y build-essential
 
 tox-install: &tox-install
   name: Install Tox
   command: |
     pip install tox
     pip install tox-conda
+
+image-run: &image-tests
+  name: Run image tests
+  environment:
+    MPLBACKEND: Agg
+  command: |
+    tox -e figure
+    pip install codecov
+    codecov
 
 version: 2
 jobs:
@@ -42,33 +51,23 @@ jobs:
       - run: *merge-check
       - run: python setup.py egg_info
 
-  pip:
+  pip-install:
     docker:
       - image: continuumio/miniconda3
     steps:
-      - restore_cache:
-          keys: sample-data-v1
       - checkout
       - run: *skip-check
       - run: *merge-check
       - run: *apt-install
       - run:
-          name: Install sunpy master
-          command: pip install git+git://github.com/sunpy/sunpy
+          name: Update pip
+          command: pip install -U pip
       - run:
-          name: Install dependencies
+          name: Install SunPy
+          command: pip install --progress-bar off git+git://github.com/sunpy/sunpy
+      - run:
+          name: Install sunkit-image
           command: pip install --progress-bar off -e .[all,dev]
-      - run:
-          name: Run tests
-          command: PYTHONHASHSEED=42 pytest --remote-data=any ./
-      - save_cache:
-          key: sample-data-v1
-          paths:
-            - ~/sunpy/data/sample_data
-
-    environment:
-          MPLBACKEND: agg
-          COLUMNS: 180
 
   html-docs:
     docker:
@@ -97,9 +96,9 @@ workflows:
       - egg-info-36
       - egg-info-37
 
-  pip-test:
+  pip-install:
     jobs:
-      - pip
+      - pip-install
 
   test-documentation:
     jobs:
