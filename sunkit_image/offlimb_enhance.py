@@ -337,12 +337,12 @@ def fourier_normalizing_radial_gradient_filter(
         The ratio in which the original image and filtered image are mixed.
         Defaults to ``[15, 1]``.
     scale : None or `astropy.units.Quantity`, optional
-        The radius of the Sun expressed in map units.  For example, in typical
+        The radius of the Sun expressed in map units. For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
-        of arcseconds.  If None, then the map scale is used.
+        of arcseconds. If None, then the map scale is used.
     intensity_summary :`function`, optional
-        A function that returns a summary statistic of the radial intensity,
-        Default is numpy.nanmean
+        A function that returns a summary statistic of the radial intensity.
+        Default is `numpy.nanmean`.
     intensity_summary_kwargs : None, `~dict`
         Keywords applicable to the summary function.
     width_function : `function`
