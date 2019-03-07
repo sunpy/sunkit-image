@@ -333,7 +333,7 @@ def fourier_normalizing_radial_gradient_filter(
         coefficients for mean calculations. The second row contains attenuation coefficients
         for standard deviation calculation.
     ratio_mix : `float`
-        A one dimensional array of shape [2, 1] with values equal to [K1, K2].
+        A one dimensional array of shape ``[2, 1]`` with values equal to ``[K1, K2]``.
         The ratio in which the original image and filtered image are mixed.
         Defaults to ``[15, 1]``.
     scale : None or `astropy.units.Quantity`, optional
