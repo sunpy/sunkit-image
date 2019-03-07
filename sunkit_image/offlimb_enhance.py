@@ -234,12 +234,9 @@ def normalizing_radial_gradient_filter(
         For example, in typical Helioprojective Cartesian maps the solar radius is expressed in
         units of arcseconds.
         Defaults to None, which means that the map scale is used.
-    summarize_bin_edges : `str`, optional
-        How to summarize the bin edges.s
-        Defaults to "center".
     intensity_summary : `function`, optional
         A function that returns a summary statistic of the radial intensity.
-        Defaults to `numpy.mean`.
+        Defaults to `numpy.nanmean`.
     intensity_summary_kwargs : None, `dict`
         Keywords applicable to the summary function.
     width_function : `function`
@@ -314,7 +311,7 @@ def fourier_normalizing_radial_gradient_filter(
     number_angular_segments=130,
 ):
     """
-    Implementation of the fourier normalizing radial gradient filter (FNRGF). 
+    Implementation of the fourier normalizing radial gradient filter (FNRGF).
 
     ..note ::
 
@@ -325,36 +322,40 @@ def fourier_normalizing_radial_gradient_filter(
     ----------
     smap : `sunpy.map.Map`
         A SunPy map
-    radial_bin_edges : `~astropy.units.Quantity`
+    radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of size [2, nbins] where nbins is
         the number of bins.
-    order : `~int`
+    order : `int`
         Order (Number) of fourier coefficients.
-    attenuation_coefficients : `~float`
-        A two dimensional array of shape [2, order + 1]. The first row contain attenuation coefficients
-        for mean calculations. The second row contains attenuation coefficients for standard deviation
-        calculation.
-    ratio_mix : `~float`
+    attenuation_coefficients : `float`
+        A two dimensional array of shape [2, order + 1]. The first row contain attenuation
+        coefficients for mean calculations. The second row contains attenuation coefficients
+        for standard deviation calculation.
+    ratio_mix : `float`
+        A one dimensional array of shape [2, 1] with values equal to [K1, K2].
         The ratio in which the original image and filtered image are mixed.
-    scale : None | `astropy.units.Quantity`
+        Defaults to [15,1].
+    scale : None or `astropy.units.Quantity`, optional
         The radius of the Sun expressed in map units.  For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds.  If None, then the map scale is used.
-    intensity_summary :`~function`
+    intensity_summary :`function`, optional
         A function that returns a summary statistic of the radial intensity,
-        for example `~numpy.mean` and `~numpy.median`.
-    intensity_summary_kwargs : None | `~dict`
+        Default is numpy.nanmean
+    intensity_summary_kwargs : None, `~dict`
         Keywords applicable to the summary function.
-    width_function : `~function`
+    width_function : `function`
         A function that returns a summary statistic of the distribution of intensity,
-        at a given radius, for example `~numpy.std`.
-    width_function_kwargs : `~function`
+        at a given radius.
+        Defaults to `numpy.std`.
+    width_function_kwargs : `function`
         Keywords applicable to the width function.
-    application_radius : `~astropy.units.Quantity`
+    application_radius : `astropy.units.Quantity`
         The FNRGF is applied to emission at radii above the application_radius.
-    number_angular_segments : `~int`
-        Number of angular segments in a circular annulus. Default value is 130. It should always be
-        even.
+        Defaults to 1 solar radii.
+    number_angular_segments : `int`
+        Number of angular segments in a circular annulus.
+        Defaults to 130.
 
     Returns
     -------
@@ -366,9 +367,7 @@ def fourier_normalizing_radial_gradient_filter(
     * Morgan, Habbal & Druckmüllerová, 2011, Astrophysical Journal 737, 88.
       https://iopscience.iop.org/article/10.1088/0004-637X/737/2/88/pdf.
     * The implementation is highly inspired by this doctoral thesis.
-      DRUCKMÜLLEROVÁ, H. Application of adaptive filters in processing of solar corona
-      images. Brno: Vysoké učenı́ technické v Brně, Fakulta strojnı́ho inženýrstvı́, 2014. 120 s.
-      Vedoucı́ dizertačnı́ práce doc. PaedDr. Dalibor Martišek, Ph.D.
+      DRUCKMÜLLEROVÁ, H. Application of adaptive filters in processing of solar corona images.
       https://dspace.vutbr.cz/bitstream/handle/11012/34520/DoctoralThesis.pdf.
     """
 
@@ -412,7 +411,7 @@ def fourier_normalizing_radial_gradient_filter(
 
         # Iterate over each segment in a circular ring
         for j in range(0, number_angular_segments, 1):
-       
+
             # Finding all the pixels whose angle values lie in the segment
             angular_segment = np.logical_and(angles > segment_angle * j, angles < segment_angle * (j + 1))
 
