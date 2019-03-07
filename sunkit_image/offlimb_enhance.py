@@ -327,7 +327,7 @@ def fourier_normalizing_radial_gradient_filter(
         A two-dimensional array of bin edges of size [2, nbins] where nbins is
         the number of bins.
     order : `int`
-        Order (Number) of fourier coefficients.
+        Order (number) of fourier coefficients.
     attenuation_coefficients : `float`
         A two dimensional array of shape [2, order + 1]. The first row contain attenuation
         coefficients for mean calculations. The second row contains attenuation coefficients
