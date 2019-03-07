@@ -322,7 +322,7 @@ def fourier_normalizing_radial_gradient_filter(
     Parameters
     ----------
     smap : `sunpy.map.Map`
-        A SunPy map
+        A SunPy map.
     radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of size [2, nbins] where nbins is
         the number of bins.
