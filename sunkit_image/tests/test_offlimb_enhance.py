@@ -1,9 +1,6 @@
-import os
-
 import numpy as np
 import pytest
 import astropy.units as u
-from numpy.testing import assert_allclose
 
 import sunpy
 import sunpy.map
@@ -45,12 +42,14 @@ def test_fourier_normalizing_radial_gradient_filter():
 
         order = 20
         attenuation_coefficients = set_attenuation_coefficients(order)
-        expect = off.fourier_normalizing_radial_gradient_filter(test_map, radial_bin_edges, order, attenuation_coefficients)
+        expect = off.fourier_normalizing_radial_gradient_filter(test_map, radial_bin_edges, order,
+                                                                attenuation_coefficients)
         assert np.allclose(expect.data.shape, test_map.data.shape)
         assert np.allclose(expect.data, result)
 
         order = 33
         attenuation_coefficients = set_attenuation_coefficients(order)
-        expect = off.fourier_normalizing_radial_gradient_filter(test_map, radial_bin_edges, order, attenuation_coefficients)
+        expect = off.fourier_normalizing_radial_gradient_filter(test_map, radial_bin_edges, order,
+                                                                attenuation_coefficients)
         assert np.allclose(expect.data.shape, test_map.data.shape)
         assert np.allclose(expect.data, result)
