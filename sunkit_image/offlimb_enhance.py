@@ -335,7 +335,7 @@ def fourier_normalizing_radial_gradient_filter(
     ratio_mix : `float`
         A one dimensional array of shape [2, 1] with values equal to [K1, K2].
         The ratio in which the original image and filtered image are mixed.
-        Defaults to [15,1].
+        Defaults to ``[15, 1]``.
     scale : None or `astropy.units.Quantity`, optional
         The radius of the Sun expressed in map units.  For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
