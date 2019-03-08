@@ -9,11 +9,19 @@ import sunkit_image.utils.utils as utils
 import sunkit_image.offlimb_enhance as off
 
 
-test_map_data = np.ones((5, 5))
-header = {}
-test_map = sunpy.map.Map((test_map_data, header))
-radial_bin_edges = utils.equally_spaced_bins()
-radial_bin_edges = radial_bin_edges*u.R_sun
+@pytest.fixture
+def map_test():
+        test_map_data = np.ones((5, 5))
+        header = {}
+        test_map = sunpy.map.Map((test_map_data, header))
+        return test_map
+
+
+@pytest.fixture
+def radial_bin_edges():
+        radial_bins = utils.equally_spaced_bins()
+        radial_bins = radial_bins*u.R_sun
+        return radial_bins
 
 
 def set_attenuation_coefficients(order):
@@ -23,33 +31,25 @@ def set_attenuation_coefficients(order):
     return attenuation_coefficients
 
 
-def test_normalizing_radial_gradient_filter():
+def test_normalizing_radial_gradient_filter(map_test, radial_bin_edges):
 
     with pytest.warns(Warning, match="Missing metadata for solar radius: assuming photospheric limb as seen from Earth"):
 
-        result = np.zeros_like(test_map_data)
-        expect = off.normalizing_radial_gradient_filter(test_map, radial_bin_edges)
+        result = np.zeros_like(map_test.data)
+        expect = off.normalizing_radial_gradient_filter(map_test, radial_bin_edges)
 
-        assert np.allclose(expect.data.shape, test_map.data.shape)
+        assert np.allclose(expect.data.shape, map_test.data.shape)
         assert np.allclose(expect.data, result)
 
 
-def test_fourier_normalizing_radial_gradient_filter():
+@pytest.mark.parametrize("order", [(20), (33)])
+def test_fourier_normalizing_radial_gradient_filter(order, map_test, radial_bin_edges):
 
     with pytest.warns(Warning, match="Missing metadata for solar radius: assuming photospheric limb as seen from Earth"):
 
-        result = np.zeros_like(test_map_data)
-
-        order = 20
+        result = np.zeros_like(map_test.data)
         attenuation_coefficients = set_attenuation_coefficients(order)
-        expect = off.fourier_normalizing_radial_gradient_filter(test_map, radial_bin_edges, order,
+        expect = off.fourier_normalizing_radial_gradient_filter(map_test, radial_bin_edges, order,
                                                                 attenuation_coefficients)
-        assert np.allclose(expect.data.shape, test_map.data.shape)
-        assert np.allclose(expect.data, result)
-
-        order = 33
-        attenuation_coefficients = set_attenuation_coefficients(order)
-        expect = off.fourier_normalizing_radial_gradient_filter(test_map, radial_bin_edges, order,
-                                                                attenuation_coefficients)
-        assert np.allclose(expect.data.shape, test_map.data.shape)
+        assert np.allclose(expect.data.shape, map_test.data.shape)
         assert np.allclose(expect.data, result)

@@ -1,1 +1,1 @@
-Added a new feature ```fourier_normalizing_radial_gradient_filter``` to normalize the radial brightness gradient using a fourier approximation.
+Added a new function (`fourier_normalizing_radial_gradient_filter`) to normalize the radial brightness gradient using a fourier approximation.

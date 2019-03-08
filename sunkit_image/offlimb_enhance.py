@@ -20,6 +20,7 @@ __all__ = [
     "normalize_fit_radial_intensity",
     "intensity_enhance",
     "normalizing_radial_gradient_filter",
+    "fourier_normalizing_radial_gradient_filter"
 ]
 
 
@@ -324,8 +325,7 @@ def fourier_normalizing_radial_gradient_filter(
     smap : `sunpy.map.Map`
         A SunPy map.
     radial_bin_edges : `astropy.units.Quantity`
-        A two-dimensional array of bin edges of size [2, nbins] where nbins is
-        the number of bins.
+        A two-dimensional array of bin edges of size [2, nbins] where nbins is the number of bins.
     order : `int`
         Order (number) of fourier coefficients.
     attenuation_coefficients : `float`
@@ -346,8 +346,7 @@ def fourier_normalizing_radial_gradient_filter(
     intensity_summary_kwargs : None, `~dict`
         Keywords applicable to the summary function.
     width_function : `function`
-        A function that returns a summary statistic of the distribution of intensity,
-        at a given radius.
+        A function that returns a summary statistic of the distribution of intensity, at a given radius.
         Defaults to `numpy.std`.
     width_function_kwargs : `function`
         Keywords applicable to the width function.
