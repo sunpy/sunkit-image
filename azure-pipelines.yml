@@ -22,3 +22,9 @@ jobs:
     name: Windows_36_online
     os: windows
     tox: py36-online
+
+- template: azure-templates.yml
+  parameters:
+    name: Linux_36_Conda_offline
+    os: linux
+    tox: conda
