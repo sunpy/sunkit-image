@@ -9,10 +9,12 @@ from scipy.ndimage import correlate
 
 __all__ = ["NoiseLevelEstimation"]
 
-
-class NoiseLevelEstimation:
-    def __init__(self, img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
-        """
+img = 0
+patchsize=7
+decim=0
+conf = 1 - 1e-6
+itr = 3
+"""
         Estimates the noise level of an image.
 
         Additive white Gaussian noise (AWGN) is a basic noise model used in Information Theory
@@ -76,18 +78,8 @@ class NoiseLevelEstimation:
         * Xinhao Liu, Masayuki Tanaka and Masatoshi Okutomi
           Single-Image Noise Level Estimation for Blind Denoising Noisy Image
           IEEE Transactions on Image Processing, Vol.22, No.12, pp.5226-5237, December, 2013.
-        """
-
-        self.img = img
-        self.patchsize = patchsize
-        self.decim = decim
-        self.conf = conf
-        self.itr = itr
-
-        self.nlevel, self.th, self.num = self.noiselevel()
-        self.mask = self.weaktexturemask()
-
-    def noiselevel(self):
+          """
+def noiselevel():
         """
         Calculates the noise level of the input array.
         """
@@ -181,8 +173,7 @@ class NoiseLevelEstimation:
         self.img = np.squeeze(self.img)
 
         return nlevel, th, num
-
-    def convmtx2(self, H, m, n):
+def convmtx2( H, m, n):
         """
         Specialized 2D convolution matrix generation.
 
@@ -210,8 +201,7 @@ class NoiseLevelEstimation:
                     T[k, (i + p) * n + j : (i + p) * n + j + 1 + s[1] - 1] = H[p, :]
                 k = k + 1
         return T
-
-    def weaktexturemask(self):
+def weaktexturemask():
         """
         Calculates the weak texture mask.
         """
