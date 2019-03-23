@@ -1,14 +1,16 @@
 import numpy as np
 from skimage import data
+import sys
+sys.path.append("..noise")
 
-from ..noise import NoiseLevelEstimation as nle
+from noise import *
 
 img = data.camera()
 
 
 def convmtx2_test():
 
-    tt = nle.convmtx2(img, 11.0, 7.0)
+    tt = convmtx2(img, 11.0, 7.0)
     assert tt.shape == ((11 - img.shape[0] + 1) * (7 - img.shape[1] + 1), 11.0 * 7.0)
 
 
@@ -20,7 +22,7 @@ def noiselevel_test():
 
     for n in range(noise_levels.size):
         noise = img + np.random.standard_normal(img.shape) * noise_levels[n]
-        output = nle(noise, patchsize=11, itr=5)
+        output = initialise(noise, patchsize=11, itr=5)
         n_levels[n] = output.nlevel
         n_patches[n] = output.num
 
@@ -31,6 +33,6 @@ def noiselevel_test():
 def weaktexturemask_test():
     noise_levels = 5
     noise = img + np.random.standard_normal(img.shape) * noise_levels
-    output = nle(noise, patchsize=11, itr=5)
+    output = initialise(noise, patchsize=11, itr=5)
 
     assert np.sum(output.mask) / output.mask.size < 1.0
