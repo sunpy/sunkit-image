@@ -8,12 +8,27 @@ from skimage.util import view_as_windows
 from scipy.ndimage import correlate
 
 __all__ = ["NoiseLevelEstimation"]
-
 img = 0
-patchsize=7
-decim=0
+patchsize = 7
+decim = 0
 conf = 1 - 1e-6
-itr = 3
+itr_ = 3
+
+"""
+        Intialise all other global varibles here
+""""
+
+def initialise(image, patch_size, itr_, decimal, conf_):
+    global img
+    img = image
+    global patchsize
+    patchsize=patch_size
+    global decim
+    decim=decimal
+    global conf
+    conf = conf_
+    global itr
+    itr = itr_
 """
         Estimates the noise level of an image.
 
@@ -78,7 +93,7 @@ itr = 3
         * Xinhao Liu, Masayuki Tanaka and Masatoshi Okutomi
           Single-Image Noise Level Estimation for Blind Denoising Noisy Image
           IEEE Transactions on Image Processing, Vol.22, No.12, pp.5226-5237, December, 2013.
-          """
+        """
 def noiselevel():
         """
         Calculates the noise level of the input array.
