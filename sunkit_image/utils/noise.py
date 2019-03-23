@@ -16,7 +16,7 @@ itr_ = 3
 
 """
         Intialise all other global varibles here
-""""
+"""
 
 def initialise(image, patch_size, itr_, decimal, conf_):
     global img
