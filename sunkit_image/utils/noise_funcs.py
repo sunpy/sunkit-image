@@ -7,16 +7,81 @@ from scipy.stats import gamma
 from skimage.util import view_as_windows
 from scipy.ndimage import correlate
 
-__all__ = ["NoiseLevelEstimation"]
+__all__ = ['noise_estimation','noiselevel','convmtx2','weaktexturemask']
 
-#TODO: Variable type checks on function calls
-#TODO: Testing
 #TODO: Documentation and comments
 
 def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
-   
+
+    """
+    Estimates the noise level of an image.
+
+    Additive white Gaussian noise (AWGN) is a basic noise model used in Information Theory
+    to mimic the effect of many random processes that occur in nature.
+
+    Parameters
+    ----------
+    img: `numpy.ndarray`
+        Single Numpy image array.
+    patchsize : `int`, optional
+        Patch size, defaults to 7.
+    decim : `int`, optional
+        Decimation factor, defaults to 0.
+        If you use large number, the calculation will be accelerated.
+    conf : `float`, optional
+        Confidence interval to determine the threshold for the weak texture.
+        In this algorithm, this value is usually set the value very close to one.
+        Defaults to 0.99.
+    itr : `int`, optional
+        Number of iterations,  defaults to 3.
+
+    Returns
+    ----------
+    nlevel: `numpy.ndarray`
+        Estimated noise levels.
+    th: `numpy.ndarray`
+        Threshold to extract weak texture patches at the last iteration.
+    num: `numpy.ndarray`
+        Number of extracted weak texture patches at the last iteration.
+    mask: `numpy.ndarray`
+        Weak-texture mask.
+    0 and 1 represent non-weak-texture and weak-texture regions, respectively.
+    """
+
+    if not(type(img) is np.ndarray):
+        raise TypeError('Input image should be a NumPy ndarray')
+
+    if not(type(patchsize) is int):
+        try:
+            patchsize = int(patchsize)
+        except ValueError:
+            raise TypeError('patchsize must be an integer, or int-compatible, variable')
+
+    if not(type(decim) is int):
+        try:
+            decim = int(decim)
+        except ValueError:
+            raise TypeError('decim must be an integer, or int-compatible, variable')
+
+    if not(type(conf) is float):
+        try:
+            conf = float(conf)
+        except ValueError:
+            raise TypeError('conf must be a float, or float-compatible, value between 0 and 1')
+
+    if not(conf >=0 and conf <= 1):
+        raise ValueError('conf must be defined in the interval 0 <= conf <= 1')
+    
+    if not(type(itr) is int):
+        try:
+            itr = int(itr)
+        except ValueError:
+            raise TypeError('itr must be an integer, or int-compatible, variable')
+
     nlevel, th, num = noiselevel(img, patchsize, decim, conf, itr)
     mask = weaktexturemask(img, patchsize, th)
+
+    return nlevel, th, num, mask
 
 def noiselevel(img, patchsize, decim, conf, itr):
     """
@@ -132,6 +197,8 @@ def convmtx2(H, m, n):
         The new convoluted matrix.
     """
     s = np.shape(H)
+    m = int(m)
+    n = int(n)
     T = np.zeros([(m - s[0] + 1) * (n - s[1] + 1), m * n])
 
     k = 0
@@ -139,8 +206,8 @@ def convmtx2(H, m, n):
         for j in range((n - s[1] + 1)):
             for p in range(s[0]):
                 T[k, (i + p) * n + j : (i + p) * n + j + 1 + s[1] - 1] = H[p, :]
-                k = k + 1
-
+    
+            k += 1
     return T
 
 
