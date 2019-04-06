@@ -5,14 +5,16 @@ import sunkit_image.utils.noise as nf
 
 img = data.camera()
 
+
 def convmtx2_test(img):
 
     tt = nf.convmtx2(img, 11.0, 7.0)
     assert tt.shape == ((11 - img.shape[0] + 1) * (7 - img.shape[1] + 1), 11.0 * 7.0)
 
+
 def noiselevel_test(img):
 
-    noise_levels = np.array([5.0,10.0,20.0,42.0])
+    noise_levels = np.array([5.0, 10.0, 20.0, 42.0])
     n_levels = np.zeros_like(noise_levels)
     n_patches = np.zeros_like(noise_levels)
 
@@ -25,6 +27,7 @@ def noiselevel_test(img):
         assert np.abs(1 - n_levels[n] / noise_levels[n]) < 0.1
         assert n_patches[n] > 10000.0
 
+
 def weaktexturemask_test(img):
 
     noise_levels = 5
@@ -32,6 +35,7 @@ def weaktexturemask_test(img):
     output = nf.noise_estimation(noise, patchsize=11, itr=5)
 
     assert np.sum(output[3]) / output[3].size < 1.0
+
 
 if __name__ == '__main__':
     

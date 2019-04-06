@@ -7,9 +7,10 @@ from scipy.stats import gamma
 from skimage.util import view_as_windows
 from scipy.ndimage import correlate
 
-__all__ = ['noise_estimation','noiselevel','convmtx2','weaktexturemask']
+__all__ = ['noise_estimation', 'noiselevel', 'convmtx2', 'weaktexturemask']
 
-#TODO: Documentation and comments
+# TODO: Documentation and comments
+
 
 def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
 
@@ -69,7 +70,7 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
         except ValueError:
             raise TypeError('conf must be a float, or float-compatible, value between 0 and 1')
 
-    if not(conf >=0 and conf <= 1):
+    if not (conf >=0 and conf <= 1) :
         raise ValueError('conf must be defined in the interval 0 <= conf <= 1')
     
     if not(type(itr) is int):
@@ -82,6 +83,7 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
     mask = weaktexturemask(img, patchsize, th)
 
     return nlevel, th, num, mask
+
 
 def noiselevel(img, patchsize, decim, conf, itr):
     """
@@ -96,7 +98,7 @@ def noiselevel(img, patchsize, decim, conf, itr):
 
     kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 0), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
+    imgh = imgh[ :, 1 : imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 2)
@@ -135,10 +137,10 @@ def noiselevel(img, patchsize, decim, conf, itr):
         ).transpose()
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
-        
+
         if decim > 0:
             XtrX = np.transpose(np.concatenate((Xtr, X), axis=0))
-            XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(),])
+            XtrX = np.transpose(XtrX[XtrX[ :, 0].argsort(), ])
             p = np.floor(XtrX.shape[1] / (decim + 1))
             p = np.expand_dims(np.arange(0, p) * (decim + 1), 0)
             Xtr = XtrX[0, p.astype("int")]
@@ -178,6 +180,7 @@ def noiselevel(img, patchsize, decim, conf, itr):
 
     return nlevel, th, num
 
+
 def convmtx2(H, m, n):
     """
     Specialized 2D convolution matrix generation.
@@ -206,7 +209,7 @@ def convmtx2(H, m, n):
         for j in range((n - s[1] + 1)):
             for p in range(s[0]):
                 T[k, (i + p) * n + j : (i + p) * n + j + 1 + s[1] - 1] = H[p, :]
-    
+
             k += 1
     return T
 
@@ -220,7 +223,7 @@ def weaktexturemask(img, patchsize, th):
 
     kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
+    imgh = imgh[ :, 1 : imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
@@ -232,7 +235,7 @@ def weaktexturemask(img, patchsize, th):
     msk = np.zeros_like(img)
 
     for cha in range(s[2]):
-        m = view_as_windows(img[:, :, cha], (patchsize, patchsize))
+        m = view_as_windows(img[ :, :, cha], (patchsize, patchsize))
         m = np.zeros_like(
             m.reshape(
                 np.int(m.size / patchsize ** 2), patchsize ** 2, order="F"
@@ -260,7 +263,7 @@ def weaktexturemask(img, patchsize, th):
 
         for col in range(0, s[1] - patchsize + 1):
             for row in range(0, s[0] - patchsize + 1):
-                if p[:, ind]:
+                if p[ :, ind]:
                     msk[
                         row : row + patchsize - 1,
                         col : col + patchsize - 1,
