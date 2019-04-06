@@ -36,9 +36,3 @@ def weaktexturemask_test(img):
 
     assert np.sum(output[3]) / output[3].size < 1.0
 
-
-if __name__ == '__main__':
-    
-    convmtx2_test(img)
-    noiselevel_test(img)
-    weaktexturemask_test(img)

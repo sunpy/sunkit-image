@@ -9,8 +9,6 @@ from scipy.ndimage import correlate
 
 __all__ = ['noise_estimation', 'noiselevel', 'convmtx2', 'weaktexturemask']
 
-# TODO: Documentation and comments
-
 
 def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
 
@@ -47,6 +45,37 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
     mask: `numpy.ndarray`
         Weak-texture mask.
     0 and 1 represent non-weak-texture and weak-texture regions, respectively.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> np.random.seed(0)
+    >>> noisy_image_array = np.random.randn(100, 100)
+    >>> estimate = noise_estimation(noisy_image_array, patchsize=11, itr=10)
+    >>> estimate[3] # Prints mask
+    array([[1., 1., 1., ..., 1., 1., 0.],
+        [1., 1., 1., ..., 1., 1., 0.],
+        [1., 1., 1., ..., 1., 1., 0.],
+        ...,
+        [1., 1., 1., ..., 1., 1., 0.],
+        [1., 1., 1., ..., 1., 1., 0.],
+        [0., 0., 0., ..., 0., 0., 0.]])
+    >>> estimate[0] # Prints nlevel
+    array([1.0014616])
+    >>> estimate[1] # Prints th
+    array([173.61530607])
+    >>> estimate[2] # Prints num
+     array([8100.])
+
+    References
+    ----------
+    * Xinhao Liu, Masayuki Tanaka and Masatoshi Okutomi
+      Noise Level Estimation Using Weak Textured Patches of a Single Noisy Image
+      IEEE International Conference on Image Processing (ICIP), 2012.
+
+    * Xinhao Liu, Masayuki Tanaka and Masatoshi Okutomi
+      Single-Image Noise Level Estimation for Blind Denoising Noisy Image
+      IEEE Transactions on Image Processing, Vol.22, No.12, pp.5226-5237, December, 2013.
     """
 
     if not(type(img) is np.ndarray):
