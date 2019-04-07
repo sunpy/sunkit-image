@@ -1,5 +1,6 @@
 """
-This module contains functions that can be used to enchance the regions off the solar limb.
+This module contains functions that can be used to enchance the regions off the
+solar limb.
 """
 import numpy as np
 import astropy.units as u
@@ -46,9 +47,9 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
 
 def calculate_fit_radial_intensity(radii, polynomial):
     """
-    Calculates the fit value of the radial intensity at the values "radii". The function assumes
-    that the polynomial is the best fit to the observed log of the intensity as a function of
-    radius.
+    Calculates the fit value of the radial intensity at the values "radii". The
+    function assumes that the polynomial is the best fit to the observed log of
+    the intensity as a function of radius.
 
     Parameters
     ----------
@@ -70,9 +71,9 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
 def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
-    Normalizes the fitted radial intensity to the value at the normalization radius. The function
-    assumes that the polynomial is the best fit to the observed log of the intensity as a function
-    of radius.
+    Normalizes the fitted radial intensity to the value at the normalization
+    radius. The function assumes that the polynomial is the best fit to the
+    observed log of the intensity as a function of radius.
 
     Parameters
     ----------
@@ -91,9 +92,9 @@ def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
         An array with the same shape as radii which expresses the fitted
         intensity value normalized to its value at the normalization radius.
     """
-    return calculate_fit_radial_intensity(
-        radii, polynomial
-    ) / calculate_fit_radial_intensity(normalization_radius, polynomial)
+    return calculate_fit_radial_intensity(radii, polynomial) / calculate_fit_radial_intensity(
+        normalization_radius, polynomial
+    )
 
 
 def intensity_enhance(
@@ -172,9 +173,7 @@ def intensity_enhance(
     )
 
     # Summarize the radial bins
-    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(
-        u.R_sun
-    )
+    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(u.R_sun)
 
     # Fit range
     if fit_range[0] >= fit_range[1]:
@@ -192,9 +191,7 @@ def intensity_enhance(
     )
 
     # Calculate the enhancement
-    enhancement = 1 / normalize_fit_radial_intensity(
-        map_r, polynomial, normalization_radius
-    )
+    enhancement = 1 / normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
     enhancement[map_r < normalization_radius] = 1
 
     # Return a map with the intensity enhanced above the normalization radius
@@ -265,20 +262,12 @@ def normalizing_radial_gradient_filter(
 
     # Radial intensity
     radial_intensity = get_radial_intensity_summary(
-        smap,
-        radial_bin_edges,
-        scale=scale,
-        summary=intensity_summary,
-        **intensity_summary_kwargs
+        smap, radial_bin_edges, scale=scale, summary=intensity_summary, **intensity_summary_kwargs
     )
 
     # An estimate of the width of the intensity distribution in each radial bin.
     radial_intensity_distribution_summary = get_radial_intensity_summary(
-        smap,
-        radial_bin_edges,
-        scale=scale,
-        summary=width_function,
-        **width_function_kwargs
+        smap, radial_bin_edges, scale=scale, summary=width_function, **width_function_kwargs
     )
 
     # Storage for the filtered data
@@ -286,9 +275,7 @@ def normalizing_radial_gradient_filter(
 
     # Calculate the filter for each radial bin.
     for i in range(0, radial_bin_edges.shape[1]):
-        here = np.logical_and(
-            map_r > radial_bin_edges[0, i], map_r < radial_bin_edges[1, i]
-        )
+        here = np.logical_and(map_r > radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         here = np.logical_and(here, map_r > application_radius)
         data[here] = (
             smap.data[here] - radial_intensity[i]

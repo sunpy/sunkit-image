@@ -11,8 +11,8 @@ __all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii"]
 
 def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     """
-    Define a set of equally spaced bins between the specified inner and outer values.  The inner
-    value must be strictly less than the outer value.
+    Define a set of equally spaced bins between the specified inner and outer
+    values. The inner value must be strictly less than the outer value.
 
     Parameters
     ----------
@@ -47,7 +47,7 @@ def bin_edge_summary(r, binfit):
 
     Parameters
     ----------
-    r :  `numpy.ndarray` like
+    r : `numpy.ndarray` like
         An array of bin edges of shape (2, nbins) where nbins is the number of
         bins.
 
@@ -76,8 +76,8 @@ def bin_edge_summary(r, binfit):
 
 def find_pixel_radii(smap, scale=None):
     """
-    Find the distance of every pixel in a map from the center of the Sun. The answer is returned in
-    units of solar radii.
+    Find the distance of every pixel in a map from the center of the Sun. The
+    answer is returned in units of solar radii.
 
     Parameters
     ----------
@@ -85,14 +85,14 @@ def find_pixel_radii(smap, scale=None):
         A sunpy map object.
 
     scale : None | `~astropy.units.Quantity`
-        The radius of the Sun expressed in map units.  For example, in typical
+        The radius of the Sun expressed in map units. For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
-        of arcseconds.  If None then the map is queried for the scale.
+        of arcseconds. If None then the map is queried for the scale.
 
     Returns
     -------
     radii : `~astropy.units.Quantity`
-        An array the same shape as the input map.  Each entry in the array
+        An array the same shape as the input map. Each entry in the array
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
     """

@@ -261,11 +261,7 @@ class NoiseLevelEstimation:
             for col in range(0, s[1] - self.patchsize + 1):
                 for row in range(0, s[0] - self.patchsize + 1):
                     if p[:, ind]:
-                        msk[
-                            row : row + self.patchsize - 1,
-                            col : col + self.patchsize - 1,
-                            cha,
-                        ] = 1
+                        msk[row : row + self.patchsize - 1, col : col + self.patchsize - 1, cha] = 1
                     ind = ind + 1
 
         # clean up
