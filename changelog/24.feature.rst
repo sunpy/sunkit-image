@@ -1,0 +1,2 @@
+Added a module (`sunkit_image.nafe`) for enhancing fine structures in extreme ultraviolet images of
+the corona via "Noise Adaptive Fuzzy Equalization".
