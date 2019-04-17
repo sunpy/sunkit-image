@@ -1,13 +1,13 @@
-'''
-This module implements a series of functions for noise level estimation
-'''
+"""
+This module implements a series of functions for noise level estimation.
+"""
 
 import numpy as np
 from scipy.stats import gamma
 from skimage.util import view_as_windows
 from scipy.ndimage import correlate
 
-__all__ = ['noise_estimation', 'noiselevel', 'convmtx2', 'weaktexturemask']
+__all__ = ["noise_estimation", "noiselevel", "convmtx2", "weaktexturemask"]
 
 
 def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
@@ -52,7 +52,7 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
     >>> np.random.seed(0)
     >>> noisy_image_array = np.random.randn(100, 100)
     >>> estimate = noise_estimation(noisy_image_array, patchsize=11, itr=10)
-    >>> estimate[3] # Prints mask
+    >>> estimate['mask'] # Prints mask
     array([[1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
@@ -60,11 +60,11 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
         [1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
         [0., 0., 0., ..., 0., 0., 0.]])
-    >>> estimate[0] # Prints nlevel
+    >>> estimate['nlevel'] # Prints nlevel
     array([1.0014616])
-    >>> estimate[1] # Prints th
+    >>> estimate['th'] # Prints th
     array([173.61530607])
-    >>> estimate[2] # Prints num
+    >>> estimate['num'] # Prints num
      array([8100.])
 
     References
@@ -72,46 +72,52 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
     * Xinhao Liu, Masayuki Tanaka and Masatoshi Okutomi
       Noise Level Estimation Using Weak Textured Patches of a Single Noisy Image
       IEEE International Conference on Image Processing (ICIP), 2012.
+      DOI: 10.1109/ICIP.2012.6466947
 
     * Xinhao Liu, Masayuki Tanaka and Masatoshi Okutomi
       Single-Image Noise Level Estimation for Blind Denoising Noisy Image
       IEEE Transactions on Image Processing, Vol.22, No.12, pp.5226-5237, December, 2013.
+      DOI: 10.1109/TIP.2013.2283400
     """
 
-    if not(type(img) is np.ndarray):
-        raise TypeError('Input image should be a NumPy ndarray')
+    try:
+        img = np.array(img)
+    except:
+        raise TypeError("Input image should be a NumPy ndarray")
 
-    if not(type(patchsize) is int):
-        try:
-            patchsize = int(patchsize)
-        except ValueError:
-            raise TypeError('patchsize must be an integer, or int-compatible, variable')
+    try:
+        patchsize = int(patchsize)
+    except ValueError:
+        raise TypeError("patchsize must be an integer, or int-compatible, variable")
 
-    if not(type(decim) is int):
-        try:
-            decim = int(decim)
-        except ValueError:
-            raise TypeError('decim must be an integer, or int-compatible, variable')
+    try:
+        decim = int(decim)
+    except ValueError:
+        raise TypeError("decim must be an integer, or int-compatible, variable")
 
-    if not(type(conf) is float):
-        try:
-            conf = float(conf)
-        except ValueError:
-            raise TypeError('conf must be a float, or float-compatible, value between 0 and 1')
+    try:
+        conf = float(conf)
+    except ValueError:
+        raise TypeError("conf must be a float, or float-compatible, value between 0 and 1")
 
-    if not (conf >=0 and conf <= 1) :
-        raise ValueError('conf must be defined in the interval 0 <= conf <= 1')
-    
-    if not(type(itr) is int):
-        try:
-            itr = int(itr)
-        except ValueError:
-            raise TypeError('itr must be an integer, or int-compatible, variable')
+    if not (conf >= 0 and conf <= 1):
+        raise ValueError("conf must be defined in the interval 0 <= conf <= 1")
 
+    try:
+        itr = int(itr)
+    except ValueError:
+        raise TypeError("itr must be an integer, or int-compatible, variable")
+
+    output = {}
     nlevel, th, num = noiselevel(img, patchsize, decim, conf, itr)
     mask = weaktexturemask(img, patchsize, th)
 
-    return nlevel, th, num, mask
+    output["nlevel"] = nlevel
+    output["th"] = th
+    output["num"] = num
+    output["mask"] = mask
+
+    return output
 
 
 def noiselevel(img, patchsize, decim, conf, itr):
@@ -127,7 +133,7 @@ def noiselevel(img, patchsize, decim, conf, itr):
 
     kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 0), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[ :, 1 : imgh.shape[1] - 1, :]
+    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 2)
@@ -147,9 +153,7 @@ def noiselevel(img, patchsize, decim, conf, itr):
 
     for cha in range(img.shape[2]):
         X = view_as_windows(img[:, :, cha], (patchsize, patchsize))
-        X = X.reshape(
-            np.int(X.size / patchsize ** 2), patchsize ** 2, order="F"
-        ).transpose()
+        X = X.reshape(np.int(X.size / patchsize ** 2), patchsize ** 2, order="F").transpose()
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
         Xh = Xh.reshape(
@@ -169,7 +173,7 @@ def noiselevel(img, patchsize, decim, conf, itr):
 
         if decim > 0:
             XtrX = np.transpose(np.concatenate((Xtr, X), axis=0))
-            XtrX = np.transpose(XtrX[XtrX[ :, 0].argsort(), ])
+            XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(),])
             p = np.floor(XtrX.shape[1] / (decim + 1))
             p = np.expand_dims(np.arange(0, p) * (decim + 1), 0)
             Xtr = XtrX[0, p.astype("int")]
@@ -252,7 +256,7 @@ def weaktexturemask(img, patchsize, th):
 
     kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[ :, 1 : imgh.shape[1] - 1, :]
+    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
@@ -264,11 +268,9 @@ def weaktexturemask(img, patchsize, th):
     msk = np.zeros_like(img)
 
     for cha in range(s[2]):
-        m = view_as_windows(img[ :, :, cha], (patchsize, patchsize))
+        m = view_as_windows(img[:, :, cha], (patchsize, patchsize))
         m = np.zeros_like(
-            m.reshape(
-                np.int(m.size / patchsize ** 2), patchsize ** 2, order="F"
-            ).transpose()
+            m.reshape(np.int(m.size / patchsize ** 2), patchsize ** 2, order="F").transpose()
         )
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
@@ -292,12 +294,8 @@ def weaktexturemask(img, patchsize, th):
 
         for col in range(0, s[1] - patchsize + 1):
             for row in range(0, s[0] - patchsize + 1):
-                if p[ :, ind]:
-                    msk[
-                        row : row + patchsize - 1,
-                        col : col + patchsize - 1,
-                        cha,
-                    ] = 1
+                if p[:, ind]:
+                    msk[row : row + patchsize - 1, col : col + patchsize - 1, cha] = 1
                 ind = ind + 1
 
     # clean up

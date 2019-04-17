@@ -21,11 +21,11 @@ def noiselevel_test(img):
     for n in range(noise_levels.size):
         noise = img + np.random.standard_normal(img.shape) * noise_levels[n]
         output = nf.noise_estimation(noise, patchsize=11, itr=5)
-        n_levels[n] = output[0]
-        n_patches[n] = output[2]
+        n_levels[n] = output["nlevel"]
+        n_patches[n] = output["num"]
 
-        assert np.abs(1 - n_levels[n] / noise_levels[n]) < 0.1
-        assert n_patches[n] > 10000.0
+    assert np.abs(1 - n_levels.all() / noise_levels.all()) < 0.1
+    assert n_patches.all() > 10000.0
 
 
 def weaktexturemask_test(img):
@@ -34,5 +34,4 @@ def weaktexturemask_test(img):
     noise = img + np.random.standard_normal(img.shape) * noise_levels
     output = nf.noise_estimation(noise, patchsize=11, itr=5)
 
-    assert np.sum(output[3]) / output[3].size < 1.0
-
+    assert np.sum(output["mask"]) / output["mask"].size < 1.0

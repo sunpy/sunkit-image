@@ -1,4 +1,1 @@
-Transferred sunkit_image.utils.noise.NoiseLevelEstimation from class object into a series of functions, which can be
-imported using "from sunkit_image.utils.noise import noise_estimation". noise_estimation can be called using the same
-parameters as the previous NoiseLevelEstimation class (img, patchsize, decim, conf, itr) but will return an output tuple
-(nlevel, th, num, mask).
+Transferred sunkit_image.utils.noise.NoiseLevelEstimation from class object into a series of functions.
