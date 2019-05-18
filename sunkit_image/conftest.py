@@ -7,7 +7,7 @@ import pytest
 
 import sunpy.tests.helpers
 from sunpy.tests.hash import HASH_LIBRARY_NAME
-from sunpy.tests.helpers import new_hash_library, generate_figure_webpage
+# from sunpy.tests.helpers import new_hash_library, generate_figure_webpage
 from sunpy.util.exceptions import SunpyDeprecationWarning
 
 # Force MPL to use non-gui backends for testing.
