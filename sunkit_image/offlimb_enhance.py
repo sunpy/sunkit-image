@@ -291,9 +291,9 @@ def normalizing_radial_gradient_filter(
             map_r > radial_bin_edges[0, i], map_r < radial_bin_edges[1, i]
         )
         here = np.logical_and(here, map_r > application_radius)
-        data[here] = (
-            smap.data[here] - radial_intensity[i]
-        ) / radial_intensity_distribution_summary[i]
+        data[here] = (smap.data[here] - radial_intensity[i])
+        if radial_intensity_distribution_summary[i] != 0.0:
+            data[here] /= radial_intensity_distribution_summary[i]
 
     return sunpy.map.Map(data, smap.meta)
 
@@ -432,22 +432,22 @@ def fourier_normalizing_radial_gradient_filter(
 
         # Calculating the fourier coefficients multiplied with the attenuation coefficients
         fourier_coefficient_a_0 = np.sum(average_segments) * (2 / number_angular_segments)
-        fourier_coefficient_a_0 = fourier_coefficient_a_0 * (attenuation_coefficients[0, 1])
+        fourier_coefficient_a_0 *= (attenuation_coefficients[0, 1])
 
         fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (2 / number_angular_segments)
-        fourier_coefficients_a_k = fourier_coefficients_a_k * attenuation_coefficients[0][1:]
+        fourier_coefficients_a_k *= attenuation_coefficients[0][1:]
 
         fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (2 / number_angular_segments)
-        fourier_coefficients_b_k = fourier_coefficients_b_k * attenuation_coefficients[0][1:]
+        fourier_coefficients_b_k *= attenuation_coefficients[0][1:]
 
         fourier_coefficient_c_0 = np.sum(std_dev) * (2 / number_angular_segments)
-        fourier_coefficient_c_0 = fourier_coefficient_c_0 * attenuation_coefficients[1, 1]
+        fourier_coefficient_c_0 *= attenuation_coefficients[1, 1]
 
         fourier_coefficients_c_k = np.matmul(std_dev, cos_matrix) * (2 / number_angular_segments)
-        fourier_coefficients_c_k = fourier_coefficients_c_k * attenuation_coefficients[1][1:]
+        fourier_coefficients_c_k *= attenuation_coefficients[1][1:]
 
         fourier_coefficients_d_k = np.matmul(std_dev, sin_matrix) * (2 / number_angular_segments)
-        fourier_coefficients_d_k = fourier_coefficients_d_k * attenuation_coefficients[1][1:]
+        fourier_coefficients_d_k *= attenuation_coefficients[1][1:]
 
         # To calculate the multiples of angles of each pixel for finding the fourier approximation
         # at that point. See equations 6.8 and 6.9 of the doctoral thesis.
@@ -457,13 +457,13 @@ def fourier_normalizing_radial_gradient_filter(
 
         # Get the approxiamted value of mean
         mean_approximated = np.matmul(fourier_coefficients_a_k, np.cos(angles_of_pixel))
-        mean_approximated = mean_approximated + np.matmul(fourier_coefficients_b_k, np.sin(angles_of_pixel))
-        mean_approximated = mean_approximated + fourier_coefficient_a_0 / 2
+        mean_approximated += np.matmul(fourier_coefficients_b_k, np.sin(angles_of_pixel))
+        mean_approximated += fourier_coefficient_a_0 / 2
 
         # Get the approxiamted value of standard deviation
         std_approximated = np.matmul(fourier_coefficients_c_k, np.cos(angles_of_pixel))
-        std_approximated = std_approximated + np.matmul(fourier_coefficients_d_k, np.sin(angles_of_pixel))
-        std_approximated = std_approximated + fourier_coefficient_c_0 / 2
+        std_approximated += np.matmul(fourier_coefficients_d_k, np.sin(angles_of_pixel))
+        std_approximated += fourier_coefficient_c_0 / 2
 
         # Normailize the data
         data[annulus] = np.ravel((smap.data[annulus] - mean_approximated) / std_approximated)
