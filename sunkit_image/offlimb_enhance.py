@@ -1,5 +1,5 @@
 """
-This module contains functions that can be used to enchance the regions off the solar limb.
+This module contains functions that can be used to enhance the regions off the solar limb.
 """
 import numpy as np
 import astropy.units as u
