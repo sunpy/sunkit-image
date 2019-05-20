@@ -327,7 +327,7 @@ def fourier_normalizing_radial_gradient_filter(
     radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of size [2, nbins] where nbins is the number of bins.
     order : `int`
-        Order (number) of fourier coefficients.
+        Order (number) of fourier coefficients. Its minimum value is 1.
     attenuation_coefficients : `float`
         A two dimensional array of shape [2, order + 1]. The first row contain attenuation
         coefficients for mean calculations. The second row contains attenuation coefficients
@@ -370,6 +370,9 @@ def fourier_normalizing_radial_gradient_filter(
       DRUCKMÜLLEROVÁ, H. Application of adaptive filters in processing of solar corona images.
       https://dspace.vutbr.cz/bitstream/handle/11012/34520/DoctoralThesis.pdf.
     """
+
+    if order < 1:
+        raise ValueError("Minimum value of order is 1")
 
     # Get the radii for every pixel
     map_r = find_pixel_radii(smap).to(u.R_sun)
@@ -466,6 +469,7 @@ def fourier_normalizing_radial_gradient_filter(
         std_approximated += fourier_coefficient_c_0 / 2
 
         # Normailize the data
+        std_approximated = np.where(std_approximated == 0.00, 1, std_approximated)
         data[annulus] = np.ravel((smap.data[annulus] - mean_approximated) / std_approximated)
 
         # Linear combination of original image and the filtered data.
