@@ -21,6 +21,7 @@ def map_test1():
         test_map1 = sunpy.map.Map((test_data1, header))
         return test_map1
 
+
 @pytest.fixture
 def map_test2():
         x = np.linspace(-2, 2, 5)

@@ -288,7 +288,7 @@ def normalizing_radial_gradient_filter(
     # Calculate the filter for each radial bin.
     for i in range(0, radial_bin_edges.shape[1]):
         here = np.logical_and(
-            map_r > radial_bin_edges[0, i], map_r < radial_bin_edges[1, i]
+            map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i]
         )
         here = np.logical_and(here, map_r > application_radius)
         data[here] = (smap.data[here] - radial_intensity[i])
@@ -394,7 +394,7 @@ def fourier_normalizing_radial_gradient_filter(
     for i in range(0, nbins):
 
         # Finding the pixels which belong to a certain circular ring
-        annulus = np.logical_and(map_r > radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
+        annulus = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         annulus = np.logical_and(annulus, map_r > application_radius)
 
         # The angle subtended by each segment
@@ -415,7 +415,7 @@ def fourier_normalizing_radial_gradient_filter(
         for j in range(0, number_angular_segments, 1):
 
             # Finding all the pixels whose angle values lie in the segment
-            angular_segment = np.logical_and(angles > segment_angle * j,
+            angular_segment = np.logical_and(angles >= segment_angle * j,
                                              angles < segment_angle * (j + 1))
 
             # Finding the particular segment in the circular ring
