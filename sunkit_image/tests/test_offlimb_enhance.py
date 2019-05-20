@@ -5,6 +5,7 @@ import astropy.units as u
 import sunpy
 import sunpy.map
 import sunpy.data.test
+
 import sunkit_image.utils.utils as utils
 import sunkit_image.offlimb_enhance as off
 

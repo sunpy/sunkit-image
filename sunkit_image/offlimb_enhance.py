@@ -325,25 +325,25 @@ def fourier_normalizing_radial_gradient_filter(
     smap : `sunpy.map.Map`
         A SunPy map.
     radial_bin_edges : `astropy.units.Quantity`
-        A two-dimensional array of bin edges of size [2, nbins] where nbins is the number of bins.
+        A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is the number of bins.
     order : `int`
-        Order (number) of fourier coefficients. Its minimum value is 1.
+        Order (number) of fourier coefficients and it can not be lower than 1.
     attenuation_coefficients : `float`
-        A two dimensional array of shape [2, order + 1]. The first row contain attenuation
+        A two dimensional array of shape ``[2, order + 1]``. The first row contain attenuation
         coefficients for mean calculations. The second row contains attenuation coefficients
         for standard deviation calculation.
     ratio_mix : `float`
         A one dimensional array of shape ``[2, 1]`` with values equal to ``[K1, K2]``.
         The ratio in which the original image and filtered image are mixed.
         Defaults to ``[15, 1]``.
-    scale : None or `astropy.units.Quantity`, optional
+    scale : `None` or `astropy.units.Quantity`, optional
         The radius of the Sun expressed in map units. For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
-        of arcseconds. If None, then the map scale is used.
+        of arcseconds. If `None` (the default), then the map scale is used.
     intensity_summary :`function`, optional
         A function that returns a summary statistic of the radial intensity.
         Default is `numpy.nanmean`.
-    intensity_summary_kwargs : None, `~dict`
+    intensity_summary_kwargs : `None`, `~dict`
         Keywords applicable to the summary function.
     width_function : `function`
         A function that returns a summary statistic of the distribution of intensity, at a given radius.
@@ -359,7 +359,7 @@ def fourier_normalizing_radial_gradient_filter(
 
     Returns
     -------
-    new_map : `sunpy.map.Map`
+    `sunpy.map.Map`
         A SunPy map that has had the FNRGF applied to it.
 
     References
