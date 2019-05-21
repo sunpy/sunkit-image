@@ -29,21 +29,17 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session", autouse=True)
 def figure_base_dir(request):
-    sunpy.tests.helpers.figure_base_dir = pathlib.Path(
-        request.config.getoption("--figure_dir")
-    )
+    sunpy.tests.helpers.figure_base_dir = pathlib.Path(request.config.getoption("--figure_dir"))
 
 
 def pytest_runtest_setup(item):
     """
-    pytest hook to skip all tests that have the mark 'remotedata' if the pytest_remotedata plugin is
-    not installed.
+    pytest hook to skip all tests that have the mark 'remotedata' if the
+    pytest_remotedata plugin is not installed.
     """
     if isinstance(item, pytest.Function):
         if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
-            pytest.skip(
-                "skipping remotedata tests as pytest-remotedata is not installed"
-            )
+            pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
 
 
 def pytest_unconfigure(config):
@@ -54,22 +50,13 @@ def pytest_unconfigure(config):
         figure_base_dir = pathlib.Path(config.getoption("--figure_dir"))
         hashfile = figure_base_dir / HASH_LIBRARY_NAME
         with open(hashfile, "w") as outfile:
-            json.dump(
-                new_hash_library,
-                outfile,
-                sort_keys=True,
-                indent=4,
-                separators=(",", ": "),
-            )
+            json.dump(new_hash_library, outfile, sort_keys=True, indent=4, separators=(",", ": "))
 
         """
         Turn on internet when generating the figure comparison webpage.
         """
         if HAVE_REMOTEDATA:
-            from pytest_remotedata.disable_internet import (
-                turn_on_internet,
-                turn_off_internet,
-            )
+            from pytest_remotedata.disable_internet import turn_on_internet, turn_off_internet
         else:
 
             def turn_on_internet():

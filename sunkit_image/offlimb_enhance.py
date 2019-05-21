@@ -175,9 +175,7 @@ def intensity_enhance(
     )
 
     # Summarize the radial bins
-    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(
-        u.R_sun
-    )
+    radial_bin_summary = bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(u.R_sun)
 
     # Fit range
     if fit_range[0] >= fit_range[1]:
