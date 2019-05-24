@@ -125,9 +125,11 @@ copyright = u"{}, {}".format(datetime.datetime.now().year, author)
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 # The short X.Y version.
-version = versionmod.version.split("-", 1)[0]
+version = '.'.join(versionmod.version.split('.')[:3])
 # The full version, including alpha/beta/rc tags.
-release = versionmod.version
+release = versionmod.version.split('+')[0]
+# Is this version a development release
+is_development = '.dev' in release
 
 try:
     from sunpy_sphinx_theme.conf import *
@@ -220,6 +222,8 @@ try:
     from sunpy.util.towncrier import generate_changelog_for_docs
 
     generate_changelog_for_docs("../", target_file)
+    if is_development:
+        generate_changelog_for_docs("../", target_file)
 except Exception:
     # If we can't generate it, we need to make sure it exists or else sphinx
     # will complain.
