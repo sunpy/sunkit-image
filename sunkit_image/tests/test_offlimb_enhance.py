@@ -18,7 +18,7 @@ def map_test1():
         test_data1 *= 10
         test_data1 = 28-test_data1
         test_data1 = np.round(test_data1)
-        header = {}
+        header = {'cunit1': 'arcsec', 'cunit2': 'arcsec'}
         test_map1 = sunpy.map.Map((test_data1, header))
         return test_map1
 
@@ -31,7 +31,7 @@ def map_test2():
         test_data1 *= 10
         test_data1 = 28-test_data1
         test_data1 = np.round(test_data1)
-        header = {}
+        header = {'cunit1': 'arcsec', 'cunit2': 'arcsec'}
         test_data2 = np.where(test_data1[:, 0:2] == 6, 8, test_data1[:, 0:2])
         test_data2 = np.concatenate((test_data2, test_data1[:, 2:]), axis=1)
         test_map2 = sunpy.map.Map((test_data2, header))
