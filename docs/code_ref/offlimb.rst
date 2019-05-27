@@ -1,7 +1,7 @@
 ***************
-offlimb_enhance
+offlimb
 ***************
 
 This package implements offlimb enhancement routines for solar physics data.
 
-.. automodapi:: sunkit_image.offlimb_enhance
+.. automodapi:: sunkit_image.offlimb
