@@ -1,31 +1,29 @@
-"""
-An open-source Python library for Solar Physics image processing.
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-Web Links
----------
-Homepage: https://sunpy.org
+# Packages may add whatever they like to this file, but
+# Enforce Python version check during package import.
+# This is the same check as the one at the top of setup.py
+import sys
 
-Documentation: http://docs.sunpy.org/projects/sunkit-image/en/stable/
+from ._sunpy_init import *
 
-Source code: https://github.com/sunpy/sunkit-image/
-"""
-
-__all__ = []
+# ----------------------------------------------------------------------------
 
 
-# this indicates whether or not we are in the package's setup.py
-try:
-    _SUNPY_SETUP_
-except NameError:
-    import builtins
+__minimum_python_version__ = "3.6"
 
-    builtins._SUNPY_SETUP_ = False
 
-try:
-    from .version import version as __version__
-except ImportError:
-    __version__ = ""
-try:
-    from .version import githash as __githash__
-except ImportError:
-    __githash__ = ""
+class UnsupportedPythonError(Exception):
+    pass
+
+
+if sys.version_info < tuple(
+    (int(val) for val in __minimum_python_version__.split("."))
+):
+    raise UnsupportedPythonError(
+        "sunkit_image does not support Python < {}".format(__minimum_python_version__)
+    )
+
+if not _SUNPY_SETUP_:
+    # For egg_info test builds to pass, put package imports here.
+    pass

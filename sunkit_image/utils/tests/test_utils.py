@@ -4,8 +4,6 @@ import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 import sunpy.map
-import sunpy.data.sample
-from sunpy.data.sample import AIA_171_IMAGE
 
 from sunkit_image.utils.utils import (
     bin_edge_summary,
@@ -18,6 +16,8 @@ from sunkit_image.utils.utils import (
 @pytest.fixture
 @pytest.mark.remote_data
 def smap():
+    import sunpy.data.sample
+    from sunpy.data.sample import AIA_171_IMAGE
     return sunpy.map.Map(AIA_171_IMAGE)
 
 

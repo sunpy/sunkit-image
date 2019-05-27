@@ -1,5 +1,7 @@
+import os
 import json
 import pathlib
+import tempfile
 import warnings
 import importlib
 
@@ -7,7 +9,7 @@ import pytest
 
 import sunpy.tests.helpers
 from sunpy.tests.hash import HASH_LIBRARY_NAME
-from sunpy.tests.helpers import new_hash_library, generate_figure_webpage
+from sunpy.tests.helpers import generate_figure_webpage, new_hash_library
 from sunpy.util.exceptions import SunpyDeprecationWarning
 
 # Force MPL to use non-gui backends for testing.
@@ -30,7 +32,52 @@ def pytest_addoption(parser):
 
 @pytest.fixture(scope="session", autouse=True)
 def figure_base_dir(request):
-    sunpy.tests.helpers.figure_base_dir = pathlib.Path(request.config.getoption("--figure_dir"))
+    sunpy.tests.helpers.figure_base_dir = pathlib.Path(
+        request.config.getoption("--figure_dir")
+    )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def tmp_config_dir(request):
+    """
+    Globally set the default config for all tests.
+    """
+    os.environ["SUNPY_CONFIGDIR"] = str(pathlib.Path(__file__).parent / "data")
+    yield
+    del os.environ["SUNPY_CONFIGDIR"]
+
+
+@pytest.fixture()
+def undo_config_dir_patch():
+    """
+    Provide a way for certain tests to not have the config dir.
+    """
+    oridir = os.environ["SUNPY_CONFIGDIR"]
+    del os.environ["SUNPY_CONFIGDIR"]
+    yield
+    os.environ["SUNPY_CONFIGDIR"] = oridir
+
+
+@pytest.fixture(scope="session", autouse=True)
+def tmp_dl_dir(request):
+    """
+    Globally set the default download directory for the test run to a tmp dir.
+    """
+    with tempfile.TemporaryDirectory() as tmpdir:
+        os.environ["SUNPY_DOWNLOADDIR"] = tmpdir
+        yield tmpdir
+        del os.environ["SUNPY_DOWNLOADDIR"]
+
+
+@pytest.fixture()
+def undo_download_dir_patch():
+    """
+    Provide a way for certain tests to not have tmp download dir.
+    """
+    oridir = os.environ["SUNPY_DOWNLOADDIR"]
+    del os.environ["SUNPY_DOWNLOADDIR"]
+    yield
+    os.environ["SUNPY_DOWNLOADDIR"] = oridir
 
 
 def pytest_runtest_setup(item):
@@ -40,7 +87,9 @@ def pytest_runtest_setup(item):
     """
     if isinstance(item, pytest.Function):
         if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
-            pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
+            pytest.skip(
+                "skipping remotedata tests as pytest-remotedata is not installed"
+            )
 
 
 def pytest_unconfigure(config):
@@ -51,13 +100,22 @@ def pytest_unconfigure(config):
         figure_base_dir = pathlib.Path(config.getoption("--figure_dir"))
         hashfile = figure_base_dir / HASH_LIBRARY_NAME
         with open(hashfile, "w") as outfile:
-            json.dump(new_hash_library, outfile, sort_keys=True, indent=4, separators=(",", ": "))
+            json.dump(
+                new_hash_library,
+                outfile,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+            )
 
         """
         Turn on internet when generating the figure comparison webpage.
         """
         if HAVE_REMOTEDATA:
-            from pytest_remotedata.disable_internet import turn_on_internet, turn_off_internet
+            from pytest_remotedata.disable_internet import (
+                turn_on_internet,
+                turn_off_internet,
+            )
         else:
 
             def turn_on_internet():
@@ -70,8 +128,12 @@ def pytest_unconfigure(config):
         generate_figure_webpage(new_hash_library)
         turn_off_internet()
 
-        print("All images from image tests can be found in {0}".format(figure_base_dir))
-        print("The corresponding hash library is {0}".format(hashfile))
+        print(
+            "All images from image tests can be found in {0}".format(
+                figure_base_dir.resolve()
+            )
+        )
+        print("The corresponding hash library is {0}".format(hashfile.resolve()))
 
 
 def pytest_sessionstart(session):
