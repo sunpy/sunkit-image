@@ -7,7 +7,7 @@ import sunpy.map
 import sunpy.data.test
 
 import sunkit_image.utils.utils as utils
-import sunkit_image.offlimb_enhance as off
+import sunkit_image.offlimb as off
 
 
 @pytest.fixture
@@ -52,12 +52,12 @@ def set_attenuation_coefficients(order):
     return attenuation_coefficients
 
 
-def test_normalizing_radial_gradient_filter(map_test1, map_test2, radial_bin_edges):
+def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
     with pytest.warns(Warning, match="Missing metadata for solar radius: assuming photospheric limb as seen from Earth"):
 
         result = np.zeros_like(map_test1.data)
-        expect = off.normalizing_radial_gradient_filter(map_test1, radial_bin_edges,
+        expect = off.nrgf(map_test1, radial_bin_edges,
                                                         application_radius=0.001*u.R_sun)
 
         assert np.allclose(expect.data.shape, map_test1.data.shape)
@@ -69,14 +69,13 @@ def test_normalizing_radial_gradient_filter(map_test1, map_test2, radial_bin_edg
                   [1.,  0.,  0.,  0., -1.],
                   [0.,  1.,  0., -1., 0.]]
 
-        expect = off.normalizing_radial_gradient_filter(map_test2, radial_bin_edges,
-                                                        application_radius=0.001*u.R_sun)
+        expect = off.nrgf(map_test2, radial_bin_edges, application_radius=0.001*u.R_sun)
 
         assert np.allclose(expect.data.shape, map_test2.data.shape)
         assert np.allclose(expect.data, result)
 
 
-def test_fourier_normalizing_radial_gradient_filter(map_test1, map_test2, radial_bin_edges):
+def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
     with pytest.warns(Warning, match="Missing metadata for solar radius: assuming photospheric limb as seen from Earth"):
 
@@ -87,7 +86,7 @@ def test_fourier_normalizing_radial_gradient_filter(map_test1, map_test2, radial
                   [96., 224., 288., 224.,  96.],
                   [-0.,  96., 128.,  96.,  -0.]]
         attenuation_coefficients = set_attenuation_coefficients(order)
-        expect = off.fourier_normalizing_radial_gradient_filter(map_test1, radial_bin_edges, order,
+        expect = off.fnrgf(map_test1, radial_bin_edges, order,
                                                                 attenuation_coefficients,
                                                                 application_radius=0.001*u.R_sun,
                                                                 number_angular_segments=4)
@@ -99,7 +98,7 @@ def test_fourier_normalizing_radial_gradient_filter(map_test1, map_test2, radial
                   [128., 288.,   0., 288., 128.],
                   [128., 224., 288., 224.,  96.],
                   [-0., 128., 128.,  96.,  -0.]]
-        expect = off.fourier_normalizing_radial_gradient_filter(map_test2, radial_bin_edges, order,
+        expect = off.fnrgf(map_test2, radial_bin_edges, order,
                                                                 attenuation_coefficients,
                                                                 application_radius=0.001*u.R_sun,
                                                                 number_angular_segments=4)

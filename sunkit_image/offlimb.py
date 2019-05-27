@@ -19,8 +19,8 @@ __all__ = [
     "calculate_fit_radial_intensity",
     "normalize_fit_radial_intensity",
     "intensity_enhance",
-    "normalizing_radial_gradient_filter",
-    "fourier_normalizing_radial_gradient_filter"
+    "nrgf",
+    "fnrgf"
 ]
 
 
@@ -203,7 +203,7 @@ def intensity_enhance(
     return sunpy.map.Map(smap.data * enhancement, smap.meta)
 
 
-def normalizing_radial_gradient_filter(
+def nrgf(
     smap,
     radial_bin_edges,
     scale=None,
@@ -296,7 +296,7 @@ def normalizing_radial_gradient_filter(
     return sunpy.map.Map(data, smap.meta)
 
 
-def fourier_normalizing_radial_gradient_filter(
+def fnrgf(
     smap,
     radial_bin_edges,
     order,
