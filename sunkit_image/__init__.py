@@ -17,9 +17,7 @@ class UnsupportedPythonError(Exception):
     pass
 
 
-if sys.version_info < tuple(
-    (int(val) for val in __minimum_python_version__.split("."))
-):
+if sys.version_info < tuple((int(val) for val in __minimum_python_version__.split("."))):
     raise UnsupportedPythonError(
         "sunkit_image does not support Python < {}".format(__minimum_python_version__)
     )

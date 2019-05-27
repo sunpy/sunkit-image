@@ -1,16 +1,19 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+
 import astropy.units as u
-from astropy.tests.helper import assert_quantity_allclose
-
 import sunpy.map
+from astropy.tests.helper import assert_quantity_allclose
+from sunpy.tests.helpers import figure_test
 
-from sunkit_image.utils.utils import (
-    bin_edge_summary,
-    find_pixel_radii,
-    equally_spaced_bins,
-    get_radial_intensity_summary,
-)
+from sunkit_image.utils.utils import (bin_edge_summary, equally_spaced_bins,
+                                      find_pixel_radii, get_radial_intensity_summary)
+
+
+@figure_test
+def test_simple_plot():
+    plt.plot([0, 1])
 
 
 @pytest.fixture
@@ -18,6 +21,7 @@ from sunkit_image.utils.utils import (
 def smap():
     import sunpy.data.sample
     from sunpy.data.sample import AIA_171_IMAGE
+
     return sunpy.map.Map(AIA_171_IMAGE)
 
 

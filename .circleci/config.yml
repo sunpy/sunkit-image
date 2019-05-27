@@ -73,6 +73,22 @@ jobs:
             pip install --no-use-pep517 -e .[all,dev]
             python setup.py develop
 
+  figure-tests-37:
+    docker:
+      - image: continuumio/miniconda3
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: *tox-install
+      - run: *tox-conda-install
+      - run: tox -e figure
+      - store_artifacts:
+          path: figure_test_images
+      - run:
+          name: "Image comparison page is available at: "
+          command: FIGS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/figure_test_images/fig_comparison.html"; echo $FIGS_URL
+
   html-docs:
     docker:
       - image: circleci/python:3.7
@@ -98,6 +114,10 @@ workflows:
     jobs:
       - egg-info-36
       - egg-info-37
+
+  figure-tests:
+    jobs:
+      - figure-tests-37
 
   pip-install:
     jobs:

@@ -4,11 +4,11 @@ import pathlib
 import tempfile
 import warnings
 import importlib
+from sys import version_info
 
 import pytest
 
 import sunpy.tests.helpers
-from sunpy.tests.hash import HASH_LIBRARY_NAME
 from sunpy.tests.helpers import generate_figure_webpage, new_hash_library
 from sunpy.util.exceptions import SunpyDeprecationWarning
 
@@ -30,11 +30,22 @@ def pytest_addoption(parser):
     parser.addoption("--figure_dir", action="store", default="./figure_test_images")
 
 
+# Bypass sunpy's figure hash library.
+HASH_LIBRARY_NAME = "figure_hashes_py37.json"
+HASH_LIBRARY_FILE = os.path.join(os.path.dirname(__file__), "tests", HASH_LIBRARY_NAME)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def hash_base_dir(request):
+    sunpy.tests.hash.HASH_LIBRARY_NAME = HASH_LIBRARY_NAME
+    sunpy.tests.hash.HASH_LIBRARY_FILE = HASH_LIBRARY_FILE
+    with open(HASH_LIBRARY_FILE) as infile:
+        sunpy.tests.hash.hash_library = json.load(infile)
+
+
 @pytest.fixture(scope="session", autouse=True)
 def figure_base_dir(request):
-    sunpy.tests.helpers.figure_base_dir = pathlib.Path(
-        request.config.getoption("--figure_dir")
-    )
+    sunpy.tests.helpers.figure_base_dir = pathlib.Path(request.config.getoption("--figure_dir"))
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -87,9 +98,7 @@ def pytest_runtest_setup(item):
     """
     if isinstance(item, pytest.Function):
         if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
-            pytest.skip(
-                "skipping remotedata tests as pytest-remotedata is not installed"
-            )
+            pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
 
 
 def pytest_unconfigure(config):
@@ -100,22 +109,13 @@ def pytest_unconfigure(config):
         figure_base_dir = pathlib.Path(config.getoption("--figure_dir"))
         hashfile = figure_base_dir / HASH_LIBRARY_NAME
         with open(hashfile, "w") as outfile:
-            json.dump(
-                new_hash_library,
-                outfile,
-                sort_keys=True,
-                indent=4,
-                separators=(",", ": "),
-            )
+            json.dump(new_hash_library, outfile, sort_keys=True, indent=4, separators=(",", ": "))
 
         """
         Turn on internet when generating the figure comparison webpage.
         """
         if HAVE_REMOTEDATA:
-            from pytest_remotedata.disable_internet import (
-                turn_on_internet,
-                turn_off_internet,
-            )
+            from pytest_remotedata.disable_internet import turn_on_internet, turn_off_internet
         else:
 
             def turn_on_internet():
@@ -128,11 +128,7 @@ def pytest_unconfigure(config):
         generate_figure_webpage(new_hash_library)
         turn_off_internet()
 
-        print(
-            "All images from image tests can be found in {0}".format(
-                figure_base_dir.resolve()
-            )
-        )
+        print("All images from image tests can be found in {0}".format(figure_base_dir.resolve()))
         print("The corresponding hash library is {0}".format(hashfile.resolve()))
 
 

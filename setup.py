@@ -13,7 +13,6 @@ from setuptools.config import read_configuration
 sys.path.append(os.path.abspath("."))
 
 
-
 # Override the default Astropy Test Command
 cmdclass = register_commands()
 try:
