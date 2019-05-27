@@ -9,6 +9,7 @@ import sunpy.map
 from sunpy.coordinates import frames
 
 from sunkit_image.utils.utils import (
+    equally_spaced_bins,
     bin_edge_summary,
     find_pixel_radii,
     get_radial_intensity_summary,
@@ -262,6 +263,12 @@ def nrgf(
     # Get the radii for every pixel
     map_r = find_pixel_radii(smap).to(u.R_sun)
 
+    # To make sure bins are in the map.
+    if radial_bin_edges[1,-1] > np.max(map_r):
+        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0,0],
+                                               outer_value=np.max(map_r),
+                                               nbins=radial_bin_edges.shape[1])
+
     # Radial intensity
     radial_intensity = get_radial_intensity_summary(
         smap,
@@ -374,6 +381,12 @@ def fnrgf(
 
     # Get the radii for every pixel
     map_r = find_pixel_radii(smap).to(u.R_sun)
+
+    # To make sure bins are in the map.
+    if radial_bin_edges[1,-1] > np.max(map_r):
+        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0,0],
+                                               outer_value=np.max(map_r),
+                                               nbins=radial_bin_edges.shape[1])
 
     # Get the Helioprojective coordinates of each pixel
     x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
