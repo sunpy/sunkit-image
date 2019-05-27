@@ -35,8 +35,8 @@ radial_bin_edges *= u.R_sun
 
 order = 20
 attenuation_coefficients = np.zeros((2, order + 1))
-attenuation_coefficients[0,:] = np.linspace(1,0,order + 1)
-attenuation_coefficients[1,:] = np.linspace(1,0,order + 1)
+attenuation_coefficients[0, :] = np.linspace(1, 0, order + 1)
+attenuation_coefficients[1, :] = np.linspace(1, 0, order + 1)
 
 out = offlimb.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients)
 

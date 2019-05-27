@@ -8,5 +8,5 @@ Code Reference
    :maxdepth: 2
 
    sunkit_image
-   offlimb_enhance
+   offlimb
    utils
