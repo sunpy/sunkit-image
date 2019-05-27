@@ -1,6 +1,6 @@
-***************
+*******
 offlimb
-***************
+*******
 
 This package implements offlimb enhancement routines for solar physics data.
 
