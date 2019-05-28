@@ -32,7 +32,7 @@ out2 = sunpy.map.Map(out2, aia_map.meta)
 ###########################################################################
 # The resulting sunpy.map are plotted
 
-fig = plt.figure(figsize=(1,2))
+fig = plt.figure(figsize=(1, 2))
 
 ax1 = fig.add_subplot(121, projection=aia_map)
 out1.plot(axes=ax1)

@@ -9,19 +9,20 @@ __all__ = [
     "mgn1"
 ]
 
+
 def mgn1(
     data,
-    sigma = [1.25, 2.5, 5, 10, 20, 40],
-    k = 0.7,
+    sigma=[1.25, 2.5, 5, 10, 20, 40],
+    k=0.7,
     gamma=3.2,
     h=0.7,
     weights=None,
-    truncate = 3
+    truncate=3
 ):
-    
+
     """
     Multi-scale Gaussian normalization.
-    
+
     Parameters
     ----------
     data : `numpy.ndarray`
@@ -46,18 +47,19 @@ def mgn1(
     truncate : `int`
         The number of sigmas to truncate the kernel.
         Defaults to 3
-    
+
     Returns
     -------
     image: `numpy.ndarray`
         Normalized image.
-    
+
     Reference
     ---------
-    * Morgan, Huw, and Miloslav Druckmuller. "Multi-scale Gaussian normalization for solar image processing."
+    * Morgan, Huw, and Miloslav Druckmuller.
+    "Multi-scale Gaussian normalization for solar image processing."
     arXiv preprint arXiv:1403.6613 (2014).
     Ref: Sol Phys (2014) 289: 2945. doi:10.1007/s11207-014-0523-9
-    
+
     .. notes::
         In practice, the weights and h may be adjusted according to the desired
         output, and also according to the type of input image
@@ -65,8 +67,8 @@ def mgn1(
         For most purposes, the weights can be set
         equal for all scales.
     """
-    
-    #This is rectified version of Stuart's Code.
+
+    # This is rectified version of Stuart's Code.
     if weights is None:
         weights = np.ones(len(sigma))
 
@@ -118,11 +120,12 @@ def mgn1(
 
     return image
 
+
 def mgn2(image, a=(5., 5000.), b=(0., 1.), weight=0.3, gamma=3.2, sigma=[2.5, 5, 10, 20, 40], k=0.7):
-    
+
     """
     Multi-scale Gaussian Normalization
-  
+
     Parameters
     ----------
     image: `numpy.ndarray`
@@ -150,23 +153,24 @@ def mgn2(image, a=(5., 5000.), b=(0., 1.), weight=0.3, gamma=3.2, sigma=[2.5, 5,
     
     Reference
     ---------
-    * Morgan, Huw, and Miloslav Druckmuller. "Multi-scale Gaussian normalization for solar image processing."
+    * Morgan, Huw, and Miloslav Druckmuller.
+    "Multi-scale Gaussian normalization for solar image processing."
     arXiv preprint arXiv:1403.6613 (2014).
     Ref: Sol Phys (2014) 289: 2945. doi:10.1007/s11207-014-0523-9
     """
 
     ax, ay = image.shape
     # normalize [a[0], a[1]] input intensities to [0,1]
-    image = (image.clip (a[0], a[1]) - a[0]) / (a[1] - a[0])
-    imi = np.zeros_like (image)
+    image = (image.clip(a[0], a[1]) - a[0]) / (a[1] - a[0])
+    imi = np.zeros_like(image)
     for s in sigma:
-    # B convolved by k_w
-        bwi = ndimage.gaussian_filter (image, s, mode='nearest')
+        # B convolved by k_w
+        bwi = ndimage.gaussian_filter(image, s, mode='nearest')
         # sigma_w
-        swi = np.sqrt (ndimage.gaussian_filter ((image - bwi) ** 2, s, mode='nearest'))
+        swi = np.sqrt(ndimage.gaussian_filter((image - bwi) ** 2, s, mode='nearest'))
         # intermediate sum of C'_i
-        imi += np.arctan (k * (image - bwi) / swi)
+        imi += np.arctan(k * (image - bwi) / swi)
     # weighted sum of gamma-transformed input image and normalized average of C'_i,
     # normalized to [b[0], b[1]]
     return b[0] + (b[1] - b[0]) * ((1. - weight) * image ** (1. / gamma)
-                                    + weight * (.5 + imi / (len (sigma) * np.pi)))
+                                    + weight * (.5 + imi / (len(sigma) * np.pi)))

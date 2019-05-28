@@ -1,0 +1,1 @@
+Added two functions (`sunkit_image.enhance.mgn1`) and (`sunkit_image.enhance.mgn2`) for applying Multi-scale Gaussian Normalization to a image.
