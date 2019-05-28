@@ -2,8 +2,8 @@
 This module contains a collection of functions of general utility.
 """
 import numpy as np
-import astropy.units as u
 
+import astropy.units as u
 from sunpy.coordinates import frames
 
 __all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii"]

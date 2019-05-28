@@ -36,25 +36,21 @@ See https://github.com/astropy/astropy-helpers for more details, and for the
 latest version of this module.
 """
 
-import contextlib
-import errno
 import io
-import locale
 import os
 import re
-import subprocess as sp
 import sys
-
+import errno
+import locale
+import contextlib
+import subprocess as sp
 from distutils import log
+from configparser import ConfigParser, RawConfigParser
 from distutils.debug import DEBUG
-
-try:
-    from ConfigParser import ConfigParser, RawConfigParser
-except ImportError:
-    from configparser import ConfigParser, RawConfigParser
+# Check that setuptools 30.3 or later is present
+from distutils.version import LooseVersion
 
 import pkg_resources
-
 from setuptools import Distribution
 from setuptools.package_index import PackageIndex
 
@@ -119,9 +115,10 @@ if SETUP_CFG.has_option('options', 'python_requires'):
 
     # We want the Python version as a string, which we can get from the platform module
     import platform
-    python_version = platform.python_version()
-
-    if not req.specifier.contains(python_version):
+    # strip off trailing '+' incase this is a dev install of python
+    python_version = platform.python_version().strip('+')
+    # allow pre-releases to count as 'new enough'
+    if not req.specifier.contains(python_version, True):
         if parent_package is None:
             message = "ERROR: Python {} is required by this package\n".format(req.specifier)
         else:
@@ -148,8 +145,6 @@ _str_types = (str, bytes)
 # issues with either missing or misbehaving pacakges (including making sure
 # setuptools itself is installed):
 
-# Check that setuptools 30.3 or later is present
-from distutils.version import LooseVersion
 
 try:
     import setuptools
