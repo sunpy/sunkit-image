@@ -118,7 +118,8 @@ def mgn1(
 
     return image
 
-def mgn2(image, a=(5., 5000.), b=(0., 1.), w=0.3, gamma=3.2, sigma=[2.5, 5, 10, 20, 40], k=0.7):
+def mgn2(image, a=(5., 5000.), b=(0., 1.), weight=0.3, gamma=3.2, sigma=[2.5, 5, 10, 20, 40], k=0.7):
+    
     """
     Multi-scale Gaussian Normalization
   
@@ -132,7 +133,7 @@ def mgn2(image, a=(5., 5000.), b=(0., 1.), w=0.3, gamma=3.2, sigma=[2.5, 5, 10, 
     b: `tuple`, optional
         Minimum and maximum output values in image ([a[0], a[1]] will be scaled to [b[0], b[1]])
         Defaults to `(0., 1)`
-    w: `float`, optional
+    weight: `float`, optional
         Weight of the MGN-processed image in output image.
         Defaults to 0.3
     gamma : `float`, optional
@@ -167,5 +168,5 @@ def mgn2(image, a=(5., 5000.), b=(0., 1.), w=0.3, gamma=3.2, sigma=[2.5, 5, 10, 
         imi += np.arctan (k * (image - bwi) / swi)
     # weighted sum of gamma-transformed input image and normalized average of C'_i,
     # normalized to [b[0], b[1]]
-    return b[0] + (b[1] - b[0]) * ((1. - w) * image ** (1. / gamma)
-                                    + w * (.5 + imi / (len (sigma) * np.pi)))
+    return b[0] + (b[1] - b[0]) * ((1. - weight) * image ** (1. / gamma)
+                                    + weight * (.5 + imi / (len (sigma) * np.pi)))
