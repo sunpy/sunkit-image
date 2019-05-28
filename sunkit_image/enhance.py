@@ -6,12 +6,11 @@ import numpy as np
 import scipy.ndimage as ndimage
 
 __all__ = [
-    "mgn1",
-    "mgn2"
+    "mgn",
 ]
 
 
-def mgn1(
+def mgn(
     data,
     sigma=[1.25, 2.5, 5, 10, 20, 40],
     k=0.7,
@@ -120,58 +119,3 @@ def mgn1(
     image += Cprime_g
 
     return image
-
-
-def mgn2(image, a=(5., 5000.), b=(0., 1.), weight=0.3, gamma=3.2, sigma=[2.5, 5, 10, 20, 40], k=0.7):
-
-    """
-    Multi-scale Gaussian Normalization
-
-    Parameters
-    ----------
-    image: `numpy.ndarray`
-        Image to be transformed.
-    a: `tuple`, optional
-        Minimum and maximum input values in image. Here it is assumed to be `(5.,5000.)`
-        According to the paper it should be calculated
-    b: `tuple`, optional
-        Minimum and maximum output values in image ([a[0], a[1]] will be scaled to [b[0], b[1]])
-        Defaults to `(0., 1)`
-    weight: `float`, optional
-        Weight of the MGN-processed image in output image.
-        Defaults to 0.3
-    gamma : `float`, optional
-        The value used to calulcate the  global gamma-transformed image.
-        Ideally should be between 2.5 to 4.
-        Defaults to 3.2
-    sigma : `list`, optional
-        Range of guassian widths to transform over.
-
-     Returns
-    -------
-    image: `numpy.ndarray`
-        Normalized image.
-    
-    Reference
-    ---------
-    * Morgan, Huw, and Miloslav Druckmuller.
-    "Multi-scale Gaussian normalization for solar image processing."
-    arXiv preprint arXiv:1403.6613 (2014).
-    Ref: Sol Phys (2014) 289: 2945. doi:10.1007/s11207-014-0523-9
-    """
-
-    ax, ay = image.shape
-    # normalize [a[0], a[1]] input intensities to [0,1]
-    image = (image.clip(a[0], a[1]) - a[0]) / (a[1] - a[0])
-    imi = np.zeros_like(image)
-    for s in sigma:
-        # B convolved by k_w
-        bwi = ndimage.gaussian_filter(image, s, mode='nearest')
-        # sigma_w
-        swi = np.sqrt(ndimage.gaussian_filter((image - bwi) ** 2, s, mode='nearest'))
-        # intermediate sum of C'_i
-        imi += np.arctan(k * (image - bwi) / swi)
-    # weighted sum of gamma-transformed input image and normalized average of C'_i,
-    # normalized to [b[0], b[1]]
-    return b[0] + (b[1] - b[0]) * ((1. - weight) * image ** (1. / gamma)
-                                    + weight * (.5 + imi / (len(sigma) * np.pi)))
