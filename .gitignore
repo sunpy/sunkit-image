@@ -9,8 +9,8 @@ __pycache__/
 *.so
 
 # Distribution / packaging
-pip-wheel-metadata/
 .Python
+pip-wheel-metadata/
 build/
 develop-eggs/
 dist/
@@ -29,8 +29,8 @@ wheels/
 MANIFEST
 
 # PyInstaller
-# Usually these files are written by a python script from a template
-# before PyInstaller builds the exe, so as to inject date/other infos into it.
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -49,6 +49,7 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+junit/
 
 # Translations
 *.mo
@@ -202,9 +203,9 @@ $RECYCLE.BIN/
 .hypothesis
 .pytest_cache
 sunpydata.sqlite
+sunpydata.sqlite-journal
 sunkit_image/_compiler.c
 sunkit_image/cython_version.py
-sunkit_image/version.py
 docs/_build
 docs/generated
 docs/api/
@@ -216,3 +217,6 @@ tags
 
 ### Pycharm(?)
 .idea
+
+# Release script
+.github_cache

@@ -9,9 +9,9 @@ The example uses <packages> to <do something> and <other package> to <do other
 thing>. Include links to referenced packages like this: `sunpy.io.fits` to
 show the sunpy.io.fits or like this `~sunpy.io.fits`to show just 'fits'
 """
+import matplotlib.pyplot as plt
 # Start by importing the necessary modules.
 import numpy as np
-import matplotlib.pyplot as plt
 
 ##############################################################################
 # This code block is executed, although it produces no output. Lines starting
@@ -37,17 +37,17 @@ z = np.cos(xx) + np.cos(yy)
 plt.figure()
 plt.imshow(z)
 plt.colorbar()
-plt.xlabel('$x$')
-plt.ylabel('$y$')
+plt.xlabel("$x$")
+plt.ylabel("$y$")
 
 ###########################################################################
 # Again it is possible to continue the discussion with a new Python string. This
 # time to introduce the next code block generates 2 separate figures.
 
 plt.figure()
-plt.imshow(z, cmap=plt.cm.get_cmap('hot'))
+plt.imshow(z, cmap=plt.cm.get_cmap("hot"))
 plt.figure()
-plt.imshow(z, cmap=plt.cm.get_cmap('Spectral'), interpolation='none')
+plt.imshow(z, cmap=plt.cm.get_cmap("Spectral"), interpolation="none")
 
 ##########################################################################
 # There's some subtle differences between rendered html rendered comment
@@ -64,6 +64,7 @@ def dummy():
     """
     pass
 
+
 # Code comments not preceded by the hash splitter are left in code blocks.
 
 
@@ -74,7 +75,7 @@ Triple-quoted string which tries to break parser but doesn't.
 ############################################################################
 # Output of the script is captured:
 
-print('Some output from Python')
+print("Some output from Python")
 
 ############################################################################
 # Finally, I'll call ``show`` at the end just so someone running the Python

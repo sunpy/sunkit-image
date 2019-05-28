@@ -3,9 +3,9 @@ This module implements a class for noise level estimation.
 """
 
 import numpy as np
+from scipy.ndimage import correlate
 from scipy.stats import gamma
 from skimage.util import view_as_windows
-from scipy.ndimage import correlate
 
 __all__ = ["NoiseLevelEstimation"]
 
