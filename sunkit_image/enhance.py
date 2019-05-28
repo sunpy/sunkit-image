@@ -6,7 +6,8 @@ import numpy as np
 import scipy.ndimage as ndimage
 
 __all__ = [
-    "mgn1"
+    "mgn1",
+    "mgn2"
 ]
 
 
