@@ -264,8 +264,8 @@ def nrgf(
     map_r = find_pixel_radii(smap).to(u.R_sun)
 
     # To make sure bins are in the map.
-    if radial_bin_edges[1,-1] > np.max(map_r):
-        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0,0],
+    if radial_bin_edges[1, -1] > np.max(map_r):
+        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0, 0],
                                                outer_value=np.max(map_r),
                                                nbins=radial_bin_edges.shape[1])
 
@@ -383,8 +383,8 @@ def fnrgf(
     map_r = find_pixel_radii(smap).to(u.R_sun)
 
     # To make sure bins are in the map.
-    if radial_bin_edges[1,-1] > np.max(map_r):
-        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0,0],
+    if radial_bin_edges[1, -1] > np.max(map_r):
+        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0, 0],
                                                outer_value=np.max(map_r),
                                                nbins=radial_bin_edges.shape[1])
 
