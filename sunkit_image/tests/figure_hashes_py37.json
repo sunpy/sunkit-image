@@ -1,3 +1,4 @@
 {
-    "sunkit_image.utils.tests.test_utils.test_simple_plot": "f2e36eff340b07bf32fba675af245c0fd31db816c6dc3725e035c79bbddd61dc"
+    "sunkit_image.utils.tests.test_utils.test_simple_plot": "aa922ea2704f696628cb3cb7084373f5a9737b6273a413723b8fcebe649505f3",
+    "sunkit_image.tests.test_enhance.test_mgn": "e91c5bc438658e33eef5cc95b0dfe2ae665820170e75ddd2831317922dc8debc"
 }
