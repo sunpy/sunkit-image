@@ -28,16 +28,17 @@ def mgn(
     data : `numpy.ndarray`
         Image to be transformed.
     sigma : `list`, optional
-        Range of guassian widths to transform over.
+        Range of Guassian widths to transform over.
+        Defaults to ``[1.25, 2.5, 5, 10, 20, 40]``.
     k : `float`, optional
         Controls the severity of the arctan transformation.
         Defaults to 0.7
     gamma : `float`, optional
-        The value used to calulcate the  global gamma-transformed image.
+        The value used to calculate the  global gamma-transformed image.
         Ideally should be between 2.5 to 4.
         Defaults to 3.2
     h : `float`, optional
-        Weight of global filter to gaussian filters.
+        Weight of global filter to Gaussian filters.
         Defaults to 0.7
     weights : `list`, optional
         Used to weight all the transformed images during the calculation of the
