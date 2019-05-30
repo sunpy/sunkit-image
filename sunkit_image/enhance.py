@@ -28,7 +28,7 @@ def mgn(
     data : `numpy.ndarray`
         Image to be transformed.
     sigma : `list`, optional
-        Range of Guassian widths to transform over.
+        Range of Gaussian widths to transform over.
         Defaults to ``[1.25, 2.5, 5, 10, 20, 40]``.
     k : `float`, optional
         Controls the severity of the arctan transformation.

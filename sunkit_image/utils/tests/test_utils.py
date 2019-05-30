@@ -11,11 +11,6 @@ from sunkit_image.utils.utils import (bin_edge_summary, equally_spaced_bins,
                                       find_pixel_radii, get_radial_intensity_summary)
 
 
-@figure_test
-def test_simple_plot():
-    plt.plot([0, 1])
-
-
 @pytest.fixture
 @pytest.mark.remote_data
 def smap():
