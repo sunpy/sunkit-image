@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pytest
 
 import sunpy.map
-from sunpy.data.sample import AIA_171_IMAGE
+import sunpy.data.sample
 from sunpy.tests.helpers import figure_test
 
 import sunkit_image.enhance as enhance
@@ -11,7 +11,7 @@ import sunkit_image.enhance as enhance
 
 @pytest.fixture
 def smap():
-    return sunpy.map.Map(AIA_171_IMAGE)
+    return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 
 @figure_test
