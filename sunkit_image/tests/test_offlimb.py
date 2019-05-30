@@ -1,10 +1,12 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import astropy.units as u
 
 import sunpy
 import sunpy.map
-import sunpy.data.test
+import sunpy.data.sample
+from sunpy.tests.helpers import figure_test
 
 import sunkit_image.utils.utils as utils
 import sunkit_image.offlimb as off
@@ -100,3 +102,36 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
                                                             number_angular_segments=4)
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
+
+
+@pytest.fixture
+@pytest.mark.remote_data
+def smap():    
+    return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
+
+
+@figure_test
+@pytest.mark.remote_data
+def test_fig_nrgf(smap):
+
+    radial_bin_edges = utils.equally_spaced_bins()
+    radial_bin_edges *= u.R_sun
+    out = off.nrgf(smap, radial_bin_edges)
+
+    fig = plt.figure()
+    out.plot()
+
+
+@figure_test
+@pytest.mark.remote_data
+def test_fig_fnrgf(smap):
+
+    radial_bin_edges = utils.equally_spaced_bins()
+    radial_bin_edges *= u.R_sun
+
+    order = 20
+    attenuation_coefficients = set_attenuation_coefficients(order)
+    out = off.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
+
+    fig = plt.figure()
+    out.plot()
