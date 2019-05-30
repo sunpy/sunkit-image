@@ -77,7 +77,9 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
 def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
-    order = 1
+    order = 1     
+    # TODO : Write few more tests with different order
+
     result = [[-0.,  96., 128.,  96.,  -0.],
               [96., 224., 288., 224.,  96.],
               [128., 288.,   0., 288., 128.],
