@@ -5,6 +5,8 @@ This module contains functions that can be used to enhance the entire solar imag
 import numpy as np
 import scipy.ndimage as ndimage
 import astropy.units as u
+
+import sunpy.map
 from sunpy.coordinates import frames
 
 __all__ = [
@@ -216,4 +218,9 @@ def occult2(smap, zmin, num_loop, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30,
         loops.append(loop)
 
     # Return a map with loops marked. What intensity values to be used for marking loops?
-    return
+    new_image = smap.data
+    for loop in loops:
+        for points in loop:
+            new_image[points[0], points[1]] = 1000
+
+    return sunpy.map.Map(new_image, smap.meta)
