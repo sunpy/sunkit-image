@@ -51,7 +51,7 @@ def test_bandpass_filter(image):
 
     expect = np.zeros((4,4))
 
-    result = enhance.bandpass_filter(test_map)
+    result = enhance.bandpass_filter(image)
 
     assert np.allclose(expect, result)
     
