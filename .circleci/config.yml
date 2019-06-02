@@ -83,13 +83,13 @@ jobs:
       - run: *tox-install
       - run: *tox-conda-install
       - run: tox -e figure
+      - run: pip install codecov
+      - run: codecov
       - store_artifacts:
           path: figure_test_images
       - run:
           name: "Image comparison page is available at: "
           command: FIGS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/figure_test_images/fig_comparison.html"; echo $FIGS_URL
-                   pip install codecov
-                   codecov
 
   html-docs:
     docker:
