@@ -57,8 +57,7 @@ def set_attenuation_coefficients(order):
 def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
     result = np.zeros_like(map_test1.data)
-    expect = off.nrgf(map_test1, radial_bin_edges,
-                                                    application_radius=0.001*u.R_sun)
+    expect = off.nrgf(map_test1, radial_bin_edges, application_radius=0.001*u.R_sun)
 
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
