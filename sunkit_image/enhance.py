@@ -4,9 +4,11 @@ This module contains functions that can be used to enhance the entire solar imag
 
 import numpy as np
 import scipy.ndimage as ndimage
-import astropy.units as u
 
-import sunpy.map
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
+import sunpy.map.maputils as maputils
 from sunpy.coordinates import frames
 
 __all__ = [
@@ -108,8 +110,8 @@ def occult2(smap, zmin, num_loop, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30,
 
     Returns
     -------
-    new_image : `sunpy.map`
-        Image with loops marked.
+    loops : `list`
+        A list of all loop where each element is a `astropy.coordinates.SkyCoord` object
 
     References
     ----------
@@ -123,82 +125,95 @@ def occult2(smap, zmin, num_loop, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30,
     # 2. Bandpass filter
     image = bandpass_filter(image, nsm1, nsm2)
 
-    x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
-    coords = smap.pixel_to_world(x, y).transform_to(frames.Helioprojective)
-
+    coords = maputils.all_coordinates_from_map(smap)
 
     # Creating the three starting arrays
-    n_s = 100
-    delta_s = 1
-    s_bi = ((np.arange(n_s) - n_s / 2) * delta_s).reshape((-1, 1))
-    s_uni = (delta_s * np.arange(n_s)).reshape((-1, 1))
 
-    n_alpha = 180
-    alp_l = (np.arange(n_alpha) * (np.pi / n_alpha)).reshape((-1, 1))
+    num_loop_segments = 100  # How to decide this
 
-    n_r = 30
-    r_m = (rmin / (-1 + np.arange(n_r) * (2 / n_r - 1))).reshape((-1, 1))
+    # The difference between two loop points
+    delta_segment = 1
 
-    loops = []
-    ngaps = 3               # Number of empty pixels to denote the end of loop
+    segments_bi = ((np.arange(num_loop_segments) - num_loop_segments / 2) * delta_segment).reshape((-1, 1))
+    segments_uni = (delta_segment * np.arange(num_loop_segments)).reshape((-1, 1))
+
+    num_ang_segment = 180
+    ang_segment = (np.arange(num_ang_segment) * (np.pi / num_ang_segment)).reshape((-1, 1))
+
+    num_radial_segments = 30
+    radial_segment = (rmin / (-1 + np.arange(num_radial_segments) * (2 / num_radial_segments - 1))).reshape((-1, 1))
+
+    loops = []  # List of all loops
+    ngaps = 3  # Number of empty pixels to denote the end of loop
 
     # Loops tracing begin
-    for i in range(num_loop):
+    for _ in range(num_loop):
 
-        z_0 = image.max()
-        if (z_0 < noise_thresh):
+        z_0 = image.max()  # First point of the loop with maximum intensity
+
+        if (z_0 < noise_thresh):  # Stop loop tracing if maximum value is noise
             break
+
         i_0, j_0 = np.where(image == z_0)
 
-        loop = []
+        loop = []  # To trace a single loop
 
+        # Coordinates of maximum value
         x_0 = coords[i_0, j_0].Tx.value
         y_0 = coords[i_0, j_0].Ty.value
         loop.append([x_0, y_0])
 
-        x_k = x_0
-        y_k = y_0
+        x_k = x_0   # x_k denotes x-coordinate of kth segment of a loop
+        y_k = y_0   # Current loop point
 
-        for sigma in [-1, 1]:               # To deal with both forward and backward pass
+        # x_k_l denotes x-coordinate of kth segment at a particular 'l' angle
+        # Same with y-coordinate
+        x_k_l = i_0 + segments_bi * np.cos(ang_segment.T)
+        y_k_l = j_0 + segments_bi * np.sin(ang_segment.T)
 
-            count = 0
+        # TODO: Write after understanding the updates. Assume we got angle_k
+
+        # amgle calculated at kth segment
+        angle_k = 12  # arbitrary for the time being
+
+        # angle along proposed centre of curvature
+        beta_0 = angle_k + np.pi / 2
+
+        # Coordinates of centre with 'rmin' radius
+        x_c = x_k + rmin * np.cos(beta_0)
+        y_c = y_k + rmin * np.sin(beta_0)
+
+        for sigma in [-1, 1]:  # To deal with both forward and backward pass
+
+            count = 0  # To make sure loop only finishes after three empty pixels
             while count < ngaps:
 
-                x_k_l = i_0 + s_bi * np.cos(alp_l.T)
-                y_k_l = j_0 + s_bi * np.sin(alp_l.T)
+                # Loci of centres with radius of curvature as 'radial_segment'
+                x_m = x_k + ((x_c - x_0) / rmin) * radial_segment
+                y_m = y_k + ((y_c - y_0) / rmin) * radial_segment
 
-                # TODO: Write after understanding the updates. Assume we got # Doing the forward pass
+                beta_m = beta_0 + sigma * (segments_uni / rmin)
 
-                alpha_k = 12  # arbitrary for the time being
-
-                beta_0 = alpha_k + np.pi / 2
-
-                x_c = x_k + rmin * np.cos(beta_0)
-                y_c = y_k + rmin * np.sin(beta_0)
-
-                x_m = x_k + ((x_c - x_0) / rmin) * r_m
-                y_m = y_k + ((y_c - y_0) / rmin) * r_m
-
-                beta_m = beta_0 + sigma * (s_uni / rmin)
-
-                x_k_m = x_m - r_m * np.cos(beta_m)
-                y_k_m = y_m - r_m * np.sin(beta_m)
+                # TODO: verify if the radius calculation is done for every loop point
+                # Not mentioned clearly in the paper but IDL seems to do so.
+                x_k_m = x_m - radial_segment * np.cos(beta_m)
+                y_k_m = y_m - radial_segment * np.sin(beta_m)
 
                 # TODO:Calculate the  rm, the radius of curvature
+                # Current loop point will change
 
                 rm = 5  # For the time being
 
-                alpha_k_1 = alpha_k + sigma * (delta_s / rm)
-                alpha_mid = (alpha_k + alpha_k_1) / 2
+                angle_k_1 = angle_k + sigma * (delta_segment / rm)
+                alpha_mid = (angle_k + angle_k_1) / 2
 
-                x_k_1 = x_k + delta_s * np.cos(alpha_mid + (1 + sigma) * np.pi / 2)
-                y_k_1 = y_k + delta_s * np.sin(alpha_mid + (1 + sigma) * np.pi / 2)
+                x_k_1 = x_k + delta_segment * np.cos(alpha_mid + (1 + sigma) * np.pi / 2)
+                y_k_1 = y_k + delta_segment * np.sin(alpha_mid + (1 + sigma) * np.pi / 2)
 
                 if image(x_k_1, y_k_1) == 0:  # representation of what to do
                     count += 1
 
-                # Better to convert to pixel values before appending
-                loop.append((x_k_1, y_k_1))
+                loop.append([x_k_1, y_k_1] * u.arcsec)
 
                 x_k = x_k_1
                 y_k = y_k_1
@@ -208,17 +223,10 @@ def occult2(smap, zmin, num_loop, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30,
                 x_k = x_0
                 y_k = y_0
 
-
         # Zero out the loop pixels assuming values are stored in pixels format
         for points in loop:
             image[points[0], points[1]] = 0
 
-        loops.append(loop)
+        loops.append(SkyCoord(loop, frame=frames.Helioprojective))
 
-    # Return a map with loops marked. What intensity values to be used for marking loops?
-    new_image = smap.data
-    for loop in loops:
-        for points in loop:
-            new_image[points[0], points[1]] = 1000
-
-    return sunpy.map.Map(new_image, smap.meta)
+    return loops
