@@ -75,9 +75,9 @@ def mgn(
 
     # 1. Replace spurious negative pixels with zero
     data[data <= 0] = 1e-15  # Makes sure that all values are above zero
-    image = np.empty(data.shape, dtype=data.dtype)
-    conv = np.empty(data.shape, dtype=data.dtype)
-    sigmaw = np.empty(data.shape, dtype=data.dtype)
+    image = np.zeros(data.shape, dtype=data.dtype)
+    conv = np.zeros(data.shape, dtype=data.dtype)
+    sigmaw = np.zeros(data.shape, dtype=data.dtype)
 
     for s, weight in zip(sigma, weights):
         # 2 & 3 Create kernel and convolve with image
