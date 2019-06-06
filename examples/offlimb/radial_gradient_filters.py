@@ -3,7 +3,7 @@
 Radial Gradient Filters
 =======================
 
-This example applies both the normalizing radial gradient filter and fourier 
+This example applies both the normalizing radial gradient filter and Fourier
 normalizing radial gradient filter to a sunpy map.
 
 The example uses `sunkit_image.offlimb` to apply the filter.
