@@ -5,7 +5,8 @@ try:
     _SUNPY_SETUP_
 except NameError:
     import builtins
-builtins._SUNPY_SETUP_ = False
+
+    builtins._SUNPY_SETUP_ = False
 
 try:
     from .version import version as __version__

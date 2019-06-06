@@ -83,6 +83,8 @@ jobs:
       - run: *tox-install
       - run: *tox-conda-install
       - run: tox -e figure
+      - run: pip install codecov
+      - run: codecov
       - store_artifacts:
           path: figure_test_images
       - run:
