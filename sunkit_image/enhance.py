@@ -218,15 +218,23 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
                 loop.append([x_k_1, y_k_1])
 
-                if image[np.min(np.max(x_k_1, 0), ix), np.min(np.max(y_k_1, 0), ix)] == 0:
+                if image[np.min(np.max(x_k_1, 0), ix), np.min(np.max(y_k_1, 0), iy)] == 0:
                     count += 1
 
             if sigma == -1:
                 loop.reverse()
 
-        # Zero out the loop pixels assuming values are stored in pixels format
+        # Zero out the loop pixels
         for points in loop:
-            image[points[0], points[1]] = 0
+
+            # Range of values to be zeroed out
+            ran_x1 = np.min(np.max(points[0] - width, 0), ix)
+            ran_x2 = np.min(np.max(points[0] + width, 0), ix)
+
+            ran_y1 = np.min(np.max(points[1] - width, 0), iy)
+            ran_y2 = np.min(np.max(points[1] + width, 0), iy)
+
+            image[ran_x1:ran_x2, ran_y1:ran_y2] = 0
 
         loops.append(loop)
 
