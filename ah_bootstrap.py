@@ -36,21 +36,22 @@ See https://github.com/astropy/astropy-helpers for more details, and for the
 latest version of this module.
 """
 
+import contextlib
+import errno
 import io
+import locale
 import os
 import re
-import sys
-import errno
-import locale
-import contextlib
 import subprocess as sp
+import sys
+
 from distutils import log
-from configparser import ConfigParser, RawConfigParser
 from distutils.debug import DEBUG
-# Check that setuptools 30.3 or later is present
-from distutils.version import LooseVersion
+
+from configparser import ConfigParser, RawConfigParser
 
 import pkg_resources
+
 from setuptools import Distribution
 from setuptools.package_index import PackageIndex
 
@@ -145,6 +146,8 @@ _str_types = (str, bytes)
 # issues with either missing or misbehaving pacakges (including making sure
 # setuptools itself is installed):
 
+# Check that setuptools 30.3 or later is present
+from distutils.version import LooseVersion
 
 try:
     import setuptools
