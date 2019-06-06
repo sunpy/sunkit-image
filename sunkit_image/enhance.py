@@ -110,6 +110,8 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
     ----------
     * Markus J. Aschwanden, Bart De Pontieu, Eugene A. Katrukha.
       Optimization of Curvi-Linear Tracing Applied to Solar Physics and Biophysics.
+      Entropy, vol. 15, issue 8, pp. 3007-3030
+      https://arxiv.org/abs/1307.5046
     """
 
     # 1. Supress the background
