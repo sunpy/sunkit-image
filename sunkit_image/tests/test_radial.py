@@ -131,3 +131,20 @@ def test_fig_fnrgf(smap):
     out = rad.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
 
     out.plot()
+
+
+def test_set_attenuation_coefficients():
+
+    order = 1
+    expect = [[1, 0.],
+              [1, 0.]]
+
+    result = set_attenuation_coefficients(order)
+
+    assert np.allclose(expect, result)
+
+    order = 3
+    expect = [[1, 0.75, 0.5, 0.],
+              [1, 0.75, 0.5, 0.]]
+
+    result = set_attenuation_coefficients(order)
