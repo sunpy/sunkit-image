@@ -1,5 +1,5 @@
 """
-This module contains functions that can be used to enhance the regions off the solar limb.
+This module contains functions that can be used to enhance the regions above a radius.
 """
 import numpy as np
 import astropy.units as u
@@ -27,7 +27,7 @@ __all__ = [
 
 def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
     """
-    Fits a polynomial of degree, "degree" to the log of the radial intensity.
+    Fits a polynomial of  a given degree to the log of the radial intensity.
 
     Parameters
     ----------
@@ -41,8 +41,8 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
 
     Returns
     -------
-    polynomial : `numpy.ndarray`
-        A polynomial of degree, "degree" that fits the log of the intensity
+    `numpy.ndarray`
+        A polynomial of degree, ``degree`` that fits the log of the intensity
         profile as a function of the radius.
     """
     return np.polyfit(radii.to(u.R_sun).value, np.log(intensity), degree)
@@ -50,9 +50,10 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
 
 def calculate_fit_radial_intensity(radii, polynomial):
     """
-    Calculates the fit value of the radial intensity at the values "radii". The function assumes
-    that the polynomial is the best fit to the observed log of the intensity as a function of
-    radius.
+    Calculates the fit value of the radial intensity at the values ``radii``. 
+    
+    The function assumes that the polynomial is the best fit to the observed 
+    log of the intensity as a function of radius.
 
     Parameters
     ----------
@@ -65,7 +66,7 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
     Returns
     -------
-    fitted intensity : `numpy.ndarray`
+    `numpy.ndarray`
         An array with the same shape as radii which expresses the fitted
         intensity value.
     """
@@ -74,9 +75,10 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
 def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
-    Normalizes the fitted radial intensity to the value at the normalization radius. The function
-    assumes that the polynomial is the best fit to the observed log of the intensity as a function
-    of radius.
+    Normalizes the fitted radial intensity to the value at the normalization radius. 
+    
+    The function assumes that the polynomial is the best fit to the observed
+    log of the intensity as a function of radius.
 
     Parameters
     ----------
@@ -84,14 +86,14 @@ def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
         The radii at which the fitted intensity is calculated, nominally in
         units of solar radii.
     polynomial : `numpy.ndarray`
-        A polynomial of degree "degree" that fits the log of the intensity
+        A polynomial of a given degree that fits the log of the intensity
         profile as a function of the radius.
     normalization_radius : `astropy.units.Quantity`
         The radius at which the fitted intensity value is normalized to.
 
     Returns
     -------
-    normalized intensity : `numpy.ndarray`
+    `numpy.ndarray`
         An array with the same shape as radii which expresses the fitted
         intensity value normalized to its value at the normalization radius.
     """
@@ -112,7 +114,7 @@ def intensity_enhance(
     **summary_kwargs
 ):
     """
-    Returns a map with the offlimb emission enhanced.
+    Returns a SunPy Map with the intensity enhanced above a given radius.
 
     The enhancement is calculated as follows:
 
@@ -134,15 +136,15 @@ def intensity_enhance(
     smap : `sunpy.map.Map`
         The SunPy map to enchance.
     radial_bin_edges : `astropy.units.Quantity`
-        A two-dimensional array of bin edges of size [2, nbins] where nbins is
+        A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is
         the number of bins.
-    scale : None or `astropy.units.Quantity`, optional
+    scale : `astropy.units.Quantity`, optional
         The radius of the Sun expressed in map units.
         For example, in typical Helioprojective Cartesian maps the solar radius is expressed in
         units of arcseconds.
         Defaults to None, which means that the map scale is used.
     summarize_bin_edges : `str`, optional
-        How to summarize the bin edges.s
+        How to summarize the bin edges.
         Defaults to "center".
     summary : `function`, optional
         A function that returns a summary statistic of the radial intensity.
@@ -158,13 +160,13 @@ def intensity_enhance(
         Array-like with 2 elements defining the range of radii over which the
         polynomial function is fit.
         The preferred units are solar radii.
-        Defaults to [1, 1.5] solar radii.
+        Defaults to ``[1, 1.5]`` solar radii.
     summary_kwargs : `dict`, optional
         Keywords applicable to the summary function.
 
     Returns
     -------
-    new_map : `sunpy.map.Map`
+    `sunpy.map.Map`
         A SunPy map that has the emission above the normalization radius enhanced.
     """
     # Get the radii for every pixel
@@ -227,7 +229,7 @@ def nrgf(
     smap : `sunpy.map.Map`
         The SunPy map to enchance.
     radial_bin_edges : `astropy.units.Quantity`
-        A two-dimensional array of bin edges of size [2, nbins] where nbins is
+        A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is
         the number of bins.
     scale : None or `astropy.units.Quantity`, optional
         The radius of the Sun expressed in map units.
@@ -237,21 +239,21 @@ def nrgf(
     intensity_summary : `function`, optional
         A function that returns a summary statistic of the radial intensity.
         Defaults to `numpy.nanmean`.
-    intensity_summary_kwargs : None, `dict`
+    intensity_summary_kwargs : `dict`, optional 
         Keywords applicable to the summary function.
-    width_function : `function`
+    width_function : `function`, optional
         A function that returns a summary statistic of the distribution of intensity,
         at a given radius.
         Defaults to `numpy.std`.
-    width_function_kwargs : `function`
+    width_function_kwargs : `function`, optional
         Keywords applicable to the width function.
-    application_radius : `astropy.units.Quantity`
+    application_radius : `astropy.units.Quantity`, optional
         The NRGF is applied to emission at radii above the application_radius.
         Defaults to 1 solar radii.
 
     Returns
     -------
-    new_map : `sunpy.map.Map`
+    `sunpy.map.Map`
         A SunPy map that has had the NRGF applied to it.
 
     References
