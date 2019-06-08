@@ -51,7 +51,7 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
 def calculate_fit_radial_intensity(radii, polynomial):
     """
     Calculates the fit value of the radial intensity at the values ``radii``. 
-    
+
     The function assumes that the polynomial is the best fit to the observed 
     log of the intensity as a function of radius.
 
@@ -76,7 +76,7 @@ def calculate_fit_radial_intensity(radii, polynomial):
 def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
     Normalizes the fitted radial intensity to the value at the normalization radius. 
-    
+
     The function assumes that the polynomial is the best fit to the observed
     log of the intensity as a function of radius.
 
@@ -219,6 +219,12 @@ def nrgf(
     """
     Implementation of the normalizing radial gradient filter (NRGF).
 
+    The filter works as follows:
+    
+    It takes the input map and find the intensity summary and width of intenstiy values in radial
+    bins above the application radius. The intensity summary and the width is then used to
+    normalize the intensity values in a particular radial bin.
+
     .. note::
 
         After applying the filter, current plot settings such as the image normalization
@@ -321,6 +327,14 @@ def fnrgf(
 ):
     """
     Implementation of the fourier normalizing radial gradient filter (FNRGF).
+
+    The filter works as follows:
+
+    It takes the input map and divides the region above the application radius and in the radial bins
+    into various small angular segments. Then for each of these angular segments the intensity summary
+    and width is calculated. The intensity summary and the width of each angular segments are then used
+    to find a Fourier approximation of the intensity summary and width for the entire radial bin, this
+    Fourier approximated value is then used to noramlize the intensity in the radial bin.
 
     ..note ::
 

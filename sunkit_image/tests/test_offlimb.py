@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import astropy.units as u
@@ -9,7 +8,7 @@ import sunpy.data.sample
 from sunpy.tests.helpers import figure_test
 
 import sunkit_image.utils.utils as utils
-import sunkit_image.offlimb as off
+import sunkit_image.radial as rad
 
 
 @pytest.fixture
@@ -57,7 +56,7 @@ def set_attenuation_coefficients(order):
 def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
     result = np.zeros_like(map_test1.data)
-    expect = off.nrgf(map_test1, radial_bin_edges, application_radius=0.001*u.R_sun)
+    expect = rad.nrgf(map_test1, radial_bin_edges, application_radius=0.001*u.R_sun)
 
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
@@ -68,7 +67,7 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
               [1.,  0.,  0.,  0., -1.],
               [0.,  1.,  0., -1., 0.]]
 
-    expect = off.nrgf(map_test2, radial_bin_edges, application_radius=0.001*u.R_sun)
+    expect = rad.nrgf(map_test2, radial_bin_edges, application_radius=0.001*u.R_sun)
 
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
@@ -76,7 +75,7 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
 def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
-    order = 1     
+    order = 1   
     # TODO : Write few more tests with different order
 
     result = [[-0.,  96., 128.,  96.,  -0.],
@@ -85,10 +84,9 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
               [96., 224., 288., 224.,  96.],
               [-0.,  96., 128.,  96.,  -0.]]
     attenuation_coefficients = set_attenuation_coefficients(order)
-    expect = off.fnrgf(map_test1, radial_bin_edges, order,
-                                                            attenuation_coefficients,
-                                                            application_radius=0.001*u.R_sun,
-                                                            number_angular_segments=4)
+    expect = rad.fnrgf(map_test1, radial_bin_edges, order, attenuation_coefficients,
+                       application_radius=0.001*u.R_sun, number_angular_segments=4)
+
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
 
@@ -97,17 +95,16 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
               [128., 288.,   0., 288., 128.],
               [128., 224., 288., 224.,  96.],
               [-0., 128., 128.,  96.,  -0.]]
-    expect = off.fnrgf(map_test2, radial_bin_edges, order,
-                                                            attenuation_coefficients,
-                                                            application_radius=0.001*u.R_sun,
-                                                            number_angular_segments=4)
+    expect = rad.fnrgf(map_test2, radial_bin_edges, order, attenuation_coefficients,
+                       application_radius=0.001*u.R_sun, number_angular_segments=4)
+
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
 
 
 @pytest.fixture
 @pytest.mark.remote_data
-def smap():    
+def smap():
     return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 
@@ -117,9 +114,8 @@ def test_fig_nrgf(smap):
 
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
-    out = off.nrgf(smap, radial_bin_edges)
+    out = rad.nrgf(smap, radial_bin_edges)
 
-    fig = plt.figure()
     out.plot()
 
 
@@ -132,7 +128,6 @@ def test_fig_fnrgf(smap):
 
     order = 20
     attenuation_coefficients = set_attenuation_coefficients(order)
-    out = off.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
+    out = rad.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
 
-    fig = plt.figure()
     out.plot()

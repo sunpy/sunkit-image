@@ -16,7 +16,7 @@ import astropy.units as u
 import sunpy.map
 import sunpy.data.sample
 
-import sunkit_image.offlimb as offlimb
+import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins
 
 ###########################################################################
@@ -31,7 +31,7 @@ radial_bin_edges = equally_spaced_bins()
 radial_bin_edges *= u.R_sun
 
 # The NRGF filter is applied after it.
-out1 = offlimb.nrgf(aia_map, radial_bin_edges)
+out1 = radial.nrgf(aia_map, radial_bin_edges)
 
 # Assuming values for parameters of FNRGF
 order = 20
@@ -40,7 +40,7 @@ attenuation_coefficients[0, :] = np.linspace(1, 0, order + 1)
 attenuation_coefficients[1, :] = np.linspace(1, 0, order + 1)
 
 # The FNRGF filter is applied after it.
-out2 = offlimb.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients)
+out2 = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients)
 
 ###########################################################################
 # The resulting SunPy Maps are plotted here.
