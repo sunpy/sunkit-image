@@ -7,9 +7,7 @@ from configparser import ConfigParser
 try:
     from sphinx_astropy.conf.v1 import *  # noqa
 except ImportError:
-    print(
-        "ERROR: the documentation requires the sphinx-astropy package to be installed"
-    )
+    print("ERROR: the documentation requires the sphinx-astropy package to be installed")
     sys.exit(1)
 
 try:
@@ -93,7 +91,7 @@ if has_sphinx_gallery:
         "examples_dirs": example_dir,
         "gallery_dirs": path.joinpath("generated", "gallery"),
         "default_thumb_file": path.joinpath("logo", "sunpy_icon_128x128.png"),
-        "abort_on_example_error": True,
+        "abort_on_example_error": False,
         "plot_gallery": True,
     }
 
@@ -102,7 +100,6 @@ target_file = os.path.abspath("./whatsnew/latest_changelog.txt")
 try:
     from sunpy.util.towncrier import generate_changelog_for_docs
 
-    generate_changelog_for_docs("../", target_file)
     if is_development:
         generate_changelog_for_docs("../", target_file)
 except Exception:

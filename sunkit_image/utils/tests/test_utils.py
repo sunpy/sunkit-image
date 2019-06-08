@@ -7,8 +7,12 @@ import sunpy.map
 from astropy.tests.helper import assert_quantity_allclose
 from sunpy.tests.helpers import figure_test
 
-from sunkit_image.utils.utils import (bin_edge_summary, equally_spaced_bins,
-                                      find_pixel_radii, get_radial_intensity_summary)
+from sunkit_image.utils.utils import (
+    bin_edge_summary,
+    equally_spaced_bins,
+    find_pixel_radii,
+    get_radial_intensity_summary,
+)
 
 
 @pytest.fixture
