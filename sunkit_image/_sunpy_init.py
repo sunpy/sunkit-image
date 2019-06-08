@@ -5,6 +5,7 @@ try:
     _SUNPY_SETUP_
 except NameError:
     import builtins
+
     builtins._SUNPY_SETUP_ = False
 
 try:
