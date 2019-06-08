@@ -6,10 +6,8 @@ Radial Gradient Filters
 This example applies both the normalizing radial gradient filter and Fourier
 normalizing radial gradient filter to a sunpy map.
 
-The example uses `sunkit_image.offlimb` to apply the filter.
 
 """
-# Start by importing the necessary modules.
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -22,8 +20,7 @@ import sunkit_image.offlimb as offlimb
 from sunkit_image.utils import equally_spaced_bins
 
 ###########################################################################
-# Sunpy sample data contains a number of suitable maps, where the sunpy.data.sample.NAME
-# returns the location of the given FITS file.
+# Sunpy's sample data contain a number of suitable FITS files for this purpose.
 
 aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
@@ -46,7 +43,7 @@ attenuation_coefficients[1, :] = np.linspace(1, 0, order + 1)
 out2 = offlimb.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients)
 
 ###########################################################################
-# The resulting sunpy.map are plotted
+# The resulting SunPy Maps are plotted here.
 
 fig = plt.figure(figsize=(1,2))
 

@@ -1,1 +1,1 @@
-Added a new function (`sunkit_image.offlimb.fnrgf`) to normalize the radial brightness gradient using a fourier approximation.
+Added a new function (`sunkit_image.offlimb.fnrgf`) to normalize the radial brightness gradient using a Fourier approximation.
