@@ -50,9 +50,9 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
 
 def calculate_fit_radial_intensity(radii, polynomial):
     """
-    Calculates the fit value of the radial intensity at the values ``radii``. 
+    Calculates the fit value of the radial intensity at the values ``radii``.
 
-    The function assumes that the polynomial is the best fit to the observed 
+    The function assumes that the polynomial is the best fit to the observed
     log of the intensity as a function of radius.
 
     Parameters
@@ -75,7 +75,7 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
 def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
-    Normalizes the fitted radial intensity to the value at the normalization radius. 
+    Normalizes the fitted radial intensity to the value at the normalization radius.
 
     The function assumes that the polynomial is the best fit to the observed
     log of the intensity as a function of radius.
@@ -220,7 +220,7 @@ def nrgf(
     Implementation of the normalizing radial gradient filter (NRGF).
 
     The filter works as follows:
-    
+
     It takes the input map and find the intensity summary and width of intenstiy values in radial
     bins above the application radius. The intensity summary and the width is then used to
     normalize the intensity values in a particular radial bin.
@@ -245,7 +245,7 @@ def nrgf(
     intensity_summary : `function`, optional
         A function that returns a summary statistic of the radial intensity.
         Defaults to `numpy.nanmean`.
-    intensity_summary_kwargs : `dict`, optional 
+    intensity_summary_kwargs : `dict`, optional
         Keywords applicable to the summary function.
     width_function : `function`, optional
         A function that returns a summary statistic of the distribution of intensity,
@@ -306,7 +306,7 @@ def nrgf(
         here = np.logical_and(here, map_r > application_radius)
         data[here] = (smap.data[here] - radial_intensity[i])
         if radial_intensity_distribution_summary[i] != 0.0:
-            data[here] /= radial_intensity_distribution_summary[i]
+            data[here] = data[here] / radial_intensity_distribution_summary[i]
 
     return sunpy.map.Map(data, smap.meta)
 

@@ -61,6 +61,7 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
 
+    # Hand calculated
     result = [[0.,  1.,  0., -1., 0.],
               [1.,  0.,  0.,  0., -1.],
               [0.,  0.,  0.,  0.,  0.],
@@ -75,9 +76,10 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
 def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
-    order = 1   
+    order = 1
     # TODO : Write few more tests with different order
 
+    # Hand calculated
     result = [[-0.,  96., 128.,  96.,  -0.],
               [96., 224., 288., 224.,  96.],
               [128., 288.,   0., 288., 128.],
@@ -90,6 +92,7 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
 
+    # Hand calculated
     result = [[-0., 128., 128.,  96.,  -0.],
               [128., 224., 288., 224.,  96.],
               [128., 288.,   0., 288., 128.],
@@ -136,6 +139,7 @@ def test_fig_fnrgf(smap):
 def test_set_attenuation_coefficients():
 
     order = 1
+    # Hand calculated
     expect = [[1, 0.],
               [1, 0.]]
 
@@ -144,6 +148,7 @@ def test_set_attenuation_coefficients():
     assert np.allclose(expect, result)
 
     order = 3
+    # Hand calculated
     expect = [[1, 0.75, 0.5, 0.],
               [1, 0.75, 0.5, 0.]]
 
