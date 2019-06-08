@@ -1,5 +1,5 @@
 """
-This module contains functions that can be used to enhance the entire solar image.
+This module contains functions that will enhance the entire image.
 """
 
 import numpy as np
@@ -45,13 +45,12 @@ def mgn(
         final image. If not specificed, all weights are one.
     width : `int`
         An odd integer defining the width of the kernel to be convolved.
-    truncate : `int`
-        The number of sigmas to truncate the kernel.
-        Defaults to 3
+    truncate : `int`, optional 
+        The number of sigmas (defaults to 3) to truncate the kernel.
 
     Returns
     -------
-    image: `numpy.ndarray`
+    `numpy.ndarray`
         Normalized image.
 
     Reference

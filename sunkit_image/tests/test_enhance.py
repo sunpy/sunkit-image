@@ -22,7 +22,6 @@ def test_mgn(smap):
     out = enhance.mgn(smap.data)
     out = sunpy.map.Map(out, smap.meta)
 
-    fig = plt.figure()
     out.plot()
 
 
