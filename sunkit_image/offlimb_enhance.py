@@ -7,8 +7,11 @@ import numpy as np
 import astropy.units as u
 import sunpy.map
 
-from sunkit_image.utils.utils import (bin_edge_summary, find_pixel_radii,
-                                      get_radial_intensity_summary)
+from sunkit_image.utils.utils import (
+    bin_edge_summary,
+    find_pixel_radii,
+    get_radial_intensity_summary,
+)
 
 __all__ = [
     "fit_polynomial_to_log_radial_intensity",
