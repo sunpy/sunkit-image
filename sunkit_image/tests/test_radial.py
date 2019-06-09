@@ -77,7 +77,6 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
 def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
     order = 1
-    # TODO : Write few more tests with different order
 
     # Hand calculated
     result = [[-0.,  96., 128.,  96.,  -0.],
@@ -103,6 +102,36 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
+
+    # The below tests are dummy testa. These values were not verified by hand rather they were
+    # generated using the code itself.
+    order = 5
+    
+    result = [[  0.   ,  90.528, 124.8  ,  90.528,   0.   ],
+              [ 90.528, 207.2  , 280.8  , 207.2  ,  90.528],
+              [124.8  , 280.8  ,   0.   , 280.8  , 124.8  ],
+              [ 90.528, 207.2  , 280.8  , 207.2  ,  90.528],
+              [  0.   ,  90.528, 124.8  ,  90.528,   0.   ]]
+
+    attenuation_coefficients = set_attenuation_coefficients(order)
+    expect = rad.fnrgf(map_test1, radial_bin_edges, order, attenuation_coefficients,
+                       application_radius=0.001*u.R_sun, number_angular_segments=4)
+
+    assert np.allclose(expect.data.shape, map_test1.data.shape)
+    assert np.allclose(expect.data, result)
+
+    result = [[ 0., 120.55347471, 124.8, 90.67852529, 0.],
+              [120.70526403, 207.2, 280.8, 207.2, 90.52673597],
+              [124.8, 280.8, 0., 280.8, 124.8],
+              [120.70526403, 207.2, 280.8, 207.2, 90.52673597],
+              [ 0., 120.55347471, 124.8,  90.67852529, 0.]]
+
+    attenuation_coefficients = set_attenuation_coefficients(order)
+    expect = rad.fnrgf(map_test2, radial_bin_edges, order, attenuation_coefficients,
+                       application_radius=0.001*u.R_sun, number_angular_segments=4)
+
+    assert np.allclose(expect.data.shape, map_test2.data.shape)
+    assert np.allclose(expect.data, result)  
 
 
 @pytest.fixture

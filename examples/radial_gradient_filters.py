@@ -36,10 +36,14 @@ out1 = radial.nrgf(aia_map, radial_bin_edges)
 
 # The NRGF filtered map is plotted. 
 out1.plot()
+plt.show()
 
 ###########################################################################
 
 # Assuming values for the parameters of FNRGF
+# Order is the number of Fourier coefficients to be used in the approximation.
+# The attentuation coefficient are calculated to be linearly decreasing, you should
+# choose them according to your requirements.
 order = 20
 attenuation_coefficients = np.zeros((2, order + 1))
 attenuation_coefficients[0, :] = np.linspace(1, 0, order + 1)
@@ -50,3 +54,4 @@ out2 = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients)
 
 # The FNRGF filtered map is plotted. 
 out2.plot()
+plt.show()

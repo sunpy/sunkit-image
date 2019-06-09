@@ -341,7 +341,7 @@ def fnrgf(
     the entire radial bin, this Fourier approximated value is then used to noramlize the intensity in the
     radial bin.
 
-    ..note ::
+    ..note::
 
         After applying the filter, current plot settings such as the image normalization
         may have to be changed in order to obtain a good-looking plot.
