@@ -344,7 +344,7 @@ def fnrgf(
     ..note ::
 
         After applying the filter, current plot settings such as the image normalization
-        may have to be changed in order to obtain a good-looking plot
+        may have to be changed in order to obtain a good-looking plot.
 
     Parameters
     ----------
