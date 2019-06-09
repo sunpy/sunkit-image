@@ -39,7 +39,7 @@ out1.plot()
 
 ###########################################################################
 
-# Assuming values for parameters of FNRGF
+# Assuming values for the parameters of FNRGF
 order = 20
 attenuation_coefficients = np.zeros((2, order + 1))
 attenuation_coefficients[0, :] = np.linspace(1, 0, order + 1)

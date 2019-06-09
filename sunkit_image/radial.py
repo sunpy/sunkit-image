@@ -221,9 +221,11 @@ def nrgf(
 
     The filter works as follows:
 
-    It takes the input map and find the intensity summary and width of intenstiy values in radial
-    bins above the application radius. The intensity summary and the width is then used to
-    normalize the intensity values in a particular radial bin.
+    Normalizing Radial Gradient Filter a simple filter for removing the radial gradient to reveal
+    coronal structure. Applied to polarized brightness observations of the corona, the NRGF produces
+    images which are striking in their detail. It takes the input map and find the intensity summary
+    and width of intenstiy values in radial bins above the application radius. The intensity summary
+    and the width is then used to normalize the intensity values in a particular radial bin.
 
     .. note::
 
@@ -298,7 +300,7 @@ def nrgf(
     # Storage for the filtered data
     data = np.zeros_like(smap.data)
 
-    # Calculate the filter for each radial bin.
+    # Calculate the filter value for each radial bin.
     for i in range(0, radial_bin_edges.shape[1]):
         here = np.logical_and(
             map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i]
@@ -330,11 +332,14 @@ def fnrgf(
 
     The filter works as follows:
 
-    It takes the input map and divides the region above the application radius and in the radial bins
-    into various small angular segments. Then for each of these angular segments the intensity summary
-    and width is calculated. The intensity summary and the width of each angular segments are then used
-    to find a Fourier approximation of the intensity summary and width for the entire radial bin, this
-    Fourier approximated value is then used to noramlize the intensity in the radial bin.
+    Fourier Normalizing Radial Gradient Filter approximates the local average and the local standard
+    deviation by a finite Fourier series. This method enables the enhancement of finer details, especially
+    in regions of lower contrast. It takes the input map and divides the region above the application
+    radius and in the radial bins into various small angular segments. Then for each of these angular
+    segments, the intensity summary and width is calculated. The intensity summary and the width of each
+    angular segments are then used to find a Fourier approximation of the intensity summary and width for
+    the entire radial bin, this Fourier approximated value is then used to noramlize the intensity in the
+    radial bin.
 
     ..note ::
 
@@ -353,7 +358,7 @@ def fnrgf(
         A two dimensional array of shape ``[2, order + 1]``. The first row contain attenuation
         coefficients for mean calculations. The second row contains attenuation coefficients
         for standard deviation calculation.
-    ratio_mix : `float`
+    ratio_mix : `float`, optional
         A one dimensional array of shape ``[2, 1]`` with values equal to ``[K1, K2]``.
         The ratio in which the original image and filtered image are mixed.
         Defaults to ``[15, 1]``.
@@ -428,7 +433,7 @@ def fnrgf(
         annulus = np.logical_and(annulus, map_r > application_radius)
 
         # The angle subtended by each segment
-        segment_angle = 2*np.pi / number_angular_segments
+        segment_angle = 2 * np.pi / number_angular_segments
 
         # Storage of mean and standard deviation of each segment in a circular ring
         average_segments = np.zeros((1, number_angular_segments))
@@ -461,6 +466,7 @@ def fnrgf(
                 std_dev[0, j] = width_function(smap.data[annulus_segment])
 
         # Calculating the fourier coefficients multiplied with the attenuation coefficients
+        # Refer to equation (2), (3), (4), (5) in the paper
         fourier_coefficient_a_0 = np.sum(average_segments) * (2 / number_angular_segments)
         fourier_coefficient_a_0 *= (attenuation_coefficients[0, 1])
 
@@ -470,6 +476,7 @@ def fnrgf(
         fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (2 / number_angular_segments)
         fourier_coefficients_b_k *= attenuation_coefficients[0][1:]
 
+        # Refer to equation (6) in the paper
         fourier_coefficient_c_0 = np.sum(std_dev) * (2 / number_angular_segments)
         fourier_coefficient_c_0 *= attenuation_coefficients[1, 1]
 
@@ -496,6 +503,7 @@ def fnrgf(
         std_approximated += fourier_coefficient_c_0 / 2
 
         # Normailize the data
+        # Refer equation (7) in the paper
         std_approximated = np.where(std_approximated == 0.00, 1, std_approximated)
         data[annulus] = np.ravel((smap.data[annulus] - mean_approximated) / std_approximated)
 
