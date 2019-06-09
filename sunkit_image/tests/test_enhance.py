@@ -27,12 +27,7 @@ def test_mgn(smap):
 
 @pytest.fixture
 def map_test():
-
-    A = np.array([[1., 1., 1., 1.],
-                 [1., 5., 5., 1.],
-                 [1., 5., 5., 1.],
-                 [1., 1., 1., 1.]])
-    return A
+    return np.ones((4, 4), dtype=float)
 
 
 def test_multiscale_gaussian(map_test):
@@ -42,3 +37,19 @@ def test_multiscale_gaussian(map_test):
     expect2 = enhance.mgn(map_test, [1, 1])
 
     assert np.allclose(expect1, expect2)
+
+    result1 = np.zeros((4, 4), dtype=float)
+    expect3 = enhance.mgn(map_test, [1])
+
+    assert np.allclose(result1, expect3)
+
+    # This is a dummy test. These values were not verified by hand rather they were
+    # generated using the code itself.
+    result2 = np.array([[0.0305363, 0.0305363, 0.0305363, 0.0305363],
+                        [0.0305363, 0.0305363, 0.0305363, 0.0305363],
+                        [0.0305363, 0.0305363, 0.0305363, 0.0305363],
+                        [0.0305363, 0.0305363, 0.0305363, 0.0305363]])
+
+    expect4 = enhance.mgn(map_test)
+
+    assert np.allclose(result2, expect4)

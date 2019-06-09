@@ -102,6 +102,7 @@ def mgn(
         np.sqrt(sigmaw, out=sigmaw)
         
         # 5. Normalize the gaussian transformed image to give C_i.
+        sigmaw = np.where(sigmaw == 0., 1., sigmaw)
         conv /= sigmaw
 
         # 6. Apply arctan transformation on Ci to give C'i
@@ -126,7 +127,8 @@ def mgn(
     data_min = data.min()
     data_max = data.max()
     Cprime_g = (data - data_min)
-    Cprime_g /= (data_max - data_min)
+    if (data_max - data_min) != 0.0:
+        Cprime_g /= (data_max - data_min)
     Cprime_g **= (1/gamma)
     Cprime_g *= h
 
