@@ -19,7 +19,6 @@ def mgn(
     weights=None,
     truncate=3
 ):
-
     """
     Multi-scale Gaussian normalization.
 
@@ -50,17 +49,17 @@ def mgn(
     k : `float`, optional
         Controls the severity of the arctan transformation. The scaling factor multiplied with each
         Gaussian transformed image before applying the arctan transformation.
-        Defaults to 0.7
+        Defaults to 0.7.
     gamma : `float`, optional
-        The value used to calculate the  global gamma-transformed image.
+        The value used to calculate the global gamma-transformed image.
         Ideally should be between 2.5 to 4 according to the paper.
-        Defaults to 3.2
+        Defaults to 3.2.
     h : `float`, optional
         Weight of global filter to Gaussian filters.
-        Defaults to 0.7
+        Defaults to 0.7.
     weights : `list`, optional
         Used to weight all the transformed images during the calculation of the
-        final image. If not specificed, all weights are one.
+        final image. If not specified, all weights are one.
     truncate : `int`, optional 
         The number of sigmas (defaults to 3) to truncate the kernel.
 
@@ -118,8 +117,7 @@ def mgn(
     del conv
     del sigmaw
 
-    # 8. Take weighted mean of C'i to give a weighted mean locally normalised
-    # image.
+    # 8. Take weighted mean of C'i to give a weighted mean locally normalised image.
     image /= len(sigma)
 
     # 9. Calculate global gamma-transformed image C'g
