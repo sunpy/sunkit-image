@@ -8,5 +8,6 @@ Code Reference
    :maxdepth: 2
 
    sunkit_image
+   radial
    utils
    enhance
