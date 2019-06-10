@@ -160,6 +160,20 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
 
+    order = 0
+
+    with pytest.raises(ValueError) as record:
+        _ = rad.fnrgf(
+            map_test2,
+            radial_bin_edges,
+            order,
+            attenuation_coefficients,
+            application_radius=0.001 * u.R_sun,
+            number_angular_segments=4,
+        )
+
+    assert str(record.value) == "Minimum value of order is 1"
+
 
 @pytest.fixture
 @pytest.mark.remote_data
@@ -212,3 +226,8 @@ def test_set_attenuation_coefficients():
 
     result3 = rad.set_attenuation_coefficients(order, cutoff=2)
     assert np.allclose(expect3, result3)
+
+    with pytest.raises(ValueError) as record:
+        _ = rad.set_attenuation_coefficients(order, cutoff=5)
+
+    assert str(record.value) == "Cutoff cannot be greater than order + 1."

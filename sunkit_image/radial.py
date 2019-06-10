@@ -310,7 +310,7 @@ def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0
     This is a helper function to Fourier Normalizing Radial Gradient Filter
     (`sunkit_image.radial.fnrgf`).
 
-    This function sets the attenuation coefficients in the one of the following two manners-
+    This function sets the attenuation coefficients in the one of the following two manners:
 
     If ``cutoff`` is ``0``, then it will set the attenuation coefficients as linearly decreasing between
     the range ``range_mean`` for the attenuation coefficents for mean approximation and ``range_std`` for
@@ -352,7 +352,7 @@ def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0
     attenuation_coefficients[1, :] = np.linspace(range_std[0], range_std[1], order + 1)
 
     if cutoff > (order + 1):
-        raise ValueError("cutoff cannot be greater than order + 1")
+        raise ValueError("Cutoff cannot be greater than order + 1.")
 
     if cutoff != 0:
         attenuation_coefficients[:, (-1 * cutoff) :] = 0
