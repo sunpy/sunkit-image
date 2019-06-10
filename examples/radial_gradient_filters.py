@@ -5,8 +5,6 @@ Radial Gradient Filters
 
 This example applies both the normalizing radial gradient (`sunkit_image.radial.nrgf`) filter and Fourier
 normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
-
-
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,12 +18,10 @@ import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins
 
 ###########################################################################
-
 # Sunpy's sample data contain a number of suitable FITS files for this purpose.
 aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 ###########################################################################
-
 # Radial bins are calculated over which the filters will be applied. The distance
 # between 1 Solar radius and 2 Solar radius is divided into 100 equal parts.
 radial_bin_edges = equally_spaced_bins()
@@ -39,8 +35,7 @@ out1.plot()
 plt.show()
 
 ###########################################################################
-
-# Assuming values for the parameters of FNRGF
+# We will need to work out  a few parameters for the FNRGF.
 # Order is the number of Fourier coefficients to be used in the approximation.
 # The attentuation coefficient are calculated to be linearly decreasing, you should
 # choose them according to your requirements.
