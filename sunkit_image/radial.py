@@ -1,16 +1,16 @@
 """
-This module contains functions that can be used to enhance the regions above a radius.
+This module contains functions that can be used to enhance the regions above a
+radius.
 """
 import numpy as np
+
 import astropy.units as u
-
 import sunpy.map
-
 from sunpy.coordinates import frames
 
 from sunkit_image.utils.utils import (
-    equally_spaced_bins,
     bin_edge_summary,
+    equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,
 )
@@ -21,7 +21,8 @@ __all__ = [
     "normalize_fit_radial_intensity",
     "intensity_enhance",
     "nrgf",
-    "fnrgf"
+    "set_attenuation_coefficients",
+    "fnrgf",
 ]
 
 
@@ -75,7 +76,8 @@ def calculate_fit_radial_intensity(radii, polynomial):
 
 def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
-    Normalizes the fitted radial intensity to the value at the normalization radius.
+    Normalizes the fitted radial intensity to the value at the normalization
+    radius.
 
     The function assumes that the polynomial is the best fit to the observed
     log of the intensity as a function of radius.
@@ -97,9 +99,9 @@ def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
         An array with the same shape as radii which expresses the fitted
         intensity value normalized to its value at the normalization radius.
     """
-    return calculate_fit_radial_intensity(
-        radii, polynomial
-    ) / calculate_fit_radial_intensity(normalization_radius, polynomial)
+    return calculate_fit_radial_intensity(radii, polynomial) / calculate_fit_radial_intensity(
+        normalization_radius, polynomial
+    )
 
 
 def intensity_enhance(
@@ -196,9 +198,7 @@ def intensity_enhance(
     )
 
     # Calculate the enhancement
-    enhancement = 1 / normalize_fit_radial_intensity(
-        map_r, polynomial, normalization_radius
-    )
+    enhancement = 1 / normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
     enhancement[map_r < normalization_radius] = 1
 
     # Return a map with the intensity enhanced above the normalization radius
@@ -275,26 +275,20 @@ def nrgf(
 
     # To make sure bins are in the map.
     if radial_bin_edges[1, -1] > np.max(map_r):
-        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0, 0],
-                                               outer_value=np.max(map_r),
-                                               nbins=radial_bin_edges.shape[1])
+        radial_bin_edges = equally_spaced_bins(
+            inner_value=radial_bin_edges[0, 0],
+            outer_value=np.max(map_r),
+            nbins=radial_bin_edges.shape[1],
+        )
 
     # Radial intensity
     radial_intensity = get_radial_intensity_summary(
-        smap,
-        radial_bin_edges,
-        scale=scale,
-        summary=intensity_summary,
-        **intensity_summary_kwargs
+        smap, radial_bin_edges, scale=scale, summary=intensity_summary, **intensity_summary_kwargs
     )
 
     # An estimate of the width of the intensity distribution in each radial bin.
     radial_intensity_distribution_summary = get_radial_intensity_summary(
-        smap,
-        radial_bin_edges,
-        scale=scale,
-        summary=width_function,
-        **width_function_kwargs
+        smap, radial_bin_edges, scale=scale, summary=width_function, **width_function_kwargs
     )
 
     # Storage for the filtered data
@@ -302,29 +296,30 @@ def nrgf(
 
     # Calculate the filter value for each radial bin.
     for i in range(0, radial_bin_edges.shape[1]):
-        here = np.logical_and(
-            map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i]
-        )
+        here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         here = np.logical_and(here, map_r > application_radius)
-        data[here] = (smap.data[here] - radial_intensity[i])
+        data[here] = smap.data[here] - radial_intensity[i]
         if radial_intensity_distribution_summary[i] != 0.0:
             data[here] = data[here] / radial_intensity_distribution_summary[i]
 
     return sunpy.map.Map(data, smap.meta)
 
 
-def set_attenuation_coefficients(order, range_mean=[1., 0.], range_std=[1., 0.], cutoff=0):
+def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0.0], cutoff=0):
     """
-    This is a helper function to Fourier Normalizing Radial Gradient Filter (`sunkit_image.radial.fnrgf`).
-    
-    This function sets the attenuation coefficients in the one of the following two manners-
-    * If ``cutoff`` is ``0``, then it will set the attenuation coefficients as linearly decreasing between
-      the range ``range_mean`` for the attenuation coefficents for mean approximation and ``range_std`` for
-      the attenuation coefficients for standard deviation approximation.
-    * If ``cutoff`` is not ``0``, then it will set the last ``cutoff`` number of coefficients equal to zero
-      while all the others the will be set as linearly decreasing as described above.
+    This is a helper function to Fourier Normalizing Radial Gradient Filter
+    (`sunkit_image.radial.fnrgf`).
 
-    ..note::
+    This function sets the attenuation coefficients in the one of the following two manners-
+
+    If ``cutoff`` is ``0``, then it will set the attenuation coefficients as linearly decreasing between
+    the range ``range_mean`` for the attenuation coefficents for mean approximation and ``range_std`` for
+    the attenuation coefficients for standard deviation approximation.
+
+    If ``cutoff`` is not ``0``, then it will set the last ``cutoff`` number of coefficients equal to zero
+    while all the others the will be set as linearly decreasing as described above.
+
+    .. note::
 
         This function only describes some of the ways in which attenuation coefficients can be calculated.
         The optimal coefficients depends on the size and quality of image. There is no generalized formula
@@ -335,10 +330,10 @@ def set_attenuation_coefficients(order, range_mean=[1., 0.], range_std=[1., 0.],
     order : `int`
         The order of the Fourier approximation.
     range_mean : `list`, optional
-        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for 
+        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
         mean approximation be calculated in a linearly decreasing manner.
     range_std : `list`, optional
-        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for 
+        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
         standard deviation approximation be calculated in a linearly decreasing manner.
     cutoff : `int`, optional
         The numbers of coefficients from the last that should be set to ``zero``.
@@ -351,7 +346,7 @@ def set_attenuation_coefficients(order, range_mean=[1., 0.], range_std=[1., 0.],
         the mean approximation. The second row contains the attenuation coefficients for the Fourier coefficients
         of the standard deviation approximation.
     """
-    
+
     attenuation_coefficients = np.zeros((2, order + 1))
     attenuation_coefficients[0, :] = np.linspace(range_mean[0], range_mean[1], order + 1)
     attenuation_coefficients[1, :] = np.linspace(range_std[0], range_std[1], order + 1)
@@ -360,7 +355,7 @@ def set_attenuation_coefficients(order, range_mean=[1., 0.], range_std=[1., 0.],
         raise ValueError("cutoff cannot be greater than order + 1")
 
     if cutoff != 0:
-        attenuation_coefficients[:, (-1 * cutoff):] = 0
+        attenuation_coefficients[:, (-1 * cutoff) :] = 0
 
     return attenuation_coefficients
 
@@ -393,7 +388,7 @@ def fnrgf(
     the entire radial bin, this Fourier approximated value is then used to noramlize the intensity in the
     radial bin.
 
-    ..note::
+    .. note::
 
         After applying the filter, current plot settings such as the image normalization
         may have to be changed in order to obtain a good-looking plot.
@@ -457,9 +452,11 @@ def fnrgf(
 
     # To make sure bins are in the map.
     if radial_bin_edges[1, -1] > np.max(map_r):
-        radial_bin_edges = equally_spaced_bins(inner_value=radial_bin_edges[0, 0],
-                                               outer_value=np.max(map_r),
-                                               nbins=radial_bin_edges.shape[1])
+        radial_bin_edges = equally_spaced_bins(
+            inner_value=radial_bin_edges[0, 0],
+            outer_value=np.max(map_r),
+            nbins=radial_bin_edges.shape[1],
+        )
 
     # Get the Helioprojective coordinates of each pixel
     x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
@@ -469,7 +466,7 @@ def fnrgf(
     angles = np.arctan2(coords.Ty.value, coords.Tx.value)
 
     # Making sure all angles are between (0, 2 * pi)
-    angles = np.where(angles < 0, angles + (2*np.pi), angles)
+    angles = np.where(angles < 0, angles + (2 * np.pi), angles)
 
     # Number of radial bins
     nbins = radial_bin_edges.shape[1]
@@ -493,17 +490,36 @@ def fnrgf(
 
         # Calculating sin and cos of the angles to be multiplied with the means and standard
         # deviations to give the fourier approximation
-        cos_matrix = np.cos(np.array([[(2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments
-                            for j in range(order)] for i in range(number_angular_segments)]))
-        sin_matrix = np.sin(np.array([[(2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments
-                            for j in range(order)] for i in range(number_angular_segments)]))
+        cos_matrix = np.cos(
+            np.array(
+                [
+                    [
+                        (2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments
+                        for j in range(order)
+                    ]
+                    for i in range(number_angular_segments)
+                ]
+            )
+        )
+        sin_matrix = np.sin(
+            np.array(
+                [
+                    [
+                        (2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments
+                        for j in range(order)
+                    ]
+                    for i in range(number_angular_segments)
+                ]
+            )
+        )
 
         # Iterate over each segment in a circular ring
         for j in range(0, number_angular_segments, 1):
 
             # Finding all the pixels whose angle values lie in the segment
-            angular_segment = np.logical_and(angles >= segment_angle * j,
-                                             angles < segment_angle * (j + 1))
+            angular_segment = np.logical_and(
+                angles >= segment_angle * j, angles < segment_angle * (j + 1)
+            )
 
             # Finding the particular segment in the circular ring
             annulus_segment = np.logical_and(annulus, angular_segment)
@@ -520,12 +536,16 @@ def fnrgf(
         # Calculating the fourier coefficients multiplied with the attenuation coefficients
         # Refer to equation (2), (3), (4), (5) in the paper
         fourier_coefficient_a_0 = np.sum(average_segments) * (2 / number_angular_segments)
-        fourier_coefficient_a_0 *= (attenuation_coefficients[0, 1])
+        fourier_coefficient_a_0 *= attenuation_coefficients[0, 1]
 
-        fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (2 / number_angular_segments)
+        fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (
+            2 / number_angular_segments
+        )
         fourier_coefficients_a_k *= attenuation_coefficients[0][1:]
 
-        fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (2 / number_angular_segments)
+        fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (
+            2 / number_angular_segments
+        )
         fourier_coefficients_b_k *= attenuation_coefficients[0][1:]
 
         # Refer to equation (6) in the paper
@@ -540,7 +560,9 @@ def fnrgf(
 
         # To calculate the multiples of angles of each pixel for finding the fourier approximation
         # at that point. See equations 6.8 and 6.9 of the doctoral thesis.
-        K_matrix = np.ones((order, np.sum(annulus > 0))) * np.array(range(1, order+1)).T.reshape(order, 1)
+        K_matrix = np.ones((order, np.sum(annulus > 0))) * np.array(range(1, order + 1)).T.reshape(
+            order, 1
+        )
         phi_matrix = angles[annulus].reshape((1, angles[annulus].shape[0]))
         angles_of_pixel = K_matrix * phi_matrix
 
