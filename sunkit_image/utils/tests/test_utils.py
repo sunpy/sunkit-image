@@ -3,7 +3,6 @@ import numpy as np
 import pytest
 
 import astropy.units as u
-import sunpy.map
 from astropy.tests.helper import assert_quantity_allclose
 from sunpy.tests.helpers import figure_test
 
