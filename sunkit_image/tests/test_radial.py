@@ -46,13 +46,6 @@ def radial_bin_edges():
     return radial_bins
 
 
-def set_attenuation_coefficients(order):
-    attenuation_coefficients = np.zeros((2, order + 1))
-    attenuation_coefficients[0][:] = np.linspace(1, 0, order + 1)
-    attenuation_coefficients[1][:] = np.linspace(1, 0, order + 1)
-    return attenuation_coefficients
-
-
 def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
     result = np.zeros_like(map_test1.data)
@@ -84,7 +77,7 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
               [128., 288.,   0., 288., 128.],
               [96., 224., 288., 224.,  96.],
               [-0.,  96., 128.,  96.,  -0.]]
-    attenuation_coefficients = set_attenuation_coefficients(order)
+    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     expect = rad.fnrgf(map_test1, radial_bin_edges, order, attenuation_coefficients,
                        application_radius=0.001*u.R_sun, number_angular_segments=4)
 
@@ -113,7 +106,7 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
               [ 90.528, 207.2  , 280.8  , 207.2  ,  90.528],
               [  0.   ,  90.528, 124.8  ,  90.528,   0.   ]]
 
-    attenuation_coefficients = set_attenuation_coefficients(order)
+    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     expect = rad.fnrgf(map_test1, radial_bin_edges, order, attenuation_coefficients,
                        application_radius=0.001*u.R_sun, number_angular_segments=4)
 
@@ -126,7 +119,7 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
               [120.70526403, 207.2, 280.8, 207.2, 90.52673597],
               [ 0., 120.55347471, 124.8,  90.67852529, 0.]]
 
-    attenuation_coefficients = set_attenuation_coefficients(order)
+    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     expect = rad.fnrgf(map_test2, radial_bin_edges, order, attenuation_coefficients,
                        application_radius=0.001*u.R_sun, number_angular_segments=4)
 
@@ -159,7 +152,7 @@ def test_fig_fnrgf(smap):
     radial_bin_edges *= u.R_sun
 
     order = 20
-    attenuation_coefficients = set_attenuation_coefficients(order)
+    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     out = rad.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
 
     out.plot()
@@ -169,16 +162,22 @@ def test_set_attenuation_coefficients():
 
     order = 1
     # Hand calculated
-    expect = [[1, 0.],
+    expect1 = [[1, 0.],
               [1, 0.]]
 
-    result = set_attenuation_coefficients(order)
-
-    assert np.allclose(expect, result)
+    result1 = rad.set_attenuation_coefficients(order)
+    assert np.allclose(expect1, result1)
 
     order = 3
     # Hand calculated
-    expect = [[1, 0.75, 0.5, 0.],
-              [1, 0.75, 0.5, 0.]]
+    expect2 = [[1., 0.66666667, 0.33333333, 0.],
+              [1., 0.66666667, 0.33333333, 0.]]
 
-    result = set_attenuation_coefficients(order)
+    result2 = rad.set_attenuation_coefficients(order)
+    assert np.allclose(expect2, result2)
+
+    expect3 = [[1., 0.66666667, 0., 0.],
+              [1., 0.66666667, 0., 0.]]
+
+    result3 = rad.set_attenuation_coefficients(order, cutoff=2)
+    assert np.allclose(expect3, result3)

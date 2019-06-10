@@ -313,6 +313,58 @@ def nrgf(
     return sunpy.map.Map(data, smap.meta)
 
 
+def set_attenuation_coefficients(order, range_mean=[1., 0.], range_std=[1., 0.], cutoff=0):
+    """
+    This is a helper function to Fourier Normalizing Radial Gradient Filter (`sunkit_image.radial.fnrgf`).
+    
+    This function sets the attenuation coefficients in the one of the following two manners-
+    * If ``cutoff`` is ``0``, then it will set the attenuation coefficients as linearly decreasing between
+      the range ``range_mean`` for the attenuation coefficents for mean approximation and ``range_std`` for
+      the attenuation coefficients for standard deviation approximation.
+    * If ``cutoff`` is not ``0``, then it will set the last ``cutoff`` number of coefficients equal to zero
+      while all the others the will be set as linearly decreasing as described above.
+
+    ..note::
+
+        This function only describes some of the ways in which attenuation coefficients can be calculated.
+        The optimal coefficients depends on the size and quality of image. There is no generalized formula
+        for choosing them and its upto the user to choose a optimum value.
+
+    Parameters
+    ----------
+    order : `int`
+        The order of the Fourier approximation.
+    range_mean : `list`, optional
+        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for 
+        mean approximation be calculated in a linearly decreasing manner.
+    range_std : `list`, optional
+        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for 
+        standard deviation approximation be calculated in a linearly decreasing manner.
+    cutoff : `int`, optional
+        The numbers of coefficients from the last that should be set to ``zero``.
+
+    Returns
+    -------
+    `numpy.ndarray`
+        A numpy array of shape ``[2, order + 1]`` containing the attenuation coefficients for the Fourier
+        coffiecients. The first row describes the attenustion coefficients for the Fourier coefficients of
+        the mean approximation. The second row contains the attenuation coefficients for the Fourier coefficients
+        of the standard deviation approximation.
+    """
+    
+    attenuation_coefficients = np.zeros((2, order + 1))
+    attenuation_coefficients[0, :] = np.linspace(range_mean[0], range_mean[1], order + 1)
+    attenuation_coefficients[1, :] = np.linspace(range_std[0], range_std[1], order + 1)
+
+    if cutoff > (order + 1):
+        raise ValueError("cutoff cannot be greater than order + 1")
+
+    if cutoff != 0:
+        attenuation_coefficients[:, (-1 * cutoff):] = 0
+
+    return attenuation_coefficients
+
+
 def fnrgf(
     smap,
     radial_bin_edges,
