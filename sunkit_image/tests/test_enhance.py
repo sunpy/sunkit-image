@@ -1,9 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pytest
 
-import sunpy.map
 import sunpy.data.sample
+import sunpy.map
 from sunpy.tests.helpers import figure_test
 
 import sunkit_image.enhance as enhance
@@ -45,10 +44,14 @@ def test_multiscale_gaussian(map_test):
 
     # This is a dummy test. These values were not verified by hand rather they were
     # generated using the code itself.
-    result2 = np.array([[0.0305363, 0.0305363, 0.0305363, 0.0305363],
-                        [0.0305363, 0.0305363, 0.0305363, 0.0305363],
-                        [0.0305363, 0.0305363, 0.0305363, 0.0305363],
-                        [0.0305363, 0.0305363, 0.0305363, 0.0305363]])
+    result2 = np.array(
+        [
+            [0.0305363, 0.0305363, 0.0305363, 0.0305363],
+            [0.0305363, 0.0305363, 0.0305363, 0.0305363],
+            [0.0305363, 0.0305363, 0.0305363, 0.0305363],
+            [0.0305363, 0.0305363, 0.0305363, 0.0305363],
+        ]
+    )
 
     expect4 = enhance.mgn(map_test)
 

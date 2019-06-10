@@ -1,10 +1,8 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
-from sunpy.tests.helpers import figure_test
 
 from sunkit_image.utils.utils import (
     bin_edge_summary,

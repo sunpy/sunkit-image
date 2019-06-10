@@ -5,38 +5,23 @@ This module contains functions that will enhance the entire image.
 import numpy as np
 import scipy.ndimage as ndimage
 
-__all__ = [
-    "mgn",
-]
+__all__ = ["mgn"]
 
 
-def mgn(
-    data,
-    sigma=[1.25, 2.5, 5, 10, 20, 40],
-    k=0.7,
-    gamma=3.2,
-    h=0.7,
-    weights=None,
-    truncate=3
-):
+def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights=None, truncate=3):
     """
     Multi-scale Gaussian normalization.
 
-    Extreme ultra-violet images of the corona contain information over a wide range of spatial scales,
-    and different structures such as active regions, quiet Sun, and filament channels contain information
-    at very different brightness regimes. The MGN method normalises an image by using the local mean and
-    standard deviation calculated using a Gaussian-weighted sample of local pixels. This normalised image
-    is transformed by the arctan function (similar to a gamma transformation). This is applied over
-    several spatial scales, and the final image is a weighted combination of the normalised components.
-    The method reveals information at the finest scales whilst maintaining enough of the larger-scale
-    information to provide context. It also intrinsically flattens noisy regions and can reveal structure
-    in off-limb regions out to the edge of the field of view.
+    This function can be used to visualize information over a wide range of spatial scales. It
+    works by normalizing the image by calculating local mean and standard devaition over many
+    spatial scales by convolving with Gaussian kernels of different standard deviations. All the
+    noramlized images are then arctan transformed (similar to a gamma transform). Then all the
+    images are combined by adding all of them after multiplying with suitable weights. This method
+    can be used to reveal information and structures at various spatial scales.
 
     .. note::
         In practice, the weights and h may be adjusted according to the desired output, and also according
-        to the type of input image
-        (e.g. wavelength or channel).
-        For most purposes, the weights can be set
+        to the type of input image (e.g. wavelength or channel). For most purposes, the weights can be set
         equal for all scales.
 
     Parameters
@@ -60,7 +45,7 @@ def mgn(
     weights : `list`, optional
         Used to weight all the transformed images during the calculation of the
         final image. If not specified, all weights are one.
-    truncate : `int`, optional 
+    truncate : `int`, optional
         The number of sigmas (defaults to 3) to truncate the kernel.
 
     Returns
@@ -88,20 +73,22 @@ def mgn(
     for s, weight in zip(sigma, weights):
         # 2 & 3 Create kernel and convolve with image
         # Refer to equation (1) in the paper
-        ndimage.filters.gaussian_filter(data, sigma=s,
-                                        truncate=truncate, mode='nearest', output=conv)
+        ndimage.filters.gaussian_filter(
+            data, sigma=s, truncate=truncate, mode="nearest", output=conv
+        )
 
         # 4. Calculate difference between image and the local mean image,
         # square the difference, and convolve with kernel. Square-root the
         # resulting image to give ‘local standard deviation’ image sigmaw
         # Refer to equation (2) in the paper
         conv = data - conv
-        ndimage.filters.gaussian_filter(conv ** 2, sigma=s,
-                                        truncate=truncate, mode='nearest', output=sigmaw)
+        ndimage.filters.gaussian_filter(
+            conv ** 2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw
+        )
         np.sqrt(sigmaw, out=sigmaw)
-        
+
         # 5. Normalize the gaussian transformed image to give C_i.
-        sigmaw = np.where(sigmaw == 0., 1., sigmaw)
+        sigmaw = np.where(sigmaw == 0.0, 1.0, sigmaw)
         conv /= sigmaw
 
         # 6. Apply arctan transformation on Ci to give C'i
@@ -124,15 +111,15 @@ def mgn(
     # Refer to equation (4) in the paper
     data_min = data.min()
     data_max = data.max()
-    Cprime_g = (data - data_min)
+    Cprime_g = data - data_min
     if (data_max - data_min) != 0.0:
-        Cprime_g /= (data_max - data_min)
-    Cprime_g **= (1/gamma)
+        Cprime_g /= data_max - data_min
+    Cprime_g **= 1 / gamma
     Cprime_g *= h
 
     # 10. Sum the weighted mean locally transformed image with the global normalized image
     # Refer to equation (5) in the paper
-    image *= (1 - h)
+    image *= 1 - h
     image += Cprime_g
 
     return image
