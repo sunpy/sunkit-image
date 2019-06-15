@@ -124,9 +124,9 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
     # Smoothing the image out at the edges
     image[:, 0:nsm2] = 0
-    image[:, iy-nsm2:iy - 1] = 0
+    image[:, iy-nsm2:iy] = 0
     image[0:nsm2, :] = 0
-    image[ix - nsm2:ix - 1, :] = 0
+    image[ix - nsm2:ix, :] = 0
 
     # Creating the three starting arrays
 
@@ -134,7 +134,7 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
     num_loop_segments = rmin
 
-    width = max(int(nsm2/2-1 + 0.5), 1)  # Width around the loop to be deleted after tracing
+    width = max(int(nsm2/2-1), 1)  # Width around the loop to be deleted after tracing
 
     # The difference between two loop points
     delta_segment = 1
@@ -152,11 +152,11 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
     ngaps = 3  # Number of empty pixels to denote the end of loop
 
     # Loops tracing begin
-    for i in range(num_loop):
+    for _ in range(num_loop):
 
         z_0 = image.max()  # First point of the loop with maximum intensity
 
-        if (z_0 < noise_thresh):  # Stop loop tracing if maximum value is noise
+        if (z_0 <= noise_thresh):  # Stop loop tracing if maximum value is noise
             break
 
         max_coords = np.where(image == z_0)
@@ -164,23 +164,33 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
         loop = []  # To trace a single loop having coordinates of loop points
         angles = []  # To store the angle value for all loop points
-        rad_index = []  # To store the radii value of all loop points
+        rad_index = []  # To store the index values correspomding to radial_segment of all loop points
 
         loop.append([i_0, j_0])
 
         # x_k_l denotes x-coordinate of kth segment at a particular 'l' angle
         # Same with y-coordinate
-        x_k_l = loop[-1][0] + np.matmul(segments_bi, np.cos(ang_segment).T)
-        y_k_l = loop[-1][1] + np.matmul(segments_bi, np.sin(ang_segment).T)
+        flux_max = -10000   # an arbitrary low value
+        ang_max = 0
+        for ang_ind in range(len(ang_segment)):
 
-        x_k_l = np.ceil(x_k_l)  # Converting to pixel values
-        y_k_l = np.ceil(y_k_l)
-        x_k_l = np.clip(np.int_(x_k_l), 0, ix - 1)
-        y_k_l = np.clip(np.int_(y_k_l), 0, iy - 1)
-
+            x_k_l = loop[-1][0] + segments_bi * ang_segment[ang_ind]
+            y_k_l = loop[-1][1] + segments_bi * ang_segment[ang_ind]
+            
+            x_k_l = np.int_(np.ceil(x_k_l))  # Converting to pixel values
+            y_k_l = np.int_(np.ceil(y_k_l))
+            if np.any(x_k_l < 0) or np.any(x_k_l >= ix):
+                continue
+            if np.any(y_k_l < 0) or np.any(y_k_l >= iy):
+                continue
+            flux = np.mean(image[x_k_l, y_k_l])
+            if flux > flux_max:
+                flux_max = flux
+                ang_max = ang_ind * (np.pi / num_ang_segment)
+        
         # Calculate the initial angle of the loop
-        angle_k = np.argmax(np.mean(image[x_k_l, y_k_l], axis=0)) * (np.pi / num_ang_segment)
-        angles.append(angle_k)
+        angles.append(ang_max)
+
 
         for sigma in [-1, 1]:  # To deal with both forward and backward pass
 
@@ -194,30 +204,40 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
                 y_c = loop[-1][1] + rmin * np.sin(beta_0)
 
                 if len(rad_index) != 0:
-                    radii = radial_segment[max(rad_index[-1] - 1, 0): min(rad_index[-1] + 1, num_radial_segments - 1), :].T
+                    r_start = max(rad_index[-1] - 1, 0)
+                    r_end = min(rad_index[-1] + 1, num_radial_segments - 1)
                 else:
-                    radii = radial_segment.T
+                    r_start = 0
+                    r_end = num_radial_segments - 1
+                
 
-                # Loci of centres with radius of curvature as 'radial_segment'
-                x_m = loop[-1][0] + ((x_c - loop[-1][0]) / rmin) * radii
-                y_m = loop[-1][1] + ((y_c - loop[-1][1]) / rmin) * radii
+                flux_rad_max = -10000
+                rad_max = 0            
+                for rad in range(r_start, r_end + 1):
 
-                beta_m = beta_0 + sigma * (segments_uni / rmin)
+                    x_m = loop[-1][0] + ((x_c - loop[-1][0]) / rmin) * radial_segment[rad]
+                    y_m = loop[-1][1] + ((y_c - loop[-1][1]) / rmin) * radial_segment[rad]
 
-                x_k_m = x_m - np.matmul(np.cos(beta_m), radii)
-                y_k_m = y_m - np.matmul(np.sin(beta_m), radii)
+                    beta_m = beta_0 + sigma * (segments_uni / rmin)
 
-                x_k_m = np.ceil(x_k_m)
-                y_k_m = np.ceil(y_k_m)
-                x_k_m = np.clip(np.int_(x_k_m), 0, ix - 1)
-                y_k_m = np.clip(np.int_(y_k_m), 0, iy - 1)
+                    # It denotes the x coordinate of the point with at a particular radius 'm'
+                    # See the paper for these variables
+                    x_k_m = x_m - np.cos(beta_m) * radial_segment[rad]
+                    y_k_m = y_m - np.sin(beta_m) * radial_segment[rad]
 
-                if len(rad_index) != 0:
-                    r_i = np.argmax(np.mean(image[x_k_m, y_k_m], axis=0)) + max(rad_index[-1] - 1, 0)
-                else:
-                    r_i = np.argmax(np.mean(image[x_k_m, y_k_m], axis=0))
+                    x_k_m = np.int_(np.ceil(x_k_m))  # Converting to pixel values
+                    y_k_m = np.int_(np.ceil(y_k_m))
 
-                rad_index.append(r_i)
+                    if np.any(x_k_m < 0) or np.any(x_k_m >= ix):
+                        continue
+                    if np.any(y_k_m < 0) or np.any(y_k_m >= iy):
+                        continue
+                    flux = np.mean(image[x_k_m, y_k_m])
+                    if flux > flux_rad_max:
+                        flux_rad_max = flux
+                        rad_max = rad
+
+                rad_index.append(rad_max)
 
                 angles.append(angles[-1] + sigma * (delta_segment / radial_segment[rad_index[-1]]))
 
@@ -238,16 +258,18 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
             if sigma == -1:
                 loop.reverse()
+                angles.reverse()
+                rad_index.reverse()
 
         # Zero out the loop pixels
         for points in loop:
 
             # Range of values to be zeroed out
-            ran_x1 = min(max(points[0] - width, 0), np.array([ix]))
-            ran_x2 = min(max(points[0] + width, 0), np.array([ix]))
+            ran_x1 = min(max(points[0] - width, np.array([0])), np.array([ix]))
+            ran_x2 = min(max(points[0] + width, np.array([0])), np.array([ix]))
 
-            ran_y1 = min(max(points[1] - width, 0), np.array([iy]))
-            ran_y2 = min(max(points[1] + width, 0), np.array([iy]))
+            ran_y1 = min(max(points[1] - width, np.array([0])), np.array([iy]))
+            ran_y2 = min(max(points[1] + width, np.array([0])), np.array([iy]))
 
             image[ran_x1[0]:ran_x2[0], ran_y1[0]:ran_y2[0]] = 0
 
