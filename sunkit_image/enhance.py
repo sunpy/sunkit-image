@@ -13,9 +13,9 @@ def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights
     Multi-scale Gaussian normalization.
 
     This function can be used to visualize information over a wide range of spatial scales. It
-    works by normalizing the image by calculating local mean and standard devaition over many
+    works by normalizing the image by calculating local mean and standard deviation over many
     spatial scales by convolving with Gaussian kernels of different standard deviations. All the
-    noramlized images are then arctan transformed (similar to a gamma transform). Then all the
+    normalized images are then arctan transformed (similar to a gamma transform). Then all the
     images are combined by adding all of them after multiplying with suitable weights. This method
     can be used to reveal information and structures at various spatial scales.
 
@@ -55,7 +55,7 @@ def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights
 
     References
     ----------
-    * Morgan, Huw, and Miloslav Druckmuller.
+    * Huw Morgan and Miloslav Druckmüller.
       "Multi-scale Gaussian normalization for solar image processing."
       arXiv preprint arXiv:1403.6613 (2014).
       Ref: Sol Phys (2014) 289: 2945. doi:10.1007/s11207-014-0523-9
