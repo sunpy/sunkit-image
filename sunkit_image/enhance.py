@@ -4,6 +4,7 @@ This module contains functions that can be used to enhance the entire solar imag
 
 import numpy as np
 import scipy.ndimage as ndimage
+import matplotlib.pyplot as plt
 
 
 __all__ = [
@@ -68,7 +69,11 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
     if(nsm1 >= nsm2):
         raise ValueError("nsm1 should be less than nsm2")
 
-    return ndimage.uniform_filter(image, nsm1) - ndimage.uniform_filter(image, nsm2)
+    if (nsm1 <= 2):
+        return image - ndimage.uniform_filter(image, nsm2, mode='nearest')
+
+    if (nsm1 >= 3):
+        return ndimage.uniform_filter(image, nsm1, mode='nearest') - ndimage.uniform_filter(image, nsm2, mode='nearest')
 
 
 def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000):
@@ -114,20 +119,43 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
       https://arxiv.org/abs/1307.5046
     """
 
+    fig0 = plt.figure()
+    plt.imshow(smap)
+    fig0.canvas.set_window_title("Input") 
+    # plt.show()
+
+
     # 1. Supress the background
     image = background_supression(smap, zmin, qmed)
+    
+    fig1 = plt.figure()
+    plt.imshow(image)
+    fig1.canvas.set_window_title("Background") 
+    # plt.show()    
 
     # 2. Bandpass filter
     image = bandpass_filter(image, nsm1, nsm2)
+    fig2 = plt.figure()
+    plt.imshow(image)
+    fig2.canvas.set_window_title("Band pass") 
+    # plt.show()
+
+    image = image.T
 
     ix, iy = np.shape(image)
 
     # Smoothing the image out at the edges
     image[:, 0:nsm2] = 0
-    image[:, iy-nsm2:iy] = 0
+    image[:, iy-nsm2:] = 0
     image[0:nsm2, :] = 0
-    image[ix - nsm2:ix, :] = 0
+    image[ix - nsm2:, :] = 0
 
+    smooth = image.T
+    
+    fig3 = plt.figure()
+    plt.imshow(smooth)
+    fig3.canvas.set_window_title("Smooth") 
+    # plt.show()
     # Creating the three starting arrays
 
     num_loop = 1000  # Maximum number of loops per image
@@ -142,7 +170,7 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
     segments_bi = ((np.arange(num_loop_segments) - num_loop_segments / 2) * delta_segment).reshape((-1, 1))
     segments_uni = (delta_segment * np.arange(num_loop_segments)).reshape((-1, 1))
 
-    num_ang_segment = 180
+    num_ang_segment = 181
     ang_segment = (np.arange(num_ang_segment) * (np.pi / num_ang_segment)).reshape((-1, 1))
 
     num_radial_segments = 30
@@ -179,10 +207,12 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
             
             x_k_l = np.int_(np.ceil(x_k_l))  # Converting to pixel values
             y_k_l = np.int_(np.ceil(y_k_l))
-            if np.any(x_k_l < 0) or np.any(x_k_l >= ix):
-                continue
-            if np.any(y_k_l < 0) or np.any(y_k_l >= iy):
-                continue
+            # if np.any(x_k_l < 0) or np.any(x_k_l >= ix):
+            #     continue
+            # if np.any(y_k_l < 0) or np.any(y_k_l >= iy):
+            #     continue
+            x_k_l = np.clip(x_k_l, 0, ix-1)
+            y_k_l = np.clip(y_k_l, 0, iy-1)
             flux = np.mean(image[x_k_l, y_k_l])
             if flux > flux_max:
                 flux_max = flux
@@ -228,10 +258,12 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
                     x_k_m = np.int_(np.ceil(x_k_m))  # Converting to pixel values
                     y_k_m = np.int_(np.ceil(y_k_m))
 
-                    if np.any(x_k_m < 0) or np.any(x_k_m >= ix):
-                        continue
-                    if np.any(y_k_m < 0) or np.any(y_k_m >= iy):
-                        continue
+                    # if np.any(x_k_m < 0) or np.any(x_k_m >= ix):
+                    #     continue
+                    # if np.any(y_k_m < 0) or np.any(y_k_m >= iy):
+                    #     continue
+                    x_k_m = np.clip(x_k_m, 0, ix-1)
+                    y_k_m = np.clip(y_k_m, 0, iy-1)
                     flux = np.mean(image[x_k_m, y_k_m])
                     if flux > flux_rad_max:
                         flux_rad_max = flux
@@ -255,6 +287,14 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
                 if image[min(max(x_k_1, 0), ix - 1), min(max(y_k_1, 0), iy - 1)] <= 0:
                     count += 1
+                else:
+                    if count!=0:
+                        count = 0
+            
+            if (count == ngaps):
+                loop = loop[:(-ngaps)]
+                angles = angles[:(-ngaps)]
+                rad_index = rad_index[:(-ngaps)]
 
             if sigma == -1:
                 loop.reverse()
@@ -273,6 +313,24 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
             image[ran_x1[0]:ran_x2[0], ran_y1[0]:ran_y2[0]] = 0
 
+        # fig5 = plt.figure()
+        # plt.imshow(image.T)
+        # fig5.canvas.set_window_title("Zeroed every") 
+
+        # test = image.T
+        # for points in loop:
+        #     test[points[1], points[0]] = 10000
+
+        # fig6 = plt.figure()
+        # plt.imshow(test)
+        # fig6.canvas.set_window_title("Every loop") 
+        # plt.show()
+
         loops.append(loop)
+    
+    # fig5 = plt.figure()
+    # plt.imshow(image)
+    # fig5.canvas.set_window_title("Zeroed") 
+    # plt.show()
 
     return loops
