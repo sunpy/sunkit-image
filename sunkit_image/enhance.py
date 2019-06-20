@@ -198,28 +198,18 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
         # x_k_l denotes x-coordinate of kth segment at a particular 'l' angle
         # Same with y-coordinate
-        flux_max = -10000   # an arbitrary low value
-        ang_max = 0
-        for ang_ind in range(len(ang_segment)):
-
-            x_k_l = loop[-1][0] + segments_bi * ang_segment[ang_ind]
-            y_k_l = loop[-1][1] + segments_bi * ang_segment[ang_ind]
-            
-            x_k_l = np.int_(np.ceil(x_k_l))  # Converting to pixel values
-            y_k_l = np.int_(np.ceil(y_k_l))
-            # if np.any(x_k_l < 0) or np.any(x_k_l >= ix):
-            #     continue
-            # if np.any(y_k_l < 0) or np.any(y_k_l >= iy):
-            #     continue
-            x_k_l = np.clip(x_k_l, 0, ix-1)
-            y_k_l = np.clip(y_k_l, 0, iy-1)
-            flux = np.mean(image[x_k_l, y_k_l])
-            if flux > flux_max:
-                flux_max = flux
-                ang_max = ang_ind * (np.pi / num_ang_segment)
         
-        # Calculate the initial angle of the loop
-        angles.append(ang_max)
+        x_k_l = loop[-1][0] + np.matmul(segments_bi, np.cos(ang_segment).T)
+        y_k_l = loop[-1][1] + np.matmul(segments_bi, np.sin(ang_segment).T)
+
+        x_k_l = np.ceil(x_k_l)  # Converting to pixel values	
+        y_k_l = np.ceil(y_k_l)
+        x_k_l = np.clip(np.int_(x_k_l), 0, ix - 1)
+        y_k_l = np.clip(np.int_(y_k_l), 0, iy - 1)
+
+        angle_k = np.argmax(np.mean(image[x_k_l, y_k_l], axis=0)) * (np.pi / num_ang_segment)
+
+        angles.append(angle_k)
 
 
         for sigma in [-1, 1]:  # To deal with both forward and backward pass
@@ -234,42 +224,30 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
                 y_c = loop[-1][1] + rmin * np.sin(beta_0)
 
                 if len(rad_index) != 0:
-                    r_start = max(rad_index[-1] - 1, 0)
-                    r_end = min(rad_index[-1] + 1, num_radial_segments - 1)
+                    radii = radial_segment[max(rad_index[-1] - 1, 0): min(rad_index[-1] + 1, num_radial_segments - 1), :].T
                 else:
-                    r_start = 0
-                    r_end = num_radial_segments - 1
-                
+                    radii = radial_segment.T
 
-                flux_rad_max = -10000
-                rad_max = 0            
-                for rad in range(r_start, r_end + 1):
+                # Loci of centres with radius of curvature as 'radial_segment'
+                x_m = loop[-1][0] + ((x_c - loop[-1][0]) / rmin) * radii
+                y_m = loop[-1][1] + ((y_c - loop[-1][1]) / rmin) * radii
 
-                    x_m = loop[-1][0] + ((x_c - loop[-1][0]) / rmin) * radial_segment[rad]
-                    y_m = loop[-1][1] + ((y_c - loop[-1][1]) / rmin) * radial_segment[rad]
+                beta_m = beta_0 + sigma * (segments_uni / rmin)
 
-                    beta_m = beta_0 + sigma * (segments_uni / rmin)
+                x_k_m = x_m - np.matmul(np.cos(beta_m), radii)
+                y_k_m = y_m - np.matmul(np.sin(beta_m), radii)
 
-                    # It denotes the x coordinate of the point with at a particular radius 'm'
-                    # See the paper for these variables
-                    x_k_m = x_m - np.cos(beta_m) * radial_segment[rad]
-                    y_k_m = y_m - np.sin(beta_m) * radial_segment[rad]
+                x_k_m = np.ceil(x_k_m)
+                y_k_m = np.ceil(y_k_m)
+                x_k_m = np.clip(np.int_(x_k_m), 0, ix - 1)
+                y_k_m = np.clip(np.int_(y_k_m), 0, iy - 1)
 
-                    x_k_m = np.int_(np.ceil(x_k_m))  # Converting to pixel values
-                    y_k_m = np.int_(np.ceil(y_k_m))
+                if len(rad_index) != 0:
+                    r_i = np.argmax(np.mean(image[x_k_m, y_k_m], axis=0)) + max(rad_index[-1] - 1, 0)
+                else:
+                    r_i = np.argmax(np.mean(image[x_k_m, y_k_m], axis=0))
 
-                    # if np.any(x_k_m < 0) or np.any(x_k_m >= ix):
-                    #     continue
-                    # if np.any(y_k_m < 0) or np.any(y_k_m >= iy):
-                    #     continue
-                    x_k_m = np.clip(x_k_m, 0, ix-1)
-                    y_k_m = np.clip(y_k_m, 0, iy-1)
-                    flux = np.mean(image[x_k_m, y_k_m])
-                    if flux > flux_rad_max:
-                        flux_rad_max = flux
-                        rad_max = rad
-
-                rad_index.append(rad_max)
+                rad_index.append(r_i)
 
                 angles.append(angles[-1] + sigma * (delta_segment / radial_segment[rad_index[-1]]))
 
@@ -325,6 +303,8 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
         # plt.imshow(test)
         # fig6.canvas.set_window_title("Every loop") 
         # plt.show()
+        if len(loop) <= 1:
+            continue
 
         loops.append(loop)
     
