@@ -8,7 +8,7 @@ import scipy.ndimage as ndimage
 __all__ = ["mgn"]
 
 
-def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights=None, truncate=3):
+def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights=None, truncate=3, clip=True):
     """
     Multi-scale Gaussian normalization.
 
@@ -20,9 +20,10 @@ def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights
     can be used to reveal information and structures at various spatial scales.
 
     .. note::
-        In practice, the weights and h may be adjusted according to the desired output, and also according
-        to the type of input image (e.g. wavelength or channel). For most purposes, the weights can be set
-        equal for all scales.
+        * In practice, the weights and h may be adjusted according to the desired output, and also according
+          to the type of input image (e.g. wavelength or channel). For most purposes, the weights can be set
+          equal for all scales.
+        * We don't deal with nan (Not A Number) in this implementation.
 
     Parameters
     ----------
@@ -47,6 +48,9 @@ def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights
         final image. If not specified, all weights are one.
     truncate : `int`, optional
         The number of sigmas (defaults to 3) to truncate the kernel.
+    clip : `bool`, optional
+        If set to `True` it will clip all the non-positive values in the image to a very small positive
+        value. Defaults to `True`.
 
     Returns
     -------
@@ -65,7 +69,9 @@ def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights
         weights = np.ones(len(sigma))
 
     # 1. Replace spurious negative pixels with zero
-    data[data <= 0] = 1e-15  # Makes sure that all values are above zero
+    if clip is True:
+        data[data <= 0] = 1e-15  # Makes sure that all values are above zero
+
     image = np.zeros_like(data)
     conv = np.zeros_like(data)
     sigmaw = np.zeros_like(data)
