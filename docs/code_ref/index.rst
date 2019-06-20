@@ -10,3 +10,4 @@ Code Reference
    sunkit_image
    radial
    utils
+   enhance

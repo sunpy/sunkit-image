@@ -1,10 +1,8 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
-from sunpy.tests.helpers import figure_test
 
 from sunkit_image.utils.utils import (
     bin_edge_summary,
@@ -12,11 +10,6 @@ from sunkit_image.utils.utils import (
     find_pixel_radii,
     get_radial_intensity_summary,
 )
-
-
-@figure_test
-def test_simple_plot():
-    plt.plot([0, 1])
 
 
 @pytest.fixture
