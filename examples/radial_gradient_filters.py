@@ -8,7 +8,6 @@ normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
 """
 # sphinx_gallery_thumbnail_number = 3
 
-import numpy as np
 import matplotlib.pyplot as plt
 
 import astropy.units as u
