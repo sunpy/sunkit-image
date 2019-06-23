@@ -5,6 +5,7 @@ import numpy as np
 
 import astropy.units as u
 from sunpy.coordinates import frames
+from sunpy.map.maputils import all_coordinates_from_map
 
 __all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii",
            "get_radial_intensity_summary"]
@@ -17,13 +18,13 @@ def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
 
     Parameters
     ----------
-    inner_value : ``float`
+    inner_value : `float`
         The inner value of the bins.
 
-    outer_value : ``float`
+    outer_value : `float`
         The outer value of the bins.
 
-    nbins : ``int`
+    nbins : `int`
         Number of bins
 
     Returns
@@ -97,11 +98,10 @@ def find_pixel_radii(smap, scale=None):
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
     """
-    # Calculate all the x and y coordinates of every pixel in the map.
-    x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
+    # Calculate the co-ordinates of every pixel.
+    coords = all_coordinates_from_map(smap)
 
-    # Calculate the helioprojective Cartesian co-ordinates of every pixel.
-    coords = smap.pixel_to_world(x, y).transform_to(frames.Helioprojective)
+    # TODO: check that the returned coordinates are indeed helioprojective cartesian
 
     # Calculate the radii of every pixel in helioprojective Cartesian
     # co-ordinate distance units.
@@ -148,17 +148,20 @@ def get_radial_intensity_summary(
         A summary statistic of the radial intensity in the bins defined by the
         bin edges.
     """
+    if scale is None:
+        s = smap.rsun_obs
+    else:
+        s = scale
+
+    # Get the radial distance of every pixel from the center of the Sun.
+    map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
 
     # Number of radial bins
     nbins = radial_bin_edges.shape[1]
 
-    # Find the pixels in all the radial bins
-    annuli = list()
-    for i in range(0, nbins):
-        annuli.append(locations_satisfying_radial_conditions(smap,
-                                                             comparison=comparison,
-                                                             scale=scale,
-                                                             radii=radial_bin_edges[:, i]))
+    # Upper and lower edges
+    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
+    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
 
     # Calculate the summary statistic in the radial bins.
     return np.asarray(
