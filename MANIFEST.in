@@ -1,10 +1,9 @@
 include README.rst
-include CHANGES.rst
+include CHANGELOG.rst
 
-include ez_setup.py
 include ah_bootstrap.py
 include setup.cfg
-include sunkit_image/tests/coveragerc
+include pyproject.toml
 
 recursive-include sunkit_image *.pyx *.c *.pxd
 recursive-include docs *
@@ -26,7 +25,6 @@ include astropy_helpers/CHANGES.rst
 include astropy_helpers/LICENSE.rst
 recursive-include astropy_helpers/licenses *
 
-include astropy_helpers/ez_setup.py
 include astropy_helpers/ah_bootstrap.py
 
 recursive-include astropy_helpers/astropy_helpers *.py *.pyx *.c *.h *.rst
@@ -36,6 +34,5 @@ recursive-include astropy_helpers/astropy_helpers/sphinx *
 
 prune astropy_helpers/build
 prune astropy_helpers/astropy_helpers/tests
-
 
 global-exclude *.pyc *.o

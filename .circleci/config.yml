@@ -1,0 +1,134 @@
+skip-check: &skip-check
+  name: Check for [ci skip]
+  command: bash .circleci/early_exit.sh
+
+merge-check: &merge-check
+  name: Check if we need to merge upstream master
+  command: |
+    if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+      git fetch origin --tags
+      git fetch origin +refs/pull/$CIRCLE_PR_NUMBER/merge:pr/$CIRCLE_PR_NUMBER/merge
+      git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
+    fi
+
+apt-run: &apt-install
+  name: Install apt packages
+  command: |
+    sudo apt update
+    sudo apt install -y graphviz build-essential
+
+permission-run: &permission-run
+  name: Fix permssions for installing
+  command: |
+    sudo chown -R circleci:circleci /usr/local/bin
+    sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+    sudo chown -R circleci:circleci /usr/local/share/
+
+tox-install: &tox-install
+  name: Install Tox
+  command: |
+    pip install tox
+
+tox-conda-install: &tox-conda-install
+  name: Install Tox-Conda
+  command: |
+    pip install tox-conda
+
+version: 2
+jobs:
+  egg-info-36:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: python setup.py egg_info
+
+  egg-info-37:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: python setup.py egg_info
+
+  pip-install:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: *apt-install
+      - run: *permission-run
+      - run:
+          name: Update pip
+          command: pip install -U pip
+      - run:
+          name: Install sunkit_image
+          command: |
+            pip install --progress-bar off .[all,dev]
+            pip install --no-use-pep517 -e .[all,dev]
+            python setup.py develop
+
+  figure-tests-37:
+    docker:
+      - image: continuumio/miniconda3
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: *tox-install
+      - run: *tox-conda-install
+      - run: tox -e figure
+      - run: pip install codecov
+      - run: codecov
+      - store_artifacts:
+          path: figure_test_images
+      - run:
+          name: "Image comparison page is available at: "
+          command: FIGS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/figure_test_images/fig_comparison.html"; echo $FIGS_URL
+
+  html-docs:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: *apt-install
+      - run: *permission-run
+      - run: *tox-install
+      - run: tox -e build_docs
+      - store_artifacts:
+          path: docs/_build/html
+
+      - run:
+          name: "Built documentation is available at:"
+          command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
+
+workflows:
+  version: 2
+
+  egg-info:
+    jobs:
+      - egg-info-36
+      - egg-info-37
+
+  figure-tests:
+    jobs:
+      - figure-tests-37
+
+  pip-install:
+    jobs:
+      - pip-install
+
+  test-documentation:
+    jobs:
+      - html-docs
+
+notify:
+  webhooks:
+    - url: https://giles.cadair.com/circleci

@@ -1,0 +1,30 @@
+variables:
+  Agent.Source.Git.ShallowFetchDepth: 1
+  CI_NAME: Azure Pipelines
+  CI_BUILD_ID: $(Build.BuildId)
+  CI_BUILD_URL: "https://dev.azure.com/sunpy/sunkit-image/_build/results?buildId=$(Build.BuildId)"
+
+jobs:
+- template: azure-templates.yml
+  parameters:
+    name: Linux_36_online
+    os: linux
+    tox: py36-online --
+
+- template: azure-templates.yml
+  parameters:
+    name: macOS_37_offline
+    os: macos
+    tox: py37-offline --
+
+- template: azure-templates.yml
+  parameters:
+    name: Windows_36_offline
+    os: windows
+    tox: py36-offline --
+
+- template: azure-templates.yml
+  parameters:
+    name: Linux_37_sunpydev
+    os: linux
+    tox: py37-sunpydev --
