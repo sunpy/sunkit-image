@@ -6,7 +6,8 @@ import numpy as np
 import astropy.units as u
 from sunpy.coordinates import frames
 
-__all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii"]
+__all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii",
+           "get_radial_intensity_summary"]
 
 
 def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
