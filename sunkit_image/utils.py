@@ -2,11 +2,18 @@
 This module contains a collection of functions of general utility.
 """
 import numpy as np
+import scipy.ndimage as ndimage
 
 import astropy.units as u
 from sunpy.coordinates import frames
 
-__all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii"]
+__all__ = [
+    "equally_spaced_bins",
+    "bin_edge_summary",
+    "find_pixel_radii",
+    "background_supression",
+    "bandpass_filter",
+]
 
 
 def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
@@ -169,3 +176,64 @@ def get_radial_intensity_summary(
             for i in range(0, nbins)
         ]
     )
+
+
+def background_supression(image, zmin, qmed=1.0):
+    """
+    Supresses the background by replacing the pixel intensity values less than
+    `zmin` by product of `qmed` and `zmed`, which is the median intensity.
+
+    Parameters
+    ----------
+    image : `numpy.ndarray`
+        Image on which background supression is to be performed.
+    zmin : `float`
+        The minimum value of intensity which is allowed.
+    qmed : `float`
+        The scaling factor with which the median is multiplied to fill the values below `zmin`.
+        Defaults to 1.0.
+
+    Returns
+    -------
+    new_image : `numpy.ndarray`
+        Background suppressed image.
+    """
+
+    zmed = np.median(image)
+    new_image = np.where(image < zmin, qmed * zmed, image)
+
+    return new_image
+
+
+def bandpass_filter(image, nsm1=1, nsm2=3):
+    """
+    Applies a band pass filter to the image.
+
+    Parameters
+    ----------
+    image : `numpy.ndarray`
+        Image to be filtered.
+    nsm1 : `int`
+        Low pass filter boxcar smoothing constant.
+        Defaults to 1.
+    nsm2 : `int`
+        High pass filter boxcar smoothing constant.
+        The value of `nsm2` equal to `nsm1 + 1` gives the best enhancement.
+        Defaults to 3.
+
+    Returns
+    -------
+    `numpy.ndarray`
+        Bandpass filtered image.
+    """
+
+    if nsm1 >= nsm2:
+        raise ValueError("nsm1 should be less than nsm2")
+
+    if nsm1 <= 2:
+        return image - ndimage.uniform_filter(image, nsm2, mode="nearest")
+
+    if nsm1 >= 3:
+        return ndimage.uniform_filter(image, nsm1, mode="nearest") - ndimage.uniform_filter(
+            image, nsm2, mode="nearest"
+        )

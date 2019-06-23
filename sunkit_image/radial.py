@@ -8,7 +8,7 @@ import astropy.units as u
 import sunpy.map
 from sunpy.coordinates import frames
 
-from sunkit_image.utils.utils import (
+from sunkit_image.utils import (
     bin_edge_summary,
     equally_spaced_bins,
     find_pixel_radii,

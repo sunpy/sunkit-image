@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pytest
 
 import sunpy.data.sample
@@ -7,6 +6,7 @@ import sunpy.map
 from sunpy.tests.helpers import figure_test
 
 import sunkit_image.enhance as enhance
+
 
 @pytest.fixture
 @pytest.mark.remote_data
@@ -56,46 +56,3 @@ def test_multiscale_gaussian(map_test):
     expect4 = enhance.mgn(map_test)
 
     assert np.allclose(result2, expect4)
-
-
-@pytest.fixture
-def test_map():
-    map_test = [[1., 1., 1., 1.],
-                [1., 5., 5., 1.],
-                [1., 5., 5., 1.],
-                [1., 1., 1., 1.]]
-
-    return np.array(map_test)
-
-
-def test_background_supression(test_map):
-
-    expect = [[0., 0., 0., 0.],
-              [0., 5., 5., 0.],
-              [0., 5., 5., 0.],
-              [0., 0., 0., 0.]]
-
-    result = enhance.background_supression(test_map, 2, 0)
-    assert np.allclose(expect, result)
-
-    expect = [[1., 1., 1., 1.],
-              [1., 5., 5., 1.],
-              [1., 5., 5., 1.],
-              [1., 1., 1., 1.]]
-
-    result = enhance.background_supression(test_map, 2)
-    assert np.allclose(expect, result)
-
-
-@pytest.fixture
-def image():
-    return np.ones((4, 4), dtype=float)
-
-
-def test_bandpass_filter(image):
-
-    expect = np.zeros((4, 4))
-
-    result = enhance.bandpass_filter(image)
-
-    assert np.allclose(expect, result)

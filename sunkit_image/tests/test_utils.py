@@ -4,7 +4,9 @@ import pytest
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-from sunkit_image.utils.utils import (
+from sunkit_image.utils import (
+    background_supression,
+    bandpass_filter,
     bin_edge_summary,
     equally_spaced_bins,
     find_pixel_radii,
@@ -120,3 +122,51 @@ def test_find_pixel_radii(smap):
 def test_get_radial_intensity_summary():
     # TODO: Write some tests.
     pass
+
+
+@pytest.fixture
+def test_map():
+    map_test = [
+        [1.0, 1.0, 1.0, 1.0],
+        [1.0, 5.0, 5.0, 1.0],
+        [1.0, 5.0, 5.0, 1.0],
+        [1.0, 1.0, 1.0, 1.0],
+    ]
+
+    return np.array(map_test)
+
+
+def test_background_supression(test_map):
+
+    expect = [
+        [0.0, 0.0, 0.0, 0.0],
+        [0.0, 5.0, 5.0, 0.0],
+        [0.0, 5.0, 5.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0],
+    ]
+
+    result = background_supression(test_map, 2, 0)
+    assert np.allclose(expect, result)
+
+    expect = [
+        [1.0, 1.0, 1.0, 1.0],
+        [1.0, 5.0, 5.0, 1.0],
+        [1.0, 5.0, 5.0, 1.0],
+        [1.0, 1.0, 1.0, 1.0],
+    ]
+
+    result = background_supression(test_map, 2)
+    assert np.allclose(expect, result)
+
+
+@pytest.fixture
+def image():
+    return np.ones((4, 4), dtype=float)
+
+
+def test_bandpass_filter(image):
+
+    expect = np.zeros((4, 4))
+    result = bandpass_filter(image)
+
+    assert np.allclose(expect, result)

@@ -1,1 +1,1 @@
-Added a new function (`sunkit_image.enhance.occult2`) to automatically trace out loops in a solar image.
+Added a new function (`sunkit_image.enhance.occult2`) to automatically trace out loops/curved structures in an image.

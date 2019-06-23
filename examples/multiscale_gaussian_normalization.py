@@ -10,8 +10,8 @@ to a SunPy Map using `sunkit_image.enhance.mgn`.
 
 import matplotlib.pyplot as plt
 
-import sunpy.map
 import sunpy.data.sample
+import sunpy.map
 
 import sunkit_image.enhance as enhance
 
