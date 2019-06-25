@@ -5,13 +5,14 @@ image.
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy import interpolate
 
 from sunkit_image.utils import background_supression, bandpass_filter
 
 __all__ = ["occult2"]
 
 
-def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000):
+def occult2(smap, zmin, qthresh, lmin, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000):
     """
     Implements the Oriented Coronal CUrved Loop Tracing (OCCULT-2) algorithm
     for loop tracing in solar images.
@@ -22,8 +23,11 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
         Image on which loops are to be detected.
     zmin : `float`
         The minimum value of intensity which is allowed.
-    noise_thresh : `float`
-        The intensity value below which pixels are considered noisy.
+    qthresh : `float`
+        The scaling factor with which the median is multiplied to find the noise threshold
+        in the image.
+    lmin : `int`
+        The length of the smallest loop.
     qmed : `float`
         The scaling factor with which the median is multiplied to fill the values below `zmin`.
         Defaults to 1.0
@@ -84,9 +88,9 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
     # Smoothing the image out at the edges
     image[:, 0:nsm2] = 0
-    image[:, iy - nsm2 :] = 0
+    image[:, iy - nsm2:] = 0
     image[0:nsm2, :] = 0
-    image[ix - nsm2 :, :] = 0
+    image[ix - nsm2:, :] = 0
 
     smooth = image.T
 
@@ -94,6 +98,9 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
     plt.imshow(smooth)
     fig3.canvas.set_window_title("Smooth")
     # plt.show()
+
+    # Calculating the noise threshold of the image
+    noise_thresh = np.median(image[image > 0]) * qthresh
 
     num_loop = nmax  # Maximum number of loops per image
 
@@ -121,53 +128,55 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
         rmin / (-1 + np.arange(num_radial_segments) * (2 / num_radial_segments - 1))
     ).reshape((-1, 1))
 
-    loops = []  # List of all loops
-    ngaps = 3  # Number of empty pixels to denote the end of loop
+    xloops = []  # List of containing x-coordinate of all loops
+    yloops = []  # List of containing y-coordinate of all loops
+    loops = []
+    ngaps = 1  # Number of empty pixels to denote the end of loop
+
+    residual = np.where(image > 0, image, 0)
 
     # Loops tracing begin
     for _ in range(num_loop):
 
-        z_0 = image.max()  # First point of the loop with maximum intensity
+        z_0 = residual.max()  # First point of the loop with maximum intensity
 
         if z_0 <= noise_thresh:  # Stop loop tracing if maximum value is noise
             break
 
-        max_coords = np.where(image == z_0)
+        max_coords = np.where(residual == z_0)
 
-        # Since lots of points can have intensity equal to highest so we choose the first point. The other points
-        # would be traced as a part of a loop or in the next loop.
+        # Since lots of points can have intensity equal to highest so we choose the first point.
+        # The other points would be traced as a part of a loop or in the next loop.
         i_0, j_0 = np.array([max_coords[0][0]]), np.array([max_coords[1][0]])
 
         loop = (
             []
         )  # To trace a single loop having coordinates of loop points. Each entry is a point having x and y coordinate
         angles = []  # To store the angle value for all loop points
-        rad_index = (
-            []
-        )  # To store the index values correspomding to radial_segment of all loop points
+        rad_index = []  # To store the index values correspomding to radial_segment of all loop points
 
         # adding the first loop point
         loop.append([i_0, j_0])
 
-        # x_k_l denotes x-coordinate of kth segment at a particular 'l' angle
-        # Same with y-coordinate. See eqn 13, 14 in the paper
-        x_k_l = loop[-1][0] + np.matmul(segments_bi, np.cos(ang_segment).T)
-        y_k_l = loop[-1][1] + np.matmul(segments_bi, np.sin(ang_segment).T)
-
-        x_k_l = np.ceil(x_k_l)  # Converting to pixel values
-        y_k_l = np.ceil(y_k_l)
-        x_k_l = np.clip(
-            np.int_(x_k_l), 0, ix - 1
-        )  # Making sure every value is between the valid range.
-        y_k_l = np.clip(np.int_(y_k_l), 0, iy - 1)
-
-        # See equation 15 of the paper
-        angle_k = np.argmax(np.mean(image[x_k_l, y_k_l], axis=0)) * (np.pi / num_ang_segment)
-
-        angles.append(angle_k)
-
         for sigma in [-1, 1]:  # To deal with both forward and backward pass
 
+            # x_k_l denotes x-coordinate of kth segment at a particular 'l' angle
+            # Same with y-coordinate. See eqn 13, 14 in the paper
+            x_k_l = loop[-1][0] + np.matmul(segments_bi, np.cos(ang_segment).T)
+            y_k_l = loop[-1][1] + np.matmul(segments_bi, np.sin(ang_segment).T)
+
+            x_k_l = np.ceil(x_k_l)  # Converting to pixel values
+            y_k_l = np.ceil(y_k_l)
+            x_k_l = np.clip(
+                np.int_(x_k_l), 0, ix - 1
+            )  # Making sure every value is between the valid range.
+            y_k_l = np.clip(np.int_(y_k_l), 0, iy - 1)
+
+            # See equation 15 of the paper
+            angle_k = np.argmax(np.mean(image[x_k_l, y_k_l], axis=0)) * (np.pi / num_ang_segment)
+
+            angles.append(angle_k)
+            
             count = 0  # To make sure loop only finishes after `ngap` empty pixels
             while count < ngaps:
 
@@ -237,16 +246,16 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
                 x_k_1 = np.clip(np.int_(x_k_1), 0, ix - 1)
                 y_k_1 = np.clip(np.int_(y_k_1), 0, iy - 1)
 
-                loop.append([x_k_1, y_k_1])
-
-                if (
-                    image[min(max(x_k_1, 0), ix - 1), min(max(y_k_1, 0), iy - 1)] <= 0
-                ):  # To check whether the detected point is valid
+                if residual[x_k_1, y_k_1] <= 0:  # To check whether the detected point is valid
                     count += 1
-                else:  # If the point is valid but somewhere during the trace we encountered some points which were not valid but not in succession
+                else:  # If the point is valid but somewhere during the trace we encountered some
+                    # points which were not valid but not in succession
                     # So we clear our `count` if we get a valid point after some non valid ones.
                     if count != 0:
                         count = 0
+
+                # if x_k_1 != loop[-1][0] or y_k_1 != loop[-1][1]:
+                loop.append([x_k_1, y_k_1])
 
             if (
                 count == ngaps
@@ -257,22 +266,37 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
 
             if (
                 sigma == -1
-            ):  # After one direction of trace is done we reverse our points and start again in the next
+            ):  # After one direction of trace is done we reverse our points and start again in the
+                # next
                 loop.reverse()
                 angles.reverse()
                 rad_index.reverse()
 
+        xloop = []
+        yloop = []
         # Zero out the loop pixels around the loop
         for points in loop:
 
             # Range of values to be zeroed out around the loop points
-            ran_x1 = min(max(points[0] - width, np.array([0])), np.array([ix]))
-            ran_x2 = min(max(points[0] + width, np.array([0])), np.array([ix]))
+            # ran_x1 = min(max(points[0] - width, np.array([0])), np.array([ix]))
+            # ran_x2 = min(max(points[0] + width, np.array([0])), np.array([ix]))
 
-            ran_y1 = min(max(points[1] - width, np.array([0])), np.array([iy]))
-            ran_y2 = min(max(points[1] + width, np.array([0])), np.array([iy]))
+            # ran_y1 = min(max(points[1] - width, np.array([0])), np.array([iy]))
+            # ran_y2 = min(max(points[1] + width, np.array([0])), np.array([iy]))
 
-            image[ran_x1[0] : ran_x2[0], ran_y1[0] : ran_y2[0]] = 0
+            xloop.append(points[0])
+            yloop.append(points[1])
+
+            i0 = min(max(int(points[0]), 0), ix-1)
+            i3 = max(int(i0 - width), 0)
+            i4 = min(int(i0 + width), ix - 1)
+            j0 = min(max(int(points[1]), 0), iy-1)
+            j3 = max(int(j0 - width), 0)
+            j4 = min(int(j0 + width), iy - 1)
+
+            image[i3:i4, j3:j4] = 0
+
+            # image[ran_x1[0]: ran_x2[0], ran_y1[0]: ran_y2[0]] = 0
 
         # fig5 = plt.figure()
         # plt.imshow(image.T)
@@ -286,15 +310,260 @@ def occult2(smap, zmin, noise_thresh, qmed=1, nsm1=1, nsm2=3, rmin=30, nmax=1000
         # plt.imshow(test)
         # fig6.canvas.set_window_title("Every loop")
         # plt.show()
-        if len(loop) <= 1:  # A loop detected having only one point is not valid
-            continue
+        # if len(loop) <= 1:  # A loop detected having only one point is not valid
+        #     continue
 
-        # Add the traced loop to the list of loops
-        loops.append(loop)
+        num_points = len(loop)
+        lengths = np.zeros((num_points,), dtype=float)
+
+        if num_points > 2:
+            for i in range(1, num_points):
+                lengths[i] = lengths[i - 1] + np.sqrt(
+                    (loop[i][0] - loop[i - 1][0]) ** 2 + (loop[i][1] - loop[i - 1][1]) ** 2
+                )
+
+        looplen = lengths[-1]
+        ns = max(int(looplen), 3)
+        ss = np.arange(ns)
+
+        xloop = np.array(xloop).reshape((-1,))
+        yloop = np.array(yloop).reshape((-1,))
+        lengths = np.array(lengths).reshape((-1,))
+
+        if (looplen >= lmin and len(xloop) > 1):
+            reso = 1
+            nn = np.ceil(ns / reso)
+            ii = np.arange(nn) * reso
+            interfunc = interpolate.interp1d(lengths, xloop, fill_value="extrapolate")
+            xx = interfunc(ii)
+            interfunc = interpolate.interp1d(lengths, yloop, fill_value="extrapolate")
+            yy = interfunc(ii)
+
+            # Add the traced loop to the list of loops
+            xloops.append(xx)
+            yloops.append(yy)
+            loops.append(loop)
 
     # fig5 = plt.figure()
     # plt.imshow(image)
     # fig5.canvas.set_window_title("Zeroed")
     # plt.show()
 
-    return loops
+    return xloops, yloops, loops
+
+
+def occult(image1, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
+    reso = 1
+    step = 1
+    nloopmax = 10000
+    npmax = 2000
+    nsm2 = nsm1+2
+    nlen = rmin
+    na = 180
+    nb = 30
+
+    s_loop = step * np.arange(nlen)
+    s0_loop = step * (np.arange(nlen) - nlen // 2)
+    wid = max(nsm2 // 2 - 1, 1)
+    looplen = 0
+
+    # BASE LEVEL
+    zmed = np.median(image1[image1 > 0])
+    image1 = np.where(image1 < zmed, zmed * qthresh1, image1)
+
+    # HIGHPASS FILTER_
+    image2 = bandpass_filter(image1, nsm1, nsm2)
+    nx, ny = image2.shape
+
+    # ERASE BOUNDARIES ZONES (SMOOTHING EFFECTS)
+    image2[:, 0:nsm2] = 0
+    image2[:, ny - nsm2:] = 0
+    image2[0:nsm2, :] = 0
+    image2[nx - nsm2:, :] = 0
+
+    # NOISE THRESHOLD
+    zmed = np.median(image2[image2 > 0])
+    thresh = zmed * qthresh2
+
+    # LOOP TRACING START AT MAXIMUM FLUX POSITION
+    iloop = 0
+    residual = np.where(image2 > 0, image2, 0)
+    iloop_nstruc = np.zeros((nstruc,))
+    loop_len = np.zeros((nloopmax,))
+
+    for istruc in range(0, nstruc):
+        zstart = residual.max()
+        if zstart <= thresh:  # goto: end_trace
+            break
+        max_coords = np.where(residual == zstart)
+        istart, jstart = max_coords[0][0], max_coords[1][0]
+
+        # TRACING LOOP STRUCTURE STEPWISE
+        ip = 0
+        ndir = 2
+        for idir in range(0, ndir):
+            xl = np.zeros((npmax + 1,))
+            yl = np.zeros((npmax + 1,))
+            zl = np.zeros((npmax + 1,))
+            al = np.zeros((npmax + 1,))
+            ir = np.zeros((npmax + 1,))
+            if idir == 0:
+                sign_dir = +1
+            if idir == 1:
+                sign_dir = -1
+
+            # INITIAL DIRECTION FINDING
+            xl[0] = istart
+            yl[0] = jstart
+            zl[0] = zstart
+            alpha = np.pi * np.arange(na, dtype=float) / float(na)
+            flux_max = 0
+            for ia in range(0, na):
+                x_ = xl[0] + s0_loop * np.cos(alpha[ia])
+                y_ = yl[0] + s0_loop * np.sin(alpha[ia])
+                ix = np.int_(np.ceil(x_))  # int(x_ + 0.5)
+                iy = np.int_(np.ceil(y_))  # int(y_ + 0.5)
+                ix = np.clip(ix, 0, nx - 1)
+                iy = np.clip(iy, 0, ny - 1)
+                flux_ = residual[ix, iy]
+                flux = np.sum(np.maximum(flux_, 0.)) / float(nlen)
+                if flux > flux_max:
+                    flux_max = flux
+                    al[0] = alpha[ia]
+                    x_lin = x_
+                    y_lin = y_
+
+
+            # CURVATURE RADIUS
+            xx_curv = np.zeros((nlen, nb, npmax))
+            yy_curv = np.zeros((nlen, nb, npmax))
+            for ip in range(0, npmax):
+
+                if ip == 0:
+                    ib1 = 0
+                    ib2 = nb-1
+
+                if ip >= 1:
+                    ib1 = int(max(ir[ip] - 1, 0))
+                    ib1 = int(min(ir[ip] + 1, nb-1))
+
+                beta0 = al[ip] + np.pi / 2
+                xcen = xl[ip] + rmin * np.cos(beta0)
+                ycen = yl[ip] + rmin * np.sin(beta0)
+
+                flux_max = 0
+                for ib in range(ib1, ib2 + 1):
+                    rad_i = rmin / (-1. + 2. * float(ib) / float(nb - 1))
+                    xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
+                    ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
+                    beta_i = beta0 + sign_dir * s_loop / rad_i
+                    x_ = xcen_i - rad_i * np.cos(beta_i)
+                    y_ = ycen_i - rad_i * np.sin(beta_i)
+                    ix = np.int_(np.ceil(x_))  # int(x_ + 0.5)
+                    iy = np.int_(np.ceil(y_))  # int(y_ + 0.5)
+                    ix = np.clip(ix, 0, nx - 1)
+                    iy = np.clip(iy, 0, ny - 1)
+                    flux_ = residual[ix, iy]
+                    flux = np.sum(np.maximum(flux_, 0.)) / float(nlen)
+                    if idir == 1:
+                        xx_curv[:, ib, ip] = x_
+                        yy_curv[:, ib, ip] = y_
+                    if flux > flux_max:
+                        flux_max = flux
+                        al[ip + 1] = al[ip] + sign_dir * (step / rad_i)
+                        ir[ip+1] = ib
+                        al_mid = (al[ip]+al[ip+1]) / 2.
+                        xl[ip+1] = xl[ip] + step * np.cos(al_mid + np.pi * idir)
+                        yl[ip+1] = yl[ip] + step * np.sin(al_mid + np.pi * idir)
+                        ix_ip = min(max(int(xl[ip + 1] + 0.5), 0), nx - 1)
+                        iy_ip = min(max(int(yl[ip + 1] + 0.5), 0), ny - 1)
+                        zl[ip + 1] = residual[ix_ip, iy_ip]
+                        if ip == 0:
+                            x_curv = x_
+                            y_curv = y_
+
+                iz1 = max((ip + 1 - ngap), 0)
+                if np.max(zl[iz1:ip+2]) <= 0:
+                    break  # goto endsegm
+
+            # ENDSEGM
+
+            # RE-ORDERING LOOP COORDINATES
+            if idir == 0:
+                xloop = np.flip(xl[0:ip+1])
+                yloop = np.flip(yl[0:ip+1])
+                zloop = np.flip(zl[0:ip+1])
+            if idir == 1:
+                xloop = np.concatenate([xloop, xl[1:ip+1]])
+                yloop = np.concatenate([yloop, yl[1:ip+1]])
+                zloop = np.concatenate([zloop, zl[1:ip+1]])
+        ind = np.logical_and(xloop != 0, yloop != 0)
+        nind = np.sum(ind)
+        looplen = 0
+        if nind > 1:
+            # skip_struct
+            xloop = xloop[ind]
+            yloop = yloop[ind]
+            zloop = zloop[ind]
+
+            if iloop >= nloopmax:
+                break  # end_trace
+
+            np1 = len(xloop)
+            s = np.zeros((np1))
+            looplen = 0
+            if np1 >= 2:
+                for ip in range(1, np1):
+                    s[ip] = s[ip - 1] + np.sqrt((xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2)
+            looplen = s[np1-1]
+            ns = max(int(looplen), 3)
+            ss = np.arange(ns)
+
+        # SKIP STRUCT
+        if (looplen >= lmin):
+            nn = int(ns / reso + 0.5)
+            ii = np.arange(nn) * reso
+            interfunc = interpolate.interp1d(s, xloop, fill_value="extrapolate")
+            xx = interfunc(ii)
+            interfunc = interpolate.interp1d(s, yloop, fill_value="extrapolate")
+            yy = interfunc(ii)
+            interfunc = interpolate.interp1d(s, zloop, fill_value="extrapolate")
+            ff = interfunc(ii)
+
+            x_rsun = xx
+            y_rsun = yy
+            s_rsun = ii
+
+            loopnum = np.ones((nn)) * iloop
+            loop = np.c_[loopnum, xx, yy, ff, ii]
+
+            if iloop == 0:
+                loopfile = loop
+            if iloop >= 1:
+                loopfile = np.r_[loopfile, loop]
+            iloop_nstruc[istruc] = iloop
+            loop_len[iloop] = looplen
+            iloop += 1
+
+        # TEST DISPLAY
+
+        # ERASE LOOP IN RESIDUAL IMAGE
+        i3 = max(istart - wid, 0)
+        i4 = min(istart + wid, nx - 1)
+        j3 = max(jstart - wid, 0)
+        j4 = min(jstart + wid, ny - 1)
+        residual[i3:i4, j3:j4] = 0.
+        nn = len(xloop)
+        for iss in range(0, nn):
+            i0 = min(max(int(xloop[iss]), 0), nx-1)
+            i3 = max(int(i0 - wid), 0)
+            i4 = min(int(i0 + wid), nx - 1)
+            j0 = min(max(int(yloop[iss]), 0), ny-1)
+            j3 = max(int(j0 - wid), 0)
+            j4 = min(int(j0 + wid), ny - 1)
+            residual[i3:i4, j3:j4] = 0.
+
+    # END_TRACE
+    fluxmin = np.min(image1)
+    fluxmax = np.max(image1)
+    return loopfile, image2
