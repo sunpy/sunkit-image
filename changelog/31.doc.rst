@@ -1,0 +1,1 @@
+Added an example on how to use `astroscrappy.detect_cosmics` to eliminate cosmic ray hits in solar images.
