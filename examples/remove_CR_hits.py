@@ -3,9 +3,9 @@
 Removing Cosmic Ray Hits
 ========================
 
-This example illustrates how to remove cosmic ray hits from a LASCO C2 image (both `FITS` and `jp2`)
-using `astroscrappy.detect_cosmics`. Astroscrappy is not a `sunkit_image` subroutine and can be
-installed seperately using `pip` or `conda`.
+This example illustrates how to remove cosmic ray hits from a LASCO C2 image (using ``FITS`` and ``jp2``)
+using ``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__. Astroscrappy is a separate Python package and can be
+installed separately using` `pip`` or ``conda``.
 """
 # sphinx_gallery_thumbnail_number = 2
 
@@ -24,8 +24,8 @@ from sunpy.net import Fido, attrs as a
 from sunpy.io.file_tools import read_file
 
 ###############################################################################
-# We will also work with `jp2` images. So to download these files we will use
-# Sunpy's Helioviewer.org api. For more information about the helioviewer api,
+# We will also work with ``jp2`` images. So to download these files we will use
+# Sunpy's Helioviewer.org client. For more information about the helioviewer client,
 # see sunpy example `Querying Helioviewer.org with SunPy`.
 from sunpy.net.helioviewer import HelioviewerClient
 
@@ -53,8 +53,8 @@ fig1 = plt.figure()
 lascomap1.plot()
 
 ###############################################################################
-# Now we will call the `astroscrappy.detect_cosmics` to remove the cosmic ray
-# hits. This algorithm can perform well with both high intensity and low intensity
+# Now we will call the ``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__ to remove the cosmic ray
+# hits. This algorithm will perform well with both high intensity and low intensity
 # noise levels in the FTIS file.
 
 # The function takes a `numpy.ndarray` as input so we only pass the data part of
@@ -72,8 +72,8 @@ fig2 = plt.figure()
 clean_map1.plot()
 
 ###############################################################################
-# The above portion explained how to use `astroscrappy.detect_cosmics` when working
-# with FITS files. Now, we will see how can we remove cosmic ray hits in a `jp2`
+# The above portion explained how to use``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__` when working
+# with FITS files. Now, we will see how can we remove cosmic ray hits in a ``jp2``
 # image.
 
 # First, we will create a HelioviewerClient
@@ -94,10 +94,10 @@ fig3 = plt.figure()
 lascomap2.plot()
 
 ################################################################################
-# Now we will again call the `astroscrappy.detect_cosmics`. It is to be noted that
-# this algorithm may not produce expected results on high intensity noisy `jp2`
-# images. Although in our observations it worked staisfactorily for low intensity
-# noise levels in a `jp2` image.
+# Now we will again call the``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__. It is to be noted that
+# this algorithm may not produce expected results on high intensity noisy ``jp2``
+# images. Although in our observations it worked satisfactorily for low intensity
+# noise levels in a ``jp2`` image.
 
 # Here, we first show results for a low noise level `jp2` image.
 # The function takes a `numpy.ndarray` as input so we only pass the data part of
@@ -112,9 +112,9 @@ fig4 = plt.figure()
 clean_map2.plot()
 
 ###############################################################################
-# Now we will take a high intensity noisy `jp2` image to evaluate the results.
+# Now we will take a high intensity noisy ``jp2`` image to evaluate the results.
 
-file = hv.download_jp2(
+jp2_file = hv.download_jp2(
     "2000/11/09", observatory="SOHO", instrument="LASCO", measurement="C2", source_id=4
 )
 
@@ -122,7 +122,7 @@ file = hv.download_jp2(
 # We can see the image by a making a `sunpy.map.GenericMap` and plotting the
 # results.
 
-lascomap3 = Map(file)
+lascomap3 = Map(jp2_file)
 
 fig5 = plt.figure()
 lascomap3.plot()
