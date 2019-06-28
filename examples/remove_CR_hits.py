@@ -34,17 +34,17 @@ from sunpy.net.helioviewer import HelioviewerClient
 # `Fido <sunpy.net.fido_factory.UnifiedDownloaderFactory>`, a downloader client.
 # We define two search variables:
 # a timerange and the instrument.
-timerange = a.Time('2000/11/09 00:26', '2000/11/09 00:27')
-instrument = a.Instrument('LASCO')
-detector = a.Detector('C2')
+timerange = a.Time("2000/11/09 00:26", "2000/11/09 00:27")
+instrument = a.Instrument("LASCO")
+detector = a.Detector("C2")
 result = Fido.search(timerange, instrument)
 
 downloaded_files = Fido.fetch(result[0])
 data, header = read_file(downloaded_files[1])[0]
 
 # Add the missing meta information to the header
-header['CUNIT1'] = 'arcsec'
-header['CUNIT2'] = 'arcsec'
+header["CUNIT1"] = "arcsec"
+header["CUNIT2"] = "arcsec"
 
 ###############################################################################
 # With this fix we can load it into a map and plot the results.
@@ -81,7 +81,9 @@ hv = HelioviewerClient()
 
 # This will download the `jp2` image based on the date of the observation and the
 # instruments used. This is a `jp2` image with a low level of noise intensity.
-file = hv.download_jp2('2003/04/16', observatory="SOHO", instrument="LASCO", measurement="C2", source_id=4)
+file = hv.download_jp2(
+    "2003/04/16", observatory="SOHO", instrument="LASCO", measurement="C2", source_id=4
+)
 
 ###############################################################################
 # We can load the downloaded file into a `sunpy.map.GenericMap` and plot the
@@ -112,7 +114,9 @@ clean_map2.plot()
 ###############################################################################
 # Now we will take a high intensity noisy `jp2` image to evaluate the results.
 
-file = hv.download_jp2('2000/11/09', observatory="SOHO", instrument="LASCO", measurement="C2", source_id=4)
+file = hv.download_jp2(
+    "2000/11/09", observatory="SOHO", instrument="LASCO", measurement="C2", source_id=4
+)
 
 ##############################################################################
 # We can see the image by a making a `sunpy.map.GenericMap` and plotting the
