@@ -15,7 +15,7 @@ apt-run: &apt-install
   name: Install apt packages
   command: |
     sudo apt update
-    sudo apt install -y graphviz build-essential
+    sudo apt install -y graphviz build-essential libopenjp2-7
 
 permission-run: &permission-run
   name: Fix permssions for installing
