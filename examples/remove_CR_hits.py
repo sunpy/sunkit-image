@@ -4,10 +4,10 @@ Removing Cosmic Ray Hits
 ========================
 
 This example illustrates how to remove cosmic ray hits from a LASCO C2 image (using ``FITS`` and ``jp2``)
-using ``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__. Astroscrappy is a separate Python package and can be
+using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__. Astroscrappy is a separate Python package and can be
 installed separately using ``pip`` or ``conda``.
 """
-# sphinx_gallery_thumbnail_number = 2
+# sphinx_gallery_thumbnail_number = 5
 
 import matplotlib.pyplot as plt
 
@@ -19,19 +19,19 @@ import astroscrappy
 # First, we will work with the FITS files.
 # These imports are necessary to download the FITS file based on the instrument.
 # For more details on how to download a particular LASCO FITS file as a map see
-# Sunpy's example ``Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html#sphx-glr-generated-gallery-acquiring-data-skip-downloading-lascoc3-py>``_.
-# To make this example work you need to have ``Sunpy`` with all the `net` dependencies also installed.
+# Sunpy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
+# To make this example work you need to have `Sunpy` with all the `net` dependencies also installed.
 from sunpy.net import Fido, attrs as a
 from sunpy.io.file_tools import read_file
 
 ###############################################################################
 # We will also work with ``jp2`` images. So to download these files we will use
 # Sunpy's Helioviewer.org client. For more information about the helioviewer client,
-# see sunpy example ``Querying Helioviewer.org with SunPy <https://docs.sunpy.org/en/stable/guide/acquiring_data/helioviewer.html>``_.
+# see sunpy example `Querying Helioviewer.org with SunPy <https://docs.sunpy.org/en/stable/guide/acquiring_data/helioviewer.html>`__.
 from sunpy.net.helioviewer import HelioviewerClient
 
 ###############################################################################
-# In order to download the required FITS file, we use
+# In order to download the required ``FITS`` file, we use
 # `Fido <sunpy.net.fido_factory.UnifiedDownloaderFactory>`, a downloader client.
 # We define two search variables:
 # a timerange and the instrument.
@@ -54,9 +54,9 @@ fig1 = plt.figure()
 lascomap1.plot()
 
 ###############################################################################
-# Now we will call the ``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__ to remove the cosmic ray
+# Now we will call the `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__ to remove the cosmic ray
 # hits. This algorithm will perform well with both high intensity and low intensity
-# noise levels in the FTIS file.
+# noise levels in the ``FTIS`` file.
 
 # The function takes a `numpy.ndarray` as input so we only pass the data part of
 # the map.
@@ -73,15 +73,15 @@ fig2 = plt.figure()
 clean_map1.plot()
 
 ###############################################################################
-# The above portion explained how to use``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__ when working
-# with FITS files. Now, we will see how can we remove cosmic ray hits in a ``jp2``
+# The above portion explained how to use `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__ when working
+# with ``FITS`` files. Now, we will see how can we remove cosmic ray hits in a ``jp2``
 # image.
 
 # First, we will create a HelioviewerClient
 hv = HelioviewerClient()
 
-# This will download the `jp2` image based on the date of the observation and the
-# instruments used. This is a `jp2` image with a low level of noise intensity.
+# This will download the ``jp2`` image based on the date of the observation and the
+# instruments used. This is a ``jp2`` image with a low level of noise intensity.
 file = hv.download_jp2(
     "2003/04/16", observatory="SOHO", instrument="LASCO", measurement="C2", source_id=4
 )
@@ -95,12 +95,12 @@ fig3 = plt.figure()
 lascomap2.plot()
 
 ################################################################################
-# Now we will again call the``astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>``__. It is to be noted that
+# Now we will again call the `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__. It is to be noted that
 # this algorithm may not produce expected results on high intensity noisy ``jp2``
 # images. Although in our observations it worked satisfactorily for low intensity
 # noise levels in a ``jp2`` image.
 
-# Here, we first show results for a low noise level `jp2` image.
+# Here, we first show results for a low noise level ``jp2`` image.
 # The function takes a `numpy.ndarray` as input so we only pass the data part of
 # the map.
 mask, clean = astroscrappy.detect_cosmics(lascomap2.data)
