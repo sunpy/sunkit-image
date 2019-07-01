@@ -55,7 +55,7 @@ lascomap1.plot()
 
 ###############################################################################
 # Now we will call the `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__
-# hits. This algorithm will perform well with both high intensity and low intensity
+#  to remove the cosmic ray hits. This algorithm will perform well with both high intensity and low intensity
 # noise levels in the FITS file.
 
 # The function takes a numpy.ndarray as input so we only pass the data part of
