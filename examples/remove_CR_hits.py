@@ -6,6 +6,11 @@ Removing Cosmic Ray Hits
 This example illustrates how to remove cosmic ray hits from a LASCO C2 image (using FITS and jp2 files)
 using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__.
 Astroscrappy is a separate Python package and can be installed separately using ``pip`` or ``conda``.
+
+.. note::
+    This astroscrappy routine works best with FITS file. It can also work well enough for low intensity noise jp2
+    images. This will be evident from the fact that we have tested this routine on both the FITS and jp2 files for
+    the same image.
 """
 # sphinx_gallery_thumbnail_number = 5
 
@@ -35,13 +40,13 @@ from sunpy.net.helioviewer import HelioviewerClient
 # `Fido <sunpy.net.fido_factory.UnifiedDownloaderFactory>`, a downloader client.
 # We define two search variables:
 # a timerange and the instrument.
-timerange = a.Time("2000/11/09 00:26", "2000/11/09 00:27")
+timerange = a.Time("2000/11/09 00:06", "2000/11/09 00:07")
 instrument = a.Instrument("LASCO")
 detector = a.Detector("C2")
 result = Fido.search(timerange, instrument)
 
 downloaded_files = Fido.fetch(result[0])
-data, header = read_file(downloaded_files[1])[0]
+data, header = read_file(downloaded_files[0])[0]
 
 # Add the missing meta information to the header
 header["CUNIT1"] = "arcsec"
@@ -55,7 +60,7 @@ lascomap1.plot()
 
 ###############################################################################
 # Now we will call the `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__
-#  to remove the cosmic ray hits. This algorithm will perform well with both high intensity and low intensity
+# to remove the cosmic ray hits. This algorithm will perform well with both high intensity and low intensity
 # noise levels in the FITS file.
 
 # The function takes a numpy.ndarray as input so we only pass the data part of
@@ -74,7 +79,7 @@ clean_map1.plot()
 
 ###############################################################################
 # The above portion explained how to use `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__
-#  when working with FITS files. Now, we will see how can we remove cosmic ray hits in a jp2
+# when working with FITS files. Now, we will see how can we remove cosmic ray hits in a jp2
 # image.
 
 # First, we will create a HelioviewerClient
