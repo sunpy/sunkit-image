@@ -24,6 +24,8 @@ outputs = (expect_x, expect_y, expect_m)
 
 vx, vy, vm = flct(images[0], images[1], 1, 1, 5, kr=0.5)
 
+print(vx)
+
 assert np.allclose(vx, outputs[0])
 assert np.allclose(vy, outputs[1])
 assert np.allclose(vm, outputs[2])
