@@ -22,7 +22,7 @@ expect_m = np.genfromtxt(filepath_m, delimiter=',')
 images = (image1, image2)
 outputs = (expect_x, expect_y, expect_m)
 
-vx, vy, vm = flct(images[0], images[1], 1, 1, 5, kr=0.5, quiet=False)
+vx, vy, vm = flct(images[0], images[1], 1, 1, 5, kr=0.5)
 
 assert np.allclose(vx, outputs[0])
 assert np.allclose(vy, outputs[1])

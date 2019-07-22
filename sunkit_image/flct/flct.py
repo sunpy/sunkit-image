@@ -231,9 +231,15 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
     vy = np.zeros((nx * ny,), dtype=float)
     vm = np.zeros((nx * ny,), dtype=float)
 
+    print("All inputs")
     print(transp)
     print(image1)
     print(image2)
+    print(nxorig, nyorig,
+          deltat, deltas, sigma, vx, vy,
+          vm, thresh, absflag, filter, kr,
+          skip, poff, qoff, interp, latmin,
+          latmax, biascor, verbose)
 
     if pc is True:
         ierflct, vx_c, vy_c, vm_c = pyflctsubs.pyflct_plate_carree(transp, image1, image2, nxorig, nyorig,
