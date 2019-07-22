@@ -8,17 +8,9 @@ __all__ = ["flct", ]
 
 
 def vcimageout(data, filename='./input.dat'):
-    '''
-    Adapted from vcimage1/2/3out.pro in Fisher & Welsch 2008.
-    Input: data - tuple containing all image data to be stored in filename
-                  It must be in the following format:
-                  data = (data1, data2 ...)
-                  where, data1, data2 ... are image data at different times
-           filename - name of file that will be generated
-    Output: Return - None
-            A new file with name of filename will be generated containing
-            data.
-    '''
+    """
+
+    """
 
     # Perform size and shape check
     num = len(data)
@@ -103,9 +95,71 @@ def vcimagein(filename='output.dat'):
 
 
 def flct(image1, image2, deltat, deltas, sigma, quiet=False,
-         biascor=False, thresh=0., absflag=False, skip=None, poff=0, qoff=0,
-         skipon=0, interp=False, kr=None, pc=False, latmin=0, latmax=0.2,
+         biascor=False, thresh=0., skip=None, poff=0, qoff=0,
+         interp=False, kr=None, pc=False, latmin=0, latmax=0.2,
          ):
+    """
+    A python wrapper which calls the FLCT C routines to perform Fourier Linear Correlation
+    Tracking between two images taken at some interval of time.
+
+    Parameters
+    ----------
+    image1 : `numpy.ndarray`
+        The first image of the sequence of two images on which the procedure is to be perfromed.
+    image2 : `numpy.ndarray`
+        The second image of the sequence of two images taken after `deltat` time of the first one.
+    deltat : `float`
+        The time interval between the capture of the two images.
+    deltas : `float`
+        Units of length of the side of a single pixel
+    sigma : `float`
+        The width of Gaussian kernel with which the images are to be modulated. If sigma is `0` then
+        the overall shift between the images is returned.
+    quiet : `bool`
+        If set to `True` all the error messages of FLCT C code will be supressed.
+        Defaults to `False`.
+    biascor : `bool`
+        If set to `True` bias correction will be applied while computing the velocities.
+    thresh : `float`
+        The threshold value below which if the average absolute value of pixel values for a certain
+        pixel in both the images, falls the FLCT calculation will not be done for that pixel.
+        Defaults to 0.
+    skip : `int`
+        The number of pixels to be skipped in the x and y direction after each calculation of a
+        velocity for a pixel.
+        Defaults to `None`.
+    poff : `int`
+        The offset in x direction after skip is enabled.
+        Defaults to 0.
+    qoff : `int`
+        The offset in y direction after skip is enabled.
+        Defaults to 0.
+    interp : `bool`
+        If set to `True` interpolation will be performed at the skipped pixels.
+        Defaults to `False`.
+    kr : `float`
+        Filter sub-images.
+        Defaults to `None`
+    pc : `bool`
+        Set to `True` if the images are in Plate Carree.
+        Defaults to `False`.
+    latmin : `float`
+        Lower latitude limit in radians.
+        Defaults to 0.
+    latmax : `float`
+        Upper latitude limit in radians.
+        Defaults to 0.2
+
+    Returns
+    -------
+    `tuple`
+        A tuple containing the velocity arrays in the following order vx, vy, and vm.
+
+    References
+    ----------
+    * The FLCT software package which can be found here:
+      http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/
+    """
 
     if quiet is True:
         verbose = 0
@@ -117,10 +171,10 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
     else:
         biascor = 1
 
-    if absflag is False:
-        absflag = 0
-    else:
+    if thresh != 0.0:
         absflag = 1
+    else:
+        absflag = 0
 
     if interp is False:
         interp = 0
@@ -136,6 +190,7 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
             raise ValueError("The absolute value of poff and qoff must be less than skip")
     else:
         skip = 0
+        skipon = 0
 
     if kr is not None:
         if kr <= 0. or kr >= 20.:
@@ -145,7 +200,7 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
         kr = 0.
         filter = 0
 
-    ibe = pyflctsubs.endian()
+    # ibe = pyflctsubs.endian()
 
     # The below statements are not needed since we are taking numpy arrays as imput
     # vcimageout((image1, image2))
@@ -156,11 +211,11 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
     # image1 = np.array(f1)
     # image2 = np.array(f2)
 
-    # nxorig = nx
-    # nyorig = ny
-
     nx = image1.shape[0]
     ny = image2.shape[1]
+
+    nxorig = nx
+    nyorig = ny
 
     if sigma == 0:
         nx = 1
@@ -176,14 +231,18 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
     vy = np.zeros((nx * ny,), dtype=float)
     vm = np.zeros((nx * ny,), dtype=float)
 
+    print(transp)
+    print(image1)
+    print(image2)
+
     if pc is True:
-        ierflct, vx_c, vy_c, vm_c = pyflctsubs.pyflct_plate_carree(transp, image1, image2, nx, ny,
+        ierflct, vx_c, vy_c, vm_c = pyflctsubs.pyflct_plate_carree(transp, image1, image2, nxorig, nyorig,
                                                                    deltat, deltas, sigma, vx, vy,
                                                                    vm, thresh, absflag, filter, kr,
                                                                    skip, poff, qoff, interp, latmin,
                                                                    latmax, biascor, verbose)
     else:
-        ierflct, vx_c, vy_c, vm_c = pyflctsubs.pyflct(transp, image1, image2, nx, ny, deltat,
+        ierflct, vx_c, vy_c, vm_c = pyflctsubs.pyflct(transp, image1, image2, nxorig, nyorig, deltat,
                                                       deltas, sigma, vx, vy, vm, thresh, absflag,
                                                       filter, kr, skip, poff, qoff, interp, biascor,
                                                       verbose)
@@ -191,5 +250,9 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
     # This is also not needed as numpy arrays are returned
     # outfile = b'output.dat'
     # pyflctsubs.write_3_images(outfile, vx_c, vy_c, vm_c, nx, ny, transp)
+
+    vx_c = vx_c.reshape((nxorig, nyorig))
+    vy_c = vy_c.reshape((nxorig, nyorig))
+    vm_c = vm_c.reshape((nxorig, nyorig))
 
     return (vx_c, vy_c, vm_c)
