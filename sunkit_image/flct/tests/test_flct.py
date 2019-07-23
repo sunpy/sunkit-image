@@ -1,9 +1,10 @@
 import numpy as np
-
 import pytest
 
+from sunpy.tests.helpers import skip_windows
+
+import sunkit_image.data.test as data
 from sunkit_image.flct import flct
-import sunkit_image.data as data
 
 
 @pytest.fixture
@@ -32,6 +33,7 @@ def outputs():
     return (expect_x, expect_y, expect_m)
 
 
+@skip_windows
 def test_pyflct(images, outputs):
 
     vx, vy, vm = flct(images[0], images[1], 1, 1, 5, kr=0.5)

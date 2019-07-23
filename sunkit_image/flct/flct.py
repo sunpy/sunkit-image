@@ -1,8 +1,12 @@
-import numpy as np
 import math
 import struct
 
-from sunkit_image.flct import _pyflct
+import numpy as np
+
+try:
+    from sunkit_image.flct import _pyflct
+except ImportError:
+    _pyflct = None
 
 __all__ = ["flct", "vcimageout", "vcimagein"]
 
@@ -172,6 +176,9 @@ def flct(
     * The FLCT software package which can be found here:
       http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/
     """
+
+    if _pyflct is None:
+        raise ImportError("C extension for flct is missing, please rebuild.")
 
     if quiet is True:
         verbose = 0

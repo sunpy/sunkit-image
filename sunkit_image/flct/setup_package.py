@@ -5,7 +5,6 @@ from distutils.core import Extension
 
 from astropy_helpers import setup_helpers
 
-
 ROOT = os.path.relpath(os.path.dirname(__file__))
 
 
@@ -16,8 +15,7 @@ def get_extensions():
     else:
         # 'numpy' will be replaced with the proper path to the numpy includes
         cfg = setup_helpers.DistutilsExtensionArgs()
-        cfg["include_dirs"].append("numpy")
-        cfg["include_dirs"].append("/usr/include/")
+        cfg["include_dirs"].extend(["numpy", "/usr/include/"])
         cfg["sources"].extend(sorted(glob(os.path.join(ROOT, "src", "*.c"))))
         cfg["sources"].extend(sorted(glob(os.path.join(ROOT, "pyflct.pyx"))))
         cfg["libraries"].extend(["m", "fftw3"])

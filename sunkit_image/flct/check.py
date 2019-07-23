@@ -1,8 +1,7 @@
 import numpy as np
 
-
+import sunkit_image.data.test as data
 from sunkit_image.flct import flct, vcimagein, vcimageout
-import sunkit_image.data as data
 
 filepath1 = data.get_test_filepath("hashgauss_1.csv")
 filepath2 = data.get_test_filepath("hashgauss_2.csv")

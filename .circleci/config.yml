@@ -11,11 +11,17 @@ merge-check: &merge-check
       git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
     fi
 
-apt-run: &apt-install
+apt-install: &apt-install
+  name: Install apt packages
+  command: |
+    apt update
+    apt install -y graphviz build-essential libfftw3-dev
+
+apt-install-sudo: &apt-install-sudo
   name: Install apt packages
   command: |
     sudo apt update
-    sudo apt install -y graphviz build-essential
+    sudo apt install -y graphviz build-essential libfftw3-dev
 
 permission-run: &permission-run
   name: Fix permssions for installing
@@ -33,6 +39,15 @@ tox-conda-install: &tox-conda-install
   name: Install Tox-Conda
   command: |
     pip install tox-conda
+
+image-run: &image-tests
+  name: Run image tests
+  environment:
+    MPLBACKEND: Agg
+  command: |
+    tox -e figure
+    pip install codecov
+    codecov
 
 version: 2
 jobs:
@@ -54,6 +69,17 @@ jobs:
       - run: *merge-check
       - run: python setup.py egg_info
 
+  twine-check:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: python setup.py sdist
+      - run: python -m pip install -U --user --force-reinstall twine
+      - run: python -m twine check dist/*
+
   pip-install:
     docker:
       - image: circleci/python:3.7
@@ -61,16 +87,16 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *apt-install
+      - run: *apt-install-sudo
       - run: *permission-run
       - run:
           name: Update pip
           command: pip install -U pip
       - run:
-          name: Install sunkit_image
+          name: Install SunPy
           command: |
             pip install --progress-bar off .[all,dev]
-            pip install --no-use-pep517 -e .[all,dev]
+            pip install -e .[all,dev]
             python setup.py develop
 
   figure-tests-37:
@@ -80,11 +106,10 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
+      - run: *apt-install
       - run: *tox-install
       - run: *tox-conda-install
-      - run: tox -e figure
-      - run: pip install codecov
-      - run: codecov
+      - run: *image-tests
       - store_artifacts:
           path: figure_test_images
       - run:
@@ -98,13 +123,12 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *apt-install
+      - run: *apt-install-sudo
       - run: *permission-run
       - run: *tox-install
       - run: tox -e build_docs
       - store_artifacts:
           path: docs/_build/html
-
       - run:
           name: "Built documentation is available at:"
           command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL
@@ -117,13 +141,17 @@ workflows:
       - egg-info-36
       - egg-info-37
 
-  figure-tests:
+  twine-check:
     jobs:
-      - figure-tests-37
+      - twine-check
 
   pip-install:
     jobs:
       - pip-install
+
+  figure-tests:
+    jobs:
+      - figure-tests-37
 
   test-documentation:
     jobs:

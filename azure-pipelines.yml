@@ -1,30 +1,50 @@
+name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
 variables:
-  Agent.Source.Git.ShallowFetchDepth: 1
   CI_NAME: Azure Pipelines
   CI_BUILD_ID: $(Build.BuildId)
-  CI_BUILD_URL: "https://dev.azure.com/sunpy/sunkit-image/_build/results?buildId=$(Build.BuildId)"
+  CI_BUILD_URL: "https://dev.azure.com/sunpy/sunkit_image/_build/results?buildId=$(Build.BuildId)"
+  CIBW_BUILD: cp36-* cp37-*
+  CIBW_SKIP: "*-win32 *-manylinux1_i686"
+  CIBW_TEST_COMMAND: pytest -p no:warnings --doctest-rst -m "not figure" --pyargs sunkit_image
+  CIBW_TEST_REQUIRES: sunpy pytest-astropy
+
+resources:
+  repositories:
+  - repository: sunpy
+    type: github
+    endpoint: sunpyorg
+    name: sunpy/azure-pipelines-template
+    ref: master
+
+trigger:
+  tags:
+    include:
+    - 'v*'
+    exclude:
+    - '*dev*'
+    - '*pre*'
+    - '*post*'
 
 jobs:
-- template: azure-templates.yml
+- template: run-tox-env.yml@sunpy
   parameters:
-    name: Linux_36_online
-    os: linux
-    tox: py36-online --
-
-- template: azure-templates.yml
-  parameters:
-    name: macOS_37_offline
+    name: Linux_37_offline
     os: macos
     tox: py37-offline --
 
-- template: azure-templates.yml
+- template: run-tox-env.yml@sunpy
   parameters:
     name: Windows_36_offline
     os: windows
     tox: py36-offline --
 
-- template: azure-templates.yml
+- template: run-tox-env.yml@sunpy
   parameters:
-    name: Linux_37_sunpydev
-    os: linux
-    tox: py37-sunpydev --
+    name: macOS_37_online
+    os: macos
+    tox: py37-online --
+
+- ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+  - template: publish-pypi.yml@sunpy
+    parameters:
+      dependsOn: [Linux_37_offline,Windows_36_offline,macOS_37_online]

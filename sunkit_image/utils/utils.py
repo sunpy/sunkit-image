@@ -7,8 +7,12 @@ import astropy.units as u
 from sunpy.coordinates import frames
 from sunpy.map.maputils import all_coordinates_from_map
 
-__all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii",
-           "get_radial_intensity_summary"]
+__all__ = [
+    "equally_spaced_bins",
+    "bin_edge_summary",
+    "find_pixel_radii",
+    "get_radial_intensity_summary",
+]
 
 
 def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
