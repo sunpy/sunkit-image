@@ -3,8 +3,8 @@ import numpy as np
 import sunkit_image.data.test as data
 from sunkit_image.flct import flct, vcimagein, vcimageout
 
-filepath1 = data.get_test_filepath("hashgauss_1.csv")
-filepath2 = data.get_test_filepath("hashgauss_2.csv")
+filepath1 = data.get_test_filepath("hashgauss_F1.csv")
+filepath2 = data.get_test_filepath("hashgauss_F2.csv")
 
 image1 = np.genfromtxt(filepath1, delimiter=",")
 image2 = np.genfromtxt(filepath2, delimiter=",")
