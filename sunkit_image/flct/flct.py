@@ -2,12 +2,12 @@ import numpy as np
 import math
 import struct
 
-from sunkit_image.flct import pyflctsubs
+from sunkit_image.flct import _pyflct
 
-__all__ = ["flct", ]
+__all__ = ["flct", "vcimageout", "vcimagein"]
 
 
-def vcimageout(data, filename='./input.dat'):
+def vcimageout(data, filename="./input.dat"):
     """
 
     """
@@ -23,54 +23,53 @@ def vcimageout(data, filename='./input.dat'):
         sizes.append(array.size)
     for v in sizes:
         if v != sizes[0]:
-            print('vcimage2out: dimensions or ranks of data ' +
-                  'do not match')
+            print("vcimage2out: dimensions or ranks of data " + "do not match")
             return None
     for v in shapes:
         if len(v) != 2 and sizes[0] > 1:
-            print('vcimage2out: input array is not 2d')
+            print("vcimage2out: input array is not 2d")
             return None
     # initial integer ID for a "vel_ccor" i/o file
-    vcid = int(2136967593).to_bytes(4, 'big')
+    vcid = int(2136967593).to_bytes(4, "big")
     if sizes[0] > 1:
         nx = int(data[0].shape[0])
         ny = int(data[0].shape[1])
     else:
         nx = int(1)
         ny = int(1)
-    nx = nx.to_bytes(4, 'big')
-    ny = ny.to_bytes(4, 'big')
-    f = open(filename, 'wb')
+    nx = nx.to_bytes(4, "big")
+    ny = ny.to_bytes(4, "big")
+    f = open(filename, "wb")
     f.write(vcid)
     f.write(nx)
     f.write(ny)
     for i in range(num):
         array = data[i]
-        for value in np.nditer(array, order='F'):
-            v = struct.pack('>f', value)
+        for value in np.nditer(array, order="F"):
+            v = struct.pack(">f", value)
             f.write(v)
 
     f.close()
 
 
-def vcimagein(filename='output.dat'):
-    '''
+def vcimagein(filename="output.dat"):
+    """
     Adapted from vcimage1/2/3out.pro in Fisher & Welsch 2008.
     Input: filename - name of C binary file
     Output: Return - a list containing arrays of data stored in that file.
-    '''
-    f = open(filename, 'rb')
-    vcid = struct.unpack('>i', f.read(4))[0]
+    """
+    f = open(filename, "rb")
+    vcid = struct.unpack(">i", f.read(4))[0]
     if vcid != 2136967593:
-        print('Input file is not a vel_coor i/o file')
+        print("Input file is not a vel_coor i/o file")
         f.close()
         return None
-    nx = struct.unpack('>i', f.read(4))[0]
-    ny = struct.unpack('>i', f.read(4))[0]
+    nx = struct.unpack(">i", f.read(4))[0]
+    ny = struct.unpack(">i", f.read(4))[0]
     data = f.read()
     f.close()
     # calculate number of files
-    num = int(len(data) / (4. * nx * ny))
+    num = int(len(data) / (4.0 * nx * ny))
     f.close()
     array = ()
     for k in range(num):
@@ -79,13 +78,12 @@ def vcimagein(filename='output.dat'):
         idx = offset
         # In the case when sigma is set to zero using FLCT
         if nx == 1 and ny == 1:
-            v = struct.unpack('>f', data[idx:idx+4])[0]
+            v = struct.unpack(">f", data[idx : idx + 4])[0]
             array = array + (v,)
         else:
-            it = np.nditer(dust, flags=["multi_index"],
-                           op_flags=["readwrite"], order='F')
+            it = np.nditer(dust, flags=["multi_index"], op_flags=["readwrite"], order="F")
             while not it.finished:
-                v = struct.unpack('>f', data[idx:idx+4])[0]
+                v = struct.unpack(">f", data[idx : idx + 4])[0]
                 dust[it.multi_index] = v
                 it.iternext()
                 idx = idx + 4
@@ -94,10 +92,24 @@ def vcimagein(filename='output.dat'):
     return array
 
 
-def flct(image1, image2, deltat, deltas, sigma, quiet=False,
-         biascor=False, thresh=0., skip=None, poff=0, qoff=0,
-         interp=False, kr=None, pc=False, latmin=0, latmax=0.2,
-         ):
+def flct(
+    image1,
+    image2,
+    deltat,
+    deltas,
+    sigma,
+    quiet=False,
+    biascor=False,
+    thresh=0.0,
+    skip=None,
+    poff=0,
+    qoff=0,
+    interp=False,
+    kr=None,
+    pc=False,
+    latmin=0,
+    latmax=0.2,
+):
     """
     A python wrapper which calls the FLCT C routines to perform Fourier Linear Correlation
     Tracking between two images taken at some interval of time.
@@ -193,11 +205,11 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
         skipon = 0
 
     if kr is not None:
-        if kr <= 0. or kr >= 20.:
+        if kr <= 0.0 or kr >= 20.0:
             raise ValueError("The value of kr must be between 0. and 20.")
         filter = 1
     else:
-        kr = 0.
+        kr = 0.0
         filter = 0
 
     # ibe = pyflctsubs.endian()
@@ -235,23 +247,79 @@ def flct(image1, image2, deltat, deltas, sigma, quiet=False,
     print(transp)
     print(image1)
     print(image2)
-    print(nxorig, nyorig,
-          deltat, deltas, sigma, vx, vy,
-          vm, thresh, absflag, filter, kr,
-          skip, poff, qoff, interp, latmin,
-          latmax, biascor, verbose)
+    print(
+        nxorig,
+        nyorig,
+        deltat,
+        deltas,
+        sigma,
+        vx,
+        vy,
+        vm,
+        thresh,
+        absflag,
+        filter,
+        kr,
+        skip,
+        poff,
+        qoff,
+        interp,
+        latmin,
+        latmax,
+        biascor,
+        verbose,
+    )
 
     if pc is True:
-        ierflct, vx_c, vy_c, vm_c = pyflctsubs.pyflct_plate_carree(transp, image1, image2, nxorig, nyorig,
-                                                                   deltat, deltas, sigma, vx, vy,
-                                                                   vm, thresh, absflag, filter, kr,
-                                                                   skip, poff, qoff, interp, latmin,
-                                                                   latmax, biascor, verbose)
+        ierflct, vx_c, vy_c, vm_c = _pyflct.pyflct_plate_carree(
+            transp,
+            image1,
+            image2,
+            nxorig,
+            nyorig,
+            deltat,
+            deltas,
+            sigma,
+            vx,
+            vy,
+            vm,
+            thresh,
+            absflag,
+            filter,
+            kr,
+            skip,
+            poff,
+            qoff,
+            interp,
+            latmin,
+            latmax,
+            biascor,
+            verbose,
+        )
     else:
-        ierflct, vx_c, vy_c, vm_c = pyflctsubs.pyflct(transp, image1, image2, nxorig, nyorig, deltat,
-                                                      deltas, sigma, vx, vy, vm, thresh, absflag,
-                                                      filter, kr, skip, poff, qoff, interp, biascor,
-                                                      verbose)
+        ierflct, vx_c, vy_c, vm_c = _pyflct.pyflct(
+            transp,
+            image1,
+            image2,
+            nxorig,
+            nyorig,
+            deltat,
+            deltas,
+            sigma,
+            vx,
+            vy,
+            vm,
+            thresh,
+            absflag,
+            filter,
+            kr,
+            skip,
+            poff,
+            qoff,
+            interp,
+            biascor,
+            verbose,
+        )
 
     # This is also not needed as numpy arrays are returned
     # outfile = b'output.dat'

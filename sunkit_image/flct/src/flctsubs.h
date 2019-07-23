@@ -32,10 +32,10 @@
 /* # define COMPLEXH 1 */
 
 # ifdef COMPLEXH
-   # include <complex.h>   
+   # include <complex.h>
 #endif
 
-# include <fftw3.h> 
+# include <fftw3.h>
 
 /* To write files deriv2.dat and deriv1.dat, containing 2nd derivatives of
 the cross-correlation function, and the peak value and first derivatives,
@@ -79,7 +79,7 @@ i4 read2images (char *fname, i4 * nx, i4 * ny, double **arr, double **barr,
         i4 transp);
 i4 where (char *cond, i4 xsize, i4 ** index, i4 * length_index);
 i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
-    double **absccor, i4 nx, i4 ny, double *shiftx, double *shifty, 
+    double **absccor, i4 nx, i4 ny, double *shiftx, double *shifty,
         i4 filterflag, double kr, double sigma);
 i4 writeimage (char *fname, double *arr, i4 nx, i4 ny, i4 transp);
 i4 write2images (char *fname, double *arr, double *barr, i4 nx, i4 ny,
@@ -92,7 +92,7 @@ i4 minloc (double *arr, i4 xsize);
 i4 iminloc (i4 * arr, i4 xsize);
 i4 imaxloc (i4 * arr, i4 xsize);
 double r (double t);
-i4 interpcc2d (double *fdata, double xmiss, i4 nx, i4 ny, 
+i4 interpcc2d (double *fdata, double xmiss, i4 nx, i4 ny,
 double *xwant, i4 nxinterp, double *ywant, i4 nyinterp, double **finterp);
 i4 gaussfilt(double *filter, double *kx, double *ky, i4 nx, i4 ny, double kr);
 i4 make_freq(double *k, i4 ndim);

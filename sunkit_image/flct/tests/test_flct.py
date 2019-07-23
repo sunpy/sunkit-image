@@ -2,7 +2,7 @@ import numpy as np
 
 import pytest
 
-from sunkit_image.flct.flct import flct
+from sunkit_image.flct import flct
 import sunkit_image.data as data
 
 
@@ -12,8 +12,8 @@ def images():
     filepath1 = data.get_test_filepath("hashgauss_1.csv")
     filepath2 = data.get_test_filepath("hashgauss_2.csv")
 
-    image1 = np.genfromtxt(filepath1, delimiter=',')
-    image2 = np.genfromtxt(filepath2, delimiter=',')
+    image1 = np.genfromtxt(filepath1, delimiter=",")
+    image2 = np.genfromtxt(filepath2, delimiter=",")
 
     return (image1, image2)
 
@@ -25,9 +25,9 @@ def outputs():
     filepath_y = data.get_test_filepath("testgauss_vy.csv")
     filepath_m = data.get_test_filepath("testgauss_vm.csv")
 
-    expect_x = np.genfromtxt(filepath_x, delimiter=',')
-    expect_y = np.genfromtxt(filepath_y, delimiter=',')
-    expect_m = np.genfromtxt(filepath_m, delimiter=',')
+    expect_x = np.genfromtxt(filepath_x, delimiter=",")
+    expect_y = np.genfromtxt(filepath_y, delimiter=",")
+    expect_m = np.genfromtxt(filepath_m, delimiter=",")
 
     return (expect_x, expect_y, expect_m)
 

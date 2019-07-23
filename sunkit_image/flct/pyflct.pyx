@@ -1,3 +1,4 @@
+# cython: language_level=3
 import numpy as np
 cimport numpy as np
 from cython cimport view
@@ -27,7 +28,7 @@ cdef extern from "./src/flctsubs.h":
             int transp)
     int where (char *cond, int xsize, int ** index, int * length_index)
     int cross_cor (int init, int hires, int expand, double *arr, double *barr,
-        double **absccor, int nx, int ny, double *shiftx, double *shifty, 
+        double **absccor, int nx, int ny, double *shiftx, double *shifty,
         int filterflag, double kr, double sigma)
     int writeimage (char *fname, double *arr, int nx, int ny, int transp)
     int write2images (char *fname, double *arr, double *barr, int nx, int ny,
@@ -40,7 +41,7 @@ cdef extern from "./src/flctsubs.h":
     int iminloc (int * arr, int xsize)
     int imaxloc (int * arr, int xsize)
     double r (double t)
-    int interpcc2d (double *fdata, double xmiss, int nx, int ny, 
+    int interpcc2d (double *fdata, double xmiss, int nx, int ny,
         double *xwant, int nxinterp, double *ywant, int nyinterp, double **finterp)
     int gaussfilt(double *filter, double *kx, double *ky, int nx, int ny, double kr)
     int make_freq(double *k, int ndim)
@@ -101,7 +102,7 @@ def read_to_images(file_name, transpose=0):
     cdef int ny
     cdef double *arr
     cdef double *barr
-    
+
     ier = read2images(file_name, &nx, &ny, &arr, &barr, transpose)
 
     cdef view.array cy_arr = <double[:nx, :ny]> arr
@@ -122,7 +123,7 @@ def endian():
     return is_large_endian ()
 
 
-def pyflct_plate_carree(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma, 
+def pyflct_plate_carree(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
                       vx, vy, vm, thresh, absflag, filter, kr, skip, poffset,
                       qoffset, interpolate, latmin, latmax, biascor, verbose
 ):
@@ -136,11 +137,11 @@ def pyflct_plate_carree(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma
                       deltas, sigma, <double *> vx_c.data, <double *> vy_c.data, <double *> vm_c.data,
                       thresh, absflag, filter, kr, skip, poffset, qoffset, interpolate, latmin, latmax,
                       biascor, verbose)
-    
+
     return ierflct, vx_c, vy_c, vm_c
 
 
-def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma, 
+def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
            vx, vy, vm, thresh, absflag, filter, kr, skip,
            poffset, qoffset, interpolate, biascor, verbose
 ):
@@ -153,5 +154,5 @@ def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
     ierflct = flct(transpose, <double *> f1_c.data, <double *> f2_c.data, nxorig, nyorig, deltat,
                    deltas, sigma, <double *> vx_c.data, <double *> vy_c.data, <double *> vm_c.data,
                    thresh, absflag, filter, kr, skip, poffset, qoffset, interpolate, biascor, verbose)
-    
+
     return ierflct, vx_c, vy_c, vm_c
