@@ -105,6 +105,7 @@ def flct(
     quiet=False,
     biascor=False,
     thresh=0.0,
+    absflag=False,
     skip=None,
     poff=0,
     qoff=0,
@@ -190,10 +191,10 @@ def flct(
     else:
         biascor = 1
 
-    if thresh != 0.0:
-        absflag = 1
-    else:
+    if absflag is False:
         absflag = 0
+    else:
+        absflag = 1
 
     if interp is False:
         interp = 0
@@ -218,6 +219,11 @@ def flct(
     else:
         kr = 0.0
         filter = 0
+
+    if(poff < 0):
+        poff = skip - math.abs(poff)
+    if(qoff < 0):
+        qoff = skip - math.abs(qoff)
 
     # ibe = pyflctsubs.endian()
 
