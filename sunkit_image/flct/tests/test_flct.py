@@ -26,7 +26,7 @@ def images():
 def images_dat():
 
     filepath1 = data.get_test_filepath("hashgauss.dat")
-    ier, nx, ny, arr, barr = pyflct.read_two_images(filepath1)
+    ier, arr, barr = pyflct.read_two_images(filepath1)
 
     # The arrays are directly read from the dat files using the python functions
     # so there is no need to swap their order as they are already in row major.
@@ -37,7 +37,7 @@ def images_dat():
 def outputs_dat():
 
     filepath1 = data.get_test_filepath("testgaussvel.dat")
-    ier, nx, ny, arr, barr, carr = pyflct.read_three_images(filepath1)
+    ier, arr, barr, carr = pyflct.read_three_images(filepath1)
 
     # The arrays are directly read from the dat files using the python functions
     # so there is no need to swap their order as they are already in row major.
@@ -63,20 +63,20 @@ def outputs():
 
 
 @skip_windows
-def test_pyflct(images, images_dat, outputs_dat, outputs):
-
-    vx, vy, vm = flct(images_dat[0], images_dat[0], "row", 1, 1, 5, kr=0.5)
-    print(images_dat[0])
-    print(images_dat[1])
-    print(vy)
-    print(outputs_dat[0])
-
-    assert np.allclose(vx, outputs_dat[0])
-    assert np.allclose(vy, outputs_dat[1])
-    assert np.allclose(vm, outputs_dat[2])
+def test_flct_array(images, outputs):
 
     vx, vy, vm = flct(images[0], images[1], "column", 1, 1, 5, kr=0.5)
 
     assert np.allclose(vx, outputs[0], atol=1e-5, rtol=1e-6)
     assert np.allclose(vy, outputs[1], atol=1e-5, rtol=1e-6)
     assert np.allclose(vm, outputs[2], atol=1e-5, rtol=1e-6)
+
+
+@skip_windows
+def test_flct_dat(images_dat, outputs_dat):
+
+    vx, vy, vm = flct(images_dat[0], images_dat[1], "row", 1, 1, 5, kr=0.5)
+
+    assert np.allclose(vx, outputs_dat[0])
+    assert np.allclose(vy, outputs_dat[1])
+    assert np.allclose(vm, outputs_dat[2])

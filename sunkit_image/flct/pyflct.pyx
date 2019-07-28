@@ -43,7 +43,7 @@ def read_two_images(file_name, transpose=0):
     a = np.array(cy_arr)
     b = np.array(cy_barr)
 
-    return (ier, nx, ny, a, b)
+    return (ier, a, b)
 
 def read_three_images(file_name, transpose=0):
 
@@ -64,10 +64,16 @@ def read_three_images(file_name, transpose=0):
     b = np.array(cy_barr)
     c = np.array(cy_carr)
 
-    return (ier, nx, ny, a, b, c)
+    return (ier, a, b, c)
 
 
-def write_two_images(file_name, arr, barr, nx, ny, transpose):
+def write_two_images(file_name, arr, barr, transpose=0):
+
+    nx, ny = arr.shape
+
+    arr = arr.reshape((-1))
+    barr = barr.reshape((-1))
+
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] arr_c = np.ascontiguousarray(arr, dtype = np.double)
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] barr_c = np.ascontiguousarray(barr, dtype = np.double)
 
@@ -75,17 +81,20 @@ def write_two_images(file_name, arr, barr, nx, ny, transpose):
     ier = write2images(file_name, <double *> arr_c.data, <double *> barr_c.data, nx, ny, transpose)
 
 
-def write_three_images(file_name, arr, barr, carr, nx, ny, transpose):
+def write_three_images(file_name, arr, barr, carr, transpose=0):
+
+    nx, ny = arr.shape
+
+    arr = arr.reshape((-1))
+    barr = barr.reshape((-1))
+    carr = carr.reshape((-1))
+
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] arr_c = np.ascontiguousarray(arr, dtype = np.double)
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] barr_c = np.ascontiguousarray(barr, dtype = np.double)
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] carr_c = np.ascontiguousarray(carr, dtype = np.double)
 
     file_name = file_name.encode('utf-8')
     ier = write3images(file_name, <double *> arr_c.data, <double *> barr_c.data, <double *> carr_c.data, nx, ny, transpose)
-
-
-def endian():
-    return is_large_endian ()
 
 
 def pyflct_plate_carree(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
@@ -124,14 +133,10 @@ def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
 
 # This is created to deal with the arrays which were first read by IDL
 def swap_order_two(arr, barr):
-    
-    nx, ny = arr.shape
-    arr = arr.reshape((-1))
-    barr = barr.reshape((-1))
 
-    write_two_images("temp.dat", arr, barr, nx, ny, 0)    
+    write_two_images("temp.dat", arr, barr, 0)    
 
-    ier, nx, ny, cy_arr, cy_barr = read_two_images("temp.dat", transpose=1)
+    ier, cy_arr, cy_barr = read_two_images("temp.dat", transpose=1)
     os.remove("temp.dat")
 
     a = np.array(cy_arr)
