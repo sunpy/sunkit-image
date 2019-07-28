@@ -1,4 +1,5 @@
 # cython: language_level=3
+import os
 import numpy as np
 cimport numpy as np
 from cython cimport view
@@ -18,31 +19,68 @@ cdef extern from "./src/flctsubs.h":
         double thresh, int absflag, int filter, double kr, int skip,
         int poffset, int qoffset, int interpolate, double latmin, double latmax,
         int biascor, int verbose)
+    int write2images (char *fname, double *arr, double *barr, int nx, int ny, int transp)
+    int read3images (char *fname, int * nx, int * ny, double **arr, double **barr,
+	     double **carr, int transp)
 
 np.import_array()
 cdef extern from "numpy/arrayobject.h":
     void PyArray_ENABLEFLAGS(np.ndarray arr, int flags)
 
-def read_to_images(file_name, transpose=0):
+def read_two_images(file_name, transpose=0):
 
     cdef int nx
     cdef int ny
     cdef double *arr
     cdef double *barr
+    file_name = file_name.encode('utf-8')
 
     ier = read2images(file_name, &nx, &ny, &arr, &barr, transpose)
 
     cdef view.array cy_arr = <double[:nx, :ny]> arr
     cdef view.array cy_barr = <double[:nx, :ny]> barr
 
-    return (ier, nx, ny, cy_arr, cy_barr)
+    a = np.array(cy_arr)
+    b = np.array(cy_barr)
+
+    return (ier, nx, ny, a, b)
+
+def read_three_images(file_name, transpose=0):
+
+    cdef int nx
+    cdef int ny
+    cdef double *arr
+    cdef double *barr
+    cdef double *carr
+    file_name = file_name.encode('utf-8')
+
+    ier = read3images(file_name, &nx, &ny, &arr, &barr, &carr,transpose)
+
+    cdef view.array cy_arr = <double[:nx, :ny]> arr
+    cdef view.array cy_barr = <double[:nx, :ny]> barr
+    cdef view.array cy_carr = <double[:nx, :ny]> carr
+
+    a = np.array(cy_arr)
+    b = np.array(cy_barr)
+    c = np.array(cy_carr)
+
+    return (ier, nx, ny, a, b, c)
 
 
-def write_3_images(file_name, arr, barr, carr, nx, ny, transpose):
+def write_two_images(file_name, arr, barr, nx, ny, transpose):
+    cdef np.ndarray[np.double_t, ndim=1, mode="c"] arr_c = np.ascontiguousarray(arr, dtype = np.double)
+    cdef np.ndarray[np.double_t, ndim=1, mode="c"] barr_c = np.ascontiguousarray(barr, dtype = np.double)
+
+    file_name = file_name.encode('utf-8')
+    ier = write2images(file_name, <double *> arr_c.data, <double *> barr_c.data, nx, ny, transpose)
+
+
+def write_three_images(file_name, arr, barr, carr, nx, ny, transpose):
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] arr_c = np.ascontiguousarray(arr, dtype = np.double)
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] barr_c = np.ascontiguousarray(barr, dtype = np.double)
     cdef np.ndarray[np.double_t, ndim=1, mode="c"] carr_c = np.ascontiguousarray(carr, dtype = np.double)
 
+    file_name = file_name.encode('utf-8')
     ier = write3images(file_name, <double *> arr_c.data, <double *> barr_c.data, <double *> carr_c.data, nx, ny, transpose)
 
 
@@ -83,3 +121,32 @@ def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
                    thresh, absflag, filter, kr, skip, poffset, qoffset, interpolate, biascor, verbose)
 
     return ierflct, vx_c, vy_c, vm_c
+
+# This is created to deal with the arrays which were first read by IDL
+def swap_order_two(arr, barr):
+    
+    nx, ny = arr.shape
+    arr = arr.reshape((-1))
+    barr = barr.reshape((-1))
+
+    write_two_images("temp.dat", arr, barr, nx, ny, 0)    
+
+    ier, nx, ny, cy_arr, cy_barr = read_two_images("temp.dat", transpose=1)
+    os.remove("temp.dat")
+
+    a = np.array(cy_arr)
+    b = np.array(cy_barr)
+
+    return a, b
+
+
+def swap_order_three(arr, barr, carr):
+    
+    temp = np.zeros_like(arr)
+
+    arr, barr = swap_order_two(arr,barr)
+    carr, temp = swap_order_two(carr, temp)
+
+    del temp
+
+    return arr, barr, carr

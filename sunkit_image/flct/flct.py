@@ -8,97 +8,13 @@ try:
 except ImportError:
     _pyflct = None
 
-__all__ = ["flct", "vcimageout", "vcimagein"]
-
-
-def vcimageout(data, filename="./input.dat"):
-    """
-
-    """
-
-    # Perform size and shape check
-    num = len(data)
-    shapes = []
-    sizes = []
-    for i in range(num):
-        array = data[i]
-        array = np.array(array, dtype=np.float32)
-        shapes.append(array.shape)
-        sizes.append(array.size)
-    for v in sizes:
-        if v != sizes[0]:
-            print("vcimage2out: dimensions or ranks of data " + "do not match")
-            return None
-    for v in shapes:
-        if len(v) != 2 and sizes[0] > 1:
-            print("vcimage2out: input array is not 2d")
-            return None
-    # initial integer ID for a "vel_ccor" i/o file
-    vcid = int(2136967593).to_bytes(4, "big")
-    if sizes[0] > 1:
-        nx = int(data[0].shape[0])
-        ny = int(data[0].shape[1])
-    else:
-        nx = int(1)
-        ny = int(1)
-    nx = nx.to_bytes(4, "big")
-    ny = ny.to_bytes(4, "big")
-    f = open(filename, "wb")
-    f.write(vcid)
-    f.write(nx)
-    f.write(ny)
-    for i in range(num):
-        array = data[i]
-        for value in np.nditer(array, order="F"):
-            v = struct.pack(">f", value)
-            f.write(v)
-
-    f.close()
-
-
-def vcimagein(filename="output.dat"):
-    """
-    Adapted from vcimage1/2/3out.pro in Fisher & Welsch 2008.
-    Input: filename - name of C binary file
-    Output: Return - a list containing arrays of data stored in that file.
-    """
-    f = open(filename, "rb")
-    vcid = struct.unpack(">i", f.read(4))[0]
-    if vcid != 2136967593:
-        print("Input file is not a vel_coor i/o file")
-        f.close()
-        return None
-    nx = struct.unpack(">i", f.read(4))[0]
-    ny = struct.unpack(">i", f.read(4))[0]
-    data = f.read()
-    f.close()
-    # calculate number of files
-    num = int(len(data) / (4.0 * nx * ny))
-    f.close()
-    array = ()
-    for k in range(num):
-        dust = np.zeros((nx, ny), dtype=np.float32)
-        offset = nx * ny * k * 4
-        idx = offset
-        # In the case when sigma is set to zero using FLCT
-        if nx == 1 and ny == 1:
-            v = struct.unpack(">f", data[idx : idx + 4])[0]
-            array = array + (v,)
-        else:
-            it = np.nditer(dust, flags=["multi_index"], op_flags=["readwrite"], order="F")
-            while not it.finished:
-                v = struct.unpack(">f", data[idx : idx + 4])[0]
-                dust[it.multi_index] = v
-                it.iternext()
-                idx = idx + 4
-            array = array + (dust,)
-
-    return array
+__all__ = ["flct",]
 
 
 def flct(
     image1,
     image2,
+    order,
     deltat,
     deltas,
     sigma,
@@ -119,12 +35,31 @@ def flct(
     A python wrapper which calls the FLCT C routines to perform Fourier Linear Correlation
     Tracking between two images taken at some interval of time.
 
+    .. note::
+
+        * In the references there are some dat files which can be used to test the FLCT code. The
+          best method to read those dat files is the `_pyflct.read_two_images` and `_pyflct.read_three_images`
+          as the arrays would automatically be read in row major format.
+        * If you use the IDL IO routines to get the input arrays from dat files as mentioned on the
+          FLCT README given in the references, the IDL routines always read the binary files in the
+          column major, but both python and C, on which these functions are based row major so the
+          order of the arrays have to be changed and read from the binary files in row major order.
+          This may lead to different values in both the cases.
+        * The above has already been taken care of in this module. If your input arrays are column
+          major then pass the `order` parameter as `column` and it will automatically take care of
+          the order change and values. But this can produce some changes in the values of the arrays
+        * If you have arrays in row major then you can pass `order` parameter as `row` and no order
+          change will be performed.
+
     Parameters
     ----------
     image1 : `numpy.ndarray`
         The first image of the sequence of two images on which the procedure is to be perfromed.
     image2 : `numpy.ndarray`
         The second image of the sequence of two images taken after `deltat` time of the first one.
+    order : `string`
+        The order in which the array elements are stored that is whether they are stored as row
+        major or column major.
     deltat : `float`
         The time interval between the capture of the two images.
     deltas : `float`
@@ -139,8 +74,14 @@ def flct(
         If set to `True` bias correction will be applied while computing the velocities.
     thresh : `float`
         The threshold value below which if the average absolute value of pixel values for a certain
-        pixel in both the images, falls the FLCT calculation will not be done for that pixel.
+        pixel in both the images, falls the FLCT calculation will not be done for that pixel.  If
+        thresh is between 0 and 1, thresh is assumed given in units relative to the largest
+        absolute value of the image averages.
         Defaults to 0.
+    absflag : `bool`
+        This is set to `True` to force the `thresh` values between 0 and 1 to be considered in the
+        absolute terms.
+        Defaults to False.
     skip : `int`
         The number of pixels to be skipped in the x and y direction after each calculation of a
         velocity for a pixel.
@@ -178,8 +119,18 @@ def flct(
       http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/
     """
 
+    # Checking whether the C extension is correctly built.
     if _pyflct is None:
         raise ImportError("C extension for flct is missing, please rebuild.")
+
+    if order != "row" and order != "column":
+        raise ValueError("The order of the arrays is not correctly specifed. It can only be 'row' or 'column'")
+
+    # If order is column then order swap is performed.
+    if order is "column":
+        image1, image2 = _pyflct.swap_order_two(image1, image2)
+        image1 = np.array(image1)
+        image2 = np.array(image2)
 
     if quiet is True:
         verbose = 0
@@ -225,17 +176,6 @@ def flct(
     if(qoff < 0):
         qoff = skip - math.abs(qoff)
 
-    # ibe = pyflctsubs.endian()
-
-    # The below statements are not needed since we are taking numpy arrays as imput
-    # vcimageout((image1, image2))
-    # infile = b'input.dat'
-
-    # ier, nx, ny, f1, f2 = pyflctsubs.read_to_images(infile, 0)
-
-    # image1 = np.array(f1)
-    # image2 = np.array(f2)
-
     nx = image1.shape[0]
     ny = image2.shape[1]
 
@@ -255,33 +195,6 @@ def flct(
     vx = np.zeros((nx * ny,), dtype=float)
     vy = np.zeros((nx * ny,), dtype=float)
     vm = np.zeros((nx * ny,), dtype=float)
-
-    print("All inputs")
-    print(transp)
-    print(image1)
-    print(image2)
-    print(
-        nxorig,
-        nyorig,
-        deltat,
-        deltas,
-        sigma,
-        vx,
-        vy,
-        vm,
-        thresh,
-        absflag,
-        filter,
-        kr,
-        skip,
-        poff,
-        qoff,
-        interp,
-        latmin,
-        latmax,
-        biascor,
-        verbose,
-    )
 
     if pc is True:
         ierflct, vx_c, vy_c, vm_c = _pyflct.pyflct_plate_carree(
@@ -333,10 +246,6 @@ def flct(
             biascor,
             verbose,
         )
-
-    # This is also not needed as numpy arrays are returned
-    # outfile = b'output.dat'
-    # pyflctsubs.write_3_images(outfile, vx_c, vy_c, vm_c, nx, ny, transp)
 
     vx_c = vx_c.reshape((nxorig, nyorig))
     vy_c = vy_c.reshape((nxorig, nyorig))

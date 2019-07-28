@@ -143,5 +143,7 @@ void shift_frac2d_f77_(double *arr, double *delx, double *dely, double *outarr,
     i4 *nx, i4 *ny, i4 *transp, i4 *verbose);
 void shift_frac2d_f77__(double *arr, double *delx, double *dely, double *outarr,
     i4 *nx, i4 *ny, i4 *transp, i4 *verbose);
+i4 read3images (char *fname, i4 * nx, i4 * ny, double **arr, double **barr,
+	     double **carr, i4 transp);
 
 /* end function prototypes */
