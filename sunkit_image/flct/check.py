@@ -2,7 +2,7 @@ import sunkit_image.flct._pyflct as pyflct
 import numpy as np
 
 import sunkit_image.data.test as data
-from sunkit_image.flct import flct, vcimagein, vcimageout
+from sunkit_image.flct import flct
 
 # Test 1 : The recommended method to read the data
 # C functions wrapped in python are used for IO.
@@ -38,7 +38,7 @@ expect_x = np.genfromtxt(filepath_x, delimiter=",")
 expect_y = np.genfromtxt(filepath_y, delimiter=",")
 expect_m = np.genfromtxt(filepath_m, delimiter=",")
 
-# Since these CSV files were created by reading the dat file on FLCT website
+# Since these CSV files were created by reading the dat file using IDL
 # their order needs to be rectified.
 expect_x, expect_y, expect_m = pyflct.swap_order_three(expect_x, expect_y, expect_m)
 
@@ -46,6 +46,6 @@ outputs = (expect_x, expect_y, expect_m)
 
 vx, vy, vm = flct(images[0], images[1], "column", 1, 1, 5, kr=0.5)
 
-assert np.allclose(vx, outputs[0])
-assert np.allclose(vy, outputs[1])
-assert np.allclose(vm, outputs[2])
+assert np.allclose(vx, outputs[0], atol=1e-5, rtol=1e-6)
+assert np.allclose(vy, outputs[1], atol=1e-5, rtol=1e-6)
+assert np.allclose(vm, outputs[2], atol=1e-5, rtol=1e-6)

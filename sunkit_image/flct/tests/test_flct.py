@@ -11,8 +11,8 @@ import sunkit_image.flct._pyflct as pyflct
 @pytest.fixture
 def images():
 
-    filepath1 = data.get_test_filepath("hashgauss_1.csv")
-    filepath2 = data.get_test_filepath("hashgauss_2.csv")
+    filepath1 = data.get_test_filepath("hashgauss_F1.csv")
+    filepath2 = data.get_test_filepath("hashgauss_F2.csv")
 
     # These CSV files were created using the IDL IO routines but their order is
     # is not swapped here because we will do it in the flct function.
@@ -20,6 +20,28 @@ def images():
     image2 = np.genfromtxt(filepath2, delimiter=",")
 
     return (image1, image2)
+
+
+@pytest.fixture
+def images_dat():
+
+    filepath1 = data.get_test_filepath("hashgauss.dat")
+    ier, nx, ny, arr, barr = pyflct.read_two_images(filepath1)
+
+    # The arrays are directly read from the dat files using the python functions
+    # so there is no need to swap their order as they are already in row major.
+    return (arr, barr)
+
+
+@pytest.fixture
+def outputs_dat():
+
+    filepath1 = data.get_test_filepath("testgaussvel.dat")
+    ier, nx, ny, arr, barr, carr = pyflct.read_three_images(filepath1)
+
+    # The arrays are directly read from the dat files using the python functions
+    # so there is no need to swap their order as they are already in row major.
+    return (arr, barr, carr)
 
 
 @pytest.fixture
@@ -41,10 +63,20 @@ def outputs():
 
 
 @skip_windows
-def test_pyflct(images, outputs):
+def test_pyflct(images, images_dat, outputs_dat, outputs):
+
+    vx, vy, vm = flct(images_dat[0], images_dat[0], "row", 1, 1, 5, kr=0.5)
+    print(images_dat[0])
+    print(images_dat[1])
+    print(vy)
+    print(outputs_dat[0])
+
+    assert np.allclose(vx, outputs_dat[0])
+    assert np.allclose(vy, outputs_dat[1])
+    assert np.allclose(vm, outputs_dat[2])
 
     vx, vy, vm = flct(images[0], images[1], "column", 1, 1, 5, kr=0.5)
 
-    assert np.allclose(vx, outputs[0])
-    assert np.allclose(vy, outputs[1])
-    assert np.allclose(vm, outputs[2])
+    assert np.allclose(vx, outputs[0], atol=1e-5, rtol=1e-6)
+    assert np.allclose(vy, outputs[1], atol=1e-5, rtol=1e-6)
+    assert np.allclose(vm, outputs[2], atol=1e-5, rtol=1e-6)
