@@ -9,11 +9,13 @@ to read and write arrays to binary `dat` files.
 
 import numpy as np
 
+# TODO: This to be imported directly
 import sunkit_image.flct._pyflct as pyflct
 
 ###########################################################################
 # We will create three dummy arrays which will help us demonstrate read
 # and write to a `dat` file.
+# TODO: Add more explanation to the dat files.
 
 a = np.zeros((4, 4))
 b = np.ones((4, 4))
@@ -34,7 +36,9 @@ pyflct.write_three_images("three.dat", a, b, c)
 # files, the ones which were written using `pyflct.write_two_images`,
 # `pyflct.read_three_images` and the IDL IO routines as given on the
 # FLCT website.
+# TODO: Add a link to the IDL routines
 
+# TODO: Get rid of the flags
 # Reading two arrays from a `dat` file
 flag, one, two = pyflct.read_two_images("two.dat")
 

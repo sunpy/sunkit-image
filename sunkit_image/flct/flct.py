@@ -1,6 +1,6 @@
 import math
 import struct
-
+# TODO: Remove the above two imports and use numpy for abs
 import numpy as np
 
 try:
@@ -50,6 +50,7 @@ def flct(
           the order change and values. But this can produce some changes in the values of the arrays
         * If you have arrays in row major then you can pass `order` parameter as `row` and no order
           change will be performed.
+          # TODO: Merge some of the points
 
     Parameters
     ----------
@@ -72,12 +73,14 @@ def flct(
         Defaults to `False`.
     biascor : `bool`
         If set to `True` bias correction will be applied while computing the velocities.
+        # TODO: Explain biascor
     thresh : `float`
         The threshold value below which if the average absolute value of pixel values for a certain
         pixel in both the images, falls the FLCT calculation will not be done for that pixel.  If
         thresh is between 0 and 1, thresh is assumed given in units relative to the largest
         absolute value of the image averages.
         Defaults to 0.
+        # TODO: Better explanation of threshold
     absflag : `bool`
         This is set to `True` to force the `thresh` values between 0 and 1 to be considered in the
         absolute terms.
@@ -98,6 +101,7 @@ def flct(
     kr : `float`
         Filter sub-images.
         Defaults to `None`
+        # TODO: More info about kr
     pc : `bool`
         Set to `True` if the images are in Plate Carree.
         Defaults to `False`.
@@ -112,6 +116,7 @@ def flct(
     -------
     `tuple`
         A tuple containing the velocity arrays in the following order vx, vy, and vm.
+        # TODO: Explain about the arrays
 
     References
     ----------
@@ -123,6 +128,7 @@ def flct(
     if _pyflct is None:
         raise ImportError("C extension for flct is missing, please rebuild.")
 
+    # TODO: Test this
     if order != "row" and order != "column":
         raise ValueError("The order of the arrays is not correctly specifed. It can only be 'row' or 'column'")
 
@@ -179,9 +185,6 @@ def flct(
     nx = image1.shape[0]
     ny = image2.shape[1]
 
-    nxorig = nx
-    nyorig = ny
-
     if sigma == 0:
         nx = 1
         ny = 1
@@ -190,6 +193,7 @@ def flct(
         if skip >= nx or skip >= ny:
             raise ValueError("Skip is greater than the input dimensions")
 
+    # TODO: Add comments about this
     transp = 1
 
     vx = np.zeros((nx * ny,), dtype=float)
@@ -247,8 +251,9 @@ def flct(
             verbose,
         )
 
-    vx_c = vx_c.reshape((nxorig, nyorig))
-    vy_c = vy_c.reshape((nxorig, nyorig))
-    vm_c = vm_c.reshape((nxorig, nyorig))
+    # TODO:Explain the reshape
+    vx_c = vx_c.reshape((nx, ny))
+    vy_c = vy_c.reshape((nx, ny))
+    vm_c = vm_c.reshape((nx, ny))
 
     return (vx_c, vy_c, vm_c)

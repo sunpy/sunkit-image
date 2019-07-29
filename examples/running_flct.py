@@ -27,6 +27,7 @@ flag, image1, image2 = pyflct.read_two_images(filepath)
 
 # Since the input arrays were stored in a row major format, `row` was passed
 # as the `order`
+# TODO More explanation on the order
 vel_x, vel_y, vel_m = flct(image1, image2, "row", 1, 1, 5, kr=0.5)
 
 ###########################################################################
