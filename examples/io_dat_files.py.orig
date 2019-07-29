@@ -13,8 +13,13 @@ import numpy as np
 import sunkit_image.flct._pyflct as pyflct
 
 ###########################################################################
-# We will create three arrays which we will save out to a ``dat`` file. 
+<<<<<<< HEAD
+# We will create three dummy arrays which will help us demonstrate read
+# and write to a `dat` file.
 # TODO: Add more explanation to the dat files.
+=======
+# We will create three arrays which we will save out to a ``dat`` file. 
+>>>>>>> af7bcde0cc4381be77934530d0df829f2fc1ca90
 
 a = np.zeros((4, 4))
 b = np.ones((4, 4))
@@ -34,11 +39,16 @@ pyflct.write_three_images("three.dat", a, b, c)
 # It is to be noted that these read functions can only read ``dat``
 # files, the ones which were written using `pyflct.write_two_images`,
 # `pyflct.read_three_images` and the IDL IO routines as given on the
+<<<<<<< HEAD
 # FLCT website.
 # TODO: Add a link to the IDL routines
 
 # TODO: Get rid of the flags
+# Reading two arrays from a `dat` file
+=======
+
 # Reading two arrays from a dat file
+>>>>>>> af7bcde0cc4381be77934530d0df829f2fc1ca90
 flag, one, two = pyflct.read_two_images("two.dat")
 
 # Reading three arrays from a dat file

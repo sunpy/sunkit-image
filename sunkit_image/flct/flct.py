@@ -32,18 +32,18 @@ def flct(
     latmax=0.2,
 ):
     """
-    A python wrapper which calls the FLCT C routines to perform Fourier Linear Correlation
-    Tracking between two images taken at some interval of time.
+    A Python wrapper which call the FLCT C routines to perform Fourier Linear Correlation
+    Tracking between two images.
 
     .. note::
 
         * In the references there are some dat files which can be used to test the FLCT code. The
           best method to read those dat files is the `_pyflct.read_two_images` and `_pyflct.read_three_images`
           as the arrays would automatically be read in row major format.
-        * If you use the IDL IO routines to get the input arrays from dat files as mentioned on the
-          FLCT README given in the references, the IDL routines always read the binary files in the
-          column major, but both python and C, on which these functions are based row major so the
-          order of the arrays have to be changed and read from the binary files in row major order.
+        * If you use the IDL IO routines to get the input arrays from ``dat`` files,
+          the IDL routines always read the binary files in the
+          column major, but both Python and C, on which these functions are row major so the
+          order of the arrays have to be changed which can be done with the keyword.
           This may lead to different values in both the cases.
         * The above has already been taken care of in this module. If your input arrays are column
           major then pass the `order` parameter as `column` and it will automatically take care of
@@ -55,21 +55,21 @@ def flct(
     Parameters
     ----------
     image1 : `numpy.ndarray`
-        The first image of the sequence of two images on which the procedure is to be perfromed.
+        The first image of the sequence of two images on which the procedure is to be performed.
     image2 : `numpy.ndarray`
-        The second image of the sequence of two images taken after `deltat` time of the first one.
-    order : `string`
+        The second image of the sequence of two images taken after ``deltat`` time of the first one.
+    order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
     deltat : `float`
-        The time interval between the capture of the two images.
+        The time interval between the two images.
     deltas : `float`
         Units of length of the side of a single pixel
     sigma : `float`
-        The width of Gaussian kernel with which the images are to be modulated. If sigma is `0` then
+        The width of Gaussian kernel with which the images are to be modulated. If sigma is ``0`` then
         the overall shift between the images is returned.
     quiet : `bool`
-        If set to `True` all the error messages of FLCT C code will be supressed.
+        If set to `True` all the error messages of FLCT C code will be suppressed.
         Defaults to `False`.
     biascor : `bool`
         If set to `True` bias correction will be applied while computing the velocities.
@@ -77,23 +77,23 @@ def flct(
     thresh : `float`
         The threshold value below which if the average absolute value of pixel values for a certain
         pixel in both the images, falls the FLCT calculation will not be done for that pixel.  If
-        thresh is between 0 and 1, thresh is assumed given in units relative to the largest
-        absolute value of the image averages.
+        ``thresh`` is between 0 and 1, ``thresh`` is assumed given in units relative to the largest
+        absolute value of the image average.
         Defaults to 0.
         # TODO: Better explanation of threshold
     absflag : `bool`
-        This is set to `True` to force the `thresh` values between 0 and 1 to be considered in the
+        This is set to `True` to force the ``thresh`` values between 0 and 1 to be considered in
         absolute terms.
         Defaults to False.
     skip : `int`
-        The number of pixels to be skipped in the x and y direction after each calculation of a
+        The number of pixels to be skipped in the ``x`` and ``y`` direction after each calculation of a
         velocity for a pixel.
         Defaults to `None`.
     poff : `int`
-        The offset in x direction after skip is enabled.
+        The offset in "x" direction after ``skip`` is enabled.
         Defaults to 0.
     qoff : `int`
-        The offset in y direction after skip is enabled.
+        The offset in "y" direction after ``skip`` is enabled.
         Defaults to 0.
     interp : `bool`
         If set to `True` interpolation will be performed at the skipped pixels.
@@ -103,34 +103,31 @@ def flct(
         Defaults to `None`
         # TODO: More info about kr
     pc : `bool`
-        Set to `True` if the images are in Plate Carree.
+        Set to `True` if the images are Plate Carrée projected.
         Defaults to `False`.
     latmin : `float`
         Lower latitude limit in radians.
         Defaults to 0.
     latmax : `float`
         Upper latitude limit in radians.
-        Defaults to 0.2
+        Defaults to 0.2.
 
     Returns
     -------
     `tuple`
-        A tuple containing the velocity arrays in the following order vx, vy, and vm.
-        # TODO: Explain about the arrays
+        A tuple containing the velocity `~numpy.ndarray` in the following order ``vx``, ``vy``, and ``vm``.
 
     References
     ----------
-    * The FLCT software package which can be found here:
-      http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/
+    * The FLCT software package which can be found `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
     """
 
     # Checking whether the C extension is correctly built.
     if _pyflct is None:
         raise ImportError("C extension for flct is missing, please rebuild.")
 
-    # TODO: Test this
-    if order != "row" and order != "column":
-        raise ValueError("The order of the arrays is not correctly specifed. It can only be 'row' or 'column'")
+    if order.lower() not in ["row", "column"]:
+        raise ValueError("The order of the arrays is not correctly specified. It can only be 'row' or 'column'")
 
     # If order is column then order swap is performed.
     if order is "column":
@@ -164,14 +161,14 @@ def flct(
         skipon = skip + math.abs(qoff) + math.abs(poff)
 
         if math.abs(poff) >= skip or math.abs(qoff) >= skip:
-            raise ValueError("The absolute value of poff and qoff must be less than skip")
+            raise ValueError("The absolute value of "poff" and "qoff" must be less than skip.")
     else:
         skip = 0
         skipon = 0
 
     if kr is not None:
         if kr <= 0.0 or kr >= 20.0:
-            raise ValueError("The value of kr must be between 0. and 20.")
+            raise ValueError("The value of "kr" must be between 0 and 20.")
         filter = 1
     else:
         kr = 0.0
