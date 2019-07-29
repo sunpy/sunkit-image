@@ -22,7 +22,7 @@ filepath = data.get_test_filepath("hashgauss.dat")
 flag, image1, image2 = pyflct.read_two_images(filepath)
 
 ###########################################################################
-# Now coming to the main function where flct is applied. We will pass the
+# Now we come to the main function where FLCT is applied. We will pass the
 # above read arrays to `sunkit_image.flct.flct`
 
 # Since the input arrays were stored in a row major format, `row` was passed
