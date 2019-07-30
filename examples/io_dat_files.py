@@ -9,12 +9,14 @@ to read and write arrays to binary ``dat`` files.
 
 import numpy as np
 
-# TODO: This to be imported directly
-import sunkit_image.flct._pyflct as pyflct
+import sunkit_image.flct as flct
 
 ###########################################################################
-# We will create three arrays which we will save out to a ``dat`` file. 
-# TODO: Add more explanation to the dat files.
+# We will create three arrays which we will save out to a ``dat`` file.
+# The original FLCT C code works only on dat files for both input and
+# output. So these functions can be used to read pre-existing ``dat`` files
+# and writing new files which keeps your current work compatible with the
+# existing one.
 
 a = np.zeros((4, 4))
 b = np.ones((4, 4))
@@ -24,25 +26,24 @@ c = np.arange(16).reshape((4, 4))
 # First, we will demonstrate writing to a ``dat`` file.
 
 # We can write two arrays to `dat` file using `pyflct.write_two_images`
-pyflct.write_two_images("two.dat", a, b)
+flct.write_2_images("two.dat", a, b)
 
 # Three arrays can also be written to a `dat` file using `pyflct.write_three_images`
-pyflct.write_three_images("three.dat", a, b, c)
+flct.write_3_images("three.dat", a, b, c)
 
 ###########################################################################
 # We can get back these arrays by using the read functions in `pyflct`
 # It is to be noted that these read functions can only read ``dat``
 # files, the ones which were written using `pyflct.write_two_images`,
 # `pyflct.read_three_images` and the IDL IO routines as given on the
-# FLCT website.
-# TODO: Add a link to the IDL routines
+# FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__..
 
-# TODO: Get rid of the flags
+
 # Reading two arrays from a dat file
-flag, one, two = pyflct.read_two_images("two.dat")
+one, two = flct.read_2_images("two.dat")
 
 # Reading three arrays from a dat file
-flag, one, two, three = pyflct.read_three_images("three.dat")
+one, two, three = flct.read_3_images("three.dat")
 
 ###########################################################################
 # We can verify that the arrays written and the arrays we read in are the same.

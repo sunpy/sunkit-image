@@ -1,2 +1,2 @@
-Added a subpackage (`sunkit_image.flct`) for applying Fourier Linear Coorelation Tracking
+Added a subpackage (`sunkit_image.flct`) for applying Fourier Local Coorelation Tracking
 between two images (`numpy.ndarray`) taken in a very close interval of each other.

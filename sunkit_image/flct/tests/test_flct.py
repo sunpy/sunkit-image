@@ -1,13 +1,68 @@
 import numpy as np
 import pytest
+import os
 
 from sunpy.tests.helpers import skip_windows
 
 import sunkit_image.data.test as data
-from sunkit_image.flct import flct
-import sunkit_image.flct._pyflct as pyflct
+import sunkit_image.flct as flct
 
 
+# Testing the FLCT subroutines
+@pytest.fixture
+def arrays_test():
+
+    a = np.zeros((4, 4))
+    b = np.ones((4, 4))
+    c = np.zeros((4, 4))
+
+    return (a, b, c)
+
+
+def test_two_read_write(arrays_test):
+
+    file_name = "temp.dat"
+
+    flct.write_2_images(file_name, arrays_test[0], arrays_test[1])
+
+    arr, barr = flct.read_2_images(file_name)
+
+    os.remove(file_name)
+
+    assert np.allclose(arr, np.zeros((4, 4)))
+    assert np.allclose(barr, np.ones((4, 4)))
+
+
+def test_three_read_write(arrays_test):
+
+    file_name = "temp.dat"
+
+    flct.write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2])
+
+    arr, barr, carr = flct.read_3_images(file_name)
+
+    os.remove(file_name)
+
+    assert np.allclose(arr, np.zeros((4, 4)))
+    assert np.allclose(barr, np.ones((4, 4)))
+    assert np.allclose(carr, np.zeros((4, 4)))
+
+
+def test_swaps(arrays_test):
+
+    result_a, result_b = flct.column_row_of_two(arrays_test[0], arrays_test[1])
+
+    assert np.allclose(result_a, arrays_test[0])
+    assert np.allclose(result_b, arrays_test[1])
+
+    result_a, result_b, result_c = flct.column_row_of_three(arrays_test[0], arrays_test[1], arrays_test[2])
+
+    assert np.allclose(result_a, arrays_test[0])
+    assert np.allclose(result_b, arrays_test[1])
+    assert np.allclose(result_c, arrays_test[2])
+
+
+# Testing the main FLCT function
 @pytest.fixture
 def images():
 
@@ -26,7 +81,7 @@ def images():
 def images_dat():
 
     filepath1 = data.get_test_filepath("hashgauss.dat")
-    ier, arr, barr = pyflct.read_two_images(filepath1)
+    arr, barr = flct.read_2_images(filepath1)
 
     # The arrays are directly read from the dat files using the python functions
     # so there is no need to swap their order as they are already in row major.
@@ -37,7 +92,7 @@ def images_dat():
 def outputs_dat():
 
     filepath1 = data.get_test_filepath("testgaussvel.dat")
-    ier, arr, barr, carr = pyflct.read_three_images(filepath1)
+    arr, barr, carr = flct.read_3_images(filepath1)
 
     # The arrays are directly read from the dat files using the python functions
     # so there is no need to swap their order as they are already in row major.
@@ -57,7 +112,7 @@ def outputs():
 
     # Since these CSV files were created by reading the dat file on FLCT website
     # their order needs to be rectified.
-    expect_x, expect_y, expect_m = pyflct.swap_order_three(expect_x, expect_y, expect_m)
+    expect_x, expect_y, expect_m = flct.column_row_of_three(expect_x, expect_y, expect_m)
 
     return (expect_x, expect_y, expect_m)
 
@@ -65,7 +120,7 @@ def outputs():
 @skip_windows
 def test_flct_array(images, outputs):
 
-    vx, vy, vm = flct(images[0], images[1], "column", 1, 1, 5, kr=0.5)
+    vx, vy, vm = flct.flct(images[0], images[1], "column", 1, 1, 5, kr=0.5)
 
     assert np.allclose(vx, outputs[0], atol=1e-5, rtol=1e-6)
     assert np.allclose(vy, outputs[1], atol=1e-5, rtol=1e-6)
@@ -75,7 +130,7 @@ def test_flct_array(images, outputs):
 @skip_windows
 def test_flct_dat(images_dat, outputs_dat):
 
-    vx, vy, vm = flct(images_dat[0], images_dat[1], "row", 1, 1, 5, kr=0.5)
+    vx, vy, vm = flct.flct(images_dat[0], images_dat[1], "row", 1, 1, 5, kr=0.5)
 
     assert np.allclose(vx, outputs_dat[0])
     assert np.allclose(vy, outputs_dat[1])

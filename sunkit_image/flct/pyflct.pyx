@@ -80,6 +80,8 @@ def write_two_images(file_name, arr, barr, transpose=0):
     file_name = file_name.encode('utf-8')
     ier = write2images(file_name, <double *> arr_c.data, <double *> barr_c.data, nx, ny, transpose)
 
+    return ier
+
 
 def write_three_images(file_name, arr, barr, carr, transpose=0):
 
@@ -96,6 +98,7 @@ def write_three_images(file_name, arr, barr, carr, transpose=0):
     file_name = file_name.encode('utf-8')
     ier = write3images(file_name, <double *> arr_c.data, <double *> barr_c.data, <double *> carr_c.data, nx, ny, transpose)
 
+    return ier
 
 def pyflct_plate_carree(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
                       vx, vy, vm, thresh, absflag, filter, kr, skip, poffset,
@@ -134,7 +137,7 @@ def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
 # This is created to deal with the arrays which were first read by IDL
 def swap_order_two(arr, barr):
 
-    write_two_images("temp.dat", arr, barr, 0)    
+    ier = write_two_images("temp.dat", arr, barr, 0)    
 
     ier, cy_arr, cy_barr = read_two_images("temp.dat", transpose=1)
     os.remove("temp.dat")
