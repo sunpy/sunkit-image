@@ -3,7 +3,7 @@
 Input/Output of dat files for FLCT
 ==================================
 
-This example demostrates the use of functions in `sunkit_image.flct._pyflct`
+This example demostrates the use of functions in `sunkit_image.flct`
 to read and write arrays to binary ``dat`` files.
 """
 
