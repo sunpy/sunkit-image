@@ -295,10 +295,11 @@ def flct(
     deltat : `float`
         The time interval between the two images.
     deltas : `float`
-        Units of length of the side of a single pixel
+        Units of length of the side of a single pixel. Velocity is computed in units of deltas/deltat.
     sigma : `float`
-        The width of Gaussian kernel with which the images are to be modulated. If sigma is ``0`` then
-        the overall shift between the images is returned.
+        The width of Gaussian kernel with which the images are to be modulated. Sub-images are weighted
+        by Gaussian of width sigma. If sigma is ``0`` then the overall shift between the images is
+        returned.
     quiet : `bool`
         If set to `True` all the error messages of FLCT C code will be suppressed.
         Defaults to `False`.
@@ -311,9 +312,9 @@ def flct(
     thresh : `float`
         The FLCT calculations will not be done for a particular pixel if the average absolute value
         between the two images is less than `thresh` at that particular pixel. The average absolute
-        value is calculated by taking the average of absolute value of intensity at that particular
-        pixel. If ``thresh`` is between 0 and 1, ``thresh`` is assumed given in units relative to
-        the largest absolute value of the image average.
+        value is calculated by taking the average of absolute value of intensity in both the images
+        at that particular pixel. If ``thresh`` is between 0 and 1, ``thresh`` is assumed given in
+        units relative to the largest absolute value of the image average.
         Defaults to 0.
     absflag : `bool`
         This is set to `True` to force the ``thresh`` values between 0 and 1 to be considered in
@@ -333,9 +334,10 @@ def flct(
         If set to `True` interpolation will be performed at the skipped pixels.
         Defaults to `False`.
     kr : `float`
-        Filter sub-images.
+        Apply a low-pass filter to the sub-images, with a Gaussian of a characteristic wavenumber
+        that is a factor of kr times the largest possible wave numbers in x, y directions.
+        kr should be positive. 
         Defaults to `None`
-        # TODO: More info about kr
     pc : `bool`
         Set to `True` if the images are Plate Carrée projected.
         Defaults to `False`.
