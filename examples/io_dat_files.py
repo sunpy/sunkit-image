@@ -25,17 +25,17 @@ c = np.arange(16).reshape((4, 4))
 ###########################################################################
 # First, we will demonstrate writing to a ``dat`` file.
 
-# We can write two arrays to `dat` file using `pyflct.write_two_images`
+# We can write two arrays to `dat` file using `flct.write_2_images`
 flct.write_2_images("two.dat", a, b)
 
-# Three arrays can also be written to a `dat` file using `pyflct.write_three_images`
+# Three arrays can also be written to a `dat` file using `flct.write_3_images`
 flct.write_3_images("three.dat", a, b, c)
 
 ###########################################################################
-# We can get back these arrays by using the read functions in `pyflct`
+# We can get back these arrays by using the read functions in `sunkit_image.flct`
 # It is to be noted that these read functions can only read ``dat``
-# files, the ones which were written using `pyflct.write_two_images`,
-# `pyflct.read_three_images` and the IDL IO routines as given on the
+# files, the ones which were written using `flct.write_2_images`,
+# `flct.read_3_images` and the IDL IO routines as given on the
 # FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__..
 
 
