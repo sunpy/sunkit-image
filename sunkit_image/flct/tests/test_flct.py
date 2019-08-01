@@ -32,6 +32,20 @@ def test_two_read_write(arrays_test):
     assert np.allclose(arr, np.zeros((4, 4)))
     assert np.allclose(barr, np.ones((4, 4)))
 
+    order = "random"
+
+    with pytest.raises(ValueError) as record:
+        flct.write_2_images(file_name, arrays_test[0], arrays_test[1], order)
+
+    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+
+    order = "random"
+
+    with pytest.raises(ValueError) as record:
+        _ = flct.read_2_images(file_name, order)
+
+    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+
 
 def test_three_read_write(arrays_test):
 
@@ -46,6 +60,20 @@ def test_three_read_write(arrays_test):
     assert np.allclose(arr, np.zeros((4, 4)))
     assert np.allclose(barr, np.ones((4, 4)))
     assert np.allclose(carr, np.zeros((4, 4)))
+
+    order = "random"
+
+    with pytest.raises(ValueError) as record:
+        flct.write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2], order)
+
+    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+
+    order = "random"
+
+    with pytest.raises(ValueError) as record:
+        _ = flct.read_3_images(file_name, order)
+
+    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
 
 
 def test_swaps(arrays_test):
@@ -126,6 +154,13 @@ def test_flct_array(images, outputs):
     assert np.allclose(vy, outputs[1], atol=1e-5, rtol=1e-6)
     assert np.allclose(vm, outputs[2], atol=1e-5, rtol=1e-6)
 
+    order = "random"
+
+    with pytest.raises(ValueError) as record:
+        _ = flct.flct(images[0], images[1], order, 1, 1, 5, kr=0.5)
+
+    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+
 
 @skip_windows
 def test_flct_dat(images_dat, outputs_dat):
@@ -135,3 +170,10 @@ def test_flct_dat(images_dat, outputs_dat):
     assert np.allclose(vx, outputs_dat[0])
     assert np.allclose(vy, outputs_dat[1])
     assert np.allclose(vm, outputs_dat[2])
+
+    order = "random"
+
+    with pytest.raises(ValueError) as record:
+        _ = flct.flct(images_dat[0], images_dat[1], order, 1, 1, 5, kr=0.5)
+
+    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
