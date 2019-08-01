@@ -16,6 +16,9 @@ import sunkit_image.data.test as data
 ###########################################################################
 # First we need to get the input images which will be read by the
 # `flct.read_two_images` from a `dat` file stored in `sunkit_image.data.test`
+# Here in this example we are using a pre-existing dat file directly from
+# the FLCT website. This is to show that this module is capable of working
+# with pre-existing files also.
 
 filepath = data.get_test_filepath("hashgauss.dat")
 image1, image2 = flct.read_2_images(filepath)
@@ -25,8 +28,8 @@ image1, image2 = flct.read_2_images(filepath)
 # above read arrays to `sunkit_image.flct.flct`
 
 # Since the input arrays were stored in a row major format, so no swapping
-# needs to take place as a result `row` was passed as the `order`
-vel_x, vel_y, vm = flct.flct(image1, image2, "row", 1, 1, 5, kr=0.5)
+# needs to take place.
+vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 5, kr=0.5)
 
 ###########################################################################
 # The return values are the two dimensional velocity field with `vel_x`

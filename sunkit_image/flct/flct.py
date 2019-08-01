@@ -96,7 +96,7 @@ def read_3_images(filename, order="row"):
     ier, a, b, c = _pyflct.read_three_images(filename, transp)
 
     if ier is not 1:
-        raise ValueError("The file was not read correctly. Please check the file")
+        raise ValueError("The file was not read correctly. Please check the file.")
 
     else:
         return a, b, c
@@ -117,10 +117,6 @@ def write_2_images(filename, array1, array2, order="row"):
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
-
-    Returns
-    -------
-    A dat file of the ``filename`` is created in the current directory without returning anything.
     """
 
     # Checking whether the C extension is correctly built.
@@ -158,10 +154,6 @@ def write_3_images(filename, array1, array2, array3, order="row"):
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
-
-    Returns
-    -------
-    A dat file of the ``filename`` is created in the current directory without returning anything.
     """
 
     # Checking whether the C extension is correctly built.
@@ -247,17 +239,17 @@ def column_row_of_three(array1, array2, array3):
 def flct(
     image1,
     image2,
-    order,
     deltat,
     deltas,
     sigma,
+    order="row",
     quiet=False,
     biascor=False,
     thresh=0.0,
     absflag=False,
     skip=None,
-    poff=0,
-    qoff=0,
+    xoff=0,
+    yoff=0,
     interp=False,
     kr=None,
     pc=False,
@@ -267,7 +259,6 @@ def flct(
     """
     Performs Fourier Local Correlation Tracking by calling the FLCT C library.
     
-
     .. note::
 
         * In the references there are some dat files which can be used to test the FLCT code. The
@@ -289,17 +280,18 @@ def flct(
         The first image.
     image2 : `numpy.ndarray`
         The second image taken after ``deltat`` time of the first one.
+    deltat : `float`
+        The time interval between the two images in seconds. 
+    deltas : `float`
+        Units of length of the side of a single pixel. Velocity is computed in units of ``deltas``/``deltat``.
+    sigma : `float`
+        Sub-images are weighted by Gaussian of width `sigma`. Results can depend on value of `sigma`.
+        The user must experiment to determine best choice of `sigma`. If `sigma` is set to 0, only
+        single values of shifts are returned. These values correspond to the overall shifts between the two images.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
-    deltat : `float`
-        The time interval between the two images.
-    deltas : `float`
-        Units of length of the side of a single pixel. Velocity is computed in units of ``deltas``/``deltat``.
-    sigma : `float`, optional
-        The width of Gaussian kernel with which the images are to be modulated. Sub-images are weighted
-        by Gaussian of width sigma. If sigma is ``0`` then the overall shift between the images is
-        returned.
+        Defaults to `row`.
     quiet : `bool`, optional
         If set to `True` all the error messages of FLCT C code will be suppressed.
         Defaults to `False`.
@@ -312,7 +304,7 @@ def flct(
         A calculation will not be done for a pixel if the average absolute value
         between the two images is less than ``thresh``.
         If ``thresh`` is between 0 and 1, ``thresh`` is assumed given in
-       in relative units of the maximum absolute pixel value in the average of the two images.
+        in relative units of the maximum absolute pixel value in the average of the two images.
         Defaults to 0.
     absflag : `bool`, optional
         This is set to `True` to force the ``thresh`` values between 0 and 1 to be considered in
@@ -322,10 +314,10 @@ def flct(
         The number of pixels to be skipped in the ``x`` and ``y`` direction after each calculation of a
         velocity for a pixel.
         Defaults to `None`.
-    poff : `int`, optional
+    xoff : `int`, optional
         The offset in "x" direction after ``skip`` is enabled.
         Defaults to 0.
-    qoff : `int`, optional
+    yoff : `int`, optional
         The offset in "y" direction after ``skip`` is enabled.
         Defaults to 0.
     interp : `bool`, optional
@@ -397,10 +389,10 @@ def flct(
     if skip is not None:
         if skip <= 0:
             raise ValueError("Skip value must be greater than zero.")
-        skipon = skip + np.abs(qoff) + np.abs(poff)
+        skipon = skip + np.abs(yoff) + np.abs(xoff)
 
-        if np.abs(poff) >= skip or np.abs(qoff) >= skip:
-            raise ValueError("The absolute value of 'poff' and 'qoff' must be less than skip.")
+        if np.abs(xoff) >= skip or np.abs(yoff) >= skip:
+            raise ValueError("The absolute value of 'xoff' and 'yoff' must be less than skip.")
     else:
         skip = 0
         skipon = 0
@@ -413,10 +405,10 @@ def flct(
         kr = 0.0
         filter = 0
 
-    if(poff < 0):
-        poff = skip - np.abs(poff)
-    if(qoff < 0):
-        qoff = skip - np.abs(qoff)
+    if(xoff < 0):
+        xoff = skip - np.abs(xoff)
+    if(yoff < 0):
+        yoff = skip - np.abs(yoff)
 
     nx = image1.shape[0]
     ny = image2.shape[1]
@@ -432,9 +424,9 @@ def flct(
     # This takes care of the order transformations in the C code.
     transp = 1
 
-    vx = np.zeros((nx * ny,), dtype=float)
-    vy = np.zeros((nx * ny,), dtype=float)
-    vm = np.zeros((nx * ny,), dtype=float)
+    vx = np.zeros((nx * ny,), dtype=np.float64)
+    vy = np.zeros((nx * ny,), dtype=np.float64)
+    vm = np.zeros((nx * ny,), dtype=np.float64)
 
     if pc is True:
         ierflct, vx_c, vy_c, vm_c = _pyflct.pyflct_plate_carree(
@@ -454,8 +446,8 @@ def flct(
             filter,
             kr,
             skip,
-            poff,
-            qoff,
+            xoff,
+            yoff,
             interp,
             latmin,
             latmax,
@@ -480,8 +472,8 @@ def flct(
             filter,
             kr,
             skip,
-            poff,
-            qoff,
+            xoff,
+            yoff,
             interp,
             biascor,
             verbose,
