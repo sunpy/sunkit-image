@@ -16,17 +16,17 @@ __all__ = ["flct",
 
 def read_2_images(filename, order="row"):
     """
-    A python function to read two arrays of the same size from ``dat`` files.
+    Reads two arrays of the same size from a ``dat`` file.
 
     .. note ::
         This function can be used to read only special arrays which were written
         using the ``write`` functions in `~sunkit_image.flct` or the IDL IO routines
-        as given on the FLCT source `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+        as given on the FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
 
     Parameters
     ----------
-    filename : `string`
-        The name of ``dat`` file from where the arrays are to be read.
+    filename : `str`
+        The name of ``dat`` file.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
@@ -34,7 +34,7 @@ def read_2_images(filename, order="row"):
     Returns
     -------
     `tuple`
-        A tuple containing two `~numpy.ndarray` arrays.
+        A tuple containing two `~numpy.ndarray`.
     """
 
     # Checking whether the C extension is correctly built.
@@ -52,7 +52,7 @@ def read_2_images(filename, order="row"):
     ier, a, b = _pyflct.read_two_images(filename, transp)
 
     if ier is not 1:
-        raise ValueError("The file was not read correctly. Please check the file")
+        raise ValueError("The file was not read correctly. Please check the file.")
 
     else:
         return a, b
@@ -60,7 +60,7 @@ def read_2_images(filename, order="row"):
 
 def read_3_images(filename, order="row"):
     """
-    A python function to read three arrays of the same size from ``dat`` files.
+    Read three arrays of the same size from a ``dat`` file.
 
     .. note ::
         This function can be used to read only special arrays which were written
@@ -69,8 +69,8 @@ def read_3_images(filename, order="row"):
 
     Parameters
     ----------
-    filename : `string`
-        The name of ``dat`` file from where the arrays are to be read.
+    filename : `str`
+        The name of ``dat`` file.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
@@ -78,7 +78,7 @@ def read_3_images(filename, order="row"):
     Returns
     -------
     `tuple`
-        A tuple containing three `~numpy.ndarray` arrays.
+        A tuple containing three `~numpy.ndarray`.
     """
 
     # Checking whether the C extension is correctly built.
@@ -104,16 +104,16 @@ def read_3_images(filename, order="row"):
 
 def write_2_images(filename, array1, array2, order="row"):
     """
-    A python function to write two arrays of the same size to a ``dat`` file.
+    Write two arrays of the same size to a ``dat`` file.
 
     Parameters
     ----------
-    filename : `string`
-        The name of ``dat`` file in which the arrays are to be stored.
+    filename : `str`
+        The name of ``dat`` file.
     array1 : `numpy.ndarray`
-        The first array to be stored in the dat file.
+        The first array to be stored.
     array2 : `numpy.ndarray`
-        The second array to be stored in the dat file.
+        The second array to be stored.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
@@ -143,18 +143,18 @@ def write_2_images(filename, array1, array2, order="row"):
 
 def write_3_images(filename, array1, array2, array3, order="row"):
     """
-    A python function to write three arrays of the same size to a ``dat`` file.
+    Write three arrays of the same size to a ``dat`` file.
 
     Parameters
     ----------
     filename : `string`
-        The name of ``dat`` file in which the arrays are to be stored.
+        The name of ``dat`` file.
     array1 : `numpy.ndarray`
-        The first array to be stored in the dat file.
+        The first array to be stored.
     array2 : `numpy.ndarray`
-        The second array to be stored in the dat file.
+        The second array to be stored.
     array3 : `numpy.ndarray`
-        The third array to be stored in the dat file.
+        The third array to be stored.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
@@ -184,8 +184,8 @@ def write_3_images(filename, array1, array2, array3, order="row"):
 
 def column_row_of_two(array1, array2):
     """
-    A function which takes two arrays and swaps the order in which they were stored i.e. changing
-    from column major to row major and ``not`` the vice-versa. This may change the values stored in
+    Takes two arrays and swaps the order in which they were stored i.e. changing
+    from column major to row major and **not** the vice-versa. This may change the values stored in
     the array as the arrays are first converted to a binary format and then the order change takes
     place.
 
@@ -214,8 +214,8 @@ def column_row_of_two(array1, array2):
 
 def column_row_of_three(array1, array2, array3):
     """
-    A function which takes two arrays and swaps the order in which they were stored i.e. changing
-    from column major to row major and ``not`` the vice-versa. This may change the values stored in
+    Takes three arrays and swaps the order in which they were stored i.e. changing
+    from column major to row major and **not** the vice-versa. This may change the values stored in
     the array as the arrays are first converted to a binary format and then the order change takes
     place.
 
@@ -265,8 +265,8 @@ def flct(
     latmax=0.2,
 ):
     """
-    A Python wrapper which call the FLCT C routines to perform Fourier Local Correlation
-    Tracking between two images.
+    Performs Fourier Local Correlation Tracking by calling the FLCT C library.
+    
 
     .. note::
 
@@ -286,66 +286,64 @@ def flct(
     Parameters
     ----------
     image1 : `numpy.ndarray`
-        The first image of the sequence of two images on which the procedure is to be performed.
+        The first image.
     image2 : `numpy.ndarray`
-        The second image of the sequence of two images taken after ``deltat`` time of the first one.
+        The second image taken after ``deltat`` time of the first one.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
     deltat : `float`
         The time interval between the two images.
     deltas : `float`
-        Units of length of the side of a single pixel. Velocity is computed in units of deltas/deltat.
-    sigma : `float`
+        Units of length of the side of a single pixel. Velocity is computed in units of ``deltas``/``deltat``.
+    sigma : `float`, optional
         The width of Gaussian kernel with which the images are to be modulated. Sub-images are weighted
         by Gaussian of width sigma. If sigma is ``0`` then the overall shift between the images is
         returned.
-    quiet : `bool`
+    quiet : `bool`, optional
         If set to `True` all the error messages of FLCT C code will be suppressed.
         Defaults to `False`.
-    biascor : `bool`
+    biascor : `bool`, optional
         If set to `True` bias correction will be applied while computing the velocities.
-        This bias is intrinsic to the FLCT algorithm. Due to this it underestimates the velocities
-        during calculations.  The bias correction algorithm that is implemented uses the Hessian
-        determinant, and the assumed value of sigma, to adjust the x-and-y velocities. For more
+        This bias is intrinsic to the FLCT algorithm and can underestimate the velocities
+        during calculations. For more
         details visit `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/flct_1.06/doc/bias_correction_in_flct.txt>`__.
-    thresh : `float`
-        The FLCT calculations will not be done for a particular pixel if the average absolute value
-        between the two images is less than `thresh` at that particular pixel. The average absolute
-        value is calculated by taking the average of absolute value of intensity in both the images
-        at that particular pixel. If ``thresh`` is between 0 and 1, ``thresh`` is assumed given in
-        units relative to the largest absolute value of the image average.
+    thresh : `float`, optional
+        A calculation will not be done for a pixel if the average absolute value
+        between the two images is less than ``thresh``.
+        If ``thresh`` is between 0 and 1, ``thresh`` is assumed given in
+       in relative units of the maximum absolute pixel value in the average of the two images.
         Defaults to 0.
-    absflag : `bool`
+    absflag : `bool`, optional
         This is set to `True` to force the ``thresh`` values between 0 and 1 to be considered in
         absolute terms.
         Defaults to False.
-    skip : `int`
+    skip : `int`, optional
         The number of pixels to be skipped in the ``x`` and ``y`` direction after each calculation of a
         velocity for a pixel.
         Defaults to `None`.
-    poff : `int`
+    poff : `int`, optional
         The offset in "x" direction after ``skip`` is enabled.
         Defaults to 0.
-    qoff : `int`
+    qoff : `int`, optional
         The offset in "y" direction after ``skip`` is enabled.
         Defaults to 0.
-    interp : `bool`
+    interp : `bool`, optional
         If set to `True` interpolation will be performed at the skipped pixels.
         Defaults to `False`.
-    kr : `float`
+    kr : `float`, optional
         Apply a low-pass filter to the sub-images, with a Gaussian of a characteristic wavenumber
-        that is a factor of kr times the largest possible wave numbers in x, y directions.
-        kr should be positive. 
+        that is a factor of ``kr`` times the largest possible wave numbers in "x", "y" directions.
+        ``kr`` should be positive. 
         Defaults to `None`
-    pc : `bool`
+    pc : `bool`, optional
         Set to `True` if the images are Plate Carrée projected.
         Defaults to `False`.
-    latmin : `float`
-        Lower latitude limit in radians.
+    latmin : `float`, optional
+        Lower latitude limit in radians, used with ``pc``.
         Defaults to 0.
-    latmax : `float`
-        Upper latitude limit in radians.
+    latmax : `float`, optional
+        Upper latitude limit in radians, used with ``pc``.
         Defaults to 0.2.
 
     Returns

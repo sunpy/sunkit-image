@@ -25,10 +25,10 @@ c = np.arange(16).reshape((4, 4))
 ###########################################################################
 # First, we will demonstrate writing to a ``dat`` file.
 
-# We can write two arrays to `dat` file using `flct.write_2_images`
+# We can write two arrays to dat file using flct.write_2_images
 flct.write_2_images("two.dat", a, b)
 
-# Three arrays can also be written to a `dat` file using `flct.write_3_images`
+# Three arrays can also be written to a dat file using flct.write_3_images
 flct.write_3_images("three.dat", a, b, c)
 
 ###########################################################################
@@ -37,7 +37,6 @@ flct.write_3_images("three.dat", a, b, c)
 # files, the ones which were written using `flct.write_2_images`,
 # `flct.read_3_images` and the IDL IO routines as given on the
 # FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__..
-
 
 # Reading two arrays from a dat file
 one, two = flct.read_2_images("two.dat")
