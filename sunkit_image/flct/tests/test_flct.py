@@ -32,6 +32,15 @@ def test_two_read_write(arrays_test):
     assert np.allclose(arr, np.zeros((4, 4)))
     assert np.allclose(barr, np.ones((4, 4)))
 
+    flct.write_2_images(file_name, arrays_test[0], arrays_test[1], order="column")
+
+    arr, barr = flct.read_2_images(file_name, order="column")
+
+    os.remove(file_name)
+
+    assert np.allclose(arr, np.zeros((4, 4)))
+    assert np.allclose(barr, np.ones((4, 4)))
+
     order = "random"
 
     with pytest.raises(ValueError) as record:
@@ -54,6 +63,16 @@ def test_three_read_write(arrays_test):
     flct.write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2])
 
     arr, barr, carr = flct.read_3_images(file_name)
+
+    os.remove(file_name)
+
+    assert np.allclose(arr, np.zeros((4, 4)))
+    assert np.allclose(barr, np.ones((4, 4)))
+    assert np.allclose(carr, np.zeros((4, 4)))
+
+    flct.write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2], order="column")
+
+    arr, barr, carr = flct.read_3_images(file_name, order="column")
 
     os.remove(file_name)
 
@@ -186,10 +205,10 @@ def test_flct_array(images, outputs):
     # parameters also. We did not have any values to compare our results against so this is why
     # these tests are at the end such that only after all the valid tests are passed then these
     # are executed. These are not tests in the strictest sense rather it is designed to increase
-    # the test coverage
+    # the test coverage for lines containing the setting of optional arguments.
 
-    _ = flct.flct(images[0], images[1], 1, 1, 0, kr=0.5, quiet=True, absflag=True, biascor=True, pc=True,)
-
+    _ = flct.flct(images[0], images[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True)
+    _ = flct.flct(images[0], images[1], 1, 1, 4, skip=4, interp=True, quiet=True, absflag=True, biascor=True, pc=True, xoff=-2, yoff=-2)
     assert True
 
 
@@ -234,8 +253,8 @@ def test_flct_dat(images_dat, outputs_dat):
     # parameters also. We did not have any values to compare our results against so this is why
     # these tests are at the end such that only after all the valid tests are passed then these
     # are executed. These are not tests in the strictest sense rather it is designed to increase
-    # the test coverage
+    # the test coverage for lines containing the setting of optional arguments.
 
-    _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 0, kr=0.5, quiet=True, absflag=True, biascor=True, pc=True,)
-
+    _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True)
+    _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 4, skip=4, interp=True, quiet=True, absflag=True, biascor=True, pc=True, xoff=-2, yoff=-2)
     assert True
