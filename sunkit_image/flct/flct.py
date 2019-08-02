@@ -283,6 +283,24 @@ def flct(
         * If your input arrays are column major then pass the `order` parameter as `column` and it
           will automatically take care of the order change. But this can produce some changes in
           the values of the arrays.
+    
+    .. note::
+
+        * `flct` is unable to find flows that are normal to image gradients. This
+          is a defect of the LCT concept.
+        * `flct` cannot determine velocities on scales below the scale size of
+          structures in the images. This is a defect of the LCT concept.
+        * Images that have minimal structure can give nonsensical velocity
+          results.
+        * Results can depend on value of ``sigma``. User must experiment to determine 
+          best choice of ``sigma``.
+        * Velocities corresponding to shifts less than 0.1-0.2 pixels are not
+          always detected. It may be necessary to increase the amount of time
+          between images, depending on the noise level in the images. Sometimes
+          using the filtering option helps.
+        * Velocities computed within ``sigma`` pixels of the image edges can be unreliable.
+        * Noisy images can result in spurious velocity results unless a suitable
+          threshold value ``thresh`` is chosen.
 
     Parameters
     ----------
