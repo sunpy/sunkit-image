@@ -29,8 +29,10 @@ jobs:
 - template: run-tox-env.yml@sunpy
   parameters:
     name: Linux_37_offline
-    os: macos
+    os: linux
     tox: py37-offline --
+    jp2: True
+    fftw: True
 
 - template: run-tox-env.yml@sunpy
   parameters:
@@ -43,6 +45,8 @@ jobs:
     name: macOS_37_online
     os: macos
     tox: py37-online --
+    jp2: True
+    fftw: True
 
 - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
   - template: publish-pypi.yml@sunpy

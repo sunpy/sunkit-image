@@ -1,12 +1,15 @@
+import os
+import sys
+
 import numpy as np
 import pytest
-import os
-
-from sunpy.tests.helpers import skip_windows
 
 import sunkit_image.data.test as data
 import sunkit_image.flct as flct
 
+# We skip this file as the extension is not built on windows.
+if sys.platform.startswith("win"):
+    pytest.skip("Tests will not run on windows", allow_module_level=True)
 
 # Testing the FLCT subroutines
 @pytest.fixture
@@ -46,14 +49,20 @@ def test_two_read_write(arrays_test):
     with pytest.raises(ValueError) as record:
         flct.write_2_images(file_name, arrays_test[0], arrays_test[1], order)
 
-    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    assert (
+        str(record.value)
+        == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    )
 
     order = "random"
 
     with pytest.raises(ValueError) as record:
         _ = flct.read_2_images(file_name, order)
 
-    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    assert (
+        str(record.value)
+        == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    )
 
 
 def test_three_read_write(arrays_test):
@@ -85,14 +94,20 @@ def test_three_read_write(arrays_test):
     with pytest.raises(ValueError) as record:
         flct.write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2], order)
 
-    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    assert (
+        str(record.value)
+        == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    )
 
     order = "random"
 
     with pytest.raises(ValueError) as record:
         _ = flct.read_3_images(file_name, order)
 
-    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    assert (
+        str(record.value)
+        == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    )
 
 
 def test_swaps(arrays_test):
@@ -102,7 +117,9 @@ def test_swaps(arrays_test):
     assert np.allclose(result_a, arrays_test[0])
     assert np.allclose(result_b, arrays_test[1])
 
-    result_a, result_b, result_c = flct.column_row_of_three(arrays_test[0], arrays_test[1], arrays_test[2])
+    result_a, result_b, result_c = flct.column_row_of_three(
+        arrays_test[0], arrays_test[1], arrays_test[2]
+    )
 
     assert np.allclose(result_a, arrays_test[0])
     assert np.allclose(result_b, arrays_test[1])
@@ -110,6 +127,8 @@ def test_swaps(arrays_test):
 
 
 # Testing the main FLCT function
+
+
 @pytest.fixture
 def images():
 
@@ -164,7 +183,6 @@ def outputs():
     return (expect_x, expect_y, expect_m)
 
 
-@skip_windows
 def test_flct_array(images, outputs):
 
     vx, vy, vm = flct.flct(images[0], images[1], 1, 1, 5, "column", kr=0.5)
@@ -179,7 +197,10 @@ def test_flct_array(images, outputs):
     with pytest.raises(ValueError) as record:
         _ = flct.flct(images[0], images[1], 1, 1, 5, order, kr=0.5)
 
-    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    assert (
+        str(record.value)
+        == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    )
 
     with pytest.raises(ValueError) as record:
         _ = flct.flct(images[0], images[1], 1, 1, 5, kr=0.5, skip=-1)
@@ -207,12 +228,27 @@ def test_flct_array(images, outputs):
     # are executed. These are not tests in the strictest sense rather it is designed to increase
     # the test coverage for lines containing the setting of optional arguments.
 
-    _ = flct.flct(images[0], images[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True)
-    _ = flct.flct(images[0], images[1], 1, 1, 4, skip=4, interp=True, quiet=True, absflag=True, biascor=True, pc=True, xoff=-2, yoff=-2)
+    _ = flct.flct(
+        images[0], images[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True
+    )
+    _ = flct.flct(
+        images[0],
+        images[1],
+        1,
+        1,
+        4,
+        skip=4,
+        interp=True,
+        quiet=True,
+        absflag=True,
+        biascor=True,
+        pc=True,
+        xoff=-2,
+        yoff=-2,
+    )
     assert True
 
 
-@skip_windows
 def test_flct_dat(images_dat, outputs_dat):
 
     vx, vy, vm = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5)
@@ -227,7 +263,10 @@ def test_flct_dat(images_dat, outputs_dat):
     with pytest.raises(ValueError) as record:
         _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, order, kr=0.5)
 
-    assert str(record.value) == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    assert (
+        str(record.value)
+        == "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
+    )
 
     with pytest.raises(ValueError) as record:
         _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5, skip=-1)
@@ -255,6 +294,31 @@ def test_flct_dat(images_dat, outputs_dat):
     # are executed. These are not tests in the strictest sense rather it is designed to increase
     # the test coverage for lines containing the setting of optional arguments.
 
-    _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True)
-    _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 4, skip=4, interp=True, quiet=True, absflag=True, biascor=True, pc=True, xoff=-2, yoff=-2)
+    _ = flct.flct(
+        images_dat[0],
+        images_dat[1],
+        1,
+        1,
+        0,
+        interp=True,
+        quiet=True,
+        absflag=True,
+        biascor=True,
+        pc=True,
+    )
+    _ = flct.flct(
+        images_dat[0],
+        images_dat[1],
+        1,
+        1,
+        4,
+        skip=4,
+        interp=True,
+        quiet=True,
+        absflag=True,
+        biascor=True,
+        pc=True,
+        xoff=-2,
+        yoff=-2,
+    )
     assert True
