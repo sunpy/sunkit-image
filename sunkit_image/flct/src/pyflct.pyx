@@ -4,7 +4,7 @@ import numpy as np
 cimport numpy as np
 from cython cimport view
 
-cdef extern from "./src/flctsubs.h":
+cdef extern from "./flctsubs.h":
     int flct (int transp, double * f1, double * f2, int nx, int ny, double deltat,
         double deltas, double sigma, double * vx, double * vy, double * vm,
         double thresh, int absflag, int filter, double kr, int skip,
@@ -137,7 +137,7 @@ def pyflct(transpose, f1, f2, nxorig, nyorig, deltat, deltas, sigma,
 # This is created to deal with the arrays which were first read by IDL
 def swap_order_two(arr, barr):
 
-    ier = write_two_images("temp.dat", arr, barr, 0)    
+    ier = write_two_images("temp.dat", arr, barr, 0)
 
     ier, cy_arr, cy_barr = read_two_images("temp.dat", transpose=1)
     os.remove("temp.dat")
@@ -149,7 +149,7 @@ def swap_order_two(arr, barr):
 
 
 def swap_order_three(arr, barr, carr):
-    
+
     temp = np.zeros_like(arr)
 
     arr, barr = swap_order_two(arr,barr)
