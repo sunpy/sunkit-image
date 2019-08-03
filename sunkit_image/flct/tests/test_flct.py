@@ -231,21 +231,21 @@ def test_flct_array(images, outputs):
     _ = flct.flct(
         images[0], images[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True
     )
-    # _ = flct.flct(	
-    #     images[0],	
-    #     images[1],	
-    #     1,	
-    #     1,	
-    #     4,	
-    #     skip=4,	
-    #     interp=True,	
-    #     quiet=True,	
-    #     absflag=True,	
-    #     biascor=True,	
-    #     pc=True,	
-    #     xoff=-2,
-    #     yoff=-2,
-    # )
+    _ = flct.flct(	
+        images[0],	
+        images[1],	
+        1,	
+        1,	
+        4,	
+        skip=4,	
+        interp=True,	
+        quiet=True,	
+        absflag=True,	
+        biascor=True,	
+        pc=True,	
+        xoff=-2,
+        yoff=-2,
+    )
     assert True
 
 
