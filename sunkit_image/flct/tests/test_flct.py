@@ -306,19 +306,19 @@ def test_flct_dat(images_dat, outputs_dat):
         biascor=True,
         pc=True,
     )
-    _ = flct.flct(	
-        images_dat[0],	
-        images_dat[1],	
-        1,	
-        1,	
-        4,	
-        skip=4,	
-        interp=True,	
-        quiet=True,	
-        absflag=True,	
-        biascor=True,	
-        pc=True,	
-        xoff=-2,	
-        yoff=-2,	
-    )
+    # _ = flct.flct(	
+    #     images_dat[0],	
+    #     images_dat[1],	
+    #     1,	
+    #     1,	
+    #     4,	
+    #     skip=4,	
+    #     interp=True,	
+    #     quiet=True,	
+    #     absflag=True,	
+    #     biascor=True,	
+    #     pc=True,	
+    #     xoff=-2,	
+    #     yoff=-2,	
+    # )
     assert True
