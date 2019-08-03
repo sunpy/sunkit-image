@@ -238,6 +238,11 @@ def test_flct_array(images, outputs):
         1,	
         4,	
         skip=4,	
+        interp=True,	
+        quiet=True,	
+        absflag=True,	
+        biascor=True,	
+        pc=True,	
         xoff=-2,
         yoff=-2,
     )
