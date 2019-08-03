@@ -53,7 +53,7 @@ lascomap1.plot()
 
 # The function takes a numpy.ndarray as input so we only pass the data part of
 # the map.
-mask, clean = astroscrappy.detect_cosmics(lascomap1.data)
+mask, clean = astroscrappy.detect_cosmics(lascomap1.data, sigclip=2, objlim=2, readnoise=4, verbose=True)
 # This returns two values - mask is a boolean array depicting whether there is
 # a cosmic ray hit at that pixel, clean is the cleaned image after removing those
 # hits.
