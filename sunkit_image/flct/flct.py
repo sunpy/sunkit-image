@@ -186,10 +186,10 @@ def write_3_images(filename, array1, array2, array3, order="row"):
 
 def column_row_of_two(array1, array2):
     """
-    Takes two arrays and swaps the order in which they were stored i.e. changing
-    from column major to row major and **not** the vice-versa. This may change the values stored in
-    the array as the arrays are first converted to a binary format and then the order change takes
-    place.
+    Takes two arrays and swaps the order in which they were stored i.e.
+    changing from column major to row major and **not** the vice-versa. This
+    may change the values stored in the array as the arrays are first converted
+    to a binary format and then the order change takes place.
 
     Parameters
     ----------
@@ -216,10 +216,10 @@ def column_row_of_two(array1, array2):
 
 def column_row_of_three(array1, array2, array3):
     """
-    Takes three arrays and swaps the order in which they were stored i.e. changing
-    from column major to row major and **not** the vice-versa. This may change the values stored in
-    the array as the arrays are first converted to a binary format and then the order change takes
-    place.
+    Takes three arrays and swaps the order in which they were stored i.e.
+    changing from column major to row major and **not** the vice-versa. This
+    may change the values stored in the array as the arrays are first converted
+    to a binary format and then the order change takes place.
 
     Parameters
     ----------
@@ -268,7 +268,7 @@ def flct(
 ):
     """
     Performs Fourier Local Correlation Tracking by calling the FLCT C library.
-    
+
     .. note::
 
         * In the references there are some dat files which can be used to test the FLCT code. The
@@ -283,7 +283,7 @@ def flct(
         * If your input arrays are column major then pass the `order` parameter as `column` and it
           will automatically take care of the order change. But this can produce some changes in
           the values of the arrays.
-    
+
     .. note::
 
         * `flct` is unable to find flows that are normal to image gradients. This
@@ -292,7 +292,7 @@ def flct(
           structures in the images. This is a defect of the LCT concept.
         * Images that have minimal structure can give nonsensical velocity
           results.
-        * Results can depend on value of ``sigma``. User must experiment to determine 
+        * Results can depend on value of ``sigma``. User must experiment to determine
           best choice of ``sigma``.
         * Velocities corresponding to shifts less than 0.1-0.2 pixels are not
           always detected. It may be necessary to increase the amount of time
@@ -309,7 +309,7 @@ def flct(
     image2 : `numpy.ndarray`
         The second image taken after ``deltat`` time of the first one.
     deltat : `float`
-        The time interval between the two images in seconds. 
+        The time interval between the two images in seconds.
     deltas : `float`
         Units of length of the side of a single pixel. Velocity is computed in units of ``deltas``/``deltat``.
     sigma : `float`
@@ -354,7 +354,7 @@ def flct(
     kr : `float`, optional
         Apply a low-pass filter to the sub-images, with a Gaussian of a characteristic wavenumber
         that is a factor of ``kr`` times the largest possible wave numbers in "x", "y" directions.
-        ``kr`` should be positive. 
+        ``kr`` should be positive.
         Defaults to `None`
     pc : `bool`, optional
         Set to `True` if the images are Plate Carrée projected.

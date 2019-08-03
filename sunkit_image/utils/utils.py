@@ -4,7 +4,6 @@ This module contains a collection of functions of general utility.
 import numpy as np
 
 import astropy.units as u
-from sunpy.coordinates import frames
 from sunpy.map.maputils import all_coordinates_from_map
 
 __all__ = [

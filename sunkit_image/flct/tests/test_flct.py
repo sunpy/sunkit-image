@@ -11,6 +11,7 @@ import sunkit_image.flct as flct
 if sys.platform.startswith("win"):
     pytest.skip("Tests will not run on windows", allow_module_level=True)
 
+
 # Testing the FLCT subroutines
 @pytest.fixture
 def arrays_test():
@@ -222,13 +223,6 @@ def test_flct_array(images, outputs):
 
     assert str(record.value) == "Skip is greater than the input dimensions"
 
-    # These tests are dummy tests. They are written just to make sure that FLCT runs on optional
-    # parameters also. We did not have any values to compare our results against so this is why
-    # these tests are at the end such that only after all the valid tests are passed then these
-    # are executed. These are not tests in the strictest sense rather it is designed to increase
-    # the test coverage for lines containing the setting of optional arguments.
-
-
 
 def test_flct_dat(images_dat, outputs_dat):
 
@@ -269,29 +263,29 @@ def test_flct_dat(images_dat, outputs_dat):
 
     assert str(record.value) == "Skip is greater than the input dimensions"
 
-    # These tests are dummy tests. They are written just to make sure that FLCT runs on optional
-    # parameters also. We did not have any values to compare our results against so this is why
-    # these tests are at the end such that only after all the valid tests are passed then these
-    # are executed. These are not tests in the strictest sense rather it is designed to increase
-    # the test coverage for lines containing the setting of optional arguments.
 
+# These tests are dummy tests. They are written just to make sure that FLCT runs on optional
+# parameters also. We did not have any values to compare our results against so this is why
+# these tests are at the end such that only after all the valid tests are passed then these
+# are executed. These are not tests in the strictest sense rather it is designed to increase
+# the test coverage for lines containing the setting of optional arguments.
 
 
 def test_flct_optional(images_dat):
-    _ = flct.flct(	
-        images_dat[0],	
-        images_dat[1],	
-        1,	
-        1,	
-        4,	
-        skip=4,	
-        interp=True,	
-        quiet=True,	
-        absflag=True,	
-        biascor=True,	
-        pc=True,	
-        xoff=-2,	
-        yoff=-2,	
+    _ = flct.flct(
+        images_dat[0],
+        images_dat[1],
+        1,
+        1,
+        4,
+        skip=4,
+        interp=True,
+        quiet=True,
+        absflag=True,
+        biascor=True,
+        pc=True,
+        xoff=-2,
+        yoff=-2,
     )
 
     _ = flct.flct(
