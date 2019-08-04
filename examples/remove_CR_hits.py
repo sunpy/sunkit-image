@@ -50,9 +50,14 @@ lascomap1.plot()
 # Now we will call the `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__
 # to remove the cosmic ray hits. This algorithm will perform well with both high and low
 # noise levels in the FITS file.
-
 # The function takes a numpy.ndarray as input so we only pass the data part of
-# the map.
+# the map. This particular image has lots of high intensity cosmic ray hits which
+# cannot be effectively removed by using the default set of parameters.
+# So we reduce ``sigclip``, the Laplacian to noise ratio from 4.5 to 2 to mark more hits.
+# We also reduce ``objlim``, contrast between the Laplacian image and the fine structed image
+# to clean the high intensity bright cosmic ray hits.
+# We also modify the ``readnoise`` parameters to obtain better results.
+
 mask, clean = astroscrappy.detect_cosmics(lascomap1.data, sigclip=2, objlim=2, readnoise=4, verbose=True)
 # This returns two values - mask is a boolean array depicting whether there is
 # a cosmic ray hit at that pixel, clean is the cleaned image after removing those
