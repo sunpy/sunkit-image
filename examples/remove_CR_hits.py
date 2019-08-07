@@ -66,7 +66,6 @@ mask, clean_data = astroscrappy.detect_cosmics(lasco_map.data, sigclip=2, objlim
 ###############################################################################
 # We can now plot the cleaned image.
 
-
 clean_map1 = Map(clean_data, lasco_map.meta)
 
 fig2 = plt.figure()
