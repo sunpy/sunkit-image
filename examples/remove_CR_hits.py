@@ -15,21 +15,22 @@ from sunpy.map import Map
 import astroscrappy
 
 ###############################################################################
-# For more details on how to download a particular LASCO FITS file as a map see
-# Sunpy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
+# For more details on how to download and plot LASCO FITS file see
+# SunPy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
 # To make this example work you need to have SunPy with all the "net" dependencies installed.
+
 from sunpy.net import Fido, attrs as a
 from sunpy.io.file_tools import read_file
 
 ###############################################################################
 # In order to download the required FITS file, we use
-# `Fido <sunpy.net.fido_factory.UnifiedDownloaderFactory>`, a downloader client.
-# We define two search variables:
-# a timerange and the instrument.
-timerange = a.Time("2000/11/09 00:06", "2000/11/09 00:07")
+# `Fido <sunpy.net.fido_factory.UnifiedDownloaderFactory>`, SunPy's downloader client.
+# We need to define two search variables:  a time range and the instrument.
+
+time_range = a.Time("2000/11/09 00:06", "2000/11/09 00:07")
 instrument = a.Instrument("LASCO")
 detector = a.Detector("C2")
-result = Fido.search(timerange, instrument)
+result = Fido.search(time_range, instrument)
 
 downloaded_files = Fido.fetch(result[0])
 data, header = read_file(downloaded_files[0])[0]
@@ -40,33 +41,35 @@ header["CUNIT2"] = "arcsec"
 
 ###############################################################################
 # With this fix we can load it into a map and plot the results.
-lascomap1 = Map(data, header)
+
+lasco_map = Map(data, header)
 fig1 = plt.figure()
-lascomap1.plot()
+lasco_map.plot()
 
 ###############################################################################
 # Now we will call the `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__
-# to remove the cosmic ray hits. This algorithm will perform well with both high and low
-# noise levels in the FITS file.
-# The function takes a numpy.ndarray as input so we only pass the data part of
-# the map. This particular image has lots of high intensity cosmic ray hits which
+# to remove the cosmic ray hits.
+# This algorithm can perform well with both high and low noise levels in the original data.
+# The function takes a `~numpy.ndarray` as input so we only pass the map data.
+# This particular image has lots of high intensity cosmic ray hits which
 # cannot be effectively removed by using the default set of parameters.
 # So we reduce ``sigclip``, the Laplacian to noise ratio from 4.5 to 2 to mark more hits.
-# We also reduce ``objlim``, contrast between the Laplacian image and the fine structed image
+# We also reduce ``objlim``, the contrast between the Laplacian image and the fine structured image
 # to clean the high intensity bright cosmic ray hits.
-# We also modify the ``readnoise`` parameters to obtain better results.
+# We also modify the ``readnoise`` parameter to obtain better results.
 
-mask, clean = astroscrappy.detect_cosmics(lascomap1.data, sigclip=2, objlim=2, readnoise=4, verbose=True)
-# This returns two values - mask is a boolean array depicting whether there is
-# a cosmic ray hit at that pixel, clean is the cleaned image after removing those
+mask, clean_data = astroscrappy.detect_cosmics(lasco_map.data, sigclip=2, objlim=2, readnoise=4, verbose=True)
+# This returns two variables - mask is a boolean array depicting whether there is
+# a cosmic ray hit at that pixel, clean_data is the cleaned image after removing those
 # hits.
 
 ###############################################################################
-# We can now plot the cleaned image after making a `sunpy.map.GenericMap`.
-clean_map1 = Map(clean, lascomap1.meta)
+# We can now plot the cleaned image.
+
+
+clean_map1 = Map(clean_data, lasco_map.meta)
 
 fig2 = plt.figure()
 clean_map1.plot()
 
-# Show all the plots
 plt.show()
