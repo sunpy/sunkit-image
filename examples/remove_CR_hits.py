@@ -3,7 +3,7 @@
 Removing Cosmic Ray Hits
 ========================
 
-This example illustrates how to remove cosmic ray hits from a LASCO C2 image
+This example illustrates how to remove cosmic ray hits from a LASCO C2 FITS file.
 using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__.
 Astroscrappy is a separate Python package and can be installed separately using ``pip`` or ``conda``.
 """
@@ -15,8 +15,6 @@ from sunpy.map import Map
 import astroscrappy
 
 ###############################################################################
-# First, we will work with the FITS files.
-# These imports are necessary to download the FITS file based on the instrument.
 # For more details on how to download a particular LASCO FITS file as a map see
 # Sunpy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
 # To make this example work you need to have SunPy with all the "net" dependencies installed.
