@@ -3,6 +3,7 @@ This module contains a collection of functions of general utility.
 """
 import numpy as np
 import scipy.ndimage as ndimage
+from scipy import interpolate
 
 import astropy.units as u
 from sunpy.coordinates import frames
@@ -11,8 +12,11 @@ __all__ = [
     "equally_spaced_bins",
     "bin_edge_summary",
     "find_pixel_radii",
-    "background_supression",
     "bandpass_filter",
+    "erase_loop_in_residual",
+    "curvature_radius",
+    "initial_direction_finding",
+    "loop_add",
 ]
 
 
@@ -178,33 +182,7 @@ def get_radial_intensity_summary(
     )
 
 
-def background_supression(image, zmin, qmed=1.0):
-    """
-    Supresses the background by replacing the pixel intensity values less than
-    `zmin` by product of `qmed` and `zmed`, which is the median intensity.
-
-    Parameters
-    ----------
-    image : `numpy.ndarray`
-        Image on which background supression is to be performed.
-    zmin : `float`
-        The minimum value of intensity which is allowed.
-    qmed : `float`
-        The scaling factor with which the median is multiplied to fill the values below `zmin`.
-        Defaults to 1.0.
-
-    Returns
-    -------
-    new_image : `numpy.ndarray`
-        Background suppressed image.
-    """
-
-    zmed = np.median(image)
-    new_image = np.where(image < zmin, qmed * zmed, image)
-
-    return new_image
-
-
+# The functions below this are subroutines for the OCCULT 2.
 def bandpass_filter(image, nsm1=1, nsm2=3):
     """
     Applies a band pass filter to the image.
@@ -231,9 +209,242 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
         raise ValueError("nsm1 should be less than nsm2")
 
     if nsm1 <= 2:
-        return image - ndimage.uniform_filter(image, nsm2, mode="nearest")
+        return image - Smooth(image, nsm2, "replace")
 
     if nsm1 >= 3:
-        return ndimage.uniform_filter(image, nsm1, mode="nearest") - ndimage.uniform_filter(
-            image, nsm2, mode="nearest"
-        )
+        return Smooth(image, nsm1, "replace") - Smooth(image, nsm2, "replace")
+
+
+def Smooth(image, width, nanopt="replace"): 
+    """
+    Python implementation of the IDL `smooth <https://www.harrisgeospatial.com/docs/smooth.html>`__.
+
+    Parameters
+    ----------
+    image : `numpy.ndarray`
+        Image to be filtered.
+    width : `int`
+        Width of the boxcar. The `width` should always be odd but if even value is given `width + 1` as the width of the boxcar.
+    nanopt : {"propagate" | "replace"}
+        It decides whether to `propagate` NAN's or `replace` them.
+
+    Returns
+    -------
+    `numpy.ndarray`
+        Smoothed image.
+    """
+
+    # make a copy of the array for the output:
+    filtered=np.copy(image)
+
+    # If width is even, add one
+    if width % 2 == 0:
+        width = width + 1
+
+    # get the size of each dim of the input:
+    r,c = image.shape
+
+    # Assume that width, the width of the window is always square.
+    startrc = int((width - 1)/2)
+    stopr = int(r - ((width + 1)/2) + 1)
+    stopc = int(c - ((width + 1)/2) + 1)
+
+    # For all pixels within the border defined by the box size, calculate the average in the window.
+    # There are two options:
+    # Ignore NaNs and replace the value where possible.
+    # Propagate the NaNs
+
+    for col in range(startrc,stopc):
+        # Calculate the window start and stop columns
+        startwc = col - int(width/2) 
+        stopwc = col + int(width/2) + 1
+        for row in range (startrc,stopr):
+            # Calculate the window start and stop rows
+            startwr = row - int(width/2)
+            stopwr = row + int(width/2) + 1
+            # Extract the window
+            window = image[startwr:stopwr, startwc:stopwc]
+            if nanopt == 'replace':
+                # If we're replacing Nans, then select only the finite elements
+                window = window[np.isfinite(window)]
+            # Calculate the mean of the window
+            filtered[row,col] = np.mean(window)
+
+    return filtered
+
+
+def erase_loop_in_residual(residual, istart, jstart, width, xloop, yloop):
+    """
+    Makes all the points in a loop and its vicinity as zero in the original image to prevent them from being
+    traced again.
+
+    Parameters
+    ----------
+    residual : `numpy.ndarray`
+        Image in which the points of a loop and surrounding it are to be made zero.
+    istart : `int`
+        The ``x`` coordinate of the starting point of the loop.
+    jstart : `int`
+        The ``y`` coordinate of the starting point of the loop.
+    width : `int`
+        The number of pixels around a loop point which are also to be removed.
+    xloop : `numpy.ndarray`
+        The ``x`` coordinates of all the loop points.
+    yloop : `numpy.ndarray`
+        The ``y`` coordinates of all the loop points.
+
+    Returns
+    -------
+    `numpy.ndarray`
+        Image with the loop and surrounding points zeroed out..
+    """
+
+    nx, ny = residual.shape
+    i3 = max(istart - width, 0)
+    i4 = min(istart + width, nx - 1)
+    j3 = max(jstart - width, 0)
+    j4 = min(jstart + width, ny - 1)
+    residual[i3:i4 + 1, j3:j4 + 1] = 0.
+
+    nn = len(xloop)
+    for iss in range(0, nn):
+        i0 = min(max(int(xloop[iss]), 0), nx-1)
+        i3 = max(int(i0 - width), 0)
+        i4 = min(int(i0 + width), nx - 1)
+        j0 = min(max(int(yloop[iss]), 0), ny-1)
+        j3 = max(int(j0 - width), 0)
+        j4 = min(int(j0 + width), ny - 1)
+        residual[i3:i4 + 1, j3:j4 + 1] = 0.
+    
+    return residual
+
+
+def loop_add(ns, reso, s, xloop, yloop, zloop, iloop, iloop_nstruc, istruc, loop_len, looplen, loopfile=None):
+    nn = int(ns / reso + 0.5)
+    ii = np.arange(nn) * reso
+    interfunc = interpolate.interp1d(s, xloop, fill_value="extrapolate")
+    xx = interfunc(ii)
+    interfunc = interpolate.interp1d(s, yloop, fill_value="extrapolate")
+    yy = interfunc(ii)
+    interfunc = interpolate.interp1d(s, zloop, fill_value="extrapolate")
+    ff = interfunc(ii)
+
+    loopnum = np.ones((nn)) * iloop
+    loop = np.c_[loopnum, yy, xx, ff, ii]
+
+    if iloop == 0:
+        loopfile = loop
+    if iloop >= 1:
+        loopfile = np.r_[loopfile, loop]
+    iloop_nstruc[istruc] = iloop
+    loop_len[iloop] = looplen
+    iloop += 1
+
+    return loopfile, iloop, loop_len, iloop_nstruc
+
+
+def initial_direction_finding(residual, xstart, ystart, nlen):
+    """
+    Finds the initial angle of the loop at the starting point.
+
+    Parameters
+    ----------
+    residual : `numpy.ndarray`
+        Image in which the loops are being detected.
+    xstart : `int`
+        The ``x`` coordinates of the starting point of the loop.
+    ystart : `int`
+        The ``y`` coordinates of the starting point of the loop.
+    nlen : `int`
+        The length of the guiding segment.
+
+    Returns
+    -------
+    `float`
+        The angle of the starting point of the loop.
+    """
+
+    step = 1
+    na = 180
+
+    s0_loop = step * (np.arange(nlen, dtype=np.float32) - nlen // 2)
+    alpha = np.pi * np.arange(na, dtype=np.float32) / np.float32(na)
+
+    nx, ny = residual.shape
+    flux_max = 0
+    for ia in range(0, na):
+        x_ = xstart + s0_loop * np.cos(alpha[ia])
+        y_ = ystart + s0_loop * np.sin(alpha[ia])
+        ix = np.int_(x_ + 0.5)
+        iy = np.int_(y_ + 0.5)
+        ix = np.clip(ix, 0, nx - 1)
+        iy = np.clip(iy, 0, ny - 1)
+        flux_ = residual[ix, iy]
+        flux = np.sum(np.maximum(flux_, 0.)) / np.float32(nlen)
+        if flux > flux_max:
+            flux_max = flux
+            al = alpha[ia]
+    
+    return al
+
+
+def curvature_radius(rmin, xl, yl, zl, al, ip, residual, nlen, idir, ir):
+
+
+    nb = 30
+    step = 1
+    nx, ny = residual.shape
+
+    s_loop = step * np.arange(nlen, dtype=np.float32)
+
+    # This denotes loop tracing in forward direction
+    if idir == 0:
+        sign_dir = +1
+    
+    # This denotes loop tracing in backward direction
+    if idir == 1:
+        sign_dir = -1
+
+    # `ib1` and `ib2` decide the range of radius in which the next point is to be searched
+    if ip == 0:
+        ib1 = 0
+        ib2 = nb-1
+    if ip >= 1:
+        ib1 = int(max(ir[ip] - 1, 0))
+        ib2 = int(min(ir[ip] + 1, nb-1))
+
+    beta0 = al[ip] + np.pi / 2
+    xcen = xl[ip] + rmin * np.cos(beta0)
+    ycen = yl[ip] + rmin * np.sin(beta0)
+    flux_max = 0
+    for ib in range(ib1, ib2 + 1):
+        rad_i, flux = find_flux(rmin, nb, ib, xl, yl, xcen, ycen, ip, beta0, sign_dir, s_loop, residual, nx, ny, nlen)
+        if flux > flux_max:
+            flux_max = flux
+            al[ip + 1] = al[ip] + sign_dir * (step / rad_i)
+            ir[ip+1] = ib
+            al_mid = (al[ip]+al[ip+1]) / 2.
+            xl[ip+1] = xl[ip] + step * np.cos(al_mid + np.pi * idir)
+            yl[ip+1] = yl[ip] + step * np.sin(al_mid + np.pi * idir)
+            ix_ip = min(max(int(xl[ip + 1] + 0.5), 0), nx - 1)
+            iy_ip = min(max(int(yl[ip + 1] + 0.5), 0), ny - 1)
+            zl[ip + 1] = residual[ix_ip, iy_ip]
+    
+    return xl, yl, zl, al
+
+
+def find_flux(rmin, nb, ib, xl, yl, xcen, ycen, ip, beta0, sign_dir, s_loop, residual, nx, ny, nlen):
+    rad_i = rmin / (-1. + 2. * np.float32(ib) / np.float32(nb - 1))
+    xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
+    ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
+    beta_i = beta0 + sign_dir * s_loop / rad_i
+    x_ = xcen_i - rad_i * np.cos(beta_i)
+    y_ = ycen_i - rad_i * np.sin(beta_i)
+    ix = np.int_(x_ + 0.5)
+    iy = np.int_(y_ + 0.5)
+    ix = np.clip(ix, 0, nx - 1)
+    iy = np.clip(iy, 0, ny - 1)
+    flux_ = residual[ix, iy]
+    flux = np.sum(np.maximum(flux_, 0.)) / np.float32(nlen)
+
+    return rad_i, flux
