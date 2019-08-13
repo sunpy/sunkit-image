@@ -234,7 +234,7 @@ def occult(image1, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
 
 
 
-def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
+def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2, file=False):
     """
     Implements the Oriented Coronal CUrved Loop Tracing (OCCULT-2) algorithm
     for loop tracing in solar images.
@@ -261,11 +261,13 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
     qthresh2 : `float`
         The factor which determines noise in the image. All the intensity values between `qthresh2 * median` are considered
         to be noise. The median for noise is chosen after the base level is fixed.
+    file : `bool`
+        If set to `True` an IDL style output txt file is created with the name as `loop.txt`
 
     Returns
     -------
     `list`
-        A list of all loop where each element is a `astropy.coordinates.SkyCoord` object
+        A list of all loop where each element is itself a list of points containg ``x`` and ``y`` coordinates for each point.
 
     References
     ----------
@@ -280,14 +282,12 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
     image = image.T
 
     # Defining all the other parameters as the IDL one.
-    reso = 1
     nloopmax = 10000
     npmax = 2000
     nsm2 = nsm1+2
     nlen = rmin
     
     wid = max(nsm2 // 2 - 1, 1)
-    looplen = 0
 
     # BASE LEVEL: Removing the points below the base level
     zmed = np.median(image[image > 0])
@@ -311,12 +311,8 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
     iloop = 0
     # The image with intensity less than zero removed
     residual = np.where(image2 > 0, image2, 0)
-    iloop_nstruc = np.zeros((nstruc,))
 
-    # Array to store the length of all the loops
-    loop_len = np.zeros((nloopmax,), dtype=np.float32)
-
-    for istruc in range(0, nstruc):
+    for _ in range(0, nstruc):
 
         # Loop tracing begins at maximum flux position
         zstart = residual.max()
@@ -353,7 +349,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
             for ip in range(0, npmax):
 
                 # The below function call will return the coordinate, flux and angle of the next point.
-                xl, yl, zl, al = curvature_radius(rmin, xl, yl, zl, al, ip, residual, nlen, idir, ir)
+                xl, yl, zl, al = curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
                 
                 # This decides when to stop tracing the loop; when then last `ngap` pixels traced are below zero, the tracing will stop.
                 iz1 = max((ip + 1 - ngap), 0)
@@ -402,16 +398,20 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2):
                     s[ip] = s[ip - 1] + np.sqrt((xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2)
             looplen = s[np1-1]
 
-            ns = max(int(looplen), 3)
-
         # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum specified
         if (looplen >= lmin):
             if iloop == 0:
                 loopfile = None
-            loopfile, iloop, loop_len, iloop_nstruc = loop_add(ns, reso, s, xloop, yloop, zloop, iloop, iloop_nstruc, istruc, loop_len, looplen, loopfile)
+                loops = []
+            loopfile, loops, iloop = loop_add(s, xloop, yloop, zloop, iloop, loops, loopfile)
 
         # ERASE LOOP IN RESIDUAL IMAGE
         residual = erase_loop_in_residual(residual, istart, jstart, wid, xloop, yloop)
 
-    # END_TRACE    
-    return loopfile, image2
+    if file is True:
+        np.savetxt('loops.txt', loopfile, '%8.8f')
+        
+    del loopfile
+    
+    # END_TRACE     
+    return loops

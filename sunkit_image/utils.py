@@ -319,14 +319,44 @@ def erase_loop_in_residual(residual, istart, jstart, width, xloop, yloop):
     return residual
 
 
-def loop_add(ns, reso, s, xloop, yloop, zloop, iloop, iloop_nstruc, istruc, loop_len, looplen, loopfile=None):
+def loop_add(lengths, xloop, yloop, zloop, iloop, loops, loopfile):
+    """
+    Adds the current loop to the output structures by interpolating the coordinates
+
+    Parameters
+    ----------
+    lengths : `numpy.ndarray`
+        The length of loop at every point from the starting point.
+    xloop : `numpy.ndarray`
+        The ``x`` coordinates of all the points of the loop.
+    yloop : `numpy.ndarray`
+        The ``y`` coordinates of all the points of the loop.
+    zloop : `numpy.ndarray`
+        The flux intensity at every point of the loop.
+    iloop : `int`
+        The current loop number.
+    loops : `list`
+        It is a list of lists which contains all the previous loops.
+    loopfile : `numpy.ndarray`
+        An array which stores data of the previous loops in the format as returned
+        by the IDL function.
+
+    Returns
+    -------
+    `tuple`
+        It contains three elements: the first one is the updated `loopfile`, the second
+        one is the updated `loops` list and the third one is the current loop number.
+    """
+    reso = 1
+    ns = max(int(lengths[-1]), 3)
     nn = int(ns / reso + 0.5)
+
     ii = np.arange(nn) * reso
-    interfunc = interpolate.interp1d(s, xloop, fill_value="extrapolate")
+    interfunc = interpolate.interp1d(lengths, xloop, fill_value="extrapolate")
     xx = interfunc(ii)
-    interfunc = interpolate.interp1d(s, yloop, fill_value="extrapolate")
+    interfunc = interpolate.interp1d(lengths, yloop, fill_value="extrapolate")
     yy = interfunc(ii)
-    interfunc = interpolate.interp1d(s, zloop, fill_value="extrapolate")
+    interfunc = interpolate.interp1d(lengths, zloop, fill_value="extrapolate")
     ff = interfunc(ii)
 
     loopnum = np.ones((nn)) * iloop
@@ -336,11 +366,15 @@ def loop_add(ns, reso, s, xloop, yloop, zloop, iloop, iloop_nstruc, istruc, loop
         loopfile = loop
     if iloop >= 1:
         loopfile = np.r_[loopfile, loop]
-    iloop_nstruc[istruc] = iloop
-    loop_len[iloop] = looplen
     iloop += 1
 
-    return loopfile, iloop, loop_len, iloop_nstruc
+    current = []
+    for i in range(0, len(xx)):
+        current.append([yy[i], xx[i]])
+    
+    loops.append(current)
+
+    return loopfile, loops, iloop
 
 
 def initial_direction_finding(residual, xstart, ystart, nlen):
@@ -388,8 +422,39 @@ def initial_direction_finding(residual, xstart, ystart, nlen):
     return al
 
 
-def curvature_radius(rmin, xl, yl, zl, al, ip, residual, nlen, idir, ir):
+def curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
+    """
+    Finds the radius of curvature at the given loop point and then uses it to find the next point in the loop.
 
+    Parameters
+    ----------
+    residual : `numpy.ndarray`
+        Image in which the loops are being detected.
+    rmin : `float`
+        The minimum radius of curvature of any point in the loop.
+    xl : `numpy.ndarray`
+        The ``x`` coordinates of all the points of the loop.
+    yl : `nump.ndarray`
+        The ``y`` coordinates of all the points of the loop.
+    zl : `nump.ndarray`
+        The flux intensity at all the points of the loop.
+    al : `nump.ndarray`
+        The angles associated with every point of the loop.
+    ir : `nump.ndarray`
+        The radius associated with every point of the loop.
+    ip : `int`
+        The current number of the point being traced in a loop.
+    nlen : `int`
+        The length of the guiding segment.
+    idir : `int`
+        The flag which denotes whether it is a forward pass or a backward pass.
+        `0` denotes forward pass and `1` denotes backward pass.
+
+    Returns
+    -------
+    `float`
+        The angle of the starting point of the loop.
+    """
 
     nb = 30
     step = 1
@@ -414,11 +479,29 @@ def curvature_radius(rmin, xl, yl, zl, al, ip, residual, nlen, idir, ir):
         ib2 = int(min(ir[ip] + 1, nb-1))
 
     beta0 = al[ip] + np.pi / 2
+
+    # Finding the assumed centre of the loop
     xcen = xl[ip] + rmin * np.cos(beta0)
     ycen = yl[ip] + rmin * np.sin(beta0)
+
+    # Finding the radius associated with the next point by finding the maximum flux
+    # along various radius values
     flux_max = 0
     for ib in range(ib1, ib2 + 1):
-        rad_i, flux = find_flux(rmin, nb, ib, xl, yl, xcen, ycen, ip, beta0, sign_dir, s_loop, residual, nx, ny, nlen)
+
+        rad_i = rmin / (-1. + 2. * np.float32(ib) / np.float32(nb - 1))
+        xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
+        ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
+        beta_i = beta0 + sign_dir * s_loop / rad_i
+        x_ = xcen_i - rad_i * np.cos(beta_i)
+        y_ = ycen_i - rad_i * np.sin(beta_i)
+        ix = np.int_(x_ + 0.5)
+        iy = np.int_(y_ + 0.5)
+        ix = np.clip(ix, 0, nx - 1)
+        iy = np.clip(iy, 0, ny - 1)
+        flux_ = residual[ix, iy]
+        flux = np.sum(np.maximum(flux_, 0.)) / np.float32(nlen)
+
         if flux > flux_max:
             flux_max = flux
             al[ip + 1] = al[ip] + sign_dir * (step / rad_i)
@@ -431,20 +514,3 @@ def curvature_radius(rmin, xl, yl, zl, al, ip, residual, nlen, idir, ir):
             zl[ip + 1] = residual[ix_ip, iy_ip]
     
     return xl, yl, zl, al
-
-
-def find_flux(rmin, nb, ib, xl, yl, xcen, ycen, ip, beta0, sign_dir, s_loop, residual, nx, ny, nlen):
-    rad_i = rmin / (-1. + 2. * np.float32(ib) / np.float32(nb - 1))
-    xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
-    ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
-    beta_i = beta0 + sign_dir * s_loop / rad_i
-    x_ = xcen_i - rad_i * np.cos(beta_i)
-    y_ = ycen_i - rad_i * np.sin(beta_i)
-    ix = np.int_(x_ + 0.5)
-    iy = np.int_(y_ + 0.5)
-    ix = np.clip(ix, 0, nx - 1)
-    iy = np.clip(iy, 0, ny - 1)
-    flux_ = residual[ix, iy]
-    flux = np.sum(np.maximum(flux_, 0.)) / np.float32(nlen)
-
-    return rad_i, flux
