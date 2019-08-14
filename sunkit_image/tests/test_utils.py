@@ -193,3 +193,53 @@ def test_erase_loop_in_residual(image, test_map):
                        [0., 0., 0., 1.]])
 
     assert np.allclose(expect, result)
+
+
+@pytest.fixture
+def test_image():
+    ima = np.zeros((3, 3), dtype=np.float32)
+    ima[0, 1] = 5
+    ima[1, 1] = 3
+    ima[2, 1] = 0
+    return ima
+
+
+def test_initial_direction_finding(test_image):
+    
+    xstart = 0
+    ystart = 1
+    nlen = 30
+    
+    # The angle returned is with respect to the ``x`` axis.
+    al = initial_direction_finding(test_image, xstart, ystart, nlen)
+
+    # The angle returned is zero because the image has loop in the ``y`` direction but the function
+    # assumes the image is transposed so it takes the straight line in the ``x`` direction.
+    assert np.allclose(al, 0.0)
+
+
+def test_curvature_radius(test_image):
+
+    xl = np.zeros((3), dtype=np.float32)
+    yl = np.zeros((3), dtype=np.float32)
+    zl = np.zeros((3), dtype=np.float32)
+    al = np.zeros((3), dtype=np.float32)
+    ir = np.zeros((3), dtype=np.float32)
+
+    xl[0] = 0
+    yl[0] = 1
+    zl[0] = 5
+    al[0] = 0.0
+
+    # Using the similar settings in as in the IDL tutorial
+    xl, yl, zl, al = curvature_radius(test_image, 30, xl, yl, zl, al, ir, 0, 30, 0)
+
+    assert np.allclose(np.ceil(xl[1]), 1)
+    assert np.allclose(np.ceil(yl[1]), 1)
+    assert np.allclose(zl[1], 3)
+
+    xl, yl, zl, al = curvature_radius(test_image, 30, xl, yl, zl, al, ir, 1, 30, 0)
+
+    assert np.allclose(np.ceil(xl[2]), 2)
+    assert np.allclose(np.ceil(yl[2]), 1)
+    assert np.allclose(zl[2], 0)
