@@ -5,12 +5,15 @@ import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from sunkit_image.utils import (
-    background_supression,
     bandpass_filter,
     bin_edge_summary,
     equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,
+    erase_loop_in_residual,
+    curvature_radius,
+    initial_direction_finding,
+    loop_add,
 )
 
 
@@ -136,37 +139,57 @@ def test_map():
     return np.array(map_test)
 
 
-def test_background_supression(test_map):
-
-    expect = [
-        [0.0, 0.0, 0.0, 0.0],
-        [0.0, 5.0, 5.0, 0.0],
-        [0.0, 5.0, 5.0, 0.0],
-        [0.0, 0.0, 0.0, 0.0],
-    ]
-
-    result = background_supression(test_map, 2, 0)
-    assert np.allclose(expect, result)
-
-    expect = [
-        [1.0, 1.0, 1.0, 1.0],
-        [1.0, 5.0, 5.0, 1.0],
-        [1.0, 5.0, 5.0, 1.0],
-        [1.0, 1.0, 1.0, 1.0],
-    ]
-
-    result = background_supression(test_map, 2)
-    assert np.allclose(expect, result)
-
-
 @pytest.fixture
 def image():
-    return np.ones((4, 4), dtype=float)
+    return np.ones((4, 4), dtype=np.float32)
 
 
-def test_bandpass_filter(image):
+def test_bandpass_filter(image, test_map):
 
+    # This function tests bandpass_filter function alongwith the smooth function
     expect = np.zeros((4, 4))
     result = bandpass_filter(image)
+
+    assert np.allclose(expect, result)
+
+    expect = np.array([[0., 0., 0., 0.],
+                        [0., 2.22222222, 2.22222222, 0.],
+                        [0., 2.22222222, 2.22222222, 0.],
+                        [0., 0., 0., 0.]])
+
+    result = bandpass_filter(test_map)
+
+    assert np.allclose(expect, result)
+
+    with pytest.raises(ValueError) as record:
+        _ = bandpass_filter(image, 5, 1)
+
+    assert str(record.value) == "nsm1 should be less than nsm2"
+
+
+def test_erase_loop_in_residual(image, test_map):
+
+    istart = 0
+    jstart = 1
+    width = 1
+
+    xloop = [1, 2, 3]
+    yloop = [1, 1, 1]
+
+    result = erase_loop_in_residual(image, istart, jstart, width, xloop, yloop)
+
+    expect = np.array([[0., 0., 0., 1.],
+                       [0., 0., 0., 1.],
+                       [0., 0., 0., 1.],
+                       [0., 0., 0., 1.]])
+
+    assert np.allclose(expect, result)
+
+    result = erase_loop_in_residual(test_map, istart, jstart, width, xloop, yloop)
+
+    expect = np.array([[0., 0., 0., 1.],
+                       [0., 0., 0., 1.],
+                       [0., 0., 0., 1.],
+                       [0., 0., 0., 1.]])
 
     assert np.allclose(expect, result)

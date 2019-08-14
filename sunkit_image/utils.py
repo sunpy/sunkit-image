@@ -13,6 +13,7 @@ __all__ = [
     "bin_edge_summary",
     "find_pixel_radii",
     "bandpass_filter",
+    "smooth",
     "erase_loop_in_residual",
     "curvature_radius",
     "initial_direction_finding",
@@ -209,13 +210,13 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
         raise ValueError("nsm1 should be less than nsm2")
 
     if nsm1 <= 2:
-        return image - Smooth(image, nsm2, "replace")
+        return image - smooth(image, nsm2, "replace")
 
     if nsm1 >= 3:
-        return Smooth(image, nsm1, "replace") - Smooth(image, nsm2, "replace")
+        return smooth(image, nsm1, "replace") - smooth(image, nsm2, "replace")
 
 
-def Smooth(image, width, nanopt="replace"): 
+def smooth(image, width, nanopt="replace"): 
     """
     Python implementation of the IDL `smooth <https://www.harrisgeospatial.com/docs/smooth.html>`__.
 
@@ -360,7 +361,7 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops, loopfile):
     ff = interfunc(ii)
 
     loopnum = np.ones((nn)) * iloop
-    loop = np.c_[loopnum, yy, xx, ff, ii]
+    loop = np.c_[loopnum, xx, yy, ff, ii]
 
     if iloop == 0:
         loopfile = loop
@@ -370,7 +371,7 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops, loopfile):
 
     current = []
     for i in range(0, len(xx)):
-        current.append([yy[i], xx[i]])
+        current.append([xx[i], yy[i]])
     
     loops.append(current)
 
