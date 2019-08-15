@@ -378,7 +378,7 @@ def flct(
 
     References
     ----------
-    * The FLCT software package which can be found `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+    * `FLCT C Code <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
     """
 
     # Checking whether the C extension is correctly built.

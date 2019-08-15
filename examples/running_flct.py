@@ -5,7 +5,7 @@ Fourier Local Correlation Tracking
 
 This example applies Fourier Local Correlation Tracking (FLCT)
 to a set of two images taken within a short interval of each other
-using `sunkit_image.flct.flct <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+using `~sunkit_image.flct.flct`.
 """
 
 import numpy as np
@@ -14,9 +14,9 @@ import sunkit_image.flct as flct
 import matplotlib.pyplot as plt
 
 ###########################################################################
-# This examples describes the objective and the probable use case to find the
+# This examples demonstrates how to find the
 # 2D velocity flow field between two images taken within a short span of time.
-# So to demonstrate that we will create two dummy images containing a moving
+# We will create two dummy images containing a moving
 # object and assume the time difference between the images to be one second.
 
 # Creating the input arrays
@@ -39,15 +39,15 @@ plt.imshow(image2)
 # Now we come to the main function where FLCT is applied. We will pass the
 # above arrays to `sunkit_image.flct.flct`
 
-# Since the input arrays were stored in a row major format, so no swapping
+# Since the input arrays were stored in a row major format, no order swapping
 # needs to take place. The values of the parameters were used, were the ones
 # which gave the best visual result of the velocities.
 vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
 
 ###########################################################################
-# The return values are the two dimensional velocity field with `vel_x`
-# showing velocity in the x-direction and `vel_y`, the velocity in the
-# y-direction. The last, ``vm`` is the mask array which shows the pixel
+# The return values are the two dimensional velocity field with ``vel_x``
+# showing velocity in the x-direction and ``vel_y``, the velocity in the
+# y-direction. ``vm`` is the mask array which shows the pixel
 # locations where the FLCT calculations were done.
 
 # We will also plot the velocity in both 'x' and 'y' directions
