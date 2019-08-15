@@ -64,7 +64,7 @@ plt.imshow(vel_x)
 # ``x`` we will get the following plot
 
 # Moving the original image 1 pixel towards right
-image1[0:3,0] = 0
+image1[0:3, 0] = 0
 image1[0:3, 1:4] = 1
 
 # Plot the shifted image
@@ -86,7 +86,7 @@ plt.imshow(vel_y)
 # the ``y`` we can account for the velocity in ``y`` direction.
 
 # Moving the original image 1 pixel towards right
-image1[0,1:4] = 0
+image1[0, 1:4] = 0
 image1[1:4, 1:4] = 1
 
 # Plot the shifted image

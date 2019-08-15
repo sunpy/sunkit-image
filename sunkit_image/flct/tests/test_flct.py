@@ -1,4 +1,3 @@
-import os
 import sys
 
 import numpy as np
@@ -6,7 +5,6 @@ import pytest
 
 import sunkit_image.data.test as data
 import sunkit_image.flct.utils as utils
-
 from sunkit_image.flct.flct import flct
 
 # We skip this file as the extension is not built on windows.
@@ -17,6 +15,7 @@ if sys.platform.startswith("win"):
 # Testing the main FLCT function. The 'dat' associated with any test function or fixture denotes that the
 # function or fixture will be used to test 'FLCT' wrapper where the data was originally stored in a dat file.
 # The other functions are used to test FLCT when the original data was a numpy array or a CSV read from IDL.
+
 
 @pytest.fixture
 def images():
@@ -169,11 +168,15 @@ def test_flct_dat(images_dat, outputs_dat):
 
 def test_flct_optional(images_dat):
     """
-    These tests are dummy tests. They are written just to make sure that FLCT runs on optional
-    parameters also. We did not have any values to compare our results against so this is why
-    these tests are at the end such that only after all the valid tests are passed then these
-    are executed. These are not tests in the strictest sense rather it is designed to increase
-    the test coverage for lines containing the setting of optional arguments.
+    These tests are dummy tests.
+
+    They are written just to make sure that FLCT runs on optional
+    parameters also. We did not have any values to compare our results
+    against so this is why these tests are at the end such that only
+    after all the valid tests are passed then these are executed. These
+    are not tests in the strictest sense rather it is designed to
+    increase the test coverage for lines containing the setting of
+    optional arguments.
     """
 
     _ = flct(

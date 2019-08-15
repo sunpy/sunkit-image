@@ -4,7 +4,6 @@ import sys
 import numpy as np
 import pytest
 
-import sunkit_image.data.test as data
 from sunkit_image.flct.utils import *
 
 # We skip this file as the extension is not built on windows.
@@ -24,12 +23,13 @@ def arrays_test():
 
 
 def test_two_read_write(arrays_test):
-    
+
     """
-    This test is written to veify that the wrapped function is able to correctly write and read two numpy arrays.
+    This test is written to veify that the wrapped function is able to
+    correctly write and read two numpy arrays.
     """
 
-    # Here a temporary dat file is created and two numpy arrays are written in it.  
+    # Here a temporary dat file is created and two numpy arrays are written in it.
     file_name = "temp.dat"
 
     write_2_images(file_name, arrays_test[0], arrays_test[1])
@@ -81,10 +81,11 @@ def test_two_read_write(arrays_test):
 def test_three_read_write(arrays_test):
 
     """
-    This test is written to veify that the wrapped function is able to correctly write and read three numpy arrays.
+    This test is written to veify that the wrapped function is able to
+    correctly write and read three numpy arrays.
     """
 
-    # Here a temporary dat file is created and three numpy arrays are written in it.  
+    # Here a temporary dat file is created and three numpy arrays are written in it.
     file_name = "temp.dat"
 
     write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2])
@@ -100,7 +101,6 @@ def test_three_read_write(arrays_test):
     assert np.allclose(barr, np.ones((4, 4)))
     assert np.allclose(carr, np.zeros((4, 4)))
 
-
     # The same thing as above is repeated the only difference being that the arrays are both written and read back
     # in column major order
     write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2], order="column")
@@ -112,7 +112,6 @@ def test_three_read_write(arrays_test):
     assert np.allclose(arr, np.zeros((4, 4)))
     assert np.allclose(barr, np.ones((4, 4)))
     assert np.allclose(carr, np.zeros((4, 4)))
-
 
     # The below series of checks below are just to check that the ValueErrors are triggered when wrong value of order is
     # given to any read or write function.
@@ -140,9 +139,12 @@ def test_three_read_write(arrays_test):
 def test_swaps(arrays_test):
 
     """
-    This series of checks are meant to check whether an array in column major order can be converted back to row major
-    order. Here arrays containing only zeros or only ones are used because when they will be converted to binary format
-    and read in column major or row major their values won't change.
+    This series of checks are meant to check whether an array in column major
+    order can be converted back to row major order.
+
+    Here arrays containing only zeros or only ones are used because when
+    they will be converted to binary format and read in column major or
+    row major their values won't change.
     """
 
     # This is to change the order of two arrays at a time.

@@ -1,5 +1,3 @@
-import numpy as np
-
 try:
     from sunkit_image.flct import _pyflct
 except ImportError:
