@@ -10,7 +10,7 @@ using `~sunkit_image.flct.flct`.
 
 import numpy as np
 
-import sunkit_image.flct.flct as flct
+from sunkit_image.flct.flct import flct
 import matplotlib.pyplot as plt
 
 ###########################################################################
@@ -42,7 +42,7 @@ plt.imshow(image2)
 # Since the input arrays were stored in a row major format, no order swapping
 # needs to take place. The values of the parameters were used, were the ones
 # which gave the best visual result of the velocities.
-vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
+vel_x, vel_y, vm = flct(image1, image2, 1, 1, 2.3)
 
 ###########################################################################
 # The return values are the two dimensional velocity field with ``vel_x``
