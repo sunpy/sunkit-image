@@ -10,7 +10,7 @@ using `~sunkit_image.flct.flct`.
 
 import numpy as np
 
-import sunkit_image.flct as flct
+import sunkit_image.flct.flct as flct
 import matplotlib.pyplot as plt
 
 ###########################################################################
@@ -27,7 +27,7 @@ image2 = np.zeros((10, 10))
 image2[1:4, 1:4] = 1
 
 # Plot both the images
-fig = plt.figure(figsize=(1, 2))
+fig = plt.figure(figsize=(10, 4))
 
 ax1 = fig.add_subplot(121)
 plt.imshow(image1)
@@ -51,7 +51,7 @@ vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
 # locations where the FLCT calculations were done.
 
 # We will also plot the velocity in both 'x' and 'y' directions
-fig = plt.figure(figsize=(1, 2))
+fig = plt.figure(figsize=(10, 4))
 
 ax1 = fig.add_subplot(121)
 plt.imshow(vel_x)
