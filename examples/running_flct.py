@@ -31,9 +31,11 @@ fig = plt.figure(figsize=(10, 4))
 
 ax1 = fig.add_subplot(121)
 plt.imshow(image1)
+ax1.set_title("First Image")
 
 ax2 = fig.add_subplot(122)
 plt.imshow(image2)
+ax2.set_title("Second Image")
 
 ###########################################################################
 # Now we come to the main function where FLCT is applied. We will pass the
@@ -48,16 +50,65 @@ vel_x, vel_y, vm = flct(image1, image2, 1, 1, 2.3)
 # The return values are the two dimensional velocity field with ``vel_x``
 # showing velocity in the x-direction and ``vel_y``, the velocity in the
 # y-direction. ``vm`` is the mask array which shows the pixel
-# locations where the FLCT calculations were done.
+# locations where the FLCT calculations were done. We will also plot the velocity
+# in both 'x' and 'y' directions individually.
 
-# We will also plot the velocity in both 'x' and 'y' directions
+# First plot the velocity in ``x`` direction
+fig = plt.figure()
+plt.title("Velocity in x direction")
+plt.imshow(vel_x)
+
+###########################################################################
+# We can clearly see that all the points have a constant velocity equal to ``1``
+# in the ``x`` direction. So if we move our original image ``1`` pixel in the positive
+# ``x`` we will get the following plot
+
+# Moving the original image 1 pixel towards right
+image1[0:3,0] = 0
+image1[0:3, 1:4] = 1
+
+# Plot the shifted image
+fig = plt.figure()
+plt.title("Original image shifted by 1 pixel in the X direction")
+plt.imshow(image1)
+
+##########################################################################
+# Now we will see the effect of velocity in the ``y`` direction.
+
+# First, plot the velocity in ``y`` direction
+fig = plt.figure()
+plt.title("Velocity in y direction")
+plt.imshow(vel_y)
+
+###########################################################################
+# We can clearly see that all the points have a constant velocity equal to ``1``
+# in the ``y`` direction. So if we move our previously shifted image ``1`` pixel in
+# the ``y`` we can account for the velocity in ``y`` direction.
+
+# Moving the original image 1 pixel towards right
+image1[0,1:4] = 0
+image1[1:4, 1:4] = 1
+
+# Plot the shifted image
+fig = plt.figure()
+plt.title("Previously shifted image shifted by 1 pixel in the Y direction")
+plt.imshow(image1)
+
+############################################################################
+# Since we have accounted for the velocities in both ``x`` and ``y`` direction,
+# the shifted `image1` should be same as the final image, `image2`. We can
+# visualize that by plotting both of them side by side.
+
+# Plot both the images
 fig = plt.figure(figsize=(10, 4))
 
 ax1 = fig.add_subplot(121)
-plt.imshow(vel_x)
+plt.imshow(image1)
+ax1.set_title("Shifted First Image")
 
 ax2 = fig.add_subplot(122)
-plt.imshow(vel_y)
+plt.imshow(image2)
+ax2.set_title("Second Image")
 
 ################################################################################
 # You must have noticed that both the velocities in ``x`` and ``y`` have similar
