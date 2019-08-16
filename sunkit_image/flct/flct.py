@@ -52,6 +52,9 @@ def flct(
 
     .. warning::
 
+        All the below limitations have been directly taken from the C source user manual without any modifications.
+        The original user manual can be found `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/flct_1.06/doc/flct.pdf>`__.
+
         * FLCT is unable to find flows that are normal to image gradients. This
           is a defect of the LCT concept.
         * FLCT cannot determine velocities on scales below the scale size of
@@ -185,13 +188,11 @@ def flct(
     if skip is not None:
         if skip <= 0:
             raise ValueError("Skip value must be greater than zero.")
-        skipon = skip + np.abs(yoff) + np.abs(xoff)
 
         if np.abs(xoff) >= skip or np.abs(yoff) >= skip:
             raise ValueError("The absolute value of 'xoff' and 'yoff' must be less than skip.")
     else:
         skip = 0
-        skipon = 0
 
     if kr is not None:
         if kr <= 0.0 or kr >= 20.0:

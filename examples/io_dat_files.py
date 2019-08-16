@@ -9,7 +9,7 @@ to read and write arrays to binary ``dat`` files.
 
 import numpy as np
 
-import sunkit_image.flct.utils as utils
+import sunkit_image.flct as flct
 
 ###########################################################################
 # We will create three arrays which we will save out to a ``dat`` file.
@@ -26,10 +26,10 @@ c = np.arange(16).reshape((4, 4))
 # First, we will demonstrate writing to a ``dat`` file.
 
 # We can write two arrays to dat file using flct.write_2_images
-utils.write_2_images("two.dat", a, b)
+flct.write_2_images("two.dat", a, b)
 
 # Three arrays can also be written to a dat file using flct.write_3_images
-utils.write_3_images("three.dat", a, b, c)
+flct.write_3_images("three.dat", a, b, c)
 
 ###########################################################################
 # We can get back these arrays by using the read functions in `sunkit_image.flct`
@@ -39,10 +39,10 @@ utils.write_3_images("three.dat", a, b, c)
 # FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
 
 # Reading two arrays from a dat file
-one, two = utils.read_2_images("two.dat")
+one, two = flct.read_2_images("two.dat")
 
 # Reading three arrays from a dat file
-one, two, three = utils.read_3_images("three.dat")
+one, two, three = flct.read_3_images("three.dat")
 
 ###########################################################################
 # We can verify that the arrays written and the arrays we read in are the same.

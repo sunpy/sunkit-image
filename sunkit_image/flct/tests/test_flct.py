@@ -4,8 +4,7 @@ import numpy as np
 import pytest
 
 import sunkit_image.data.test as data
-import sunkit_image.flct.utils as utils
-from sunkit_image.flct.flct import flct
+import sunkit_image.flct as flct
 
 # We skip this file as the extension is not built on windows.
 if sys.platform.startswith("win"):
@@ -37,7 +36,7 @@ def images_dat():
 
     # Getting filepath of the test data
     filepath1 = data.get_test_filepath("hashgauss.dat")
-    arr, barr = utils.read_2_images(filepath1)
+    arr, barr = flct.read_2_images(filepath1)
 
     # The arrays are directly read from the dat files using the python functions
     # so there is no need to swap their order as they are already in row major.
@@ -49,7 +48,7 @@ def outputs_dat():
 
     # Getting filepath of the test data
     filepath1 = data.get_test_filepath("testgaussvel.dat")
-    arr, barr, carr = utils.read_3_images(filepath1)
+    arr, barr, carr = flct.read_3_images(filepath1)
 
     # The arrays are directly read from the dat files using the python functions
     # so there is no need to swap their order as they are already in row major.
@@ -70,7 +69,7 @@ def outputs():
 
     # Since these CSV files were created by reading the dat file on FLCT website using the IDL IO
     # routines their order needs to be rectified.
-    expect_x, expect_y, expect_m = utils.column_row_of_three(expect_x, expect_y, expect_m)
+    expect_x, expect_y, expect_m = flct.column_row_of_three(expect_x, expect_y, expect_m)
 
     return (expect_x, expect_y, expect_m)
 
@@ -81,7 +80,7 @@ def test_flct_array(images, outputs):
     # data is also used for testing.
     # Here the order is set as column as the input arrays are read from CSV file which was read by IDL.
     # So they have been read in column major order and it needs to be changed.
-    vx, vy, vm = flct(images[0], images[1], 1, 1, 5, "column", kr=0.5)
+    vx, vy, vm = flct.flct(images[0], images[1], 1, 1, 5, "column", kr=0.5)
 
     # The velocitites in x and y direction are verified along with the mask arrays. The small discrepancies
     # have been introduced due to the order change so we had to use a higher tolerance limit.
@@ -94,7 +93,7 @@ def test_flct_array(images, outputs):
     order = "random"
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images[0], images[1], 1, 1, 5, order, kr=0.5)
+        _ = flct.flct(images[0], images[1], 1, 1, 5, order, kr=0.5)
 
     assert (
         str(record.value)
@@ -102,22 +101,22 @@ def test_flct_array(images, outputs):
     )
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images[0], images[1], 1, 1, 5, kr=0.5, skip=-1)
+        _ = flct.flct(images[0], images[1], 1, 1, 5, kr=0.5, skip=-1)
 
     assert str(record.value) == "Skip value must be greater than zero."
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images[0], images[1], 1, 1, 5, kr=0.5, skip=1, xoff=4)
+        _ = flct.flct(images[0], images[1], 1, 1, 5, kr=0.5, skip=1, xoff=4)
 
     assert str(record.value) == "The absolute value of 'xoff' and 'yoff' must be less than skip."
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images[0], images[1], 1, 1, 5, kr=40)
+        _ = flct.flct(images[0], images[1], 1, 1, 5, kr=40)
 
     assert str(record.value) == "The value of 'kr' must be between 0 and 20."
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images[0], images[1], 1, 1, 5, kr=0.5, skip=1000)
+        _ = flct.flct(images[0], images[1], 1, 1, 5, kr=0.5, skip=1000)
 
     assert str(record.value) == "Skip is greater than the input dimensions"
 
@@ -126,7 +125,7 @@ def test_flct_dat(images_dat, outputs_dat):
 
     # Here the FLCT function is called with the same settings as given on the C code website and the same
     # data is also used for testing.
-    vx, vy, vm = flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5)
+    vx, vy, vm = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5)
 
     # The velocitites in x and y direction are verified along with the mask arrays.
     assert np.allclose(vx, outputs_dat[0])
@@ -138,7 +137,7 @@ def test_flct_dat(images_dat, outputs_dat):
     order = "random"
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images_dat[0], images_dat[1], 1, 1, 5, order, kr=0.5)
+        _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, order, kr=0.5)
 
     assert (
         str(record.value)
@@ -146,22 +145,22 @@ def test_flct_dat(images_dat, outputs_dat):
     )
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5, skip=-1)
+        _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5, skip=-1)
 
     assert str(record.value) == "Skip value must be greater than zero."
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5, skip=1, xoff=4)
+        _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5, skip=1, xoff=4)
 
     assert str(record.value) == "The absolute value of 'xoff' and 'yoff' must be less than skip."
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images_dat[0], images_dat[1], 1, 1, 5, kr=40)
+        _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=40)
 
     assert str(record.value) == "The value of 'kr' must be between 0 and 20."
 
     with pytest.raises(ValueError) as record:
-        _ = flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5, skip=1000)
+        _ = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5, skip=1000)
 
     assert str(record.value) == "Skip is greater than the input dimensions"
 
@@ -179,7 +178,7 @@ def test_flct_optional(images_dat):
     optional arguments.
     """
 
-    _ = flct(
+    _ = flct.flct(
         images_dat[0],
         images_dat[1],
         1,
@@ -195,7 +194,7 @@ def test_flct_optional(images_dat):
         yoff=-2,
     )
 
-    _ = flct(
+    _ = flct.flct(
         images_dat[0],
         images_dat[1],
         1,
