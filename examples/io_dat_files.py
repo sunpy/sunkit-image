@@ -13,10 +13,10 @@ import sunkit_image.flct.utils as utils
 
 ###########################################################################
 # We will create three arrays which we will save out to a ``dat`` file.
-# The original FLCT C code works only on dat files for both input and
+# The original FLCT C code uses ``dat`` files for both input and
 # output. So these functions can be used to read pre-existing ``dat`` files
 # and writing new files which keeps your current work compatible with the
-# existing one.
+# existing implementation.
 
 a = np.zeros((4, 4))
 b = np.ones((4, 4))
@@ -34,9 +34,9 @@ utils.write_3_images("three.dat", a, b, c)
 ###########################################################################
 # We can get back these arrays by using the read functions in `sunkit_image.flct`
 # It is to be noted that these read functions can only read ``dat``
-# files, the ones which were written using `flct.write_2_images`,
-# `flct.read_3_images` and the IDL IO routines as given on the
-# FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__..
+# files, the ones which were written using `~sunkit_image.flct.write_2_images`,
+# `~sunkit_image.flct.read_3_images` and the IDL IO routines as given on the
+# FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
 
 # Reading two arrays from a dat file
 one, two = utils.read_2_images("two.dat")

@@ -81,7 +81,7 @@ def test_two_read_write(arrays_test):
 def test_three_read_write(arrays_test):
 
     """
-    This test is written to veify that the wrapped function is able to
+    This test is written to verify that the wrapped function is able to
     correctly write and read three numpy arrays.
     """
 

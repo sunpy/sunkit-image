@@ -4,8 +4,7 @@ Fourier Local Correlation Tracking
 ===================================
 
 This example applies Fourier Local Correlation Tracking (FLCT)
-to a set of two images taken within a short interval of each other
-using `~sunkit_image.flct.flct`.
+to a set of two arrays using `~sunkit_image.flct.flct`.
 """
 
 import numpy as np
@@ -14,10 +13,9 @@ from sunkit_image.flct.flct import flct
 import matplotlib.pyplot as plt
 
 ###########################################################################
-# This examples demonstrates how to find the
-# 2D velocity flow field between two images taken within a short span of time.
-# We will create two dummy images containing a moving
-# object and assume the time difference between the images to be one second.
+# This examples demonstrates how to find the 2D velocity flow field.
+# We will create two dummy images containing a moving object and
+# assume the time difference between the images to be one second.
 
 # Creating the input arrays
 image1 = np.zeros((10, 10))
@@ -38,11 +36,8 @@ plt.imshow(image2)
 ax2.set_title("Second Image")
 
 ###########################################################################
-# Now we come to the main function where FLCT is applied. We will pass the
-# above arrays to `sunkit_image.flct.flct`
-
-# Since the input arrays were stored in a row major format, no order swapping
-# needs to take place. The values of the parameters were used, were the ones
+# Now we come to the main function where FLCT is applied.
+# The values of the parameters were used, were the ones
 # which gave the best visual result of the velocities.
 vel_x, vel_y, vm = flct(image1, image2, 1, 1, 2.3)
 

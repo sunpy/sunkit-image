@@ -52,15 +52,15 @@ def flct(
 
     .. warning::
 
-        * `flct` is unable to find flows that are normal to image gradients. This
+        * FLCT is unable to find flows that are normal to image gradients. This
           is a defect of the LCT concept.
-        * `flct` cannot determine velocities on scales below the scale size of
+        * FLCT cannot determine velocities on scales below the scale size of
           structures in the images. This is a defect of the LCT concept.
         * Images that have minimal structure can give nonsensical velocity
           results.
-        * Results can depend on value of ``sigma``. User must experiment to determine
-          best choice of ``sigma``.
-        * Velocities corresponding to shifts less than 0.1-0.2 pixels are not
+        * Results can depend on value of ``sigma``, so you must experiment to determine
+          the best choice of ``sigma``.
+        * Velocities corresponding to shifts less than 0.1 - 0.2 pixels are not
           always detected. It may be necessary to increase the amount of time
           between images, depending on the noise level in the images. Sometimes
           using the filtering option helps.
