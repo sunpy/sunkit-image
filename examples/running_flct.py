@@ -146,8 +146,7 @@ image1[0:3, 0:3] = 1
 plt.imshow(image1, origin="lower")
 ax1.set_title("Original Image")
 
-# Plot the flow field only in the ``y`` direction assuming the flow field is
-# zero in ``x`` direction
+# Plotting the two dimensional flow field
 ax2 = fig.add_subplot(132)
 ax2.quiver(U, V, vel_x, vel_y, scale=20)
 ax2.set_title("Flow Field in the both direction")
