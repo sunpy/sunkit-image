@@ -1,13 +1,13 @@
 """
-This module contains functions that will enhance the trace out structures in an
-image.
+This module contains functions that will the trace out structures in an image.
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interpolate
 
-from sunkit_image.utils import bandpass_filter, erase_loop_in_residual, curvature_radius, initial_direction_finding, loop_add
+from sunkit_image.utils import (bandpass_filter, erase_loop_in_residual, curvature_radius,
+                                                initial_direction_finding, loop_add)
 
 __all__ = ["occult2"]
 
@@ -38,7 +38,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
         The factor which determines noise in the image. All the intensity values between `qthresh2 * median` are considered
         to be noise. The median for noise is chosen after the base level is fixed.
     file : `bool`
-        If set to `True` an IDL style output txt file is created with the name as `loop.txt`
+        If set to `True` an IDL style output txt file is created with the name as ``loop.txt``.
 
     Returns
     -------
