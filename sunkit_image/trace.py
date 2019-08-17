@@ -12,7 +12,7 @@ from sunkit_image.utils import bandpass_filter, erase_loop_in_residual, curvatur
 __all__ = ["occult2"]
 
 
-def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2, file=False):
+def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=False):
     """
     Implements the Oriented Coronal CUrved Loop Tracing (OCCULT-2) algorithm
     for loop tracing in solar images.
@@ -29,8 +29,6 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2, fi
         The length of the smallest loop to be detected in pixels.
     nstruc : `int`
         Maximum limit of traced structures.
-    nloop : `int`
-        Maximum number of detected loops.
     ngap : `int`
         Number of pixels in the loop below the flux threshold.
     qthresh1 : `float`
@@ -55,14 +53,23 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2, fi
       https://doi.org/10.3390/e15083007
     """
 
+    image = image.astype(np.float32)
+
     # Image is transposed because IDL works column major and python is row major. This is done
     # so that the python and the IDL codes look similar
     image = image.T
 
     # Defining all the other parameters as the IDL one.
+    # The maximum number of loops that can be detected
     nloopmax = 10000
+
+    # The maximum number of points in a loop
     npmax = 2000
+
+    # High pass filter boxcar window size
     nsm2 = nsm1+2
+
+    # The length of the tracing curved element
     nlen = rmin
     
     wid = max(nsm2 // 2 - 1, 1)
@@ -71,22 +78,23 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2, fi
     zmed = np.median(image[image > 0])
     image = np.where(image > (zmed * qthresh1), image, zmed * qthresh1)
 
-    # HIGHPASS FILTER
+    # BANDPASS FILTER
     image2 = bandpass_filter(image, nsm1, nsm2)
     nx, ny = image2.shape
 
     # ERASE BOUNDARIES ZONES (SMOOTHING EFFECTS)
-    image2[:, 0:nsm2] = 0
-    image2[:, ny - nsm2:] = 0
-    image2[0:nsm2, :] = 0
-    image2[nx - nsm2:, :] = 0
+    image2[:, 0:nsm2] = 0.
+    image2[:, ny - nsm2:] = 0.
+    image2[0:nsm2, :] = 0.
+    image2[nx - nsm2:, :] = 0.
 
     # NOISE THRESHOLD
     zmed = np.median(image2[image2 > 0])
     thresh = zmed * qthresh2
 
-    # Define the number of loops
+    # Defines the current number of loop being traced
     iloop = 0
+
     # The image with intensity less than zero removed
     residual = np.where(image2 > 0, image2, 0)
 
@@ -104,16 +112,25 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2, fi
         istart, jstart = max_coords[0][0], max_coords[1][0]
 
         # TRACING LOOP STRUCTURE STEPWISE
+        # The point number in the current loop being traced
         ip = 0
+
+        # The two directions in bidirectional tracing of loops
         ndir = 2
+
         for idir in range(0, ndir):
 
             # Creating arrays which will store all the loops points coordinates, flux, angle and radius
-            xl = np.zeros((npmax + 1,))
-            yl = np.zeros((npmax + 1,))
-            zl = np.zeros((npmax + 1,))
-            al = np.zeros((npmax + 1,))
-            ir = np.zeros((npmax + 1,))
+            # xl, yl are the x and y coordinates
+            xl = np.zeros((npmax + 1,), dtype=np.float32)
+            yl = np.zeros((npmax + 1,), dtype=np.float32)
+
+            # zl is the flux at each loop point
+            zl = np.zeros((npmax + 1,), dtype=np.float32)
+
+            # al, rl are the angles and radius involved with every loop point
+            al = np.zeros((npmax + 1,), dtype=np.float32)
+            ir = np.zeros((npmax + 1,), dtype=np.float32)
 
             # INITIAL DIRECTION FINDING
             xl[0] = istart
@@ -187,7 +204,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, nloop, ngap, qthresh1, qthresh2, fi
         residual = erase_loop_in_residual(residual, istart, jstart, wid, xloop, yloop)
 
     if file is True:
-        np.savetxt('loops.txt', loopfile, '%8.8f')
+        np.savetxt('loops.txt', loopfile, '%5.5f')
         
     del loopfile
     

@@ -33,11 +33,10 @@ plt.imshow(image, cmap="Spectral", origin="lower")
 # * The minimum radius of curvature at any point in the loop ``rmin`` is 30 pixels.
 # * The length of the smallest loop to be detected ``lmin`` is 25 pixels.
 # * The maximum number of structures to be examined ``nstruc`` is 1000.
-# * The maximum number of loops to be detected ``nloop`` is 1000.
 # * The number of extra points in the loop below noise level to terminate a loop tracing ``ngap`` is 0.
 # * The base flux and median flux ratio ``qthresh1`` is 0.0
 # * The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 
-loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, nloop=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=False)
+loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
 
 ###############################################################################
 # The `sunkit_image.trace.occult2` returns a list of all loop where each element

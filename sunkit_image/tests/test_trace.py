@@ -25,14 +25,14 @@ def filepath():
 @pytest.mark.remote_data
 def test_occult2(image, filepath):
 
-    loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, nloop=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
+    loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
     
     expect = np.loadtxt(filepath)
     result = np.loadtxt("loops.txt")
 
     os.remove("loops.txt")
 
-    assert np.allclose(expect, result)
+    assert np.allclose(expect, result, atol = 1e-04, rtol = 1e-04)
     assert np.allclose(expect[-1, 0], len(loops) - 1)
 
     x = []

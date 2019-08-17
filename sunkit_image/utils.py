@@ -271,7 +271,7 @@ def smooth(image, width, nanopt="replace"):
             # Calculate the mean of the window
             filtered[row,col] = np.mean(window)
 
-    return filtered
+    return filtered.astype(np.float32)
 
 
 def erase_loop_in_residual(residual, istart, jstart, width, xloop, yloop):
@@ -399,6 +399,7 @@ def initial_direction_finding(residual, xstart, ystart, nlen):
         The angle of the starting point of the loop.
     """
 
+    # The number of steps to be taken to move from one point to another
     step = 1
     na = 180
 
@@ -406,10 +407,10 @@ def initial_direction_finding(residual, xstart, ystart, nlen):
     alpha = np.pi * np.arange(na, dtype=np.float32) / np.float32(na)
 
     nx, ny = residual.shape
-    flux_max = 0
+    flux_max = 0.
     for ia in range(0, na):
-        x_ = xstart + s0_loop * np.cos(alpha[ia])
-        y_ = ystart + s0_loop * np.sin(alpha[ia])
+        x_ = xstart + s0_loop * np.float32(np.cos(alpha[ia]))
+        y_ = ystart + s0_loop * np.float32(np.sin(alpha[ia]))
         ix = np.int_(x_ + 0.5)
         iy = np.int_(y_ + 0.5)
         ix = np.clip(ix, 0, nx - 1)
@@ -419,7 +420,7 @@ def initial_direction_finding(residual, xstart, ystart, nlen):
         if flux > flux_max:
             flux_max = flux
             al = alpha[ia]
-    
+
     return al
 
 
@@ -479,23 +480,23 @@ def curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
         ib1 = int(max(ir[ip] - 1, 0))
         ib2 = int(min(ir[ip] + 1, nb-1))
 
-    beta0 = al[ip] + np.pi / 2
+    beta0 = al[ip] + np.float32(np.pi / 2)
 
     # Finding the assumed centre of the loop
-    xcen = xl[ip] + rmin * np.cos(beta0)
-    ycen = yl[ip] + rmin * np.sin(beta0)
+    xcen = xl[ip] + rmin * np.float32(np.cos(beta0))
+    ycen = yl[ip] + rmin * np.float32(np.sin(beta0))
 
     # Finding the radius associated with the next point by finding the maximum flux
     # along various radius values
-    flux_max = 0
+    flux_max = 0.
     for ib in range(ib1, ib2 + 1):
 
         rad_i = rmin / (-1. + 2. * np.float32(ib) / np.float32(nb - 1))
         xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
         ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
         beta_i = beta0 + sign_dir * s_loop / rad_i
-        x_ = xcen_i - rad_i * np.cos(beta_i)
-        y_ = ycen_i - rad_i * np.sin(beta_i)
+        x_ = xcen_i - rad_i * np.float32(np.cos(beta_i))
+        y_ = ycen_i - rad_i * np.float32(np.sin(beta_i))
         ix = np.int_(x_ + 0.5)
         iy = np.int_(y_ + 0.5)
         ix = np.clip(ix, 0, nx - 1)
@@ -508,8 +509,8 @@ def curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
             al[ip + 1] = al[ip] + sign_dir * (step / rad_i)
             ir[ip+1] = ib
             al_mid = (al[ip]+al[ip+1]) / 2.
-            xl[ip+1] = xl[ip] + step * np.cos(al_mid + np.pi * idir)
-            yl[ip+1] = yl[ip] + step * np.sin(al_mid + np.pi * idir)
+            xl[ip+1] = xl[ip] + step * np.float32(np.cos(al_mid + np.pi * idir))
+            yl[ip+1] = yl[ip] + step * np.float32(np.sin(al_mid + np.pi * idir))
             ix_ip = min(max(int(xl[ip + 1] + 0.5), 0), nx - 1)
             iy_ip = min(max(int(yl[ip + 1] + 0.5), 0), ny - 1)
             zl[ip + 1] = residual[ix_ip, iy_ip]
