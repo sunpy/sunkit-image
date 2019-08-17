@@ -5,7 +5,7 @@ This module contains functions that will the trace out structures in an image.
 import numpy as np
 from scipy import interpolate
 
-from sunkit_image.utils import (bandpass_filter, erase_loop_in_residual, curvature_radius,
+from sunkit_image.utils import (bandpass_filter, erase_loop_in_image, curvature_radius,
                                 initial_direction_finding, loop_add)
 
 __all__ = ["occult2"]
@@ -206,7 +206,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
             loopfile, loops, iloop = loop_add(s, xloop, yloop, zloop, iloop, loops, loopfile)
 
         # ERASE LOOP IN RESIDUAL IMAGE
-        residual = erase_loop_in_residual(residual, istart, jstart, wid, xloop, yloop)
+        residual = erase_loop_in_image(residual, istart, jstart, wid, xloop, yloop)
 
     if loopfile is not None:
         if file is True:

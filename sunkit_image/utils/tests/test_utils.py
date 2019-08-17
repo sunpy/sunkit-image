@@ -10,7 +10,7 @@ from sunkit_image.utils import (
     equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,
-    erase_loop_in_residual,
+    erase_loop_in_image,
     curvature_radius,
     initial_direction_finding,
     loop_add,
@@ -187,7 +187,7 @@ def test_smooth(image, test_map):
     assert np.allclose(filtered, expect)
 
 
-def test_erase_loop_in_residual(image, test_map):
+def test_erase_loop_in_image(image, test_map):
 
     # The starting point of a dummy loop
     istart = 0
@@ -198,7 +198,7 @@ def test_erase_loop_in_residual(image, test_map):
     xloop = [1, 2, 3]
     yloop = [1, 1, 1]
 
-    result = erase_loop_in_residual(image, istart, jstart, width, xloop, yloop)
+    result = erase_loop_in_image(image, istart, jstart, width, xloop, yloop)
 
     expect = np.array([[0., 0., 0., 1.],
                        [0., 0., 0., 1.],
@@ -207,7 +207,7 @@ def test_erase_loop_in_residual(image, test_map):
 
     assert np.allclose(expect, result)
 
-    result = erase_loop_in_residual(test_map, istart, jstart, width, xloop, yloop)
+    result = erase_loop_in_image(test_map, istart, jstart, width, xloop, yloop)
 
     expect = np.array([[0., 0., 0., 1.],
                        [0., 0., 0., 1.],
