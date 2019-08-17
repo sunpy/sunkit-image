@@ -14,6 +14,7 @@ from sunkit_image.utils import (
     curvature_radius,
     initial_direction_finding,
     loop_add,
+    smooth,
 )
 
 
@@ -146,7 +147,6 @@ def image():
 
 def test_bandpass_filter(image, test_map):
 
-    # This function tests bandpass_filter function alongwith the smooth function
     expect = np.zeros((4, 4))
     result = bandpass_filter(image)
 
@@ -167,12 +167,34 @@ def test_bandpass_filter(image, test_map):
     assert str(record.value) == "nsm1 should be less than nsm2"
 
 
+def test_smooth(image, test_map):
+
+    filtered = smooth(image, 1)
+    assert np.allclose(filtered, image)
+
+    filtered = smooth(image, 4)
+    assert np.allclose(filtered, image)
+
+    filtered = smooth(test_map, 1)
+    assert np.allclose(filtered, test_map)
+
+    filtered = smooth(test_map, 3)
+    expect = np.array([[1., 1., 1., 1.],
+                        [1., 2.77777777, 2.77777777, 1.],
+                        [1., 2.77777777, 2.77777777, 1.],
+                        [1., 1., 1., 1.]])
+    
+    assert np.allclose(filtered, expect)
+
+
 def test_erase_loop_in_residual(image, test_map):
 
+    # The starting point of a dummy loop
     istart = 0
     jstart = 1
     width = 1
 
+    # The coordinates of the dummy loop
     xloop = [1, 2, 3]
     yloop = [1, 1, 1]
 
@@ -197,6 +219,8 @@ def test_erase_loop_in_residual(image, test_map):
 
 @pytest.fixture
 def test_image():
+
+    # An image containing a loop in a straight line
     ima = np.zeros((3, 3), dtype=np.float32)
     ima[0, 1] = 5
     ima[1, 1] = 3
@@ -206,6 +230,7 @@ def test_image():
 
 def test_initial_direction_finding(test_image):
     
+    # The starting point of the loop i.e. the maximumflux position
     xstart = 0
     ystart = 1
     nlen = 30
@@ -231,15 +256,75 @@ def test_curvature_radius(test_image):
     zl[0] = 5
     al[0] = 0.0
 
-    # Using the similar settings in as in the IDL tutorial
+    # Using the similar settings in as in the IDL tutorial.
+    # This is forward tracing where the first point is after the starting point is being traced.
     xl, yl, zl, al = curvature_radius(test_image, 30, xl, yl, zl, al, ir, 0, 30, 0)
 
     assert np.allclose(np.ceil(xl[1]), 1)
     assert np.allclose(np.ceil(yl[1]), 1)
     assert np.allclose(zl[1], 3)
 
+    # This is forward tracing where the second point is after the starting point is being traced.
     xl, yl, zl, al = curvature_radius(test_image, 30, xl, yl, zl, al, ir, 1, 30, 0)
 
     assert np.allclose(np.ceil(xl[2]), 2)
     assert np.allclose(np.ceil(yl[2]), 1)
     assert np.allclose(zl[2], 0)
+
+
+@pytest.fixture
+def parameters_add_loop():
+
+    # Here we are creating dummy coordinates and flux for a loop
+    xloop = np.ones(8, dtype=np.float32) * 7
+    yloop = np.arange(11,3,-1, dtype=np.float32)
+    zloop = np.array([1, 2, 4, 3, 4, 12, 6, 3], dtype=np.float32)
+
+    iloop = 0
+    np1 = len(xloop)
+
+    # Calculate the length of each point
+    lengths = np.zeros((np1), dtype=np.float32)
+
+    for ip in range(1, np1):
+        lengths[ip] = lengths[ip - 1] + np.sqrt((xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2)
+
+    # The empty structures in which the first loop is stored
+    loops = []
+    loopfile = None
+    
+    return (lengths, xloop, yloop, zloop, iloop, loops, loopfile)
+
+
+def test_add_loop(parameters_add_loop):
+
+    # We call the add_loop function and the values should be placed in the structures
+    loopfile, loops, iloop = loop_add(*parameters_add_loop)
+
+    expect_loopfile = np.array([[ 0.,  7., 11.,  1.,  0.],
+                                [ 0.,  7., 10.,  2.,  1.],
+                                [ 0.,  7.,  9.,  4.,  2.],
+                                [ 0.,  7.,  8.,  3.,  3.],
+                                [ 0.,  7.,  7.,  4.,  4.],
+                                [ 0.,  7.,  6., 12.,  5.],
+                                [ 0.,  7.,  5.,  6.,  6.]])
+
+    expect_loops = [[[7.0, 11.0], [7.0, 10.0], [7.0, 9.0], [7.0, 8.0], [7.0, 7.0], [7.0, 6.0], [7.0, 5.0]]]
+
+    assert np.allclose(loopfile, expect_loopfile)
+    assert np.allclose(loops, expect_loops)
+    assert np.allclose(iloop, 1)
+
+def test_parameters_add_loop(parameters_add_loop):
+
+    lengths, xloop, yloop, zloop, iloop, loops, loopfile = parameters_add_loop
+
+    assert np.allclose(lengths, np.arange(0, 8))
+    assert np.allclose(xloop, np.ones(8) * 7)
+    assert np.allclose(yloop, np.arange(11,3,-1))
+    assert np.allclose(zloop, np.array([1, 2, 4, 3, 4, 12, 6, 3]))
+    assert np.allclose(iloop, 0)
+    assert (not loops)
+    
+    if loopfile is not None:
+        assert False 

@@ -225,7 +225,8 @@ def smooth(image, width, nanopt="replace"):
     image : `numpy.ndarray`
         Image to be filtered.
     width : `int`
-        Width of the boxcar. The `width` should always be odd but if even value is given `width + 1` as the width of the boxcar.
+        Width of the boxcar window. The `width` should always be odd but if even value is given then
+        `width + 1` is used as the width of the boxcar.
     nanopt : {"propagate" | "replace"}
         It decides whether to `propagate` NAN's or `replace` them.
 
@@ -233,9 +234,13 @@ def smooth(image, width, nanopt="replace"):
     -------
     `numpy.ndarray`
         Smoothed image.
+    
+    References
+    ----------
+    * Emmalg's answer on `stackoverflow <https://stackoverflow.com/a/35777966>`___.
     """
 
-    # make a copy of the array for the output:
+    # Make a copy of the array for the output:
     filtered=np.copy(image)
 
     # If width is even, add one
@@ -301,21 +306,24 @@ def erase_loop_in_residual(residual, istart, jstart, width, xloop, yloop):
     """
 
     nx, ny = residual.shape
-    i3 = max(istart - width, 0)
-    i4 = min(istart + width, nx - 1)
-    j3 = max(jstart - width, 0)
-    j4 = min(jstart + width, ny - 1)
-    residual[i3:i4 + 1, j3:j4 + 1] = 0.
 
-    nn = len(xloop)
-    for iss in range(0, nn):
-        i0 = min(max(int(xloop[iss]), 0), nx-1)
-        i3 = max(int(i0 - width), 0)
-        i4 = min(int(i0 + width), nx - 1)
-        j0 = min(max(int(yloop[iss]), 0), ny-1)
-        j3 = max(int(j0 - width), 0)
-        j4 = min(int(j0 + width), ny - 1)
-        residual[i3:i4 + 1, j3:j4 + 1] = 0.
+    # The points surrounding the first point of the loop are zeroed out
+    xstart = max(istart - width, 0)
+    xend = min(istart + width, nx - 1)
+    ystart = max(jstart - width, 0)
+    yend = min(jstart + width, ny - 1)
+    residual[xstart:xend + 1, ystart:yend + 1] = 0.
+
+    # All the points surrounding the loops are zeroed out
+    for point in range(0, len(xloop)):
+
+        i0 = min(max(int(xloop[point]), 0), nx-1)
+        xstart = max(int(i0 - width), 0)
+        xend = min(int(i0 + width), nx - 1)
+        j0 = min(max(int(yloop[point]), 0), ny-1)
+        ystart = max(int(j0 - width), 0)
+        yend = min(int(j0 + width), ny - 1)
+        residual[xstart:xend + 1, ystart:yend + 1] = 0.
     
     return residual
 
@@ -348,20 +356,34 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops, loopfile):
         It contains three elements: the first one is the updated `loopfile`, the second
         one is the updated `loops` list and the third one is the current loop number.
     """
+    
+    # The resolution between the points
     reso = 1
-    ns = max(int(lengths[-1]), 3)
-    nn = int(ns / reso + 0.5)
 
-    ii = np.arange(nn) * reso
+    # The length of the loop must be greater than 3 to interpolate
+    nlen = max(int(lengths[-1]), 3)
+
+    # The number of points in the final loop
+    num_points = int(nlen / reso + 0.5)
+
+    # All the coordinates and the flux values are interpolated
+    interp_points = np.arange(num_points) * reso
+
+    # The one dimensional interpolation function created for interpolating x coordinates
     interfunc = interpolate.interp1d(lengths, xloop, fill_value="extrapolate")
-    xx = interfunc(ii)
-    interfunc = interpolate.interp1d(lengths, yloop, fill_value="extrapolate")
-    yy = interfunc(ii)
-    interfunc = interpolate.interp1d(lengths, zloop, fill_value="extrapolate")
-    ff = interfunc(ii)
+    x_interp = interfunc(interp_points)
 
-    loopnum = np.ones((nn)) * iloop
-    loop = np.c_[loopnum, xx, yy, ff, ii]
+    # The one dimensional interpolation function created for interpolating y coordinates
+    interfunc = interpolate.interp1d(lengths, yloop, fill_value="extrapolate")
+    y_interp = interfunc(interp_points)
+
+    # The one dimensional interpolation function created for interpolating the flux values
+    interfunc = interpolate.interp1d(lengths, zloop, fill_value="extrapolate")
+    flux_interp = interfunc(interp_points)
+
+    # Creating the loopfile in the same format as IDL output
+    loopnum = np.ones((num_points)) * iloop
+    loop = np.c_[loopnum, x_interp, y_interp, flux_interp, interp_points]
 
     if iloop == 0:
         loopfile = loop
@@ -369,9 +391,10 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops, loopfile):
         loopfile = np.r_[loopfile, loop]
     iloop += 1
 
+    # The current loop which will contain its points
     current = []
-    for i in range(0, len(xx)):
-        current.append([xx[i], yy[i]])
+    for i in range(0, len(x_interp)):
+        current.append([x_interp[i], y_interp[i]])
     
     loops.append(current)
 

@@ -2,7 +2,6 @@
 This module contains functions that will the trace out structures in an image.
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interpolate
 
@@ -32,18 +31,19 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
     ngap : `int`
         Number of pixels in the loop below the flux threshold.
     qthresh1 : `float`
-        The ratio of image base flux and median flux. All the pixels in the image below `qthresh1 * median` intensity value
-        are made to zero before tracing the loops.
+        The ratio of image base flux and median flux. All the pixels in the image below `qthresh1 * median`
+        intensity value are made to zero before tracing the loops.
     qthresh2 : `float`
-        The factor which determines noise in the image. All the intensity values between `qthresh2 * median` are considered
-        to be noise. The median for noise is chosen after the base level is fixed.
+        The factor which determines noise in the image. All the intensity values between `qthresh2 * median`
+        are considered to be noise. The median for noise is chosen after the base level is fixed.
     file : `bool`
         If set to `True` an IDL style output txt file is created with the name as ``loop.txt``.
 
     Returns
     -------
     `list`
-        A list of all loop where each element is itself a list of points containg ``x`` and ``y`` coordinates for each point.
+        A list of all loop where each element is itself a list of points containg
+        ``x`` and ``y`` coordinates for each point.
 
     References
     ----------
@@ -88,6 +88,9 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
     image2[0:nsm2, :] = 0.
     image2[nx - nsm2:, :] = 0.
 
+    if  (not np.count_nonzero(image2)) is True:
+        raise RuntimeError("The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering.")
+
     # NOISE THRESHOLD
     zmed = np.median(image2[image2 > 0])
     thresh = zmed * qthresh2
@@ -97,6 +100,10 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
 
     # The image with intensity less than zero removed
     residual = np.where(image2 > 0, image2, 0)
+
+    # Creating the structures in which the loops will be finally stored
+    loopfile = None
+    loops = []
 
     for _ in range(0, nstruc):
 
@@ -195,18 +202,16 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
 
         # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum specified
         if (looplen >= lmin):
-            if iloop == 0:
-                loopfile = None
-                loops = []
             loopfile, loops, iloop = loop_add(s, xloop, yloop, zloop, iloop, loops, loopfile)
 
         # ERASE LOOP IN RESIDUAL IMAGE
         residual = erase_loop_in_residual(residual, istart, jstart, wid, xloop, yloop)
 
-    if file is True:
-        np.savetxt('loops.txt', loopfile, '%5.5f')
-        
-    del loopfile
+    if loopfile is not None:
+        if file is True:
+            np.savetxt('loops.txt', loopfile, '%5.5f')
+            
+        del loopfile
     
     # END_TRACE     
     return loops

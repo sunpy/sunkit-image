@@ -17,13 +17,14 @@ import astropy
 import numpy as np
 
 import sunkit_image.trace as trace
+import sunpy.cm 
 
 ###########################################################################
 # We will be using `astropy.io.fits.getdata` to read the FITS file from the tutorial website.
 image = astropy.io.fits.getdata("http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True)
 
 # The original image is plotted to showcase the difference.
-plt.imshow(image, cmap="Spectral", origin="lower")
+plt.imshow(image, cmap="hmimag", origin="lower")
 
 ###########################################################################
 # Now the loop tracing will begin. We will be using the same set of parameters
@@ -43,6 +44,10 @@ loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthr
 # Now we will plot all the loops detected.
 
 fig = plt.figure()
+
+# We also plot the original image to overlay the loops over it.
+plt.imshow(image, cmap="hmimag", origin="lower")
+
 for loop in loops:
 
     # We collect all the ``x`` and ``y`` coordinates in seperate lists for plotting.
@@ -53,10 +58,5 @@ for loop in loops:
         y.append(points[1])
     
     plt.plot(x, y, 'b')
-    
-#################################################################################
-# We also plot the original image to overlay the loops over it.
-
-plt.imshow(image, cmap="Spectral", origin="lower")
 
 plt.show()
