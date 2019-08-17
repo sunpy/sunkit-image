@@ -3,11 +3,11 @@
 Coronal Loops Tracing
 =====================
 
-This example applies traces out the coronal loops in a FITS image file
-using `sunkit_image.trace.occult2`. In this example we will use the settings
-and the data from Markus J. Aschwanden tutorial on his IDL implemetation of
-the ``OCCULT2`` algorithm, which can be found `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>__.
-The aim of this example is to demonstrate that `sunkit_image.trace.occult2` provides similar
+This example applies traces out the coronal loops in a FITS file
+using `~sunkit_image.trace.occult2`. In this example we will use the settings
+and the data from Markus Aschwanden's tutorial on his IDL implementation of
+the ``OCCULT2`` algorithm, which can be found `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
+The aim of this example is to demonstrate that `~sunkit_image.trace.occult2` provides similar
 results as the IDL version.
 """
 # sphinx_gallery_thumbnail_number = 2
@@ -19,11 +19,10 @@ import numpy as np
 import sunkit_image.trace as trace
 
 ###########################################################################
-# We will be using `astropy.io.fits.getdata` to read a FITS file from the tutorial website
+# We will be using `astropy.io.fits.getdata` to read the FITS file from the tutorial website.
 image = astropy.io.fits.getdata("http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True)
 
-# The original image is plotted to showcase the difference. Matplotlib plots are inverted by default so
-# to fix it we will be using ``origin`` as ``lower``.
+# The original image is plotted to showcase the difference.
 plt.imshow(image, cmap="Spectral", origin="lower")
 
 ###########################################################################
@@ -37,10 +36,11 @@ plt.imshow(image, cmap="Spectral", origin="lower")
 # * The number of extra points in the loop below noise level to terminate a loop tracing ``ngap`` is 0.
 # * The base flux and median flux ratio ``qthresh1`` is 0.0
 # * The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 
-loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, nloop=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
+loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, nloop=1000, 
+                                  ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
 
 ###############################################################################
-# The `sunkit_image.trace.occult2` returns a list of all loop where each element
+# `~sunkit_image.trace.occult2` returns a list of all loop where each element
 # is itself a list of points containg ``x`` and ``y`` coordinates for each point.
 # Now we will plot all the loops detected.
 
@@ -55,9 +55,10 @@ for loop in loops:
         y.append(points[1])
     
     plt.plot(x, y, 'b')
+    
 #################################################################################
 # We also plot the original image to overlay the loops over it.
+
 plt.imshow(image, cmap="Spectral", origin="lower")
 
-# All the plots are plotted at the end
 plt.show()
