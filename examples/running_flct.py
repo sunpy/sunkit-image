@@ -14,12 +14,8 @@ import sunkit_image.flct as flct
 
 ###########################################################################
 # This examples demonstrates how to find the 2D velocity flow field.
-# We will create two dummy images containing a moving object and
-# assume the time difference between the images to be one second.
-# Here we will create two dummy images assuming time between them as
-# 1 second. We also plot both the images as subplots and demonstrate how
-# FLCT functions. This entire example has three parts all of which depicts motion
-# of the image in some particular directions.
+# It has three parts all of which depicts motion of the object in a dummy
+# image in some particular directions.
 
 #############################################################################
 # First we plot the velocity field when the image moves in positive ``X`` direction.
@@ -76,12 +72,8 @@ image2 = np.zeros((10, 10))
 image2[1:4, 0:3] = 1
 
 ###########################################################################
-# Now we come to the main function where FLCT is applied.
-# The values of the parameters were used which gave the best visual result
-# of the velocities. The time difference between the two images, ``deltat`` is assumed
-# to be 1 second. The units of length of the side of a single pixel, ``deltas`` is assumed
-# to be 1. The width of Gaussian used to weigh the subimages, ``sigma`` is taken to be 2.3.
-# Note you should always experiment with the values of ``sigma`` to get the best results.
+# Now we again apply FLCT to this new set of images using the same parameter values
+# as before.
 vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
 
 ############################################################################
@@ -115,12 +107,7 @@ image2 = np.zeros((10, 10))
 image2[1:4, 1:4] = 1
 
 ###########################################################################
-# Now we come to the main function where FLCT is applied.
-# The values of the parameters were used which gave the best visual result
-# of the velocities. The time difference between the two images, ``deltat`` is assumed
-# to be 1 second. The units of length of the side of a single pixel, ``deltas`` is assumed
-# to be 1. The width of Gaussian used to weigh the subimages, ``sigma`` is taken to be 2.3.
-# Note you should always experiment with the values of ``sigma`` to get the best results.
+# We again apply FLCT with the similar settings as before to find the velocity field
 vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
 
 ############################################################################
