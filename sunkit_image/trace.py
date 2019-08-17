@@ -6,7 +6,7 @@ import numpy as np
 from scipy import interpolate
 
 from sunkit_image.utils import (bandpass_filter, erase_loop_in_residual, curvature_radius,
-                                                initial_direction_finding, loop_add)
+                                initial_direction_finding, loop_add)
 
 __all__ = ["occult2"]
 
@@ -71,7 +71,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
 
     # The length of the tracing curved element
     nlen = rmin
-    
+
     wid = max(nsm2 // 2 - 1, 1)
 
     # BASE LEVEL: Removing the points below the base level
@@ -88,7 +88,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
     image2[0:nsm2, :] = 0.
     image2[nx - nsm2:, :] = 0.
 
-    if  (not np.count_nonzero(image2)) is True:
+    if (not np.count_nonzero(image2)) is True:
         raise RuntimeError("The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering.")
 
     # NOISE THRESHOLD
@@ -114,7 +114,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
         if zstart <= thresh:  # goto: end_trace
             break
 
-        # Points where the maximum flux is detected 
+        # Points where the maximum flux is detected
         max_coords = np.where(residual == zstart)
         istart, jstart = max_coords[0][0], max_coords[1][0]
 
@@ -143,7 +143,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
             xl[0] = istart
             yl[0] = jstart
             zl[0] = zstart
-            
+
             # This will return the angle at the first point of the loop during every forward or backward pass
             al[0] = initial_direction_finding(residual, xl[0], yl[0], nlen)
 
@@ -152,8 +152,9 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
 
                 # The below function call will return the coordinate, flux and angle of the next point.
                 xl, yl, zl, al = curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
-                
-                # This decides when to stop tracing the loop; when then last `ngap` pixels traced are below zero, the tracing will stop.
+
+                # This decides when to stop tracing the loop; when then last `ngap` pixels traced
+                # are below zero, the tracing will stop.
                 iz1 = max((ip + 1 - ngap), 0)
                 if np.max(zl[iz1:ip+2]) <= 0:
                     ip = max(iz1 - 1, 0)
@@ -210,8 +211,8 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
     if loopfile is not None:
         if file is True:
             np.savetxt('loops.txt', loopfile, '%5.5f')
-            
-        del loopfile
     
+        del loopfile
+
     # END_TRACE     
     return loops

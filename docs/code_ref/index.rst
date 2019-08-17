@@ -9,7 +9,6 @@ Code Reference
 
    sunkit_image
    enhance
-   noise
    radial
    trace
    utils
