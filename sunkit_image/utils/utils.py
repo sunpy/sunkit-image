@@ -6,7 +6,7 @@ import scipy.ndimage as ndimage
 from scipy import interpolate
 
 import astropy.units as u
-from sunpy.coordinates import frames
+from sunpy.map.maputils import all_coordinates_from_map
 
 __all__ = [
     "equally_spaced_bins",
@@ -109,8 +109,10 @@ def find_pixel_radii(smap, scale=None):
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
     """
-    # Calculate all the x and y coordinates of every pixel in the map.
-    x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
+   # Calculate the co-ordinates of every pixel.
+    coords = all_coordinates_from_map(smap)
+
+    # TODO: check that the returned coordinates are indeed helioprojective cartesian
 
     # Calculate the helioprojective Cartesian co-ordinates of every pixel.
     coords = smap.pixel_to_world(x, y).transform_to(frames.Helioprojective)
@@ -134,8 +136,8 @@ def get_radial_intensity_summary(
 
     Parameters
     ----------
-    smap : sunpy.map.Map
-        A sunpy map.
+    smap : `~sunpy.map.Map`
+        A SunPy map
 
     radial_bin_edges : `~astropy.units.Quantity`
         A two-dimensional array of bin edges of shape (2, nbins) where nbins is
