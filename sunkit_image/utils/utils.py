@@ -109,13 +109,10 @@ def find_pixel_radii(smap, scale=None):
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
     """
-   # Calculate the co-ordinates of every pixel.
+    # Calculate the co-ordinates of every pixel.
     coords = all_coordinates_from_map(smap)
 
     # TODO: check that the returned coordinates are indeed helioprojective cartesian
-
-    # Calculate the helioprojective Cartesian co-ordinates of every pixel.
-    coords = smap.pixel_to_world(x, y).transform_to(frames.Helioprojective)
 
     # Calculate the radii of every pixel in helioprojective Cartesian
     # co-ordinate distance units.
@@ -137,7 +134,7 @@ def get_radial_intensity_summary(
     Parameters
     ----------
     smap : `~sunpy.map.Map`
-        A SunPy map
+        A SunPy map.
 
     radial_bin_edges : `~astropy.units.Quantity`
         A two-dimensional array of bin edges of shape (2, nbins) where nbins is
