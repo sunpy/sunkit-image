@@ -488,7 +488,7 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     `float`
         The angle of the starting point of the loop.
     """
- 
+
     # Number of radial segments to be searched
     rad_segments = 30
     
@@ -506,7 +506,7 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     # This denotes loop tracing in backward direction
     if idir == 1:
         sign_dir = -1
-    
+
     # `ib1` and `ib2` decide the range of radius in which the next point is to be searched
     if ip == 0:
         ib1 = 0
@@ -517,7 +517,7 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
 
     # See Eqn. 6 in the paper. Getting the values of all the valid radii
     rad_i = rmin / (-1. + 2. * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(rad_segments - 1)).reshape((1, -1))
-    
+
     # See Eqn 16.
     beta0 = al[ip] + np.float32(np.pi / 2)
 
