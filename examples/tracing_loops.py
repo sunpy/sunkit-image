@@ -17,7 +17,7 @@ import astropy
 import numpy as np
 
 import sunkit_image.trace as trace
-import sunpy.cm 
+import sunpy.cm
 
 ###########################################################################
 # We will be using `astropy.io.fits.getdata` to read the FITS file from the tutorial website.
@@ -36,8 +36,8 @@ plt.imshow(image, cmap="hmimag", origin="lower")
 # The number of extra points in the loop below noise level to terminate a loop tracing ``ngap`` is 0.
 # The base flux and median flux ratio ``qthresh1`` is 0.0.
 # The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
-loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, 
-                                  ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
+loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000,
+                      ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
 
 ###############################################################################
 # `~sunkit_image.trace.occult2` returns a list of all loop where each element
@@ -57,7 +57,7 @@ for loop in loops:
     for points in loop:
         x.append(points[0])
         y.append(points[1])
-    
+
     plt.plot(x, y, 'b')
 
 plt.show()

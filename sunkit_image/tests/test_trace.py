@@ -16,12 +16,12 @@ def image():
     im = astropy.io.fits.getdata("http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True)
     return im
 
+
 @pytest.fixture
 def filepath_IDL():
 
     filepath = data.get_test_filepath("IDL.txt")
     return filepath
-
 
 
 @pytest.fixture
@@ -54,8 +54,8 @@ def test_occult2_remote(image, filepath_IDL, filepath_py):
             x.append(points[0])
             y.append(points[1])
 
-    assert np.allclose(expect[:,1], x)
-    assert np.allclose(expect[:,2], y)
+    assert np.allclose(expect[:, 1], x)
+    assert np.allclose(expect[:, 2], y)
 
     # Now we will test on the IDL output data
     # We know that the python code detects one point extra than the IDL code.
@@ -64,20 +64,20 @@ def test_occult2_remote(image, filepath_IDL, filepath_py):
 
     # Reading the IDL file
     expect = np.loadtxt(filepath_IDL)
-    
+
     # Taking all the coords
     coords_py = result[:, 1:3]
     coords_idl = expect[:, 1:3]
 
     # Checking all the coordinates must be close to each other
-    assert np.allclose(coords_py, coords_idl, atol=1e-0, rtol = 1e-10)
+    assert np.allclose(coords_py, coords_idl, atol=1e-0, rtol=1e-10)
 
     # We devise one more test where we will find the distance between the Python and IDL points
     # For the algorithm to work correctly this distance should be very small
     diff = coords_idl - coords_py
     square_diff = diff ** 2
     sum_diff = np.sum(square_diff, axis=1)
-    
+
     distance = np.sqrt(sum_diff)
     assert all(distance < 0.11)
 
@@ -97,7 +97,7 @@ def test_occult2_fig(image):
         for points in loop:
             x.append(points[0])
             y.append(points[1])
-        
+
         plt.plot(x, y, 'b')
 
 
@@ -117,9 +117,9 @@ def image_test():
 
     # An image containing a loop in a straight line
     ima = np.zeros((15, 15), dtype=np.float32)
-    ima[:,7] = 1
+    ima[:, 7] = 1
     ima[3:12, 7] = [4, 3, 6, 12, 4, 3, 4, 2, 1]
-    
+
     return ima
 
 
@@ -142,7 +142,7 @@ def test_occult2(test_image, image_test):
     # From the input image it is clear that all x coordinate is 7.
     assert np.allclose(np.round(x), np.ones(8) * 7)
     # All the y coords are [11, 10, ..., 4]
-    assert np.allclose(np.round(y), np.arange(11,3,-1))
+    assert np.allclose(np.round(y), np.arange(11, 3, -1))
 
     # This check will return an empty list as no loop is detected
     loops = trace.occult2(image_test, nsm1=1, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)

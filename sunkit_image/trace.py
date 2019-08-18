@@ -211,8 +211,8 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
     if loopfile is not None:
         if file is True:
             np.savetxt('loops.txt', loopfile, '%5.5f')
-    
+
         del loopfile
 
-    # END_TRACE     
+    # END_TRACE
     return loops

@@ -153,9 +153,9 @@ def test_bandpass_filter(image, test_map):
     assert np.allclose(expect, result)
 
     expect = np.array([[0., 0., 0., 0.],
-                        [0., 2.22222222, 2.22222222, 0.],
-                        [0., 2.22222222, 2.22222222, 0.],
-                        [0., 0., 0., 0.]])
+                       [0., 2.22222222, 2.22222222, 0.],
+                       [0., 2.22222222, 2.22222222, 0.],
+                       [0., 0., 0., 0.]])
 
     result = bandpass_filter(test_map)
 
@@ -180,10 +180,10 @@ def test_smooth(image, test_map):
 
     filtered = smooth(test_map, 3)
     expect = np.array([[1., 1., 1., 1.],
-                        [1., 2.77777777, 2.77777777, 1.],
-                        [1., 2.77777777, 2.77777777, 1.],
-                        [1., 1., 1., 1.]])
-    
+                       [1., 2.77777777, 2.77777777, 1.],
+                       [1., 2.77777777, 2.77777777, 1.],
+                       [1., 1., 1., 1.]])
+
     assert np.allclose(filtered, expect)
 
 
@@ -229,12 +229,12 @@ def test_image():
 
 
 def test_initial_direction_finding(test_image):
-    
+
     # The starting point of the loop i.e. the maximumflux position
     xstart = 0
     ystart = 1
     nlen = 30
-    
+
     # The angle returned is with respect to the ``x`` axis.
     al = initial_direction_finding(test_image, xstart, ystart, nlen)
 
@@ -277,7 +277,7 @@ def parameters_add_loop():
 
     # Here we are creating dummy coordinates and flux for a loop
     xloop = np.ones(8, dtype=np.float32) * 7
-    yloop = np.arange(11,3,-1, dtype=np.float32)
+    yloop = np.arange(11, 3, -1, dtype=np.float32)
     zloop = np.array([1, 2, 4, 3, 4, 12, 6, 3], dtype=np.float32)
 
     iloop = 0
@@ -292,7 +292,7 @@ def parameters_add_loop():
     # The empty structures in which the first loop is stored
     loops = []
     loopfile = None
-    
+
     return (lengths, xloop, yloop, zloop, iloop, loops, loopfile)
 
 
@@ -301,13 +301,13 @@ def test_add_loop(parameters_add_loop):
     # We call the add_loop function and the values should be placed in the structures
     loopfile, loops, iloop = loop_add(*parameters_add_loop)
 
-    expect_loopfile = np.array([[ 0.,  7., 11.,  1.,  0.],
-                                [ 0.,  7., 10.,  2.,  1.],
-                                [ 0.,  7.,  9.,  4.,  2.],
-                                [ 0.,  7.,  8.,  3.,  3.],
-                                [ 0.,  7.,  7.,  4.,  4.],
-                                [ 0.,  7.,  6., 12.,  5.],
-                                [ 0.,  7.,  5.,  6.,  6.]])
+    expect_loopfile = np.array([[0.,  7., 11.,  1.,  0.],
+                                [0.,  7., 10.,  2.,  1.],
+                                [0.,  7.,  9.,  4.,  2.],
+                                [0.,  7.,  8.,  3.,  3.],
+                                [0.,  7.,  7.,  4.,  4.],
+                                [0.,  7.,  6., 12.,  5.],
+                                [0.,  7.,  5.,  6.,  6.]])
 
     expect_loops = [[[7.0, 11.0], [7.0, 10.0], [7.0, 9.0], [7.0, 8.0], [7.0, 7.0], [7.0, 6.0], [7.0, 5.0]]]
 
@@ -315,16 +315,17 @@ def test_add_loop(parameters_add_loop):
     assert np.allclose(loops, expect_loops)
     assert np.allclose(iloop, 1)
 
+
 def test_parameters_add_loop(parameters_add_loop):
 
     lengths, xloop, yloop, zloop, iloop, loops, loopfile = parameters_add_loop
 
     assert np.allclose(lengths, np.arange(0, 8))
     assert np.allclose(xloop, np.ones(8) * 7)
-    assert np.allclose(yloop, np.arange(11,3,-1))
+    assert np.allclose(yloop, np.arange(11, 3 ,-1))
     assert np.allclose(zloop, np.array([1, 2, 4, 3, 4, 12, 6, 3]))
     assert np.allclose(iloop, 0)
     assert (not loops)
-    
+
     if loopfile is not None:
-        assert False 
+        assert False

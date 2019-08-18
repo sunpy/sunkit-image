@@ -431,7 +431,7 @@ def initial_direction_finding(image, xstart, ystart, nlen):
 
     # Creating the bidirectional tracing segment
     trace_seg_bi = step * (np.arange(nlen, dtype=np.float32) - nlen // 2).reshape((-1, 1))
-    
+
     # Creating an array of all angles between 0 to 180 degree
     angles = np.pi * np.arange(na, dtype=np.float32) / np.float32(na).reshape((1, -1))
 
@@ -453,7 +453,6 @@ def initial_direction_finding(image, xstart, ystart, nlen):
 
     # Returning the angle along which the flux is maximum
     return angles[0, np.argmax(flux)]
-
 
 
 def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
@@ -489,12 +488,16 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     `float`
         The angle of the starting point of the loop.
     """
-
-    nb = 30
+ 
+    # Number of radial segments to be searched
+    rad_segments = 30
+    
+    # The number of steps to be taken to move from one point to another
     step = 1
     nx, ny = image.shape
 
-    s_loop = step * np.arange(nlen, dtype=np.float32)
+    # The unidirectional tracing segment
+    trace_seg_uni = step * np.arange(nlen, dtype=np.float32).reshape((-1, 1))
 
     # This denotes loop tracing in forward direction
     if idir == 0:
@@ -503,117 +506,70 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     # This denotes loop tracing in backward direction
     if idir == 1:
         sign_dir = -1
-
+    
     # `ib1` and `ib2` decide the range of radius in which the next point is to be searched
     if ip == 0:
         ib1 = 0
-        ib2 = nb-1
+        ib2 = rad_segments-1
     if ip >= 1:
         ib1 = int(max(ir[ip] - 1, 0))
-        ib2 = int(min(ir[ip] + 1, nb-1))
+        ib2 = int(min(ir[ip] + 1, rad_segments-1))
 
+    # See Eqn. 6 in the paper. Getting the values of all the valid radii
+    rad_i = rmin / (-1. + 2. * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(rad_segments - 1)).reshape((1, -1))
+    
+    # See Eqn 16.
     beta0 = al[ip] + np.float32(np.pi / 2)
 
     # Finding the assumed centre of the loop
+    # See Eqn 17, 18.
     xcen = xl[ip] + rmin * np.float32(np.cos(beta0))
     ycen = yl[ip] + rmin * np.float32(np.sin(beta0))
 
-    # Finding the radius associated with the next point by finding the maximum flux
-    # along various radius values
-    flux_max = 0.
-    for ib in range(ib1, ib2 + 1):
+    # See Eqn 19, 20.
+    xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
+    ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
 
-        rad_i = rmin / (-1. + 2. * np.float32(ib) / np.float32(nb - 1))
-        xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
-        ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
-        beta_i = beta0 + sign_dir * s_loop / rad_i
-        x_ = xcen_i - rad_i * np.float32(np.cos(beta_i))
-        y_ = ycen_i - rad_i * np.float32(np.sin(beta_i))
-        ix = np.int_(x_ + 0.5)
-        iy = np.int_(y_ + 0.5)
-        ix = np.clip(ix, 0, nx - 1)
-        iy = np.clip(iy, 0, ny - 1)
-        flux_ = image[ix, iy]
-        flux = np.sum(np.maximum(flux_, 0.)) / np.float32(nlen)
+    # All the possible values of angle of the curved segment from cente
+    # See Eqn 21.
+    beta_i = beta0 + sign_dir * np.float32(np.matmul(trace_seg_uni, 1 / rad_i))
 
-        if flux > flux_max:
-            flux_max = flux
-            al[ip + 1] = al[ip] + sign_dir * (step / rad_i)
-            ir[ip+1] = ib
-            al_mid = (al[ip]+al[ip+1]) / 2.
-            xl[ip+1] = xl[ip] + step * np.float32(np.cos(al_mid + np.pi * idir))
-            yl[ip+1] = yl[ip] + step * np.float32(np.sin(al_mid + np.pi * idir))
-            ix_ip = min(max(int(xl[ip + 1] + 0.5), 0), nx - 1)
-            iy_ip = min(max(int(yl[ip + 1] + 0.5), 0), ny - 1)
-            zl[ip + 1] = image[ix_ip, iy_ip]
+    # Getting the possible values of the coordinates
+    x_pos = xcen_i - rad_i * np.float32(np.cos(beta_i))
+    y_pos = ycen_i - rad_i * np.float32(np.sin(beta_i))
 
-    # Attempt to optimize the code by vectorizing. Not succeessful as of yet due to
-    # three dimensional search space and also the readability of the code is affected
-    
-    # nb = 30
-    # step = 1
-    # nx, ny = image.shape
+    # Taking the ceil as images can be indexed by pixels
+    ix = np.int_(x_pos + 0.5)
+    iy = np.int_(y_pos + 0.5)
 
-    # s_loop = step * np.arange(nlen, dtype=np.float32).reshape((-1, 1))
+    # All the coordinate values should be within the input range
+    ix = np.clip(ix, 0, nx - 1)
+    iy = np.clip(iy, 0, ny - 1)
 
-    # # This denotes loop tracing in forward direction
-    # if idir == 0:
-    #     sign_dir = +1
+    # Calculating the mean flux at possible x and y locations
+    flux_ = image[ix, iy]
 
-    # # This denotes loop tracing in backward direction
-    # if idir == 1:
-    #     sign_dir = -1
-    
-    # # `ib1` and `ib2` decide the range of radius in which the next point is to be searched
-    # if ip == 0:
-    #     ib1 = 0
-    #     ib2 = nb-1
-    # if ip >= 1:
-    #     ib1 = int(max(ir[ip] - 1, 0))
-    #     ib2 = int(min(ir[ip] + 1, nb-1))
+    # Finding the average flux at every radii
+    flux = np.sum(np.maximum(flux_, 0.), axis=0) / np.float32(nlen)
 
-    # rad_i = rmin / (-1. + 2. * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(nb - 1)).reshape((1, -1))
-    
-    # beta0 = al[ip] + np.float32(np.pi / 2)
+    # Finding the maximum flux radii
+    v = np.argmax(flux)
 
-    # # Finding the assumed centre of the loop
-    # xcen = xl[ip] + rmin * np.float32(np.cos(beta0))
-    # ycen = yl[ip] + rmin * np.float32(np.sin(beta0))
+    # Getting the direction angle for the next point
+    # See Eqn 25.
+    al[ip + 1] = al[ip] + sign_dir * (step / rad_i[0, v])
+    ir[ip+1] = ib1 + v
 
-    # xcen_i = xl[ip] + (xcen - xl[ip]) * (rad_i / rmin)
-    # ycen_i = yl[ip] + (ycen - yl[ip]) * (rad_i / rmin)
+    # See Eqn 26.
+    al_mid = (al[ip]+al[ip+1]) / 2.
 
-    # beta_i = beta0 + sign_dir * np.float32(np.matmul(s_loop, 1 / rad_i))
+    # Coordinates of the next point in the loop
+    xl[ip+1] = xl[ip] + step * np.float32(np.cos(al_mid + np.pi * idir))
+    yl[ip+1] = yl[ip] + step * np.float32(np.sin(al_mid + np.pi * idir))
 
-    # rad_i = rad_i.reshape(-1)
-
-    # x_pos = xcen_i - rad_i[:, None, None] * np.float32(np.cos(beta_i))
-    # y_pos = ycen_i - rad_i[:, None, None] * np.float32(np.sin(beta_i))
-
-    # # Taking the ceil as images can be indexed by pixels
-    # ix = np.int_(x_pos + 0.5)
-    # iy = np.int_(y_pos + 0.5)
-
-    # # All the coordinate values should be within the input range
-    # ix = np.clip(ix, 0, nx - 1)
-    # iy = np.clip(iy, 0, ny - 1)
-
-    # # Calculating the mean flux at possible x and y locations
-    # flux_ = image[ix, iy]
-
-    # flux = flux_.sum(-1).sum(-1) / np.float32(nlen)
-
-    # v = np.argmax(flux)
-
-    # al[ip + 1] = al[ip] + sign_dir * (step / rad_i[v])
-    # ir[ip+1] = ib1 + v
-
-    # al_mid = (al[ip]+al[ip+1]) / 2.
-
-    # xl[ip+1] = xl[ip] + step * np.float32(np.cos(al_mid + np.pi * idir))
-    # yl[ip+1] = yl[ip] + step * np.float32(np.sin(al_mid + np.pi * idir))
-    # ix_ip = min(max(int(xl[ip + 1] + 0.5), 0), nx - 1)
-    # iy_ip = min(max(int(yl[ip + 1] + 0.5), 0), ny - 1)
-    # zl[ip + 1] = image[ix_ip, iy_ip]
+    # Bringing the coordinates values in the valid pixel range
+    ix_ip = min(max(int(xl[ip + 1] + 0.5), 0), nx - 1)
+    iy_ip = min(max(int(yl[ip + 1] + 0.5), 0), ny - 1)
+    zl[ip + 1] = image[ix_ip, iy_ip]
 
     return xl, yl, zl, al
