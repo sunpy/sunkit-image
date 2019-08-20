@@ -11,4 +11,3 @@ For further information see Welsch et al, 2004, ApJ, 610 (doi:10.1086/421767) an
 .. automodapi:: sunkit_image.flct
     :no-inheritance-diagram:
 
-.. automodapi:: sunkit_image.flct.utils
