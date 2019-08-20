@@ -3,12 +3,12 @@
 Coronal Loops Tracing
 =====================
 
-This example applies traces out the coronal loops in a FITS file
+This example traces out the coronal loops in a FITS image
 using `~sunkit_image.trace.occult2`. In this example we will use the settings
 and the data from Markus Aschwanden's tutorial on his IDL implementation of
 the ``OCCULT2`` algorithm, which can be found `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
 The aim of this example is to demonstrate that `~sunkit_image.trace.occult2` provides similar
-results as the IDL version.
+results compared to the IDL version.
 """
 # sphinx_gallery_thumbnail_number = 2
 
@@ -23,11 +23,11 @@ import sunpy.cm
 # We will be using `astropy.io.fits.getdata` to read the FITS file from the tutorial website.
 image = astropy.io.fits.getdata("http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True)
 
-# The original image is plotted to showcase the difference.
+# The original image shows coronal loops.
 plt.imshow(image, cmap="hmimag", origin="lower")
 
 ###########################################################################
-# Now the loop tracing will begin. We will be using the same set of parameters
+# Now the loop tracing will begin. We will use the same set of parameters
 # as in the IDL tutorial.
 # The lowpass filter boxcar filter size ``nsm1`` is taken to be 3.
 # The minimum radius of curvature at any point in the loop ``rmin`` is 30 pixels.
@@ -36,12 +36,13 @@ plt.imshow(image, cmap="hmimag", origin="lower")
 # The number of extra points in the loop below noise level to terminate a loop tracing ``ngap`` is 0.
 # The base flux and median flux ratio ``qthresh1`` is 0.0.
 # The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
+# For the meaning of these parameters please consult the OCCULT2 article.
 loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000,
                       ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
 
 ###############################################################################
 # `~sunkit_image.trace.occult2` returns a list of all loop where each element
-# is itself a list of points containg ``x`` and ``y`` coordinates for each point.
+# is itself a list of points containing ``x`` and ``y`` coordinates for each point.
 # Now we will plot all the loops detected.
 
 fig = plt.figure()

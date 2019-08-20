@@ -14,7 +14,7 @@ __all__ = ["occult2"]
 def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=False):
     """
     Implements the Oriented Coronal CUrved Loop Tracing (OCCULT-2) algorithm
-    for loop tracing in solar images.
+    for loop tracing in images.
 
     Parameters
     ----------
