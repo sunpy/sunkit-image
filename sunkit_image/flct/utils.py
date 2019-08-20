@@ -20,7 +20,7 @@ def read_2_images(filename, order="row"):
     .. note ::
         This function can be used to read only special arrays which were written
         using the ``write`` functions in `~sunkit_image.flct` or the IDL IO routines
-        as given on the FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+        as given on the FLCT `website <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/dir?ci=tip>`__.
 
     Parameters
     ----------
@@ -66,7 +66,7 @@ def read_3_images(filename, order="row"):
     .. note ::
         This function can be used to read only special arrays which were written
         using the ``write`` functions in `~sunkit_image.flct` or the IDL IO routines
-        as given on the FLCT source `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+        as given on the FLCT source `website <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/dir?ci=tip>`__.
 
     Parameters
     ----------

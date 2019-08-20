@@ -96,7 +96,7 @@ def flct(
         If set to `True` bias correction will be applied while computing the velocities.
         This bias is intrinsic to the FLCT algorithm and can underestimate the velocities
         during calculations. For more
-        details visit `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/flct_1.06/doc/bias_correction_in_flct.txt>`__.
+        details visit `here <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/artifact/ac3d8244c3221e8b>`__.
     thresh : `float`, optional
         A calculation will not be done for a pixel if the average absolute value
         between the two images is less than ``thresh``.
@@ -147,7 +147,8 @@ def flct(
 
     References
     ----------
-    * `FLCT C Code <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+    * `FLCT C Code <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/dir?ci=tip>__`
+    * `FLCT C Code Old Version <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
     """
 
     # Checking whether the C extension is correctly built.
