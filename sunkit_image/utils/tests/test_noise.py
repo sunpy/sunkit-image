@@ -4,6 +4,7 @@ from skimage import data
 
 import sunkit_image.utils.noise as nf
 
+
 @pytest.fixture
 def img():
     image = data.camera()

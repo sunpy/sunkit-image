@@ -133,12 +133,12 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
     kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 0), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
+    imgh = imgh[:, 1:imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 2)
     imgv = correlate(img, kv, mode="nearest")
-    imgv = imgv[1 : imgv.shape[0] - 1, :, :]
+    imgv = imgv[1:imgv.shape[0] - 1, :, :]
     imgv = imgv * imgv
 
     Dh = np.matrix(conv2d_matrix(np.squeeze(kh, 2), patchsize, patchsize))
@@ -173,11 +173,11 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
         if decim > 0:
             XtrX = np.transpose(np.concatenate((Xtr, X), axis=0))
-            XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(),])
+            XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(), ])
             p = np.floor(XtrX.shape[1] / (decim + 1))
             p = np.expand_dims(np.arange(0, p) * (decim + 1), 0)
             Xtr = XtrX[0, p.astype("int")]
-            X = np.squeeze(XtrX[1 : XtrX.shape[1], p.astype("int")])
+            X = np.squeeze(XtrX[1:XtrX.shape[1], p.astype("int")])
 
         # noise level estimation
         tau = np.inf
@@ -246,7 +246,7 @@ def conv2d_matrix(H, rows, columns):
         for j in range(matr_column):
             for p in range(s[0]):
                 start = (i + p) * columns + j
-                T[k, start : start + s[1]] = H[p, :]
+                T[k, start:start + s[1]] = H[p, :]
 
             k += 1
     return T
@@ -261,12 +261,12 @@ def weak_texture_mask(img, patchsize, thresh):
 
     kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
+    imgh = imgh[:, 1:imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
     imgv = correlate(img, kv, mode="nearest")
-    imgv = imgv[1 : imgv.shape[0] - 1, :, :]
+    imgv = imgv[1:imgv.shape[0] - 1, :, :]
     imgv = imgv * imgv
 
     s = img.shape
@@ -300,7 +300,7 @@ def weak_texture_mask(img, patchsize, thresh):
         for col in range(0, s[1] - patchsize + 1):
             for row in range(0, s[0] - patchsize + 1):
                 if p[:, ind]:
-                    msk[row : row + patchsize - 1, col : col + patchsize - 1, cha] = 1
+                    msk[row:row + patchsize - 1, col:col + patchsize - 1, cha] = 1
                 ind = ind + 1
 
     # clean up
