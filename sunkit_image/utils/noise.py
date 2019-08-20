@@ -7,10 +7,10 @@ from scipy.ndimage import correlate
 from scipy.stats import gamma
 from skimage.util import view_as_windows
 
-__all__ = ["noise_estimation", "noiselevel", "convmtx2", "weaktexturemask"]
+__all__ = ["noise_estimation", "noiselevel", "conv2d_matrix", "weak_texture_mask"]
 
 
-def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
+def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=3):
 
     """
     Estimates the noise level of an image.
@@ -27,18 +27,18 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
     decim : `int`, optional
         Decimation factor, defaults to 0.
         If you use large number, the calculation will be accelerated.
-    conf : `float`, optional
+    confidence : `float`, optional
         Confidence interval to determine the threshold for the weak texture.
         In this algorithm, this value is usually set the value very close to one.
         Defaults to 0.99.
-    itr : `int`, optional
+    iterations : `int`, optional
         Number of iterations,  defaults to 3.
 
     Returns
     ----------
     nlevel: `numpy.ndarray`
         Estimated noise levels.
-    th: `numpy.ndarray`
+    thresh: `numpy.ndarray`
         Threshold to extract weak texture patches at the last iteration.
     num: `numpy.ndarray`
         Number of extracted weak texture patches at the last iteration.
@@ -51,7 +51,7 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
     >>> import numpy as np
     >>> np.random.seed(0)
     >>> noisy_image_array = np.random.randn(100, 100)
-    >>> estimate = noise_estimation(noisy_image_array, patchsize=11, itr=10)
+    >>> estimate = noise_estimation(noisy_image_array, patchsize=11, iterations=10)
     >>> estimate['mask'] # Prints mask
     array([[1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
@@ -62,7 +62,7 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
         [0., 0., 0., ..., 0., 0., 0.]])
     >>> estimate['nlevel'] # Prints nlevel
     array([1.0014616])
-    >>> estimate['th'] # Prints th
+    >>> estimate['thresh'] # Prints thresh
     array([173.61530607])
     >>> estimate['num'] # Prints num
      array([8100.])
@@ -96,31 +96,31 @@ def noise_estimation(img, patchsize=7, decim=0, conf=1 - 1e-6, itr=3):
         raise TypeError("decim must be an integer, or int-compatible, variable")
 
     try:
-        conf = float(conf)
+        confidence = float(confidence)
     except ValueError:
-        raise TypeError("conf must be a float, or float-compatible, value between 0 and 1")
+        raise TypeError("confidence must be a float, or float-compatible, value between 0 and 1")
 
-    if not (conf >= 0 and conf <= 1):
-        raise ValueError("conf must be defined in the interval 0 <= conf <= 1")
+    if not (confidence >= 0 and confidence <= 1):
+        raise ValueError("confidence must be defined in the interval 0 <= confidence <= 1")
 
     try:
-        itr = int(itr)
+        iterations = int(iterations)
     except ValueError:
-        raise TypeError("itr must be an integer, or int-compatible, variable")
+        raise TypeError("iterations must be an integer, or int-compatible, variable")
 
     output = {}
-    nlevel, th, num = noiselevel(img, patchsize, decim, conf, itr)
-    mask = weaktexturemask(img, patchsize, th)
+    nlevel, thresh, num = noiselevel(img, patchsize, decim, confidence, iterations)
+    mask = weak_texture_mask(img, patchsize, thresh)
 
     output["nlevel"] = nlevel
-    output["th"] = th
+    output["thresh"] = thresh
     output["num"] = num
     output["mask"] = mask
 
     return output
 
 
-def noiselevel(img, patchsize, decim, conf, itr):
+def noiselevel(img, patchsize, decim, confidence, iterations):
     """
     Calculates the noise level of the input array.
     """
@@ -128,7 +128,7 @@ def noiselevel(img, patchsize, decim, conf, itr):
         img = np.expand_dims(img, 2)
 
     nlevel = np.ndarray(img.shape[2])
-    th = np.ndarray(img.shape[2])
+    thresh = np.ndarray(img.shape[2])
     num = np.ndarray(img.shape[2])
 
     kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 0), 2)
@@ -141,15 +141,15 @@ def noiselevel(img, patchsize, decim, conf, itr):
     imgv = imgv[1 : imgv.shape[0] - 1, :, :]
     imgv = imgv * imgv
 
-    Dh = np.matrix(convmtx2(np.squeeze(kh, 2), patchsize, patchsize))
-    Dv = np.matrix(convmtx2(np.squeeze(kv, 2), patchsize, patchsize))
+    Dh = np.matrix(conv2d_matrix(np.squeeze(kh, 2), patchsize, patchsize))
+    Dv = np.matrix(conv2d_matrix(np.squeeze(kv, 2), patchsize, patchsize))
 
     DD = Dh.getH() * Dh + Dv.getH() * Dv
 
     r = np.double(np.linalg.matrix_rank(DD))
     Dtr = np.trace(DD)
 
-    tau0 = gamma.ppf(conf, r / 2, scale=(2 * Dtr / r))
+    tau0 = gamma.ppf(confidence, r / 2, scale=(2 * Dtr / r))
 
     for cha in range(img.shape[2]):
         X = view_as_windows(img[:, :, cha], (patchsize, patchsize))
@@ -189,7 +189,7 @@ def noiselevel(img, patchsize, decim, conf, itr):
             d = np.flip(np.linalg.eig(cov)[0], axis=0)
             sig2 = d[0]
 
-        for i in range(1, itr):
+        for _ in range(1, iterations):
             # weak texture selection
             tau = sig2 * tau0
             p = Xtr < tau
@@ -205,16 +205,16 @@ def noiselevel(img, patchsize, decim, conf, itr):
             sig2 = d[0]
 
         nlevel[cha] = np.sqrt(sig2)
-        th[cha] = tau
+        thresh[cha] = tau
         num[cha] = X.shape[1]
 
     # clean up
     img = np.squeeze(img)
 
-    return nlevel, th, num
+    return nlevel, thresh, num
 
 
-def convmtx2(H, m, n):
+def conv2d_matrix(H, rows, columns):
     """
     Specialized 2D convolution matrix generation.
 
@@ -222,9 +222,9 @@ def convmtx2(H, m, n):
     ----------
     H : `numpy.ndarray`
         Input matrix.
-    m : `numpy.ndarray`
+    rows : `numpy.ndarray`
         Rows in convolution matrix.
-    n : `numpy.ndarray`
+    columns : `numpy.ndarray`
         Columns in convolution matrix.
 
     Returns
@@ -233,25 +233,30 @@ def convmtx2(H, m, n):
         The new convoluted matrix.
     """
     s = np.shape(H)
-    m = int(m)
-    n = int(n)
-    T = np.zeros([(m - s[0] + 1) * (n - s[1] + 1), m * n])
+    rows = int(rows)
+    columns = int(columns)
+
+    matr_row = rows - s[0] + 1
+    matr_column = columns - s[1] + 1
+
+    T = np.zeros([matr_row * matr_column, rows * columns])
 
     k = 0
-    for i in range((m - s[0] + 1)):
-        for j in range((n - s[1] + 1)):
+    for i in range(matr_row):
+        for j in range(matr_column):
             for p in range(s[0]):
-                T[k, (i + p) * n + j : (i + p) * n + j + 1 + s[1] - 1] = H[p, :]
+                start = (i + p) * columns + j
+                T[k, start : start + s[1]] = H[p, :]
 
             k += 1
     return T
 
 
-def weaktexturemask(img, patchsize, th):
+def weak_texture_mask(img, patchsize, thresh):
     """
     Calculates the weak texture mask.
     """
-    if len(img.shape) < 3:
+    if img.ndim < 3:
         img = np.expand_dims(img, 2)
 
     kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
@@ -289,7 +294,7 @@ def weaktexturemask(img, patchsize, th):
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
 
-        p = Xtr < th[cha]
+        p = Xtr < thresh[cha]
         ind = 0
 
         for col in range(0, s[1] - patchsize + 1):
