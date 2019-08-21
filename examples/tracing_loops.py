@@ -13,11 +13,12 @@ results compared to the IDL version.
 # sphinx_gallery_thumbnail_number = 2
 
 import matplotlib.pyplot as plt
-import astropy
 import numpy as np
 
-import sunkit_image.trace as trace
+import astropy
 import sunpy.cm
+
+import sunkit_image.trace as trace
 
 ###########################################################################
 # We will be using `astropy.io.fits.getdata` to read the FITS file from the tutorial website.
