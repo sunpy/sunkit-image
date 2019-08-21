@@ -3,10 +3,14 @@ This module contains functions that will the trace out structures in an image.
 """
 
 import numpy as np
-from scipy import interpolate
 
-from sunkit_image.utils import (bandpass_filter, erase_loop_in_image, curvature_radius,
-                                initial_direction_finding, loop_add)
+from sunkit_image.utils import (
+    bandpass_filter,
+    curvature_radius,
+    erase_loop_in_image,
+    initial_direction_finding,
+    loop_add,
+)
 
 __all__ = ["occult2"]
 
@@ -67,7 +71,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
     npmax = 2000
 
     # High pass filter boxcar window size
-    nsm2 = nsm1+2
+    nsm2 = nsm1 + 2
 
     # The length of the tracing curved element
     nlen = rmin
@@ -83,13 +87,15 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
     nx, ny = image2.shape
 
     # ERASE BOUNDARIES ZONES (SMOOTHING EFFECTS)
-    image2[:, 0:nsm2] = 0.
-    image2[:, ny - nsm2:] = 0.
-    image2[0:nsm2, :] = 0.
-    image2[nx - nsm2:, :] = 0.
+    image2[:, 0:nsm2] = 0.0
+    image2[:, ny - nsm2 :] = 0.0
+    image2[0:nsm2, :] = 0.0
+    image2[nx - nsm2 :, :] = 0.0
 
     if (not np.count_nonzero(image2)) is True:
-        raise RuntimeError("The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering.")
+        raise RuntimeError(
+            "The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering."
+        )
 
     # NOISE THRESHOLD
     zmed = np.median(image2[image2 > 0])
@@ -151,12 +157,14 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
             for ip in range(0, npmax):
 
                 # The below function call will return the coordinate, flux and angle of the next point.
-                xl, yl, zl, al = curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
+                xl, yl, zl, al = curvature_radius(
+                    residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir
+                )
 
                 # This decides when to stop tracing the loop; when then last `ngap` pixels traced
                 # are below zero, the tracing will stop.
                 iz1 = max((ip + 1 - ngap), 0)
-                if np.max(zl[iz1:ip+2]) <= 0:
+                if np.max(zl[iz1 : ip + 2]) <= 0:
                     ip = max(iz1 - 1, 0)
                     break  # goto endsegm
 
@@ -165,15 +173,15 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
             # RE-ORDERING LOOP COORDINATES
             # After the forward pass the loop points are flipped as the backward pass starts from the maximum flux point
             if idir == 0:
-                xloop = np.flip(xl[0:ip+1])
-                yloop = np.flip(yl[0:ip+1])
-                zloop = np.flip(zl[0:ip+1])
+                xloop = np.flip(xl[0 : ip + 1])
+                yloop = np.flip(yl[0 : ip + 1])
+                zloop = np.flip(zl[0 : ip + 1])
                 continue
             # After the backward pass the forward and backward traces are concatenated
             if idir == 1 and ip >= 1:
-                xloop = np.concatenate([xloop, xl[1:ip+1]])
-                yloop = np.concatenate([yloop, yl[1:ip+1]])
-                zloop = np.concatenate([zloop, zl[1:ip+1]])
+                xloop = np.concatenate([xloop, xl[1 : ip + 1]])
+                yloop = np.concatenate([yloop, yl[1 : ip + 1]])
+                zloop = np.concatenate([zloop, zl[1 : ip + 1]])
             else:
                 break
 
@@ -198,11 +206,13 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
             looplen = 0
             if np1 >= 2:
                 for ip in range(1, np1):
-                    s[ip] = s[ip - 1] + np.sqrt((xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2)
-            looplen = s[np1-1]
+                    s[ip] = s[ip - 1] + np.sqrt(
+                        (xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2
+                    )
+            looplen = s[np1 - 1]
 
         # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum specified
-        if (looplen >= lmin):
+        if looplen >= lmin:
             loopfile, loops, iloop = loop_add(s, xloop, yloop, zloop, iloop, loops, loopfile)
 
         # ERASE LOOP IN RESIDUAL IMAGE
@@ -210,7 +220,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2, file=Fals
 
     if loopfile is not None:
         if file is True:
-            np.savetxt('loops.txt', loopfile, '%5.5f')
+            np.savetxt("loops.txt", loopfile, "%5.5f")
 
         del loopfile
 

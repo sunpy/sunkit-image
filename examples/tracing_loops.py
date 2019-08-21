@@ -21,7 +21,9 @@ import sunpy.cm
 
 ###########################################################################
 # We will be using `astropy.io.fits.getdata` to read the FITS file from the tutorial website.
-image = astropy.io.fits.getdata("http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True)
+image = astropy.io.fits.getdata(
+    "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
+)
 
 # The original image shows coronal loops.
 plt.imshow(image, cmap="hmimag", origin="lower")
@@ -37,8 +39,9 @@ plt.imshow(image, cmap="hmimag", origin="lower")
 # The base flux and median flux ratio ``qthresh1`` is 0.0.
 # The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
 # For the meaning of these parameters please consult the OCCULT2 article.
-loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000,
-                      ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
+loops = trace.occult2(
+    image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True
+)
 
 ###############################################################################
 # `~sunkit_image.trace.occult2` returns a list of all loop where each element
@@ -59,6 +62,6 @@ for loop in loops:
         x.append(points[0])
         y.append(points[1])
 
-    plt.plot(x, y, 'b')
+    plt.plot(x, y, "b")
 
 plt.show()

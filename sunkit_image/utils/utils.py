@@ -2,7 +2,6 @@
 This module contains a collection of functions of general utility.
 """
 import numpy as np
-import scipy.ndimage as ndimage
 from scipy import interpolate
 
 import astropy.units as u
@@ -218,7 +217,8 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
 
 def smooth(image, width, nanopt="replace"):
     """
-    Python implementation of the IDL `smooth <https://www.harrisgeospatial.com/docs/smooth.html>`__.
+    Python implementation of the IDL `smooth
+    <https://www.harrisgeospatial.com/docs/smooth.html>`__.
 
     Parameters
     ----------
@@ -251,9 +251,9 @@ def smooth(image, width, nanopt="replace"):
     r, c = image.shape
 
     # Assume that width, the width of the window is always square.
-    startrc = int((width - 1)/2)
-    stopr = int(r - ((width + 1)/2) + 1)
-    stopc = int(c - ((width + 1)/2) + 1)
+    startrc = int((width - 1) / 2)
+    stopr = int(r - ((width + 1) / 2) + 1)
+    stopc = int(c - ((width + 1) / 2) + 1)
 
     # For all pixels within the border defined by the box size, calculate the average in the window.
     # There are two options:
@@ -262,15 +262,15 @@ def smooth(image, width, nanopt="replace"):
 
     for col in range(startrc, stopc):
         # Calculate the window start and stop columns
-        startwc = col - int(width/2)
-        stopwc = col + int(width/2) + 1
+        startwc = col - int(width / 2)
+        stopwc = col + int(width / 2) + 1
         for row in range(startrc, stopr):
             # Calculate the window start and stop rows
-            startwr = row - int(width/2)
-            stopwr = row + int(width/2) + 1
+            startwr = row - int(width / 2)
+            stopwr = row + int(width / 2) + 1
             # Extract the window
             window = image[startwr:stopwr, startwc:stopwc]
-            if nanopt == 'replace':
+            if nanopt == "replace":
                 # If we're replacing Nans, then select only the finite elements
                 window = window[np.isfinite(window)]
             # Calculate the mean of the window
@@ -281,8 +281,8 @@ def smooth(image, width, nanopt="replace"):
 
 def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     """
-    Makes all the points in a loop and its vicinity as zero in the original image to prevent them from being
-    traced again.
+    Makes all the points in a loop and its vicinity as zero in the original
+    image to prevent them from being traced again.
 
     Parameters
     ----------
@@ -312,25 +312,26 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     xend = min(istart + width, nx - 1)
     ystart = max(jstart - width, 0)
     yend = min(jstart + width, ny - 1)
-    image[xstart:xend + 1, ystart:yend + 1] = 0.
+    image[xstart : xend + 1, ystart : yend + 1] = 0.0
 
     # All the points surrounding the loops are zeroed out
     for point in range(0, len(xloop)):
 
-        i0 = min(max(int(xloop[point]), 0), nx-1)
+        i0 = min(max(int(xloop[point]), 0), nx - 1)
         xstart = max(int(i0 - width), 0)
         xend = min(int(i0 + width), nx - 1)
-        j0 = min(max(int(yloop[point]), 0), ny-1)
+        j0 = min(max(int(yloop[point]), 0), ny - 1)
         ystart = max(int(j0 - width), 0)
         yend = min(int(j0 + width), ny - 1)
-        image[xstart:xend + 1, ystart:yend + 1] = 0.
+        image[xstart : xend + 1, ystart : yend + 1] = 0.0
 
     return image
 
 
 def loop_add(lengths, xloop, yloop, zloop, iloop, loops, loopfile):
     """
-    Adds the current loop to the output structures by interpolating the coordinates
+    Adds the current loop to the output structures by interpolating the
+    coordinates.
 
     Parameters
     ----------
@@ -449,7 +450,7 @@ def initial_direction_finding(image, xstart, ystart, nlen):
 
     # Calculating the mean flux at possible x and y locations
     flux_ = image[ix, iy]
-    flux = np.sum(np.maximum(flux_, 0.), axis=0) / np.float32(nlen)
+    flux = np.sum(np.maximum(flux_, 0.0), axis=0) / np.float32(nlen)
 
     # Returning the angle along which the flux is maximum
     return angles[0, np.argmax(flux)]
@@ -457,7 +458,8 @@ def initial_direction_finding(image, xstart, ystart, nlen):
 
 def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     """
-    Finds the radius of curvature at the given loop point and then uses it to find the next point in the loop.
+    Finds the radius of curvature at the given loop point and then uses it to
+    find the next point in the loop.
 
     Parameters
     ----------
@@ -491,7 +493,7 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
 
     # Number of radial segments to be searched
     rad_segments = 30
-    
+
     # The number of steps to be taken to move from one point to another
     step = 1
     nx, ny = image.shape
@@ -510,13 +512,15 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     # `ib1` and `ib2` decide the range of radius in which the next point is to be searched
     if ip == 0:
         ib1 = 0
-        ib2 = rad_segments-1
+        ib2 = rad_segments - 1
     if ip >= 1:
         ib1 = int(max(ir[ip] - 1, 0))
-        ib2 = int(min(ir[ip] + 1, rad_segments-1))
+        ib2 = int(min(ir[ip] + 1, rad_segments - 1))
 
     # See Eqn. 6 in the paper. Getting the values of all the valid radii
-    rad_i = rmin / (-1. + 2. * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(rad_segments - 1)).reshape((1, -1))
+    rad_i = rmin / (
+        -1.0 + 2.0 * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(rad_segments - 1)
+    ).reshape((1, -1))
 
     # See Eqn 16.
     beta0 = al[ip] + np.float32(np.pi / 2)
@@ -550,7 +554,7 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     flux_ = image[ix, iy]
 
     # Finding the average flux at every radii
-    flux = np.sum(np.maximum(flux_, 0.), axis=0) / np.float32(nlen)
+    flux = np.sum(np.maximum(flux_, 0.0), axis=0) / np.float32(nlen)
 
     # Finding the maximum flux radii
     v = np.argmax(flux)
@@ -558,14 +562,14 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     # Getting the direction angle for the next point
     # See Eqn 25.
     al[ip + 1] = al[ip] + sign_dir * (step / rad_i[0, v])
-    ir[ip+1] = ib1 + v
+    ir[ip + 1] = ib1 + v
 
     # See Eqn 26.
-    al_mid = (al[ip]+al[ip+1]) / 2.
+    al_mid = (al[ip] + al[ip + 1]) / 2.0
 
     # Coordinates of the next point in the loop
-    xl[ip+1] = xl[ip] + step * np.float32(np.cos(al_mid + np.pi * idir))
-    yl[ip+1] = yl[ip] + step * np.float32(np.sin(al_mid + np.pi * idir))
+    xl[ip + 1] = xl[ip] + step * np.float32(np.cos(al_mid + np.pi * idir))
+    yl[ip + 1] = yl[ip] + step * np.float32(np.sin(al_mid + np.pi * idir))
 
     # Bringing the coordinates values in the valid pixel range
     ix_ip = min(max(int(xl[ip + 1] + 0.5), 0), nx - 1)

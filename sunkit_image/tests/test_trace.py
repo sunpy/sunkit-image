@@ -1,19 +1,24 @@
-import matplotlib.pyplot as plt
-import astropy
-import numpy as np
-import pytest
 import os
 
-import sunkit_image.trace as trace
-import sunkit_image.data.test as data
+import matplotlib.pyplot as plt
+import numpy as np
+import pytest
+
+import astropy
 from sunpy.tests.helpers import figure_test
+
+import sunkit_image.data.test as data
+import sunkit_image.trace as trace
 
 
 @pytest.fixture
 @pytest.mark.remote_data
 def image():
 
-    im = astropy.io.fits.getdata("http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True)
+    im = astropy.io.fits.getdata(
+        "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits",
+        ignore_missing_end=True,
+    )
     return im
 
 
@@ -35,7 +40,9 @@ def filepath_py():
 def test_occult2_remote(image, filepath_IDL, filepath_py):
 
     # Testing on the same input files as in the IDL tutorial
-    loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True)
+    loops = trace.occult2(
+        image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True
+    )
 
     result = np.loadtxt("loops.txt")
 
@@ -87,7 +94,9 @@ def test_occult2_remote(image, filepath_IDL, filepath_py):
 def test_occult2_fig(image):
 
     # A figure test for occult2, the plot is same as the one in the IDL tutorial
-    loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
+    loops = trace.occult2(
+        image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
+    )
 
     for loop in loops:
 
@@ -98,7 +107,7 @@ def test_occult2_fig(image):
             x.append(points[0])
             y.append(points[1])
 
-        plt.plot(x, y, 'b')
+        plt.plot(x, y, "b")
 
 
 @pytest.fixture
@@ -128,7 +137,9 @@ def test_occult2(test_image, image_test):
     # Set of checks which does not require remote data
 
     # The first test were valid loops are detected
-    loops = trace.occult2(image_test, nsm1=1, rmin=30, lmin=0, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
+    loops = trace.occult2(
+        image_test, nsm1=1, rmin=30, lmin=0, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
+    )
 
     for loop in loops:
 
@@ -145,11 +156,18 @@ def test_occult2(test_image, image_test):
     assert np.allclose(np.round(y), np.arange(11, 3, -1))
 
     # This check will return an empty list as no loop is detected
-    loops = trace.occult2(image_test, nsm1=1, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
-    assert (not loops)
+    loops = trace.occult2(
+        image_test, nsm1=1, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
+    )
+    assert not loops
 
     # This check is used to verify whether the RuntimeError is triggered
     with pytest.raises(RuntimeError) as record:
-        _ = trace.occult2(test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
+        _ = trace.occult2(
+            test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
+        )
 
-    assert str(record.value) == "The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering."
+    assert (
+        str(record.value)
+        == "The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering."
+    )

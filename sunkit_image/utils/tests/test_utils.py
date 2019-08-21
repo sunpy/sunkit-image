@@ -7,11 +7,11 @@ from astropy.tests.helper import assert_quantity_allclose
 from sunkit_image.utils import (
     bandpass_filter,
     bin_edge_summary,
+    curvature_radius,
     equally_spaced_bins,
+    erase_loop_in_image,
     find_pixel_radii,
     get_radial_intensity_summary,
-    erase_loop_in_image,
-    curvature_radius,
     initial_direction_finding,
     loop_add,
     smooth,
@@ -152,10 +152,14 @@ def test_bandpass_filter(image, test_map):
 
     assert np.allclose(expect, result)
 
-    expect = np.array([[0., 0., 0., 0.],
-                       [0., 2.22222222, 2.22222222, 0.],
-                       [0., 2.22222222, 2.22222222, 0.],
-                       [0., 0., 0., 0.]])
+    expect = np.array(
+        [
+            [0.0, 0.0, 0.0, 0.0],
+            [0.0, 2.22222222, 2.22222222, 0.0],
+            [0.0, 2.22222222, 2.22222222, 0.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ]
+    )
 
     result = bandpass_filter(test_map)
 
@@ -179,10 +183,14 @@ def test_smooth(image, test_map):
     assert np.allclose(filtered, test_map)
 
     filtered = smooth(test_map, 3)
-    expect = np.array([[1., 1., 1., 1.],
-                       [1., 2.77777777, 2.77777777, 1.],
-                       [1., 2.77777777, 2.77777777, 1.],
-                       [1., 1., 1., 1.]])
+    expect = np.array(
+        [
+            [1.0, 1.0, 1.0, 1.0],
+            [1.0, 2.77777777, 2.77777777, 1.0],
+            [1.0, 2.77777777, 2.77777777, 1.0],
+            [1.0, 1.0, 1.0, 1.0],
+        ]
+    )
 
     assert np.allclose(filtered, expect)
 
@@ -200,19 +208,17 @@ def test_erase_loop_in_image(image, test_map):
 
     result = erase_loop_in_image(image, istart, jstart, width, xloop, yloop)
 
-    expect = np.array([[0., 0., 0., 1.],
-                       [0., 0., 0., 1.],
-                       [0., 0., 0., 1.],
-                       [0., 0., 0., 1.]])
+    expect = np.array(
+        [[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]]
+    )
 
     assert np.allclose(expect, result)
 
     result = erase_loop_in_image(test_map, istart, jstart, width, xloop, yloop)
 
-    expect = np.array([[0., 0., 0., 1.],
-                       [0., 0., 0., 1.],
-                       [0., 0., 0., 1.],
-                       [0., 0., 0., 1.]])
+    expect = np.array(
+        [[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]]
+    )
 
     assert np.allclose(expect, result)
 
@@ -287,7 +293,9 @@ def parameters_add_loop():
     lengths = np.zeros((np1), dtype=np.float32)
 
     for ip in range(1, np1):
-        lengths[ip] = lengths[ip - 1] + np.sqrt((xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2)
+        lengths[ip] = lengths[ip - 1] + np.sqrt(
+            (xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2
+        )
 
     # The empty structures in which the first loop is stored
     loops = []
@@ -301,15 +309,21 @@ def test_add_loop(parameters_add_loop):
     # We call the add_loop function and the values should be placed in the structures
     loopfile, loops, iloop = loop_add(*parameters_add_loop)
 
-    expect_loopfile = np.array([[0.,  7., 11.,  1.,  0.],
-                                [0.,  7., 10.,  2.,  1.],
-                                [0.,  7.,  9.,  4.,  2.],
-                                [0.,  7.,  8.,  3.,  3.],
-                                [0.,  7.,  7.,  4.,  4.],
-                                [0.,  7.,  6., 12.,  5.],
-                                [0.,  7.,  5.,  6.,  6.]])
+    expect_loopfile = np.array(
+        [
+            [0.0, 7.0, 11.0, 1.0, 0.0],
+            [0.0, 7.0, 10.0, 2.0, 1.0],
+            [0.0, 7.0, 9.0, 4.0, 2.0],
+            [0.0, 7.0, 8.0, 3.0, 3.0],
+            [0.0, 7.0, 7.0, 4.0, 4.0],
+            [0.0, 7.0, 6.0, 12.0, 5.0],
+            [0.0, 7.0, 5.0, 6.0, 6.0],
+        ]
+    )
 
-    expect_loops = [[[7.0, 11.0], [7.0, 10.0], [7.0, 9.0], [7.0, 8.0], [7.0, 7.0], [7.0, 6.0], [7.0, 5.0]]]
+    expect_loops = [
+        [[7.0, 11.0], [7.0, 10.0], [7.0, 9.0], [7.0, 8.0], [7.0, 7.0], [7.0, 6.0], [7.0, 5.0]]
+    ]
 
     assert np.allclose(loopfile, expect_loopfile)
     assert np.allclose(loops, expect_loops)
@@ -322,10 +336,10 @@ def test_parameters_add_loop(parameters_add_loop):
 
     assert np.allclose(lengths, np.arange(0, 8))
     assert np.allclose(xloop, np.ones(8) * 7)
-    assert np.allclose(yloop, np.arange(11, 3 ,-1))
+    assert np.allclose(yloop, np.arange(11, 3, -1))
     assert np.allclose(zloop, np.array([1, 2, 4, 3, 4, 12, 6, 3]))
     assert np.allclose(iloop, 0)
-    assert (not loops)
+    assert not loops
 
     if loopfile is not None:
         assert False
