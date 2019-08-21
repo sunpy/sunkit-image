@@ -7,9 +7,7 @@ try:
 except ImportError:
     _pyflct = None
 
-__all__ = [
-    "flct",
-]
+__all__ = ["flct"]
 
 
 def flct(

@@ -19,7 +19,7 @@ import sunkit_image.flct as flct
 
 #############################################################################
 # First we plot the velocity field when the image moves in positive ``X`` direction.
- 
+
 # Creating the input arrays
 image1 = np.zeros((10, 10))
 image1[0:3, 0:3] = 1
@@ -62,8 +62,8 @@ plt.imshow(image2, origin="lower")
 ax3.set_title("Second Image")
 
 #############################################################################
-# Nw, we plot the velocity field when the image moves in positive ``Y`` direction.
- 
+# Now, we plot the velocity field when the image moves in positive ``Y`` direction.
+
 # Creating the input arrays
 image1 = np.zeros((10, 10))
 image1[0:3, 0:3] = 1
@@ -98,7 +98,7 @@ ax3.set_title("Second Image")
 
 #############################################################################
 # Finally we plot the velocity field when the image moves in both the directions.
- 
+
 # Creating the input arrays
 image1 = np.zeros((10, 10))
 image1[0:3, 0:3] = 1
