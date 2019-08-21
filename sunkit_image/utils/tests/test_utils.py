@@ -341,5 +341,4 @@ def test_parameters_add_loop(parameters_add_loop):
     assert np.allclose(iloop, 0)
     assert not loops
 
-    if loopfile is not None:
-        assert False
+    assert loopfile is None
