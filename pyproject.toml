@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools_scm", "cython== 0.28.5", "wheel", "numpy==1.14.5"]
+requires = ["setuptools", "setuptools_scm", "cython== 0.29.13", "wheel", "numpy==1.14.5"]
 build-backend = 'setuptools.build_meta'
 
 [tool.black]
