@@ -3,17 +3,18 @@ import os
 import sys
 from itertools import chain
 
-# Ensure that astropy-helpers is available
-import ah_bootstrap  # noqa
-from astropy_helpers.setup_helpers import get_package_info, register_commands  # noqa
 from setuptools import setup
 from setuptools.config import read_configuration
 
 # Append cwd for pip 19
 sys.path.append(os.path.abspath("."))
+import ah_bootstrap  # noqa
 
+from astropy_helpers.setup_helpers import register_commands, get_package_info  # noqa
 
+################################################################################
 # Override the default Astropy Test Command
+################################################################################
 cmdclass = register_commands()
 try:
     from sunpy.tests.setup_command import SunPyTest
@@ -21,10 +22,12 @@ try:
     # Overwrite the Astropy Testing framework
     cmdclass["test"] = type("SunPyTest", (SunPyTest,), {"package_name": "sunkit_image"})
 except Exception:
-    # Catch everything, if it doesn't work, we still want SunPy to install.
+    # Catch everything, if it doesn't work, we still want sunkit_image to install.
     pass
 
+################################################################################
 # Programmatically generate some extras combos.
+################################################################################
 extras = read_configuration("setup.cfg")["options"]["extras_require"]
 
 # Dev is everything
