@@ -35,16 +35,11 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
         Number of iterations,  defaults to 3.
 
     Returns
-    ----------
-    nlevel: `numpy.ndarray`
-        Estimated noise levels.
-    thresh: `numpy.ndarray`
-        Threshold to extract weak texture patches at the last iteration.
-    num: `numpy.ndarray`
-        Number of extracted weak texture patches at the last iteration.
-    mask: `numpy.ndarray`
-        Weak-texture mask.
-    0 and 1 represent non-weak-texture and weak-texture regions, respectively.
+    -------
+    `dict`
+        A dictionary containing the estimated noise levels, `nlevel`;  threshold to extract weak texture
+        patches at the last iteration, `thresh`; number of extracted weak texture patches `num` and the
+        weak texture mask, `mask`.
 
     Examples
     --------
@@ -123,6 +118,28 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
 def noiselevel(img, patchsize, decim, confidence, iterations):
     """
     Calculates the noise level of the input array.
+
+    Parameters
+    ----------
+    img: `numpy.ndarray`
+        Single Numpy image array.
+    patchsize : `int`, optional
+        Patch size, defaults to 7.
+    decim : `int`, optional
+        Decimation factor, defaults to 0.
+        If you use large number, the calculation will be accelerated.
+    confidence : `float`, optional
+        Confidence interval to determine the threshold for the weak texture.
+        In this algorithm, this value is usually set the value very close to one.
+        Defaults to 0.99.
+    iterations : `int`, optional
+        Number of iterations,  defaults to 3.
+
+    Returns
+    -------
+    `tuple`
+        A tuple containing the estimated noise levels,  threshold to extract weak texture
+        patches at the last iteration, and number of extracted weak texture patches.
     """
     if len(img.shape) < 3:
         img = np.expand_dims(img, 2)
@@ -133,12 +150,12 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
     kh = np.expand_dims(np.expand_dims(np.array([-0.5, 0, 0.5]), 0), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[:, 1:imgh.shape[1] - 1, :]
+    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 2)
     imgv = correlate(img, kv, mode="nearest")
-    imgv = imgv[1:imgv.shape[0] - 1, :, :]
+    imgv = imgv[1 : imgv.shape[0] - 1, :, :]
     imgv = imgv * imgv
 
     Dh = np.matrix(conv2d_matrix(np.squeeze(kh, 2), patchsize, patchsize))
@@ -173,11 +190,11 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
         if decim > 0:
             XtrX = np.transpose(np.concatenate((Xtr, X), axis=0))
-            XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(), ])
+            XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(),])
             p = np.floor(XtrX.shape[1] / (decim + 1))
             p = np.expand_dims(np.arange(0, p) * (decim + 1), 0)
             Xtr = XtrX[0, p.astype("int")]
-            X = np.squeeze(XtrX[1:XtrX.shape[1], p.astype("int")])
+            X = np.squeeze(XtrX[1 : XtrX.shape[1], p.astype("int")])
 
         # noise level estimation
         tau = np.inf
@@ -246,7 +263,7 @@ def conv2d_matrix(H, rows, columns):
         for j in range(matr_column):
             for p in range(s[0]):
                 start = (i + p) * columns + j
-                T[k, start:start + s[1]] = H[p, :]
+                T[k, start : start + s[1]] = H[p, :]
 
             k += 1
     return T
@@ -255,18 +272,32 @@ def conv2d_matrix(H, rows, columns):
 def weak_texture_mask(img, patchsize, thresh):
     """
     Calculates the weak texture mask.
+
+    Parameters
+    ----------
+    img: `numpy.ndarray`
+        Single Numpy image array.
+    patchsize : `int`, optional
+        Patch size, defaults to 7.
+    thresh: `numpy.ndarray`
+        Threshold to extract weak texture patches at the last iteration.
+
+    Returns
+    -------
+    mask: `numpy.ndarray`
+        Weak-texture mask. 0 and 1 represent non-weak-texture and weak-texture regions, respectively.
     """
     if img.ndim < 3:
         img = np.expand_dims(img, 2)
 
     kh = np.expand_dims(np.transpose(np.vstack(np.array([-0.5, 0, 0.5]))), 2)
     imgh = correlate(img, kh, mode="nearest")
-    imgh = imgh[:, 1:imgh.shape[1] - 1, :]
+    imgh = imgh[:, 1 : imgh.shape[1] - 1, :]
     imgh = imgh * imgh
 
     kv = np.expand_dims(np.vstack(np.array([-0.5, 0, 0.5])), 1)
     imgv = correlate(img, kv, mode="nearest")
-    imgv = imgv[1:imgv.shape[0] - 1, :, :]
+    imgv = imgv[1 : imgv.shape[0] - 1, :, :]
     imgv = imgv * imgv
 
     s = img.shape
@@ -300,7 +331,7 @@ def weak_texture_mask(img, patchsize, thresh):
         for col in range(0, s[1] - patchsize + 1):
             for row in range(0, s[0] - patchsize + 1):
                 if p[:, ind]:
-                    msk[row:row + patchsize - 1, col:col + patchsize - 1, cha] = 1
+                    msk[row : row + patchsize - 1, col : col + patchsize - 1, cha] = 1
                 ind = ind + 1
 
     # clean up
