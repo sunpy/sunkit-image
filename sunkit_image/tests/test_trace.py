@@ -1,5 +1,3 @@
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -8,14 +6,13 @@ import astropy
 from sunpy.tests.helpers import figure_test
 
 import sunkit_image.data.test as data
-
 from sunkit_image.trace import (
-    occult2,
     bandpass_filter,
     curvature_radius,
     erase_loop_in_image,
     initial_direction_finding,
     loop_add,
+    occult2,
     smooth,
 )
 
@@ -169,8 +166,8 @@ def test_occult2(test_image, image_test):
 
     assert (
         str(record.value)
-        == "The filter size is very large compared to the size of the image." + 
-        " The entire image zeros out while smoothing the image edges after filtering."
+        == "The filter size is very large compared to the size of the image."
+        + " The entire image zeros out while smoothing the image edges after filtering."
     )
 
 

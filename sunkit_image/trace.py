@@ -1,5 +1,6 @@
 """
-This module contains functions that will the trace out coronal loop-like structures in an image.
+This module contains functions that will the trace out coronal loop-like
+structures in an image.
 """
 
 import numpy as np
@@ -94,8 +95,8 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
     if (not np.count_nonzero(image2)) is True:
         raise RuntimeError(
-            "The filter size is very large compared to the size of the image." + 
-            " The entire image zeros out while smoothing the image edges after filtering."
+            "The filter size is very large compared to the size of the image."
+            + " The entire image zeros out while smoothing the image edges after filtering."
         )
 
     # NOISE THRESHOLD
@@ -262,7 +263,8 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
 
 def smooth(image, width, nanopt="replace"):
     """
-    Python implementation of the IDL `smooth
+    Python implementation of the IDL `smooth.
+
     <https://www.harrisgeospatial.com/docs/smooth.html>`__.
 
     Parameters
@@ -419,10 +421,6 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops):
     # The one dimensional interpolation function created for interpolating y coordinates
     interfunc = interpolate.interp1d(lengths, yloop, fill_value="extrapolate")
     y_interp = interfunc(interp_points)
-
-    # The one dimensional interpolation function created for interpolating the flux values
-    interfunc = interpolate.interp1d(lengths, zloop, fill_value="extrapolate")
-    flux_interp = interfunc(interp_points)
 
     iloop += 1
 

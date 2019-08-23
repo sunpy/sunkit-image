@@ -9,7 +9,6 @@ from sunkit_image.utils import (
     equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,
-
 )
 
 
