@@ -41,17 +41,17 @@ plt.imshow(image, cmap="hmimag", origin="lower")
 # The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
 # For the meaning of these parameters please consult the OCCULT2 article.
 loops = trace.occult2(
-    image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0, file=True
+    image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
 )
 
 ###############################################################################
-# `~sunkit_image.trace.occult2` returns a list of all loop where each element
-# is itself a list of points containing ``x`` and ``y`` coordinates for each point.
-# Now we will plot all the loops detected.
+# `~sunkit_image.trace.occult2` returns a list, each element of which is a detected loop.
+# Each detected loop is stored as a list of ``x`` positions in image pixels, and a list of ``y``
+# positions in image pixels, of the pixels traced out by OCCULT2.
+# Now plot all the detected loops on the original image.
 
 fig = plt.figure()
 
-# We also plot the original image to overlay the loops over it.
 plt.imshow(image, cmap="hmimag", origin="lower")
 
 for loop in loops:
