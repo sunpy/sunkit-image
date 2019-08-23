@@ -78,7 +78,7 @@ jobs:
 
   figure-tests-37:
     docker:
-      - image: conda/miniconda3
+      - image: continuumio/miniconda3
     steps:
       - checkout
       - run: *skip-check
