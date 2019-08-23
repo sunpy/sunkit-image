@@ -40,12 +40,13 @@ def test_two_read_write(arrays_test):
     # The temporary file is then deleted
     os.remove(file_name)
 
-    # Then it is verified whether the arrays that were actually written, the same arrays are read back.
+    # Then it is verified whether the arrays that were actually written,
+    # the same arrays are read back.
     assert np.allclose(arr, np.zeros((4, 4)))
     assert np.allclose(barr, np.ones((4, 4)))
 
-    # The same thing as above is repeated the only difference being that the arrays are both written and read back
-    # in column major order
+    # The same thing as above is repeated the only difference being that the arrays are
+    # both written and read back in column major order
     write_2_images(file_name, arrays_test[0], arrays_test[1], order="column")
 
     arr, barr = read_2_images(file_name, order="column")
@@ -55,8 +56,8 @@ def test_two_read_write(arrays_test):
     assert np.allclose(arr, np.zeros((4, 4)))
     assert np.allclose(barr, np.ones((4, 4)))
 
-    # The below series of checks below are just to check that the ValueErrors are triggered when wrong value of order is
-    # given to any read or write function.
+    # The below series of checks below are just to check that the ValueErrors are triggered
+    # when wrong value of order is given to any read or write function.
     order = "random"
 
     with pytest.raises(ValueError) as record:
@@ -96,13 +97,14 @@ def test_three_read_write(arrays_test):
     # The temporary file is then deleted
     os.remove(file_name)
 
-    # Then it is verified whether the arrays that were actually written, the same arrays are read back.
+    # Then it is verified whether the arrays that were actually written, the same arrays
+    # are read back.
     assert np.allclose(arr, np.zeros((4, 4)))
     assert np.allclose(barr, np.ones((4, 4)))
     assert np.allclose(carr, np.zeros((4, 4)))
 
-    # The same thing as above is repeated the only difference being that the arrays are both written and read back
-    # in column major order
+    # The same thing as above is repeated the only difference being that the arrays
+    # are both written and read back in column major order
     write_3_images(file_name, arrays_test[0], arrays_test[1], arrays_test[2], order="column")
 
     arr, barr, carr = read_3_images(file_name, order="column")
@@ -113,8 +115,8 @@ def test_three_read_write(arrays_test):
     assert np.allclose(barr, np.ones((4, 4)))
     assert np.allclose(carr, np.zeros((4, 4)))
 
-    # The below series of checks below are just to check that the ValueErrors are triggered when wrong value of order is
-    # given to any read or write function.
+    # The below series of checks below are just to check that the ValueErrors are triggered
+    # when wrong value of order is given to any read or write function.
     order = "random"
 
     with pytest.raises(ValueError) as record:

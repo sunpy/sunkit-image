@@ -50,8 +50,10 @@ def flct(
 
     .. warning::
 
-        All the below limitations have been directly taken from the C source user manual without any modifications.
-        The original user manual can be found `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/flct_1.06/doc/flct.pdf>`__.
+        All the below limitations have been directly taken from the C source user manual without
+        any modifications.
+        The original user manual can be found
+        `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/flct_1.06/doc/flct.pdf>`__.
 
         * FLCT is unable to find flows that are normal to image gradients. This
           is a defect of the LCT concept.
@@ -78,11 +80,13 @@ def flct(
     deltat : `float`
         The time interval between the two images in seconds.
     deltas : `float`
-        Units of length of the side of a single pixel. Velocity is computed in units of ``deltas``/``deltat``.
+        Units of length of the side of a single pixel. Velocity is computed in units of
+        ``deltas``/``deltat``.
     sigma : `float`
         Sub-images are weighted by Gaussian of width `sigma`. Results can depend on value of `sigma`.
         The user must experiment to determine best choice of `sigma`. If `sigma` is set to 0, only
-        single values of shifts are returned. These values correspond to the overall shifts between the two images.
+        single values of shifts are returned. These values correspond to the overall shifts between
+        the two images.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
@@ -136,9 +140,9 @@ def flct(
     Returns
     -------
     `tuple`
-        A tuple containing the velocity `~numpy.ndarray` in the following order ``vx``, ``vy``, and ``vm``.
-        ``vx`` is the velocity at every pixel location in the ``x`` direction.
-        ``vy`` is the velocity at every pixel location in the ``y`` direction.
+        A tuple containing the velocity `~numpy.ndarray` in the following order
+        ``vx``, ``vy``, and ``vm``. ``vx`` is the velocity at every pixel location
+        in the ``x`` direction. ``vy`` is the velocity at every pixel location in the ``y`` direction.
         ``vm`` is the mask array which is set to 1 at pixel locations where the FLCT calculations
         were performed, 0 where the calculations were not performed and 0.5 where the results were
         interpolated.

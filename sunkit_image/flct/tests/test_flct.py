@@ -11,9 +11,10 @@ if sys.platform.startswith("win"):
     pytest.skip("Tests will not run on windows", allow_module_level=True)
 
 
-# Testing the main FLCT function. The 'dat' associated with any test function or fixture denotes that the
-# function or fixture will be used to test 'FLCT' wrapper where the data was originally stored in a dat file.
-# The other functions are used to test FLCT when the original data was a numpy array or a CSV read from IDL.
+# Testing the main FLCT function. The 'dat' associated with any test function or fixture denotes
+# that the function or fixture will be used to test 'FLCT' wrapper where the data was originally
+# stored in a dat file. The other functions are used to test FLCT when the original data was a
+# numpy array or a CSV read from IDL.
 
 
 @pytest.fixture
@@ -76,20 +77,21 @@ def outputs():
 
 def test_flct_array(images, outputs):
 
-    # Here the FLCT function is called with the same settings as given on the C code website and the same
-    # data is also used for testing.
-    # Here the order is set as column as the input arrays are read from CSV file which was read by IDL.
-    # So they have been read in column major order and it needs to be changed.
+    # Here the FLCT function is called with the same settings as given on the C code website and
+    # the same data is also used for testing.
+    # Here the order is set as column as the input arrays are read from CSV file which was read
+    # by IDL. So they have been read in column major order and it needs to be changed.
     vx, vy, vm = flct.flct(images[0], images[1], 1, 1, 5, "column", kr=0.5)
 
-    # The velocitites in x and y direction are verified along with the mask arrays. The small discrepancies
-    # have been introduced due to the order change so we had to use a higher tolerance limit.
+    # The velocitites in x and y direction are verified along with the mask arrays.
+    # The small discrepancies have been introduced due to the order change so we had
+    # to use a higher tolerance limit.
     assert np.allclose(vx, outputs[0], atol=1e-5, rtol=1e-6)
     assert np.allclose(vy, outputs[1], atol=1e-5, rtol=1e-6)
     assert np.allclose(vm, outputs[2], atol=1e-5, rtol=1e-6)
 
-    # The below series of checks below are just to check that the ValueErrors are triggered when wrong values of any optional
-    # parameter are passed to the flct function.
+    # The below series of checks below are just to check that the ValueErrors are triggered
+    # when wrong values of any optional parameter are passed to the flct function.
     order = "random"
 
     with pytest.raises(ValueError) as record:
@@ -123,8 +125,8 @@ def test_flct_array(images, outputs):
 
 def test_flct_dat(images_dat, outputs_dat):
 
-    # Here the FLCT function is called with the same settings as given on the C code website and the same
-    # data is also used for testing.
+    # Here the FLCT function is called with the same settings as given on the C code website and
+    # the same data is also used for testing.
     vx, vy, vm = flct.flct(images_dat[0], images_dat[1], 1, 1, 5, kr=0.5)
 
     # The velocitites in x and y direction are verified along with the mask arrays.
@@ -132,8 +134,9 @@ def test_flct_dat(images_dat, outputs_dat):
     assert np.allclose(vy, outputs_dat[1])
     assert np.allclose(vm, outputs_dat[2])
 
-    # The below series of checks below are just to check that the ValueErrors are triggered when wrong values of any optional
-    # parameter are passed to the flct function.
+    # The below series of checks below are just to check that the ValueErrors
+    # are triggered when wrong values of any optional parameter are passed to
+    # the flct function.
     order = "random"
 
     with pytest.raises(ValueError) as record:
