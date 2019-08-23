@@ -83,7 +83,6 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *sudo-apt-install
       - run: *apt-install
       - run: pip install -U tox tox-conda codecov
       - run: tox -e figure
