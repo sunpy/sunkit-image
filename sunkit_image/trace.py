@@ -36,11 +36,12 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     ngap : `int`
         Number of pixels in the loop below the flux threshold.
     qthresh1 : `float`
-        The ratio of image base flux and median flux. All the pixels in the image below `qthresh1 * median`
-        intensity value are made to zero before tracing the loops.
+        The ratio of image base flux and median flux. All the pixels in the image below
+        `qthresh1 * median` intensity value are made to zero before tracing the loops.
     qthresh2 : `float`
-        The factor which determines noise in the image. All the intensity values between `qthresh2 * median`
-        are considered to be noise. The median for noise is chosen after the base level is fixed.
+        The factor which determines noise in the image. All the intensity values between
+        `qthresh2 * median` are considered to be noise. The median for noise is chosen
+        after the base level is fixed.
 
     Returns
     -------
@@ -87,13 +88,14 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
     # ERASE BOUNDARIES ZONES (SMOOTHING EFFECTS)
     image2[:, 0:nsm2] = 0.0
-    image2[:, ny - nsm2 :] = 0.0
+    image2[:, ny - nsm2:] = 0.0
     image2[0:nsm2, :] = 0.0
-    image2[nx - nsm2 :, :] = 0.0
+    image2[nx - nsm2:, :] = 0.0
 
     if (not np.count_nonzero(image2)) is True:
         raise RuntimeError(
-            "The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering."
+            "The filter size is very large compared to the size of the image." + 
+            " The entire image zeros out while smoothing the image edges after filtering."
         )
 
     # NOISE THRESHOLD
@@ -131,7 +133,8 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
         for idir in range(0, ndir):
 
-            # Creating arrays which will store all the loops points coordinates, flux, angle and radius
+            # Creating arrays which will store all the loops points coordinates, flux,
+            # angle and radius.
             # xl, yl are the x and y coordinates
             xl = np.zeros((npmax + 1,), dtype=np.float32)
             yl = np.zeros((npmax + 1,), dtype=np.float32)
@@ -148,13 +151,15 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             yl[0] = jstart
             zl[0] = zstart
 
-            # This will return the angle at the first point of the loop during every forward or backward pass
+            # This will return the angle at the first point of the loop during every
+            # forward or backward pass
             al[0] = initial_direction_finding(residual, xl[0], yl[0], nlen)
 
             # `ip` denotes a point in the traced loop
             for ip in range(0, npmax):
 
-                # The below function call will return the coordinate, flux and angle of the next point.
+                # The below function call will return the coordinate, flux and angle
+                # of the next point.
                 xl, yl, zl, al = curvature_radius(
                     residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir
                 )
@@ -162,24 +167,25 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
                 # This decides when to stop tracing the loop; when then last `ngap` pixels traced
                 # are below zero, the tracing will stop.
                 iz1 = max((ip + 1 - ngap), 0)
-                if np.max(zl[iz1 : ip + 2]) <= 0:
+                if np.max(zl[iz1:ip + 2]) <= 0:
                     ip = max(iz1 - 1, 0)
                     break  # goto endsegm
 
             # ENDSEGM
 
             # RE-ORDERING LOOP COORDINATES
-            # After the forward pass the loop points are flipped as the backward pass starts from the maximum flux point
+            # After the forward pass the loop points are flipped as the backward pass starts
+            # from the maximum flux point
             if idir == 0:
-                xloop = np.flip(xl[0 : ip + 1])
-                yloop = np.flip(yl[0 : ip + 1])
-                zloop = np.flip(zl[0 : ip + 1])
+                xloop = np.flip(xl[0:ip + 1])
+                yloop = np.flip(yl[0:ip + 1])
+                zloop = np.flip(zl[0:ip + 1])
                 continue
             # After the backward pass the forward and backward traces are concatenated
             if idir == 1 and ip >= 1:
-                xloop = np.concatenate([xloop, xl[1 : ip + 1]])
-                yloop = np.concatenate([yloop, yl[1 : ip + 1]])
-                zloop = np.concatenate([zloop, zl[1 : ip + 1]])
+                xloop = np.concatenate([xloop, xl[1:ip + 1]])
+                yloop = np.concatenate([yloop, yl[1:ip + 1]])
+                zloop = np.concatenate([zloop, zl[1:ip + 1]])
             else:
                 break
 
@@ -209,7 +215,8 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
                     )
             looplen = s[np1 - 1]
 
-        # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum specified
+        # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum
+        # specified
         if looplen >= lmin:
             loops, iloop = loop_add(s, xloop, yloop, zloop, iloop, loops)
 
@@ -350,7 +357,7 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     xend = min(istart + width, nx - 1)
     ystart = max(jstart - width, 0)
     yend = min(jstart + width, ny - 1)
-    image[xstart : xend + 1, ystart : yend + 1] = 0.0
+    image[xstart:xend + 1, ystart:yend + 1] = 0.0
 
     # All the points surrounding the loops are zeroed out
     for point in range(0, len(xloop)):
@@ -361,7 +368,7 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
         j0 = min(max(int(yloop[point]), 0), ny - 1)
         ystart = max(int(j0 - width), 0)
         yend = min(int(j0 + width), ny - 1)
-        image[xstart : xend + 1, ystart : yend + 1] = 0.0
+        image[xstart:xend + 1, ystart:yend + 1] = 0.0
 
     return image
 
@@ -463,7 +470,8 @@ def initial_direction_finding(image, xstart, ystart, nlen):
     # Creating an array of all angles between 0 to 180 degree
     angles = np.pi * np.arange(na, dtype=np.float32) / np.float32(na).reshape((1, -1))
 
-    # Calculating the possible x and y values when you move the tracing segment along a particular angle
+    # Calculating the possible x and y values when you move the tracing
+    # segment along a particular angle
     x_pos = xstart + np.matmul(trace_seg_bi, np.float32(np.cos(angles)))
     y_pos = ystart + np.matmul(trace_seg_bi, np.float32(np.sin(angles)))
 

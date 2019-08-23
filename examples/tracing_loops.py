@@ -6,7 +6,8 @@ Coronal Loops Tracing
 This example traces out the coronal loops in a FITS image
 using `~sunkit_image.trace.occult2`. In this example we will use the settings
 and the data from Markus Aschwanden's tutorial on his IDL implementation of
-the ``OCCULT2`` algorithm, which can be found `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
+the ``OCCULT2`` algorithm, which can be found
+`here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
 The aim of this example is to demonstrate that `~sunkit_image.trace.occult2` provides similar
 results compared to the IDL version.
 """

@@ -169,7 +169,8 @@ def test_occult2(test_image, image_test):
 
     assert (
         str(record.value)
-        == "The filter size is very large compared to the size of the image. The entire image zeros out while smoothing the image edges after filtering."
+        == "The filter size is very large compared to the size of the image." + 
+        " The entire image zeros out while smoothing the image edges after filtering."
     )
 
 
