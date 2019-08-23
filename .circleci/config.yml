@@ -71,21 +71,10 @@ jobs:
       - run: *merge-check
       - run: *sudo-apt-install
       - run: *permission-run
-      - run:
-          name: Update pip
-          command: pip install -U pip
-      - run:
-          name: Install SunPy 1
-          command: |
-            pip install --progress-bar off .[all,dev]
-      - run:
-          name: Install SunPy 2
-          command: |
-            pip install -e .[all,dev]
-      - run:
-          name: Install SunPy 3
-          command: |
-            python setup.py develop
+      - run: pip install -U pip
+      - run: pip install --progress-bar off .[all,dev]
+      - run: pip install -e .[all,dev]
+      - run: python setup.py develop
 
   figure-tests-37:
     docker:
@@ -93,8 +82,9 @@ jobs:
     steps:
       - checkout
       - run: *skip-check
+      - run: *merge-check
+      - run: *sudo-apt-install
       - run: *apt-install
-      #- run: *merge-check
       - run: pip install -U tox tox-conda codecov
       - run: tox -e figure
       - run: codecov
