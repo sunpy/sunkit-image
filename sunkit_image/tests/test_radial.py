@@ -8,7 +8,7 @@ import sunpy.map
 from sunpy.tests.helpers import figure_test
 
 import sunkit_image.radial as rad
-import sunkit_image.utils.utils as utils
+import sunkit_image.utils as utils
 
 
 @pytest.fixture

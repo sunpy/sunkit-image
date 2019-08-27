@@ -11,12 +11,6 @@ merge-check: &merge-check
       git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
     fi
 
-apt-run: &apt-install
-  name: Install apt packages
-  command: |
-    sudo apt update
-    sudo apt install -y graphviz
-
 permission-run: &permission-run
   name: Fix permssions for installing
   command: |
@@ -24,15 +18,17 @@ permission-run: &permission-run
     sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
     sudo chown -R circleci:circleci /usr/local/share/
 
-tox-install: &tox-install
-  name: Install Tox
+apt-run: &apt-install
+  name: Install apt packages
   command: |
-    pip install tox
+    apt update
+    apt install -y graphviz build-essential libopenjp2-7 git
 
-tox-conda-install: &tox-conda-install
-  name: Install Tox-Conda
+sudo-apt-run: &sudo-apt-install
+  name: Install apt packages
   command: |
-    pip install tox-conda
+    sudo apt update
+    sudo apt install -y graphviz build-essential libopenjp2-7 git
 
 version: 2
 jobs:
@@ -54,6 +50,18 @@ jobs:
       - run: *merge-check
       - run: python setup.py egg_info
 
+  twine-check:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: *permission-run
+      - run: python setup.py sdist
+      - run: python -m pip install -U --force-reinstall twine
+      - run: python -m twine check dist/*
+
   pip-install:
     docker:
       - image: circleci/python:3.7
@@ -61,17 +69,12 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *apt-install
+      - run: *sudo-apt-install
       - run: *permission-run
-      - run:
-          name: Update pip
-          command: pip install -U pip
-      - run:
-          name: Install sunkit_image
-          command: |
-            pip install --progress-bar off .[all,dev]
-            pip install --no-use-pep517 -e .[all,dev]
-            python setup.py develop
+      - run: pip install -U pip
+      - run: pip install --progress-bar off .[all,dev]
+      - run: pip install -e .[all,dev]
+      - run: python setup.py develop
 
   figure-tests-37:
     docker:
@@ -80,10 +83,9 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *tox-install
-      - run: *tox-conda-install
+      - run: *apt-install
+      - run: pip install -U tox tox-conda codecov
       - run: tox -e figure
-      - run: pip install codecov
       - run: codecov
       - store_artifacts:
           path: figure_test_images
@@ -98,9 +100,9 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *apt-install
       - run: *permission-run
-      - run: *tox-install
+      - run: *sudo-apt-install
+      - run: pip install -U tox
       - run: tox -e build_docs
       - store_artifacts:
           path: docs/_build/html
@@ -117,13 +119,17 @@ workflows:
       - egg-info-36
       - egg-info-37
 
-  figure-tests:
+  twine-check:
     jobs:
-      - figure-tests-37
+      - twine-check
 
   pip-install:
     jobs:
       - pip-install
+
+  figure-tests:
+    jobs:
+      - figure-tests-37
 
   test-documentation:
     jobs:

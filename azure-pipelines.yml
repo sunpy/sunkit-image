@@ -13,15 +13,15 @@ jobs:
 
 - template: azure-templates.yml
   parameters:
-    name: macOS_37_offline
+    name: macOS_37_online
     os: macos
-    tox: py37-offline --
+    tox: py37-online --
 
 - template: azure-templates.yml
   parameters:
-    name: Windows_36_offline
+    name: Windows_36_online
     os: windows
-    tox: py36-offline --
+    tox: py36-online --
 
 - template: azure-templates.yml
   parameters:
