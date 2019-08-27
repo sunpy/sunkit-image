@@ -22,13 +22,13 @@ apt-install: &apt-install
   name: Install apt packages
   command: |
     apt update
-    apt install -y graphviz build-essential libopenjp2-7 git
+    apt install -y graphviz build-essential libopenjp2-7 libfftw3-dev
 
 sudo-apt-install: &sudo-apt-install
   name: Install apt packages
   command: |
     sudo apt update
-    sudo apt install -y graphviz build-essential libopenjp2-7 git
+    sudo apt install -y graphviz build-essential libopenjp2-7 libfftw3-dev
 
 version: 2
 jobs:
