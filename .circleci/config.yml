@@ -18,13 +18,13 @@ permission-run: &permission-run
     sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
     sudo chown -R circleci:circleci /usr/local/share/
 
-apt-run: &apt-install
+apt-install: &apt-install
   name: Install apt packages
   command: |
     apt update
     apt install -y graphviz build-essential libopenjp2-7 git
 
-sudo-apt-run: &sudo-apt-install
+sudo-apt-install: &sudo-apt-install
   name: Install apt packages
   command: |
     sudo apt update
