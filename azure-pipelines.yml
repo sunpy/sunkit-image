@@ -36,9 +36,9 @@ jobs:
 
 - template: run-tox-env.yml@sunpy
   parameters:
-    name: Windows_36_offline
+    name: Windows_36_online
     os: windows
-    tox: py36-offline --
+    tox: py36-online --
 
 - template: run-tox-env.yml@sunpy
   parameters:

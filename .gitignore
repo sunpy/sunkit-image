@@ -223,3 +223,4 @@ tags
 
 # Release script
 .github_cache
+examples/loops.txt

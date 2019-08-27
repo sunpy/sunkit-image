@@ -11,9 +11,8 @@ normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
 import matplotlib.pyplot as plt
 
 import astropy.units as u
-
-import sunpy.map
 import sunpy.data.sample
+import sunpy.map
 
 import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins

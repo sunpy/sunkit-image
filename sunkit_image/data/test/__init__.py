@@ -29,7 +29,6 @@ def get_test_filepath(filename, **kwargs):
 
     Notes
     -----
-
     This is a wrapper around `~astropy.utils.data.get_pkg_data_filename` which
     sets the ``package`` kwarg to be ``sunkit_image.data.test``.
     """
@@ -39,7 +38,7 @@ def get_test_filepath(filename, **kwargs):
 def test_data_filenames():
     """
     Return a list of all test files in ``data`` directory.
-
+    
     This ignores any ``py``, ``pyc`` and ``__*__`` files in these directories.
 
     Return

@@ -4,7 +4,7 @@ import pytest
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-from sunkit_image.utils.utils import (
+from sunkit_image.utils import (
     bin_edge_summary,
     equally_spaced_bins,
     find_pixel_radii,

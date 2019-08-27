@@ -11,18 +11,6 @@ merge-check: &merge-check
       git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
     fi
 
-apt-install: &apt-install
-  name: Install apt packages
-  command: |
-    apt update
-    apt install -y graphviz build-essential libfftw3-dev
-
-apt-install-sudo: &apt-install-sudo
-  name: Install apt packages
-  command: |
-    sudo apt update
-    sudo apt install -y graphviz build-essential libfftw3-dev
-
 permission-run: &permission-run
   name: Fix permssions for installing
   command: |
@@ -30,24 +18,17 @@ permission-run: &permission-run
     sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
     sudo chown -R circleci:circleci /usr/local/share/
 
-tox-install: &tox-install
-  name: Install Tox
+apt-run: &apt-install
+  name: Install apt packages
   command: |
-    pip install tox
+    apt update
+    apt install -y graphviz build-essential libopenjp2-7 git
 
-tox-conda-install: &tox-conda-install
-  name: Install Tox-Conda
+sudo-apt-run: &sudo-apt-install
+  name: Install apt packages
   command: |
-    pip install tox-conda
-
-image-run: &image-tests
-  name: Run image tests
-  environment:
-    MPLBACKEND: Agg
-  command: |
-    tox -e figure
-    pip install codecov
-    codecov
+    sudo apt update
+    sudo apt install -y graphviz build-essential libopenjp2-7 git
 
 version: 2
 jobs:
@@ -76,8 +57,9 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
+      - run: *permission-run
       - run: python setup.py sdist
-      - run: python -m pip install -U --user --force-reinstall twine
+      - run: python -m pip install -U --force-reinstall twine
       - run: python -m twine check dist/*
 
   pip-install:
@@ -87,17 +69,12 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *apt-install-sudo
+      - run: *sudo-apt-install
       - run: *permission-run
-      - run:
-          name: Update pip
-          command: pip install -U pip
-      - run:
-          name: Install SunPy
-          command: |
-            pip install --progress-bar off .[all,dev]
-            pip install -e .[all,dev]
-            python setup.py develop
+      - run: pip install -U pip
+      - run: pip install --progress-bar off .[all,dev]
+      - run: pip install -e .[all,dev]
+      - run: python setup.py develop
 
   figure-tests-37:
     docker:
@@ -107,9 +84,9 @@ jobs:
       - run: *skip-check
       - run: *merge-check
       - run: *apt-install
-      - run: *tox-install
-      - run: *tox-conda-install
-      - run: *image-tests
+      - run: pip install -U tox tox-conda codecov
+      - run: tox -e figure
+      - run: codecov
       - store_artifacts:
           path: figure_test_images
       - run:
@@ -123,12 +100,13 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *apt-install-sudo
       - run: *permission-run
-      - run: *tox-install
+      - run: *sudo-apt-install
+      - run: pip install -U tox
       - run: tox -e build_docs
       - store_artifacts:
           path: docs/_build/html
+
       - run:
           name: "Built documentation is available at:"
           command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL

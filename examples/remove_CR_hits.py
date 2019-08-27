@@ -8,19 +8,19 @@ using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/lates
 Astroscrappy is a separate Python package and can be installed separately using ``pip`` or ``conda``.
 """
 
+import astroscrappy
 import matplotlib.pyplot as plt
 
+from sunpy.io.file_tools import read_file
 from sunpy.map import Map
-
-import astroscrappy
+from sunpy.net import Fido
+from sunpy.net import attrs as a
 
 ###############################################################################
 # For more details on how to download and plot LASCO FITS file see
 # SunPy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
 # To make this example work you need to have SunPy with all the "net" dependencies installed.
 
-from sunpy.net import Fido, attrs as a
-from sunpy.io.file_tools import read_file
 
 ###############################################################################
 # In order to download the required FITS file, we use
