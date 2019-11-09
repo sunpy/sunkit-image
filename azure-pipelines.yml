@@ -31,7 +31,7 @@ jobs:
   parameters:
     submodules: false
     coverage: codecov
-    posargs: -n=4
+    posargs:
     libraries:
       apt:
         - libfftw3-dev
