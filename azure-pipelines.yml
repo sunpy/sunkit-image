@@ -36,7 +36,7 @@ jobs:
       apt:
         - fftw3
       brew:
-        - fftw3
+        - fftw
     envs:
       - macos: py37-offline
         name: py37_offline
