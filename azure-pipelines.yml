@@ -34,7 +34,7 @@ jobs:
     posargs: -n=4
     libraries:
       apt:
-        - fftw3
+        - libfftw3-dev
       brew:
         - fftw
     envs:
