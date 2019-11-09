@@ -93,7 +93,6 @@ jobs:
       - run: pip install -U pip
       - run: pip install --progress-bar off .[all,dev]
       - run: pip install -e .[all,dev]
-      - run: python setup.py develop
 
   figure-tests-37:
     docker:

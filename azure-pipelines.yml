@@ -34,9 +34,9 @@ jobs:
     posargs: -n=4
     libraries:
       apt:
-        - fftw
+        - fftw3
       brew:
-        - fftw
+        - fftw3
     envs:
       - macos: py37-offline
         name: py37_offline
