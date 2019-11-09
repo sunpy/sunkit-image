@@ -4,35 +4,135 @@ Fourier Local Correlation Tracking
 ===================================
 
 This example applies Fourier Local Correlation Tracking (FLCT)
-to a set of two images taken within a short interval of each other
-using `sunkit_image.flct.flct <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/home>`__.
+to a set of two arrays using `~sunkit_image.flct.flct`.
 """
 
 import numpy as np
 
-import sunkit_image.data.test as data
+import matplotlib.pyplot as plt
 import sunkit_image.flct as flct
 
 ###########################################################################
-# First we need to get the input images which will be read by the
-# `flct.read_two_images` from a `dat` file stored in `sunkit_image.data.test`
-# Here in this example we are using a pre-existing dat file directly from
-# the FLCT website. This is to show that this module is capable of working
-# with pre-existing files also.
+# This examples demonstrates how to find the 2D velocity flow field.
+# It has three parts all of which depicts motion of the object in a dummy
+# image in some particular directions.
 
-filepath = data.get_test_filepath("hashgauss.dat")
-image1, image2 = flct.read_2_images(filepath)
+#############################################################################
+# First we plot the velocity field when the image moves in positive ``X`` direction.
 
-###########################################################################
-# Now we come to the main function where FLCT is applied. We will pass the
-# above read arrays to `sunkit_image.flct.flct`
+# Creating the input arrays
+image1 = np.zeros((10, 10))
+image1[0:3, 0:3] = 1
 
-# Since the input arrays were stored in a row major format, so no swapping
-# needs to take place.
-vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 5, kr=0.5)
+image2 = np.zeros((10, 10))
+image2[0:3, 1:4] = 1
 
 ###########################################################################
-# The return values are the two dimensional velocity field with `vel_x`
-# showing velocity in the x-direction and `vel_y`, the velocity in the
-# y-direction. The last, ``vm`` is the mask array which shows the pixel
-# locations where the FLCT calculations were done.
+# Now we will apply FLCT.
+# The values of the parameters used gave the best visual result
+# of the velocities. The time difference between the two images, ``deltat`` is
+# 1 second. The units of length of the side of a single pixel, ``deltas`` is
+# 1. The width of Gaussian used to weigh the subimages, ``sigma`` is taken to be 2.3.
+# Note you should experiment with the values of ``sigma`` to get the best results.
+vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
+
+############################################################################
+# We will plot the 2D flow field what we get when the image have moved in positive ``X`` direction.
+
+# But first we need to create a meshgrid on which the flow field will be plotted
+X = np.arange(0, 10, 1)
+Y = np.arange(0, 10, 1)
+U, V = np.meshgrid(X, Y)
+
+# Plotting the first image
+fig = plt.figure(figsize=(12, 4))
+
+ax1 = fig.add_subplot(131)
+plt.imshow(image1, origin="lower")
+ax1.set_title("First Image")
+
+# Plot the 2D flow field
+ax2 = fig.add_subplot(132)
+ax2.quiver(U, V, vel_x, vel_y, scale=20)
+ax2.set_title("Flow Field")
+
+# Plot the shifted image
+ax3 = fig.add_subplot(133)
+plt.imshow(image2, origin="lower")
+ax3.set_title("Second Image")
+
+#############################################################################
+# Now, we plot the velocity field when the image moves in positive ``Y`` direction.
+
+# Creating the input arrays
+image1 = np.zeros((10, 10))
+image1[0:3, 0:3] = 1
+
+image2 = np.zeros((10, 10))
+image2[1:4, 0:3] = 1
+
+###########################################################################
+# Now we again apply FLCT to this new set of images using the same parameter values
+# as before.
+vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
+
+############################################################################
+# We will plot the 2D flow field what we get when the image have moved in positive ``Y`` direction.
+
+# Plotting the first image
+fig = plt.figure(figsize=(12, 4))
+
+ax1 = fig.add_subplot(131)
+plt.imshow(image1, origin="lower")
+ax1.set_title("First Image")
+
+# Plot the 2D flow field
+ax2 = fig.add_subplot(132)
+ax2.quiver(U, V, vel_x, vel_y, scale=20)
+ax2.set_title("Flow Field")
+
+# Plot the shifted image
+ax3 = fig.add_subplot(133)
+plt.imshow(image2, origin="lower")
+ax3.set_title("Second Image")
+
+#############################################################################
+# Finally we plot the velocity field when the image moves in both the directions.
+
+# Creating the input arrays
+image1 = np.zeros((10, 10))
+image1[0:3, 0:3] = 1
+
+image2 = np.zeros((10, 10))
+image2[1:4, 1:4] = 1
+
+###########################################################################
+# We again apply FLCT with the similar settings as before to find the velocity field
+vel_x, vel_y, vm = flct.flct(image1, image2, 1, 1, 2.3)
+
+############################################################################
+# We will plot the 2D flow field what we get when the image have moved in both directions.
+
+# Plotting the first image
+fig = plt.figure(figsize=(12, 4))
+
+ax1 = fig.add_subplot(131)
+plt.imshow(image1, origin="lower")
+ax1.set_title("First Image")
+
+# Plot the 2D flow field
+ax2 = fig.add_subplot(132)
+ax2.quiver(U, V, vel_x, vel_y, scale=20)
+ax2.set_title("Flow Field")
+
+# Plot the shifted image
+ax3 = fig.add_subplot(133)
+plt.imshow(image2, origin="lower")
+ax3.set_title("Second Image")
+
+################################################################################
+# Notice the lonely pixel in the bottom left of every flow field which has value less than zero.
+# This discrepancy is due one of the limitations of the FLCT algorithm where it is unable to reliably
+# calculate the velocitites within ``sigma`` pixels of the image edges.
+
+plt.show()

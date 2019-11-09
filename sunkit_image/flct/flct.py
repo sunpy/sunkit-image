@@ -1,250 +1,14 @@
 # Licensed under GNU Lesser General Public License, version 2.1 - see licenses/LICENSE_FLCT.rst
 import numpy as np
 
+from sunkit_image.flct.utils import column_row_of_two
+
 try:
     from sunkit_image.flct import _pyflct
 except ImportError:
     _pyflct = None
 
-__all__ = [
-    "flct",
-    "read_2_images",
-    "read_3_images",
-    "write_2_images",
-    "write_3_images",
-    "column_row_of_two",
-    "column_row_of_three",
-]
-
-
-def read_2_images(filename, order="row"):
-    """
-    Reads two arrays of the same size from a ``dat`` file.
-
-    .. note ::
-        This function can be used to read only special arrays which were written
-        using the ``write`` functions in `~sunkit_image.flct` or the IDL IO routines
-        as given on the FLCT `website <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/dir?ci=tip>`__.
-
-    Parameters
-    ----------
-    filename : `str`
-        The name of ``dat`` file.
-    order : {"row" | "column"}
-        The order in which the array elements are stored that is whether they are stored as row
-        major or column major.
-
-    Returns
-    -------
-    `tuple`
-        A tuple containing two `~numpy.ndarray`.
-    """
-
-    # Checking whether the C extension is correctly built.
-    if _pyflct is None:
-        raise ImportError("C extension for flct is missing, please rebuild.")
-
-    if order.lower() not in ["row", "column"]:
-        raise ValueError(
-            "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
-        )
-
-    if order == "row":
-        transp = 0
-    else:
-        transp = 1
-
-    ier, a, b = _pyflct.read_two_images(filename, transp)
-
-    if ier != 1:
-        raise ValueError("The file was not read correctly. Please check the file.")
-
-    else:
-        return a, b
-
-
-def read_3_images(filename, order="row"):
-    """
-    Read three arrays of the same size from a ``dat`` file.
-
-    .. note ::
-        This function can be used to read only special arrays which were written
-        using the ``write`` functions in `~sunkit_image.flct` or the IDL IO routines
-        as given on the FLCT source `website <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/dir?ci=tip>`__.
-
-    Parameters
-    ----------
-    filename : `str`
-        The name of ``dat`` file.
-    order : {"row" | "column"}
-        The order in which the array elements are stored that is whether they are stored as row
-        major or column major.
-
-    Returns
-    -------
-    `tuple`
-        A tuple containing three `~numpy.ndarray`.
-    """
-
-    # Checking whether the C extension is correctly built.
-    if _pyflct is None:
-        raise ImportError("C extension for flct is missing, please rebuild.")
-
-    if order.lower() not in ["row", "column"]:
-        raise ValueError(
-            "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
-        )
-
-    if order == "row":
-        transp = 0
-    else:
-        transp = 1
-
-    ier, a, b, c = _pyflct.read_three_images(filename, transp)
-
-    if ier != 1:
-        raise ValueError("The file was not read correctly. Please check the file.")
-
-    else:
-        return a, b, c
-
-
-def write_2_images(filename, array1, array2, order="row"):
-    """
-    Write two arrays of the same size to a ``dat`` file.
-
-    Parameters
-    ----------
-    filename : `str`
-        The name of ``dat`` file.
-    array1 : `numpy.ndarray`
-        The first array to be stored.
-    array2 : `numpy.ndarray`
-        The second array to be stored.
-    order : {"row" | "column"}
-        The order in which the array elements are stored that is whether they are stored as row
-        major or column major.
-    """
-
-    # Checking whether the C extension is correctly built.
-    if _pyflct is None:
-        raise ImportError("C extension for flct is missing, please rebuild.")
-
-    if order.lower() not in ["row", "column"]:
-        raise ValueError(
-            "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
-        )
-
-    if order == "row":
-        transp = 0
-    else:
-        transp = 1
-
-    ier = _pyflct.write_two_images(filename, array1, array2, transp)
-
-    if ier != 1:
-        raise ValueError("The file was not read correctly. Please check the file")
-
-
-def write_3_images(filename, array1, array2, array3, order="row"):
-    """
-    Write three arrays of the same size to a ``dat`` file.
-
-    Parameters
-    ----------
-    filename : `string`
-        The name of ``dat`` file.
-    array1 : `numpy.ndarray`
-        The first array to be stored.
-    array2 : `numpy.ndarray`
-        The second array to be stored.
-    array3 : `numpy.ndarray`
-        The third array to be stored.
-    order : {"row" | "column"}
-        The order in which the array elements are stored that is whether they are stored as row
-        major or column major.
-    """
-
-    # Checking whether the C extension is correctly built.
-    if _pyflct is None:
-        raise ImportError("C extension for flct is missing, please rebuild.")
-
-    if order.lower() not in ["row", "column"]:
-        raise ValueError(
-            "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
-        )
-
-    if order == "row":
-        transp = 0
-    else:
-        transp = 1
-
-    ier = _pyflct.write_three_images(filename, array1, array2, array3, transp)
-
-    if ier != 1:
-        raise ValueError("The file was not read correctly. Please check the file")
-
-
-def column_row_of_two(array1, array2):
-    """
-    Takes two arrays and swaps the order in which they were stored i.e. changing
-    from column major to row major and **not** the vice-versa. This may change the values stored in
-    the array as the arrays are first converted to a binary format and then the order change takes
-    place.
-
-    Parameters
-    ----------
-    array1 : `numpy.ndarray`
-        The first array whose order is to be changed.
-    array2 : `numpy.ndarray`
-        The second array whose order is to be changed.
-
-    Returns
-    -------
-    `tuple`
-        It returns the two input arrays after changing their order from column major to
-        row major.
-    """
-
-    # Checking whether the C extension is correctly built.
-    if _pyflct is None:
-        raise ImportError("C extension for flct is missing, please rebuild.")
-
-    one, two = _pyflct.swap_order_two(array1, array2)
-
-    return (one, two)
-
-
-def column_row_of_three(array1, array2, array3):
-    """
-    Takes three arrays and swaps the order in which they were stored i.e. changing
-    from column major to row major and **not** the vice-versa. This may change the values stored in
-    the array as the arrays are first converted to a binary format and then the order change takes
-    place.
-
-    Parameters
-    ----------
-    array1 : `numpy.ndarray`
-        The first array whose order is to be changed.
-    array2 : `numpy.ndarray`
-        The second array whose order is to be changed.
-    array3 : `numpy.ndarray`
-        The third array whose order is to be changed.
-
-    Returns
-    -------
-    `tuple`
-        It returns the two input arrays after changing their order from column major to
-        row major.
-    """
-
-    # Checking whether the C extension is correctly built.
-    if _pyflct is None:
-        raise ImportError("C extension for flct is missing, please rebuild.")
-
-    one, two, three = _pyflct.swap_order_three(array1, array2, array3)
-
-    return (one, two, three)
+__all__ = ["flct"]
 
 
 def flct(
@@ -284,6 +48,29 @@ def flct(
         * If your input arrays are column major then pass the `order` parameter as `column` and it
           will automatically take care of the order change. But this can produce some changes in
           the values of the arrays.
+
+    .. warning::
+
+        All the below limitations have been directly taken from the C source user manual without
+        any modifications.
+        The original user manual can be found
+        `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/flct_1.06/doc/flct.pdf>`__.
+
+        * FLCT is unable to find flows that are normal to image gradients. This
+          is a defect of the LCT concept.
+        * FLCT cannot determine velocities on scales below the scale size of
+          structures in the images. This is a defect of the LCT concept.
+        * Images that have minimal structure can give nonsensical velocity
+          results.
+        * Results can depend on value of ``sigma``, so you must experiment to determine
+          the best choice of ``sigma``.
+        * Velocities corresponding to shifts less than 0.1 - 0.2 pixels are not
+          always detected. It may be necessary to increase the amount of time
+          between images, depending on the noise level in the images. Sometimes
+          using the filtering option helps.
+        * Velocities computed within ``sigma`` pixels of the image edges can be unreliable.
+        * Noisy images can result in spurious velocity results unless a suitable
+          threshold value ``thresh`` is chosen.
 
     Parameters
     ----------
@@ -408,7 +195,6 @@ def flct(
     if skip is not None:
         if skip <= 0:
             raise ValueError("Skip value must be greater than zero.")
-        skip = skip + np.abs(yoff) + np.abs(xoff)
 
         if np.abs(xoff) >= skip or np.abs(yoff) >= skip:
             raise ValueError("The absolute value of 'xoff' and 'yoff' must be less than skip.")

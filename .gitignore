@@ -225,3 +225,4 @@ tags
 
 # Release script
 .github_cache
+*.orig
