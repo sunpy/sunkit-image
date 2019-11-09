@@ -12,6 +12,7 @@ __pycache__/
 # C extensions
 *.so
 
+.history/
 # Distribution / packaging
 .Python
 pip-wheel-metadata/
@@ -224,4 +225,3 @@ tags
 
 # Release script
 .github_cache
-.history

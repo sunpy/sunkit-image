@@ -10,5 +10,6 @@ Code Reference
    sunkit_image
    flct
    radial
+   trace
    utils
    enhance
