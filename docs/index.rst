@@ -11,6 +11,6 @@ We have a documentation :any:`index <genindex>` and a :any:`module <modindex>` l
   :maxdepth: 2
 
   code_ref/index
-  format
   generated/gallery/index
   whatsnew/index
+  format
