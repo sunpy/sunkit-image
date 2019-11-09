@@ -276,9 +276,7 @@ def nrgf(
     # To make sure bins are in the map.
     if radial_bin_edges[1, -1] > np.max(map_r):
         radial_bin_edges = equally_spaced_bins(
-            inner_value=radial_bin_edges[0, 0],
-            outer_value=np.max(map_r),
-            nbins=radial_bin_edges.shape[1],
+            inner_value=radial_bin_edges[0, 0], outer_value=np.max(map_r), nbins=radial_bin_edges.shape[1]
         )
 
     # Radial intensity
@@ -453,9 +451,7 @@ def fnrgf(
     # To make sure bins are in the map.
     if radial_bin_edges[1, -1] > np.max(map_r):
         radial_bin_edges = equally_spaced_bins(
-            inner_value=radial_bin_edges[0, 0],
-            outer_value=np.max(map_r),
-            nbins=radial_bin_edges.shape[1],
+            inner_value=radial_bin_edges[0, 0], outer_value=np.max(map_r), nbins=radial_bin_edges.shape[1]
         )
 
     # Get the Helioprojective coordinates of each pixel
@@ -493,10 +489,7 @@ def fnrgf(
         cos_matrix = np.cos(
             np.array(
                 [
-                    [
-                        (2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments
-                        for j in range(order)
-                    ]
+                    [(2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments for j in range(order)]
                     for i in range(number_angular_segments)
                 ]
             )
@@ -504,10 +497,7 @@ def fnrgf(
         sin_matrix = np.sin(
             np.array(
                 [
-                    [
-                        (2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments
-                        for j in range(order)
-                    ]
+                    [(2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments for j in range(order)]
                     for i in range(number_angular_segments)
                 ]
             )
@@ -517,9 +507,7 @@ def fnrgf(
         for j in range(0, number_angular_segments, 1):
 
             # Finding all the pixels whose angle values lie in the segment
-            angular_segment = np.logical_and(
-                angles >= segment_angle * j, angles < segment_angle * (j + 1)
-            )
+            angular_segment = np.logical_and(angles >= segment_angle * j, angles < segment_angle * (j + 1))
 
             # Finding the particular segment in the circular ring
             annulus_segment = np.logical_and(annulus, angular_segment)
@@ -538,14 +526,10 @@ def fnrgf(
         fourier_coefficient_a_0 = np.sum(average_segments) * (2 / number_angular_segments)
         fourier_coefficient_a_0 *= attenuation_coefficients[0, 1]
 
-        fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (
-            2 / number_angular_segments
-        )
+        fourier_coefficients_a_k = np.matmul(average_segments, cos_matrix) * (2 / number_angular_segments)
         fourier_coefficients_a_k *= attenuation_coefficients[0][1:]
 
-        fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (
-            2 / number_angular_segments
-        )
+        fourier_coefficients_b_k = np.matmul(average_segments, sin_matrix) * (2 / number_angular_segments)
         fourier_coefficients_b_k *= attenuation_coefficients[0][1:]
 
         # Refer to equation (6) in the paper
@@ -560,9 +544,7 @@ def fnrgf(
 
         # To calculate the multiples of angles of each pixel for finding the fourier approximation
         # at that point. See equations 6.8 and 6.9 of the doctoral thesis.
-        K_matrix = np.ones((order, np.sum(annulus > 0))) * np.array(range(1, order + 1)).T.reshape(
-            order, 1
-        )
+        K_matrix = np.ones((order, np.sum(annulus > 0))) * np.array(range(1, order + 1)).T.reshape(order, 1)
         phi_matrix = angles[annulus].reshape((1, angles[annulus].shape[0]))
         angles_of_pixel = K_matrix * phi_matrix
 

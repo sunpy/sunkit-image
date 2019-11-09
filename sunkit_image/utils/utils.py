@@ -7,12 +7,7 @@ import astropy.units as u
 from sunpy.coordinates import frames
 from sunpy.map.maputils import all_coordinates_from_map
 
-__all__ = [
-    "equally_spaced_bins",
-    "bin_edge_summary",
-    "find_pixel_radii",
-    "get_radial_intensity_summary",
-]
+__all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii", "get_radial_intensity_summary"]
 
 
 def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
@@ -118,9 +113,7 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / scale)
 
 
-def get_radial_intensity_summary(
-    smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs
-):
+def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
     """
     Get a summary statistic of the intensity in a map as a function of radius.
 
@@ -169,8 +162,5 @@ def get_radial_intensity_summary(
 
     # Calculate the summary statistic in the radial bins.
     return np.asarray(
-        [
-            summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs)
-            for i in range(0, nbins)
-        ]
+        [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)]
     )

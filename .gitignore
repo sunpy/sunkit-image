@@ -2,6 +2,7 @@
 
 # Package Specific files
 sunkit_image/flct/pyflct.c
+sunkit_image/flct/src/pyflct.c
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -223,3 +224,4 @@ tags
 
 # Release script
 .github_cache
+.history

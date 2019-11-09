@@ -1,3 +1,4 @@
+# Licensed under GNU Lesser General Public License, version 2.1 - see licenses/LICENSE_FLCT.rst
 import os
 import sys
 
@@ -117,9 +118,7 @@ def test_swaps(arrays_test):
     assert np.allclose(result_a, arrays_test[0])
     assert np.allclose(result_b, arrays_test[1])
 
-    result_a, result_b, result_c = flct.column_row_of_three(
-        arrays_test[0], arrays_test[1], arrays_test[2]
-    )
+    result_a, result_b, result_c = flct.column_row_of_three(arrays_test[0], arrays_test[1], arrays_test[2])
 
     assert np.allclose(result_a, arrays_test[0])
     assert np.allclose(result_b, arrays_test[1])
@@ -228,9 +227,7 @@ def test_flct_array(images, outputs):
     # are executed. These are not tests in the strictest sense rather it is designed to increase
     # the test coverage for lines containing the setting of optional arguments.
 
-    _ = flct.flct(
-        images[0], images[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True
-    )
+    _ = flct.flct(images[0], images[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True)
     _ = flct.flct(
         images[0],
         images[1],
@@ -295,16 +292,7 @@ def test_flct_dat(images_dat, outputs_dat):
     # the test coverage for lines containing the setting of optional arguments.
 
     _ = flct.flct(
-        images_dat[0],
-        images_dat[1],
-        1,
-        1,
-        0,
-        interp=True,
-        quiet=True,
-        absflag=True,
-        biascor=True,
-        pc=True,
+        images_dat[0], images_dat[1], 1, 1, 0, interp=True, quiet=True, absflag=True, biascor=True, pc=True
     )
     _ = flct.flct(
         images_dat[0],

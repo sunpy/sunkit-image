@@ -120,9 +120,7 @@ class NoiseLevelEstimation:
 
         for cha in range(self.img.shape[2]):
             X = view_as_windows(self.img[:, :, cha], (self.patchsize, self.patchsize))
-            X = X.reshape(
-                np.int(X.size / self.patchsize ** 2), self.patchsize ** 2, order="F"
-            ).transpose()
+            X = X.reshape(np.int(X.size / self.patchsize ** 2), self.patchsize ** 2, order="F").transpose()
 
             Xh = view_as_windows(imgh[:, :, cha], (self.patchsize, self.patchsize - 2))
             Xh = Xh.reshape(
@@ -234,9 +232,7 @@ class NoiseLevelEstimation:
         for cha in range(s[2]):
             m = view_as_windows(self.img[:, :, cha], (self.patchsize, self.patchsize))
             m = np.zeros_like(
-                m.reshape(
-                    np.int(m.size / self.patchsize ** 2), self.patchsize ** 2, order="F"
-                ).transpose()
+                m.reshape(np.int(m.size / self.patchsize ** 2), self.patchsize ** 2, order="F").transpose()
             )
 
             Xh = view_as_windows(imgh[:, :, cha], (self.patchsize, self.patchsize - 2))

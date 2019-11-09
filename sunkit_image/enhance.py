@@ -8,16 +8,7 @@ import scipy.ndimage as ndimage
 __all__ = ["mgn"]
 
 
-def mgn(
-    data,
-    sigma=[1.25, 2.5, 5, 10, 20, 40],
-    k=0.7,
-    gamma=3.2,
-    h=0.7,
-    weights=None,
-    truncate=3,
-    clip=True,
-):
+def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights=None, truncate=3, clip=True):
     """
     Multi-scale Gaussian normalization.
 
@@ -88,18 +79,14 @@ def mgn(
     for s, weight in zip(sigma, weights):
         # 2 & 3 Create kernel and convolve with image
         # Refer to equation (1) in the paper
-        ndimage.filters.gaussian_filter(
-            data, sigma=s, truncate=truncate, mode="nearest", output=conv
-        )
+        ndimage.filters.gaussian_filter(data, sigma=s, truncate=truncate, mode="nearest", output=conv)
 
         # 4. Calculate difference between image and the local mean image,
         # square the difference, and convolve with kernel. Square-root the
         # resulting image to give ‘local standard deviation’ image sigmaw
         # Refer to equation (2) in the paper
         conv = data - conv
-        ndimage.filters.gaussian_filter(
-            conv ** 2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw
-        )
+        ndimage.filters.gaussian_filter(conv ** 2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw)
         np.sqrt(sigmaw, out=sigmaw)
 
         # 5. Normalize the gaussian transformed image to give C_i.

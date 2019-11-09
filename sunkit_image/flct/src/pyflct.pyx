@@ -1,3 +1,4 @@
+# Licensed under GNU Lesser General Public License, version 2.1 - see licenses/LICENSE_FLCT.rst
 # cython: language_level=3
 import os
 import numpy as np
@@ -20,8 +21,9 @@ cdef extern from "./flctsubs.h":
         int poffset, int qoffset, int interpolate, double latmin, double latmax,
         int biascor, int verbose)
     int write2images (char *fname, double *arr, double *barr, int nx, int ny, int transp)
-    int read3images (char *fname, int * nx, int * ny, double **arr, double **barr,
-	     double **carr, int transp)
+
+cdef extern from "./sunkit.h":
+    int read3images (char *fname, int * nx, int * ny, double **arr, double **barr, double **carr, int transp)
 
 np.import_array()
 cdef extern from "numpy/arrayobject.h":

@@ -36,7 +36,7 @@ flct.write_3_images("three.dat", a, b, c)
 # It is to be noted that these read functions can only read ``dat``
 # files, the ones which were written using `flct.write_2_images`,
 # `flct.read_3_images` and the IDL IO routines as given on the
-# FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__..
+# FLCT `website <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/home>`__..
 
 # Reading two arrays from a dat file
 one, two = flct.read_2_images("two.dat")

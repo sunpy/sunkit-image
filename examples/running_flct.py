@@ -5,13 +5,13 @@ Fourier Local Correlation Tracking
 
 This example applies Fourier Local Correlation Tracking (FLCT)
 to a set of two images taken within a short interval of each other
-using `sunkit_image.flct.flct <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+using `sunkit_image.flct.flct <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/home>`__.
 """
 
 import numpy as np
 
-import sunkit_image.flct as flct
 import sunkit_image.data.test as data
+import sunkit_image.flct as flct
 
 ###########################################################################
 # First we need to get the input images which will be read by the

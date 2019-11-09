@@ -1,29 +1,36 @@
 /*
+       FLCT Local Correlation Tracking software
+       http://cgem.ssl.berkeley.edu/~fisher/public/software/FLCT
+       Copyright (C) 2007-2019, Regents of the University of California
 
- FLCT: http://solarmuri.ssl.berkeley.edu/overview/publicdownloads/software.html
- Copyright (C) 2007-2018 Regents of the University of California
+       This software is based on the concepts described in Welsch & Fisher
+       (2008, PASP Conf. Series 383, 373), with updates described in
+       Fisher et al. 2019, "The PDFI_SS Electric Field Inversion Software",
+       in prep.
+       If you use the software in a scientific
+       publication, the authors would appreciate a citation to these papers
+       and any future papers describing updates to the methods.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
+       This is free software; you can redistribute it and/or
+       modify it under the terms of the GNU Lesser General Public
+       License version 2.1 as published by the Free Software Foundation.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+       This software is distributed in the hope that it will be useful,
+       but WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+       See the GNU Lesser General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+       To view the GNU Lesser General Public License visit
+       http://www.gnu.org/copyleft/lesser.html
+       or write to the Free Software Foundation, Inc.,
+       59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 # include "flctsubs.h"
 
-void flct_f77__(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny, 
-     double * deltat, double * deltas, double * sigma, double * vx, 
-     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter, 
+void flct_f77__(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny,
+     double * deltat, double * deltas, double * sigma, double * vx,
+     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter,
      double * kr, i4 * skip, i4 * poffset, i4 * qoffset, i4 * interpolate,
      i4 * biascor, i4 * verbose)
 
@@ -40,9 +47,9 @@ ierflct=flct(*transp,f1,f2,*nx,*ny,*deltat,*deltas,*sigma,vx,vy,vm,
 return;
 }
 
-void flct_f77_(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny, 
-     double * deltat, double * deltas, double * sigma, double * vx, 
-     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter, 
+void flct_f77_(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny,
+     double * deltat, double * deltas, double * sigma, double * vx,
+     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter,
      double * kr, i4 * skip, i4 * poffset, i4 * qoffset, i4 * interpolate,
      i4 * biascor, i4 * verbose)
 
@@ -59,9 +66,9 @@ ierflct=flct(*transp,f1,f2,*nx,*ny,*deltat,*deltas,*sigma,vx,vy,vm,
 return;
 }
 
-void flct_f77(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny, 
-     double * deltat, double * deltas, double * sigma, double * vx, 
-     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter, 
+void flct_f77(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny,
+     double * deltat, double * deltas, double * sigma, double * vx,
+     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter,
      double * kr, i4 * skip, i4 * poffset, i4 * qoffset, i4 * interpolate,
      i4 * biascor, i4 * verbose)
 
@@ -78,15 +85,15 @@ ierflct=flct(*transp,f1,f2,*nx,*ny,*deltat,*deltas,*sigma,vx,vy,vm,
 return;
 }
 
-i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat, 
+i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
     double deltas, double sigma, double * vx, double * vy, double * vm,
     double thresh, i4 absflag, i4 filter, double kr, i4 skip,
-    i4 poffset, i4 qoffset, i4 interpolate, i4 biascor, i4 verbose) 
+    i4 poffset, i4 qoffset, i4 interpolate, i4 biascor, i4 verbose)
 {
 
 /* BEGIN FLCT FUNCTION */
 
-/*  char *version ="1.05    "; */
+/*  char *version ="1.07    "; */
 
   i4 hires=-1, expand=1, sigmaeq0;
   i4 nxtmp, nytmp, nxorig, nyorig, i, j, ii, jj, ic, jc, ixcount=0, iycount=0;
@@ -99,7 +106,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
   double *gaussdata, *f1temp, *f2temp,
     *g1, *g2, *absccor;
   double shiftx, shifty, argx, argy, f1max, f2max, fmax, fabsbar, vmask;
-  double sigminv=-999., 
+  double sigminv=-999.,
      deltinv, vxx=0., vyy=0., f1bar=0., f2bar=0.;
 /*      double tol=1e-4; */
   double tol = 1e-2;
@@ -112,7 +119,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
   i4 maxind,ixmax,iymax,absccmax,nsig;
   double gamx2val,gamy2val,gamxyval,
      gamxval,gamyval, gampeakval;
-  double *gamx2=NULL, *gamy2=NULL, *gamx=NULL, *gamy=NULL, *gamxy=NULL, 
+  double *gamx2=NULL, *gamy2=NULL, *gamx=NULL, *gamy=NULL, *gamxy=NULL,
      *gampeak=NULL;
   double fx,fy,fxx,fyy,fxy,fpeak,hessian,hm1over2,corfac,gam2oversigma2;
 
@@ -153,7 +160,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
      nt = (i4) sigma *sqrt (log (1. / tol));
      ndmin = (nx < ny) ? (((nx / 3) / 2)) * 2 : (((ny / 3) / 2)) * 2;
      nsize = ((nt / 2) * 2 < ndmin) ? (nt / 2) * 2 : ndmin;
-     if (verbose) 
+     if (verbose)
      {
        printf ("flct: nominal sliding box size = %d\n", 2 * nsize);
        fflush(stdout);
@@ -165,7 +172,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
         exit(1);
      }
   }
-  if(sigmaeq0) 
+  if(sigmaeq0)
   {
      /* sigma = 0 means we'll only compute one point */
      nx=1;
@@ -207,7 +214,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
       /* now convert relative thresh to absolute threshhold */
 
         thresh *= fmax;
-        if (verbose) 
+        if (verbose)
            printf ("flct: relative threshold in abs. units = %g\n", thresh);
            fflush(stdout);
 
@@ -231,7 +238,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 */
 
   /* the vm array (velocity mask array, not to be confused with the
-   * gaussian mask array that is used to modulate the images) 
+   * gaussian mask array that is used to modulate the images)
    * will later be set to 1.0 where the velocity is computed,
    * and to 0.0 where the velocity is not computed -- because the image
    * pixels are below the noise threshold value "thresh" input from
@@ -318,7 +325,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 	   * threshold: */
 
 	  /* the data is considered below theshhold if the
-	   * absolute value of average of the pixel value from the 2 images 
+	   * absolute value of average of the pixel value from the 2 images
 	   * is below threshold */
 
 	  fabsbar = 0.5 * (fabs (*(f1 + i * ny + j) + *(f2 + i * ny + j)));
@@ -366,11 +373,11 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 	       * now */
 
 
-	      /* Now find where the gaussian modulated image 
+	      /* Now find where the gaussian modulated image
 	       * is
 	       * chopped off by the sliding box.  The sliding
 	       * box is centered at i,j, unless the edges of
-	       * the box would go outside the array -- 
+	       * the box would go outside the array --
 	       * then the
 	       * sliding box just sits at edges and/or corners
 	       * of the array   */
@@ -420,7 +427,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
               f1bar=0.;
               f2bar=0.;
               for (ii = 0; ii < isize; ii++)
-                { 
+                {
                    for (jj = 0; jj < jsize; jj++)
                       {
                          f1bar=f1bar+ *(f1 + (ii+imin)*nyorig + (jj+jmin));
@@ -434,7 +441,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 	      g1 = (double *) malloc (sizeof (double) * isize * jsize);
 	      g2 = (double *) malloc (sizeof (double) * isize * jsize);
 
-/* comment out the g1bar calculation:  
+/* comment out the g1bar calculation:
    This is not being used, but code retained just in case it is resurrected. */
 
 /*
@@ -454,32 +461,32 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
               g2bar=g2bar/((double)isize*jsize);
 */
 
-	      /* Now fill the reduced size arrays (sub-images) with the 
-	       * appropriate values from the 
+	      /* Now fill the reduced size arrays (sub-images) with the
+	       * appropriate values from the
 	       * full-sized arrays: */
 
 	      for (ii = 0; ii < isize; ii++)
 		{
 		  for (jj = 0; jj < jsize; jj++)
 		    {
-		      *(g1 + ii * jsize + jj) = 
+		      *(g1 + ii * jsize + jj) =
                           *(gaussdata + (nxorig-i+(ii+imin))*2*nyorig
                            +nyorig-j+(jj+jmin)) *
                           (*(f1 + (ii + imin) * nyorig + (jj + jmin))-f1bar) ;
 
-		      *(g2 + ii * jsize + jj) = 
+		      *(g2 + ii * jsize + jj) =
                           *(gaussdata + (nxorig-i+(ii+imin))*2*nyorig
                            +nyorig-j+(jj+jmin)) *
                           (*(f2 + (ii + imin) * nyorig + (jj + jmin))-f2bar) ;
 		    }
 		}
 
-	      /* Call to cross_cor is used to find the 
+	      /* Call to cross_cor is used to find the
 	       * relative
 	       * shift of image g2 relative to g1: */
 
 	      icc = cross_cor (init, hires, expand, g1, g2, &absccor,
-			       isize, jsize, &shiftx, &shifty, filter, 
+			       isize, jsize, &shiftx, &shifty, filter,
                                kr, sigma);
 
 /*                              debug:  output of absccor */
@@ -513,23 +520,23 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
               gampeakval=0.;
               gamxval=0.;
               gamyval=0.;
-              if( (ixmax > 0) && (ixmax < (isize-1)) && (iymax > 0) && 
+              if( (ixmax > 0) && (ixmax < (isize-1)) && (iymax > 0) &&
                   (iymax < (jsize-1)) && (absccmax == 1))
               {
 
-                fx=0.5* ( *(absccor+(ixmax+1)*jsize+iymax) - 
+                fx=0.5* ( *(absccor+(ixmax+1)*jsize+iymax) -
                      *(absccor+(ixmax-1)*jsize+iymax) );
-                fy=0.5* ( *(absccor+ixmax*jsize+iymax+1) - 
+                fy=0.5* ( *(absccor+ixmax*jsize+iymax+1) -
                    *(absccor+ixmax*jsize+iymax-1) );
-                fxx = ( *(absccor+(ixmax+1)*jsize+iymax)+ 
-                   *(absccor+(ixmax-1)*jsize+iymax) 
+                fxx = ( *(absccor+(ixmax+1)*jsize+iymax)+
+                   *(absccor+(ixmax-1)*jsize+iymax)
                   -2.*( *(absccor+ixmax*jsize+iymax))  );
-                fyy = ( *(absccor+ixmax*jsize+iymax+1) + 
+                fyy = ( *(absccor+ixmax*jsize+iymax+1) +
                    *(absccor+ixmax*jsize+iymax-1)
                   -2.*( *(absccor+ixmax*jsize+iymax)) );
-                fxy = 0.25*( *(absccor+(ixmax+1)*jsize+iymax+1) + 
+                fxy = 0.25*( *(absccor+(ixmax+1)*jsize+iymax+1) +
                    *(absccor+(ixmax-1)*jsize+iymax-1) -
-                   *(absccor+(ixmax+1)*jsize+iymax-1) - 
+                   *(absccor+(ixmax+1)*jsize+iymax-1) -
                    *(absccor+(ixmax-1)*jsize+iymax+1) );
                 fpeak=*(absccor+ixmax*jsize+iymax);
 /*
@@ -545,7 +552,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
                 gamyval=fy;
                 hessian=fxx*fyy/(fpeak*fpeak)-fxy*fxy/(fpeak*fpeak);
                 hm1over2=1./sqrt(hessian);
-                /* Don't let ratio of hm1over2 to sigma^2 approach 1 
+                /* Don't let ratio of hm1over2 to sigma^2 approach 1
                  or get singularity in corfac */
                 if((hm1over2 > 0.95*sigma*sigma) || (hessian == 0))
                 {
@@ -557,15 +564,15 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
                   gam2oversigma2+=(hm1over2/(sigma*sigma));
                   nsig++;
                 }
-                if( (sigmaeq0) || (!biascor)) 
+                if( (sigmaeq0) || (!biascor))
                 {
                   corfac=1.;
                 }
-                else 
+                else
                 {
                   corfac=1./(1.-0.8*hm1over2/(sigma*sigma));
                 }
-                /* Now add corrections to shiftx, shifty 
+                /* Now add corrections to shiftx, shifty
                 based on bias correction factor */
                 shiftx*=corfac;
                 shifty*=corfac;
@@ -580,7 +587,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 	      /* Now convert shifts to units of velocity using
 	       * deltas and deltat */
 
-	      /* Note: if (transp), then the meaning of 
+	      /* Note: if (transp), then the meaning of
 	       * velocities
 	       * has to be switched between x and y */
 
@@ -617,7 +624,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 
 	  if ((belowthresh || !noskipxy) && !sigmaeq0)
 
-	    /* If data below threshold, set vxx, vyy to xmiss 
+	    /* If data below threshold, set vxx, vyy to xmiss
 	     * and vmask to 0, meaning vel not computed. */
             /* If sigma=0 just ignore the threshold and compute anyway */
 
@@ -663,7 +670,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
      }
    }
 /* Debug
-    printf("\n"); 
+    printf("\n");
 */
 
   /*  If interpolation to non-computed pixels is desired, this next code is
@@ -671,7 +678,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 
   if(skipon && interpolate)
   {
-  /* First step is to figure out the number of computed points in x,y 
+  /* First step is to figure out the number of computed points in x,y
   which we'll call ixcount and iycount */
   if(transp)
     {
@@ -730,7 +737,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
         {
            noskipy = !((j-yoffset) % skip);
            if(noskipy) jc++;
-           noskipxy=noskipx*noskipy; 
+           noskipxy=noskipx*noskipy;
            if(noskipxy) *(vxnoi+ic*iycount+jc)=*(vx+i*ny+j);
            if(noskipxy) *(vynoi+ic*iycount+jc)=*(vy+i*ny+j);
            if(noskipxy) *(vmnoi+ic*iycount+jc)=*(vm+i*ny+j);
@@ -762,8 +769,8 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
          xoffset=poffset;
       }
       *(xwant+i)=((double)(i-xoffset))/(double)(skip);
-/* debug: 
-      printf("for i= %d, xwant[i] = %g\n",i,*(xwant+i)); 
+/* debug:
+      printf("for i= %d, xwant[i] = %g\n",i,*(xwant+i));
 */
     }
 
@@ -779,7 +786,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
       }
       *(ywant+j)=((double)(j-yoffset))/(double)(skip);
 /* debug:
-      printf("for j= %d, ywant[j] = %g\n",j,*(ywant+j)); 
+      printf("for j= %d, ywant[j] = %g\n",j,*(ywant+j));
 */
 
     }
@@ -791,7 +798,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
       interpcc2d(vxnoi,xmiss,ixcount,iycount,xwant,nx,ywant,ny,&vxint);
       interpcc2d(vynoi,xmiss,ixcount,iycount,xwant,nx,ywant,ny,&vyint);
 
-/* Debug: 
+/* Debug:
       write3images ("intarrays.dat", vxint,vyint,vyint,nx,ny,transp);
 */
 
@@ -814,7 +821,7 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
              yoffset=qoffset;
            }
            noskipy = !((j-yoffset) % skip);
-           noskipxy=noskipx*noskipy; 
+           noskipxy=noskipx*noskipy;
            skipxy=!noskipxy;
            if(skipxy) *(vx+i*ny+j)=*(vxint+i*ny+j);
            if(skipxy) *(vy+i*ny+j)=*(vyint+i*ny+j);
@@ -890,12 +897,12 @@ i4 flct (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
 i4 readimage (char *fname, i4 * nx, i4 * ny, double **arr,
 	     i4 transp)
 /* Function to read array dims, create space for 1 double array, read it in.
- * Note the double pointer to the double precision * arrays in the calling 
+ * Note the double pointer to the double precision * arrays in the calling
  * argument.  Note also these are referenced as pointers and returned to the
  * calling function. */
 {
   FILE *f1;			/* pointer to input file */
-  i4 newsize;			/* size of the new double prec. array to be 
+  i4 newsize;			/* size of the new double prec. array to be
 				   read in =nx*ny */
   i4 i, ier, ibe, ise, vcid;
   f4 *farr;
@@ -983,12 +990,12 @@ i4 readimage (char *fname, i4 * nx, i4 * ny, double **arr,
 i4 read2images (char *fname, i4 * nx, i4 * ny, double **arr, double **barr,
 	     i4 transp)
 /* Function to read array dims, create space for 2 double arrays, read them in.
- * Note the double pointer to the double precision * arrays in the calling 
+ * Note the double pointer to the double precision * arrays in the calling
  * argument.  Note also these are referenced as pointers and returned to the
  * calling function. */
 {
   FILE *f1;			/* pointer to input file */
-  i4 newsize;			/* size of the new double prec. array to be 
+  i4 newsize;			/* size of the new double prec. array to be
 				   read in =nx*ny */
   i4 i, ier, ibe, ise, vcid;
   f4 *farr, *fbarr;
@@ -1094,11 +1101,11 @@ i4 read2images (char *fname, i4 * nx, i4 * ny, double **arr, double **barr,
 
 i4 where (char *cond, i4 xsize, i4 ** index, i4 * length_index)
 /* This function serves a similar purpose to the "where" function in IDL.
- * Given the array *cond (char) of length xsize 
+ * Given the array *cond (char) of length xsize
  * containing a pre-computed condition, the function finds **index, a double
  * pointer to an array of indices which reference those values
  * where *cond is
- * non-zero.  The integer *length_index returns the length of *index. 
+ * non-zero.  The integer *length_index returns the length of *index.
  */
 /* Note - this function no longer used in vel_ccor */
 {
@@ -1148,7 +1155,7 @@ i4 where (char *cond, i4 xsize, i4 ** index, i4 * length_index)
 }
 
 i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
-	   double **absccor, i4 nx, i4 ny, double *shiftx, double *shifty, 
+	   double **absccor, i4 nx, i4 ny, double *shiftx, double *shifty,
            i4 filterflag, double kr, double sigma)
 {
   i4 i, j, ixx, iyy, maxind, ixmax, iymax, ishft, maxfine, absccmax;
@@ -1211,7 +1218,7 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
 
       outa = (fftw_complex *) fftw_malloc (sizeof (fftw_complex) *
 					   nx * ((ny / 2) + 2));
-      outb = (fftw_complex *) fftw_malloc (sizeof (fftw_complex) * 
+      outb = (fftw_complex *) fftw_malloc (sizeof (fftw_complex) *
               nx * ((ny / 2) + 2));	/* valgrind sometimes complains */
       ccorconj = (fftw_complex *) fftw_malloc (sizeof (fftw_complex) *
 					       nx * ((ny / 2) + 2));
@@ -1271,7 +1278,7 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
 
   normfac = (1. / ((double) nx * ny));
   normfac *= normfac; /* square of above line */
- 
+
 /* Now apply the gaussian filter to the FFT'd data in frequency space */
 
     if(filterflag)
@@ -1290,7 +1297,7 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
             outa[i*((ny/2)+1)+j][1]=outa[i*((ny/2)+1)+j][1]*filter[i*ny+j];
             outb[i*((ny/2)+1)+j][0]=outb[i*((ny/2)+1)+j][0]*filter[i*ny+j];
             outb[i*((ny/2)+1)+j][1]=outb[i*((ny/2)+1)+j][1]*filter[i*ny+j];
-#endif            
+#endif
          }
       }
     }
@@ -1350,7 +1357,7 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
 
   absccmax=1;
   maxind = maxloc (*absccor, nx * ny);
-  if( *(*absccor+maxind) == (double)0.) 
+  if( *(*absccor+maxind) == (double)0.)
   {
      absccmax=0;
   }
@@ -1372,16 +1379,16 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
   if(( expand == 1) && (hires == -1) && (ixmax > 0) && (ixmax < (nx-1))
      && (iymax > 0) && (iymax < (ny-1)) && (absccmax == 1))
   {
-     fx=0.5* ( *(*absccor+(ixmax+1)*ny+iymax) - 
+     fx=0.5* ( *(*absccor+(ixmax+1)*ny+iymax) -
          *(*absccor+(ixmax-1)*ny+iymax) );
      fy=0.5* ( *(*absccor+ixmax*ny+iymax+1) - *(*absccor+ixmax*ny+iymax-1) );
      fxx = ( *(*absccor+(ixmax+1)*ny+iymax)+ *(*absccor+(ixmax-1)*ny+iymax)
         -2.*( *(*absccor+ixmax*ny+iymax))  );
      fyy = ( *(*absccor+ixmax*ny+iymax+1) + *(*absccor+ixmax*ny+iymax-1)
         -2.*( *(*absccor+ixmax*ny+iymax)) );
-     fxy = 0.25*( *(*absccor+(ixmax+1)*ny+iymax+1) + 
+     fxy = 0.25*( *(*absccor+(ixmax+1)*ny+iymax+1) +
             *(*absccor+(ixmax-1)*ny+iymax-1) -
-            *(*absccor+(ixmax+1)*ny+iymax-1) - 
+            *(*absccor+(ixmax+1)*ny+iymax-1) -
             *(*absccor+(ixmax-1)*ny+iymax+1) );
      fpeak=*(*absccor+ixmax*ny+iymax);
 /* In following expressions for subshifts, shift is in units of pixel length */
@@ -1394,7 +1401,7 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
 /*
        printf("shiftx0-nx/2 = %g\n",(shiftx0-(double)(nx/2)));
        printf("shifty0-ny/2 = %g\n",(shifty0-(double)(ny/2)));
- 
+
 */
 
 /* Now create x, y arrays to define desired interpolation grid: */
@@ -1419,10 +1426,10 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
    	- 0.5 * rangey + shifty0;
 /*                 printf("ywant[%d] = %g\n",j,*(ywant+j)); */
        }
-   
+
   /* Now, do the interpolation of the region of the peak of the cc fn */
 
-     interpcc2d (*absccor, xmiss, nx, ny, xwant, nxinterp, ywant, 
+     interpcc2d (*absccor, xmiss, nx, ny, xwant, nxinterp, ywant,
           nyinterp, &peakarea);
 
   /* Following writeimage stmt is available if you need to examine the
@@ -1444,11 +1451,11 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
      if((expand == 1) && (ixx > 0) && (ixx < (nxinterp-1)) && (iyy > 0)
         && (iyy < (nyinterp-1)))
      {
-        fx=0.5* ( *(peakarea+(ixx+1)*nyinterp+iyy) - 
+        fx=0.5* ( *(peakarea+(ixx+1)*nyinterp+iyy) -
               *(peakarea+(ixx-1)*nyinterp+iyy) );
-        fy=0.5* ( *(peakarea+ixx*nyinterp+iyy+1) - 
+        fy=0.5* ( *(peakarea+ixx*nyinterp+iyy+1) -
               *(peakarea+ixx*nyinterp+iyy-1) );
-        fxx = ( *(peakarea+(ixx+1)*nyinterp+iyy)+ 
+        fxx = ( *(peakarea+(ixx+1)*nyinterp+iyy)+
               *(peakarea+(ixx-1)*nyinterp+iyy)
               -2.*( *(peakarea+ixx*nyinterp+iyy))  );
         fyy = ( *(peakarea+ixx*nyinterp+iyy+1) + *(peakarea+ixx*nyinterp+iyy-1)
@@ -1476,7 +1483,7 @@ i4 cross_cor (i4 init, i4 hires, i4 expand, double *arr, double *barr,
   *shiftx = shiftxx - (double) (nx / 2);
   *shifty = shiftyy - (double) (ny / 2);
 
-/* Following expressions used if only 1 pixel accuracy needed from absccor 
+/* Following expressions used if only 1 pixel accuracy needed from absccor
  *
 	*shiftx=((double)ixmax)-(double)(nx/2);
 	*shifty=((double)iymax)-(double)(ny/2);
@@ -1558,7 +1565,7 @@ i4 filter_image(double *arr, double *barr, double *outarr, double *outbarr,
 kr*kmax, where 0 < kr < 1, and kmax is the maximum wavenumber in x and y,
 considered separately.  The input arrays are arr, barr, and the output
 arrays are outarr, and outbarr.  They are assumed already allocated in
-caller.  
+caller.
 
 This function is not used in this particular version of flct (filtering
 is done within cross_cor), but is
@@ -1576,7 +1583,7 @@ included as it may be useful in the future.
   fftw_plan pa, pb, pbacka, pbackb;
   outa = (fftw_complex *) fftw_malloc (sizeof (fftw_complex) *
      nx * ((ny / 2) + 2));
-  outb = (fftw_complex *) fftw_malloc (sizeof (fftw_complex) * 
+  outb = (fftw_complex *) fftw_malloc (sizeof (fftw_complex) *
      nx * ((ny / 2) + 2));	/* valgrind sometimes complains */
   ina = (double *) fftw_malloc (sizeof (double) * nx * ny);
   inb = (double *) fftw_malloc (sizeof (double) * nx * ny);
@@ -1763,7 +1770,7 @@ i4 writeimage (char *fname, double *arr, i4 nx, i4 ny, i4 transp)
   return ier;
 }
 
-i4 write2images (char *fname, double *arr, double *barr, 
+i4 write2images (char *fname, double *arr, double *barr,
          i4 nx, i4 ny, i4 transp)
 {
 
@@ -1801,7 +1808,7 @@ i4 write2images (char *fname, double *arr, double *barr,
 
   fwrite (&vcidtmp, sizeof (i4), 1, f1);	/* write vel_ccor id flag */
 
-  /* switch role of nx, ny if transp is set (for interaction with IDL) 
+  /* switch role of nx, ny if transp is set (for interaction with IDL)
    * and write these into the file */
 
   if (transp)
@@ -1891,7 +1898,7 @@ i4 write3images (char *fname, double *arr, double *barr, double *carr,
 
   fwrite (&vcidtmp, sizeof (i4), 1, f1);
 
-  /* switch role of nx, ny if transp is set (for interaction with IDL) 
+  /* switch role of nx, ny if transp is set (for interaction with IDL)
    * and write these into the file */
 
   if (transp)
@@ -2063,26 +2070,26 @@ i4 iminloc (i4 * arr, i4 xsize)
   return location;
 }
 
-i4 interpcc2d (double *fdata, double xmiss, i4 nx, i4 ny, 
+i4 interpcc2d (double *fdata, double xmiss, i4 nx, i4 ny,
     double *xwant, i4 nxinterp, double *ywant, i4 nyinterp, double **finterp)
 {
   /*
-   * This function does cubic convolution interpolation onto an array 
+   * This function does cubic convolution interpolation onto an array
    * finterp from data defined in array fdata.  nx, ny are the
    * assumed dimensions of fdata, and nxinterp, nyinterp are the
    * assumed dimensions of finterp.  The values of x,y at which
    * the interpolation is desired are passed in through the arrays
    * xwant and ywant, which are dimensioned nxinterp and nyinterp,
    * respectively.  It is assumed that xwant, ywant are in units of
-   * the indices of the original data array (fdata), 
-   * treated as floating point (double precision, actually) 
+   * the indices of the original data array (fdata),
+   * treated as floating point (double precision, actually)
    * numbers. Arrays fdata, xwant, and ywant are passed in
    * as pointers; The array finterp is defined in this function
    * as a "double" pointer and the array is created and passed back to
    * the calling function.  In the calling function, finterp is declared
    * as a pointer, but when it is passed into this function as
    * an argument, the address of the pointer is used.
-   * 
+   *
    * if any of the datapoints within a kernel weighting distance of
    * xwant and ywant are equal to xmiss,
    * the returned value of finterp is also set to xmiss.  xmiss is a user-
@@ -2156,16 +2163,16 @@ i4 interpcc2d (double *fdata, double xmiss, i4 nx, i4 ny,
 
   /* Now fill in the 4 corners: */
 
-  *(cdata + 0*(nx + 2) + 0) = 
+  *(cdata + 0*(nx + 2) + 0) =
     3. * (*(cdata + 1*(ny + 2) + 0)) -
     3. * (*(cdata + 2*(ny + 2) + 0)) + *(cdata + 3*(ny + 2) + 0);
 
-  *(cdata + (nx + 1)*(ny + 2) + 0) = 
+  *(cdata + (nx + 1)*(ny + 2) + 0) =
     3. * (*(cdata + nx*(ny + 2) + 0)) -
     3. * (*(cdata + (nx - 1)*(ny + 2) + 0)) + *(cdata +
 						    (nx - 2)*(ny + 2) + 0);
 
-  *(cdata + 0*(ny + 2) + ny + 1) = 
+  *(cdata + 0*(ny + 2) + ny + 1) =
     3. * (*(cdata + 0*(ny + 2) + ny)) -
     3. * (*(cdata + 0*(ny + 2) + ny - 1)) + *(cdata + 0*(ny + 2) + ny - 2);
 
@@ -2229,7 +2236,7 @@ i4 interpcc2d (double *fdata, double xmiss, i4 nx, i4 ny,
 
 		  /* evaluate kernel wt function r(tx): */
 
-		  /* Note no testing for out of range 
+		  /* Note no testing for out of range
 		   * values of |tx| or |ty| > 2 --
 		   * we assume the tx, ty are properly
 		   * computed such that their absolute
@@ -2345,15 +2352,15 @@ double signum(double v)
   return 0.0;
 }
 
-i4 pc2mc(i4 transp, double *f, i4 nx, i4 ny, double lonmin, double lonmax, 
-         double latmin, double latmax, double ** finterp, i4 *nxinterp, 
+i4 pc2mc(i4 transp, double *f, i4 nx, i4 ny, double lonmin, double lonmax,
+         double latmin, double latmax, double ** finterp, i4 *nxinterp,
          i4 *nyinterp, double * vmin, double *vmax)
 {
 /* interpolate input array f, in Plate Carree coordinates, to output
-array *finterp, in Mercator projected coordinates.  Uses math.h 
+array *finterp, in Mercator projected coordinates.  Uses math.h
 
 If (transp) then longitude index varies fastest, corresponding to
-the "y" direction in interpcc2d.  So if (transp), latitude index varies 
+the "y" direction in interpcc2d.  So if (transp), latitude index varies
 more slowly, and is associated with "x" direction here:
 
 In notation below, the "u" direction in Mercator projection is in the
@@ -2408,7 +2415,7 @@ umax=lonmax;
 
 /* Compute array index range in x,y directions for *finterp.
 
-First calculate expansion factor in lat direction, then nvinterp, delv, 
+First calculate expansion factor in lat direction, then nvinterp, delv,
 rangey.  The objective here is to make sure there's enough resolution in
 the v direction so that the original array is not undersampled. */
 
@@ -2430,7 +2437,7 @@ else
 {
 /* in this case, latitude is in the rapidly varying index direction */
 /* nvinterp=(i4) ny*expfac + 1; */
-  nvinterp=(i4) ny*expfac; 
+  nvinterp=(i4) ny*expfac;
   *nyinterp=nvinterp;
   delv=(*vmax-*vmin)/(nvinterp-1);
 /* in lon direction, no expansion */
@@ -2439,7 +2446,7 @@ else
   delu=(umax-umin)/(nuinterp-1);
 }
 
-/* Compute uniformly spaced array vrange and corresponding latwant for Mercator 
+/* Compute uniformly spaced array vrange and corresponding latwant for Mercator
   projection */
 
 vrange=malloc(nvinterp*sizeof(double));
@@ -2509,21 +2516,21 @@ free(lonwant);
 free(vrange);
 free(latwant);
 
-/* In calling program, might want to test if any values of finterp are 
+/* In calling program, might want to test if any values of finterp are
 equal to xmiss, and if so, set them to 0? or maybe do that here?*/
 
 return 0;
 }
 
-i4 mc2pc(i4 transp, double *f, i4 nxinterp, i4 nyinterp, double umin, 
-         double umax, double vmin, double vmax, double ** finterp, i4 nx, 
+i4 mc2pc(i4 transp, double *f, i4 nxinterp, i4 nyinterp, double umin,
+         double umax, double vmin, double vmax, double ** finterp, i4 nx,
          i4 ny)
 {
 /* interpolate input array f, in Mercator coordinates, to output
-array *finterp, in Plate Carree projected coordinates.  Uses math.h 
+array *finterp, in Plate Carree projected coordinates.  Uses math.h
 
 If (transp) then longitude index varies fastest, corresponding to
-the "y" direction in interpcc2d.  So if (transp), latitude index varies 
+the "y" direction in interpcc2d.  So if (transp), latitude index varies
 more slowly, and is associated with "x" direction here.
 
 In notation below, the "u" direction in Mercator projection is in the
@@ -2531,8 +2538,8 @@ azimuthal direction, and the "v" direction is in the latitude direction.
 
 Note some differences here from mc2pc and pc2mc:  While in pc2mc, nxinterp
 and nyinterp are computed within the function and returned as output variables,
-here nxinterp, nyinterp, nx, and ny are all specified as input variables.  
-This is to ensure that when going back from Mercator to (lon,lat) 
+here nxinterp, nyinterp, nx, and ny are all specified as input variables.
+This is to ensure that when going back from Mercator to (lon,lat)
 that nx,ny are the same as what you start with.  There shouldn't need to be
 an expansion factor going in this direction that was needed in going from
 pc to mc. */
@@ -2606,7 +2613,7 @@ else
   dellon=(lonmax-lonmin)/(nu-1);
 }
 
-/* Compute uniformly spaced array latrange and corresponding vwant for 
+/* Compute uniformly spaced array latrange and corresponding vwant for
 Plate Carree projection */
 
 latrange=malloc(nv*sizeof(double));
@@ -2685,11 +2692,11 @@ free(lonrange);
 return 0;
 }
 
-i4 flct_pc (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat, 
+i4 flct_pc (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
     double deltas, double sigma, double * vx, double * vy, double * vm,
     double thresh, i4 absflag, i4 filter, double kr, i4 skip,
-    i4 poffset, i4 qoffset, i4 interpolate, double latmin, double latmax, 
-    i4 biascor, i4 verbose) 
+    i4 poffset, i4 qoffset, i4 interpolate, double latmin, double latmax,
+    i4 biascor, i4 verbose)
 {
 
 /* BEGIN FLCT_PC FUNCTION */
@@ -2698,7 +2705,7 @@ i4 flct_pc (i4 transp, double * f1, double * f2, i4 nx, i4 ny, double deltat,
    interpolate those velocity results back to Plate Carree coordinates.  Once
    this is done, both velocity components are modulated by cos(latitude). */
 
-/*  char *version ="1.04    "; */
+/*  char *version ="1.07    "; */
 
 i4 nxinterp,nyinterp,nxf,nyf,nu,nv,i,j,ier,absflag0,iloc1,iloc2,belowthresh;
 i4 sigmaeq0;
@@ -2710,14 +2717,14 @@ double *f1temp=NULL,*f2temp=NULL;
 double *latrange=NULL;
 
 /* Note that at this point, nx,ny do not necessarily correspond to the
-slowly varying and rapidly varying index directions, resp.  Must be careful, 
-because in pc2mc and mc2pc ny is assumed to be rapidly varying, nx slowly 
-varying. 
+slowly varying and rapidly varying index directions, resp.  Must be careful,
+because in pc2mc and mc2pc ny is assumed to be rapidly varying, nx slowly
+varying.
 
 Approach here is to do what is done in flct function itself, and flip the
-roles of nx,ny (if transp) to mirror what is assumed in flct.  Still 
+roles of nx,ny (if transp) to mirror what is assumed in flct.  Still
 retain original nx,ny in case they're needed.
-So:  Will define variables nxf,nyf that are flipped from nx,ny if(transp). 
+So:  Will define variables nxf,nyf that are flipped from nx,ny if(transp).
 Note flct is called with nxinterp,nyinterp.
 
 If sigma == 0, will set nx,ny to 1.
@@ -2780,7 +2787,7 @@ latrange=malloc(nv*sizeof(double));
 latbar=0.;
 for(i=0;i<nv;i++)
 {
-  latrange[i]=latmin+i*dellat; 
+  latrange[i]=latmin+i*dellat;
   latbar+=latrange[i];
 }
 
@@ -2829,15 +2836,15 @@ absflag0=0;
 
 if(transp)
 {
-    if(verbose) 
+    if(verbose)
     {
       printf("flct_pc: No. of points in v - Mercator Proj: %d\n", nxinterp);
       fflush(stdout);
     }
-    if(verbose) 
+    if(verbose)
     {
       printf("flct_pc: effective value of sigma in Merc Proj: %g\n",
-      sigma * (double) nxf / (double) nxinterp );  
+      sigma * (double) nxf / (double) nxinterp );
       fflush(stdout);
     }
     ier=flct(transp,f1merc,f2merc,nyinterp,nxinterp,deltat,deltas,sigma,
@@ -2846,16 +2853,16 @@ if(transp)
 }
 else
 {
-    if(verbose) 
+    if(verbose)
     {
       printf("flct_pc: No. of points in v - Mercator Proj: %d\n",
       nyinterp);
       fflush(stdout);
     }
-    if(verbose) 
+    if(verbose)
     {
       printf("flct_pc: effective value of sigma in Merc Proj: %g\n",
-      sigma * (double) nyf / (double) nyinterp );  
+      sigma * (double) nyf / (double) nyinterp );
       fflush(stdout);
     }
     ier=flct(transp,f1merc,f2merc,nxinterp,nyinterp,deltat,deltas,sigma,
@@ -2932,7 +2939,7 @@ if ((thresh > 0.) && (thresh < 1.) && (absflag == 0) && (!sigmaeq0))
   /* now convert relative thresh to absolute threshhold */
 
   thresh *= fmax;
-  if (verbose) 
+  if (verbose)
   {
     printf ("flct_pc: relative threshold in abs. units = %g\n", thresh);
     fflush(stdout);
@@ -2966,9 +2973,9 @@ if(sigmaeq0) /* Only a single value is computed if sigma == 0 */
   vx[0] = cos(latbar) * vxmerc[0];
   vy[0] = cos(latbar) * vymerc[0];
   vm[0] = 0.5; /* in this case we should say vx,vy interpolated */
-  if(verbose) 
+  if(verbose)
   {
-     printf("flct_pc: After cos(latbar) modulation, vx = %g, vy =%g\n" 
+     printf("flct_pc: After cos(latbar) modulation, vx = %g, vy =%g\n"
        ,vx[0],vy[0]);
      fflush(stdout);
   }
@@ -3000,9 +3007,9 @@ return 0;
 /*  END FLCT_PC FUNCTION */
 }
 
-void flct_pc_f77__(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny, 
-     double * deltat, double * deltas, double * sigma, double * vx, 
-     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter, 
+void flct_pc_f77__(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny,
+     double * deltat, double * deltas, double * sigma, double * vx,
+     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter,
      double * kr, i4 * skip, i4 * poffset, i4 * qoffset, i4 * interpolate,
      double * latmin, double * latmax, i4 * biascor, i4 * verbose)
 
@@ -3019,9 +3026,9 @@ ierflct=flct_pc(*transp,f1,f2,*nx,*ny,*deltat,*deltas,*sigma,vx,vy,vm,
 return;
 }
 
-void flct_pc_f77_(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny, 
-     double * deltat, double * deltas, double * sigma, double * vx, 
-     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter, 
+void flct_pc_f77_(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny,
+     double * deltat, double * deltas, double * sigma, double * vx,
+     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter,
      double * kr, i4 * skip, i4 * poffset, i4 * qoffset, i4 * interpolate,
      double * latmin, double * latmax, i4 * biascor, i4 * verbose)
 
@@ -3038,9 +3045,9 @@ ierflct=flct_pc(*transp,f1,f2,*nx,*ny,*deltat,*deltas,*sigma,vx,vy,vm,
 return;
 }
 
-void flct_pc_f77(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny, 
-     double * deltat, double * deltas, double * sigma, double * vx, 
-     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter, 
+void flct_pc_f77(i4 * transp, double * f1, double * f2, i4 * nx, i4 * ny,
+     double * deltat, double * deltas, double * sigma, double * vx,
+     double * vy, double * vm, double * thresh, i4 * absflag, i4 * filter,
      double * kr, i4 * skip, i4 * poffset, i4 * qoffset, i4 * interpolate,
      double * latmin, double * latmax, i4 * biascor, i4 * verbose)
 
@@ -3116,9 +3123,9 @@ i4 shift_frac2d(double *arr, double delx, double dely, double *outarr,
 	}
 
   /* do the forward FFT: */
-  
+
   fftw_execute (pa);
-  
+
   /* get shifts normalized to nx, ny.  Note if transp==1 then roles of delx,
   dely are switched.  This occurs if array is column-major.  */
 
@@ -3230,7 +3237,7 @@ i4 warp_frac2d(double *arr, double *delx, double *dely, double *outarr,
   double pi=3.1415926535898;
   double normfac, fftdeltr, fftdelti,outar,outai,totalimij,nxinv,nyinv,
          xarg,yarg,shiftx,shifty;
-  fftw_complex *ina, *outa; 
+  fftw_complex *ina, *outa;
   fftw_plan pa;
   /* if verbose==0, no output to stdout, if verbose==1, msgs sent to stdout */
   /* flip nx, ny if (transp) */
@@ -3337,14 +3344,14 @@ i4 warp_frac2d(double *arr, double *delx, double *dely, double *outarr,
                     outar=outa[ii*ny+jj][0];
                     outai=outa[ii*ny+jj][1];
 #endif
-    
 
-                    /* add contributions to the total shifted image at i,j 
+
+                    /* add contributions to the total shifted image at i,j
                        noting that only the real part matters */
                     totalimij+= (outar*fftdeltr-outai*fftdelti);
                  }
              }
-         
+
          /* record shifted image at i,j, after normalizing */
          outarr[i*ny+j] = (double) totalimij*normfac;
       }
@@ -3416,133 +3423,4 @@ void shift_frac2d_f77__(double *arr, double *delx, double *dely, double *outarr,
   i4 iershift;
   iershift=shift_frac2d(arr, *delx, *dely, outarr, *nx, *ny, *transp, *verbose);
   return;
-}
-
-i4 read3images (char *fname, i4 * nx, i4 * ny, double **arr, double **barr,
-	     double **carr, i4 transp)
-/* Function to read array dims, create space for 2 double arrays, read them in.
- * Note the double pointer to the double precision * arrays in the calling 
- * argument.  Note also these are referenced as pointers and returned to the
- * calling function. */
-{
-  FILE *f1;			/* pointer to input file */
-  i4 newsize;			/* size of the new double prec. array to be 
-				   read in =nx*ny */
-  i4 i, ier, ibe, ise, vcid;
-  f4 *farr, *fbarr, *fcarr;
-  ibe = is_large_endian ();
-  ise = 0;
-  if (ibe == 0) ise = 1;	/* set small endian flag if not big  endian */
-  f1 = fopen (fname, "rb");	/* open file for binary unformatted read */
-  ier = 0;
-  if (f1 == NULL)		/* error exit if file can't be opened */
-    {
-      printf ("read3images: cannot open file %s\n", fname);
-      exit (1);
-    }
-
-  /* check that files begins with special vel_ccor flag: */
-  fread (&vcid, sizeof (i4), 1, f1);
-  if (ise) byteswapflct ((void *) &vcid, 1, sizeof (i4));
-  if (vcid != 2136967593)
-    {
-      printf ("read3images: input file is not a vel_ccor i/o file\n");
-      exit (1);
-    }
-
-  /* order of nx, ny read in must be switched if transp is true */
-
-  if (transp)
-    {
-      fread (ny, sizeof (i4), 1, f1);
-      fread (nx, sizeof (i4), 1, f1);
-    }
-  else
-    {
-      fread (nx, sizeof (i4), 1, f1);
-      fread (ny, sizeof (i4), 1, f1);
-    }
-  if (ise)			/* byteswap nx,ny if small endian */
-    {
-      byteswapflct ((void *) nx, 1, sizeof (i4));
-      byteswapflct ((void *) ny, 1, sizeof (i4));
-    }
-/*
-	printf("\n\nnx,ny read in from file arr = %d,%d\n",*nx,*ny);
-*/
-  newsize = (*nx) * (*ny) * sizeof (double);	/* size of new double array */
-
-  /* now create enough space in memory to hold the array arr */
-
-  *arr = malloc (newsize);
-
-  /* allocate space for the temporary, f4 array farr */
-
-  farr = malloc (sizeof (f4) * (*nx) * (*ny));
-
-  if (!*arr)
-    {				/* check for error in memory allocation */
-      printf ("read3images: memory request for arr failed\n");
-      exit (1);
-    }
-/*
-	printf("%d bytes of memory now allocated for arr \n",newsize);
-*/
-
-  /* now read in the arr array */
-
-  fread (farr, sizeof (f4), (*nx) * (*ny), f1);
-  if (ise) byteswapflct ((void *) farr, (*nx) * (*ny), sizeof (f4));
-  /*byteswap if needed */
-
-  /* now create space for temp. f4 array fbarr, and returned
-   * array barr: */
-
-  fbarr = malloc (sizeof (f4) * (*nx) * (*ny));
-  *barr = malloc (newsize);
-
-  if (!*barr)
-    {				/* check for error in memory allocation */
-      printf ("read3images: memory request for barr failed\n");
-      exit (1);
-    }
-
-  /* now read in the fbarr array */
-
-  fread (fbarr, sizeof (f4), (*nx) * (*ny), f1);
-  /*byteswap if needed */
-  if (ise) byteswapflct ((void *) fbarr, (*nx) * (*ny), sizeof (f4));
-
-  fcarr = malloc (sizeof (f4) * (*nx) * (*ny));
-  *carr = malloc (newsize);
-
-  if (!*carr)
-    {				/* check for error in memory allocation */
-      printf ("read3images: memory request for barr failed\n");
-      exit (1);
-    }
-
-  /* now read in the fcarr array */
-
-  fread (fcarr, sizeof (f4), (*nx) * (*ny), f1);
-  /*byteswap if needed */
-  if (ise) byteswapflct ((void *) fcarr, (*nx) * (*ny), sizeof (f4));
-
-  /* now transfer data from temp. arrays to arr and barr: */
-
-  for (i = 0; i < (*nx) * (*ny); i++)
-    {
-      *(*arr + i) = (double) *(farr + i);
-      *(*barr + i) = (double) *(fbarr + i);
-      *(*carr + i) = (double) *(fcarr + i);
-    }
-
-  /* now free the temp. arrays and close the files */
-
-  free (farr);
-  free (fbarr);
-  free(fcarr);
-  fclose (f1);
-  ier = 1;
-  return ier;
 }

@@ -1,10 +1,11 @@
+# Licensed under GNU Lesser General Public License, version 2.1 - see licenses/LICENSE_FLCT.rst
 import os
 from glob import glob
 from distutils.core import Extension
 
 from astropy_helpers import setup_helpers
 
-ROOT = os.path.relpath(os.path.dirname(__file__))
+ROOT = os.path.dirname(__file__)
 
 
 def get_extensions():

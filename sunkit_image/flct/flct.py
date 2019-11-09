@@ -1,3 +1,4 @@
+# Licensed under GNU Lesser General Public License, version 2.1 - see licenses/LICENSE_FLCT.rst
 import numpy as np
 
 try:
@@ -23,7 +24,7 @@ def read_2_images(filename, order="row"):
     .. note ::
         This function can be used to read only special arrays which were written
         using the ``write`` functions in `~sunkit_image.flct` or the IDL IO routines
-        as given on the FLCT `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+        as given on the FLCT `website <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/dir?ci=tip>`__.
 
     Parameters
     ----------
@@ -48,14 +49,14 @@ def read_2_images(filename, order="row"):
             "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
         )
 
-    if order is "row":
+    if order == "row":
         transp = 0
     else:
         transp = 1
 
     ier, a, b = _pyflct.read_two_images(filename, transp)
 
-    if ier is not 1:
+    if ier != 1:
         raise ValueError("The file was not read correctly. Please check the file.")
 
     else:
@@ -69,7 +70,7 @@ def read_3_images(filename, order="row"):
     .. note ::
         This function can be used to read only special arrays which were written
         using the ``write`` functions in `~sunkit_image.flct` or the IDL IO routines
-        as given on the FLCT source `website <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+        as given on the FLCT source `website <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/dir?ci=tip>`__.
 
     Parameters
     ----------
@@ -94,14 +95,14 @@ def read_3_images(filename, order="row"):
             "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
         )
 
-    if order is "row":
+    if order == "row":
         transp = 0
     else:
         transp = 1
 
     ier, a, b, c = _pyflct.read_three_images(filename, transp)
 
-    if ier is not 1:
+    if ier != 1:
         raise ValueError("The file was not read correctly. Please check the file.")
 
     else:
@@ -134,14 +135,14 @@ def write_2_images(filename, array1, array2, order="row"):
             "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
         )
 
-    if order is "row":
+    if order == "row":
         transp = 0
     else:
         transp = 1
 
     ier = _pyflct.write_two_images(filename, array1, array2, transp)
 
-    if ier is not 1:
+    if ier != 1:
         raise ValueError("The file was not read correctly. Please check the file")
 
 
@@ -173,14 +174,14 @@ def write_3_images(filename, array1, array2, array3, order="row"):
             "The order of the arrays is not correctly specified. It can only be 'row' or 'column'"
         )
 
-    if order is "row":
+    if order == "row":
         transp = 0
     else:
         transp = 1
 
     ier = _pyflct.write_three_images(filename, array1, array2, array3, transp)
 
-    if ier is not 1:
+    if ier != 1:
         raise ValueError("The file was not read correctly. Please check the file")
 
 
@@ -268,7 +269,7 @@ def flct(
 ):
     """
     Performs Fourier Local Correlation Tracking by calling the FLCT C library.
-    
+
     .. note::
 
         * In the references there are some dat files which can be used to test the FLCT code. The
@@ -291,13 +292,16 @@ def flct(
     image2 : `numpy.ndarray`
         The second image taken after ``deltat`` time of the first one.
     deltat : `float`
-        The time interval between the two images in seconds. 
+        The time interval between the two images in seconds.
     deltas : `float`
-        Units of length of the side of a single pixel. Velocity is computed in units of ``deltas``/``deltat``.
+        Units of length of the side of a single pixel.
+        Velocity is computed in units of ``deltas`` / ``deltat``.
     sigma : `float`
-        Sub-images are weighted by Gaussian of width `sigma`. Results can depend on value of `sigma`.
-        The user must experiment to determine best choice of `sigma`. If `sigma` is set to 0, only
-        single values of shifts are returned. These values correspond to the overall shifts between the two images.
+        Sub-images are weighted by Gaussian of width `sigma`.
+        Results can depend on value of `sigma`.
+        The user must experiment to determine best choice of `sigma`.
+        If `sigma` is set to 0, only single values of shifts are returned.
+        These values correspond to the overall shifts between the two images.
     order : {"row" | "column"}
         The order in which the array elements are stored that is whether they are stored as row
         major or column major.
@@ -309,7 +313,7 @@ def flct(
         If set to `True` bias correction will be applied while computing the velocities.
         This bias is intrinsic to the FLCT algorithm and can underestimate the velocities
         during calculations. For more
-        details visit `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/flct_1.06/doc/bias_correction_in_flct.txt>`__.
+        details visit `here <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/artifact/ac3d8244c3221e8b>`__.
     thresh : `float`, optional
         A calculation will not be done for a pixel if the average absolute value
         between the two images is less than ``thresh``.
@@ -336,7 +340,7 @@ def flct(
     kr : `float`, optional
         Apply a low-pass filter to the sub-images, with a Gaussian of a characteristic wavenumber
         that is a factor of ``kr`` times the largest possible wave numbers in "x", "y" directions.
-        ``kr`` should be positive. 
+        ``kr`` should be positive.
         Defaults to `None`
     pc : `bool`, optional
         Set to `True` if the images are Plate Carrée projected.
@@ -360,7 +364,10 @@ def flct(
 
     References
     ----------
-    * The FLCT software package which can be found `here <http://solarmuri.ssl.berkeley.edu/~fisher/public/software/FLCT/C_VERSIONS/>`__.
+    * `FLCT software package <http://cgem.ssl.berkeley.edu/cgi-bin/cgem/FLCT/home>`__.
+    * Welsch et al, ApJ 610, 1148, (2004)
+    * Fisher & Welsch, PASP 383, 373, (2008)
+    * Fisher et al. ("The PDFI_SS Electric Field Inversion Software", in prep)
     """
 
     # Checking whether the C extension is correctly built.
@@ -373,7 +380,7 @@ def flct(
         )
 
     # If order is column then order swap is performed.
-    if order is "column":
+    if order == "column":
         image1, image2 = column_row_of_two(image1, image2)
         image1 = np.array(image1)
         image2 = np.array(image2)
@@ -401,21 +408,20 @@ def flct(
     if skip is not None:
         if skip <= 0:
             raise ValueError("Skip value must be greater than zero.")
-        skipon = skip + np.abs(yoff) + np.abs(xoff)
+        skip = skip + np.abs(yoff) + np.abs(xoff)
 
         if np.abs(xoff) >= skip or np.abs(yoff) >= skip:
             raise ValueError("The absolute value of 'xoff' and 'yoff' must be less than skip.")
     else:
         skip = 0
-        skipon = 0
 
     if kr is not None:
         if kr <= 0.0 or kr >= 20.0:
             raise ValueError("The value of 'kr' must be between 0 and 20.")
-        filter = 1
+        afilter = 1
     else:
         kr = 0.0
-        filter = 0
+        afilter = 0
 
     if xoff < 0:
         xoff = skip - np.abs(xoff)
@@ -455,7 +461,7 @@ def flct(
             vm,
             thresh,
             absflag,
-            filter,
+            afilter,
             kr,
             skip,
             xoff,
@@ -481,7 +487,7 @@ def flct(
             vm,
             thresh,
             absflag,
-            filter,
+            afilter,
             kr,
             skip,
             xoff,
