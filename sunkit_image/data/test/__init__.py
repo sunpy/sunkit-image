@@ -16,16 +16,20 @@ file_list = glob.glob(os.path.join(rootdir, "*.[!p]*"))
 def get_test_filepath(filename, **kwargs):
     """
     Return the full path to a test file in the ``data`` directory.
+
     Parameters
     ----------
     filename : `str`
         The name of the file inside the ``data`` directory.
+
     Return
     ------
     filepath : `str`
         The full path to the file.
+
     Notes
     -----
+
     This is a wrapper around `~astropy.utils.data.get_pkg_data_filename` which
     sets the ``package`` kwarg to be ``sunkit_image.data.test``.
     """
@@ -35,7 +39,9 @@ def get_test_filepath(filename, **kwargs):
 def test_data_filenames():
     """
     Return a list of all test files in ``data`` directory.
+
     This ignores any ``py``, ``pyc`` and ``__*__`` files in these directories.
+
     Return
     ------
     get_all_test_filepath : `list`

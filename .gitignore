@@ -1,5 +1,9 @@
 ### Python: https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 
+# Package Specific files
+sunkit_image/flct/pyflct.c
+sunkit_image/flct/src/pyflct.c
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -8,6 +12,7 @@ __pycache__/
 # C extensions
 *.so
 
+.history/
 # Distribution / packaging
 .Python
 pip-wheel-metadata/
@@ -220,4 +225,4 @@ tags
 
 # Release script
 .github_cache
-examples/loops.txt
+*.orig

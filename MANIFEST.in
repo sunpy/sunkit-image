@@ -2,8 +2,12 @@ include README.rst
 include CHANGELOG.rst
 
 include ah_bootstrap.py
+include setup.py
 include setup.cfg
 include pyproject.toml
+include LICENSE.rst
+include licenses/*.rst
+include README.rst
 
 recursive-include sunkit_image *.pyx *.c *.pxd
 recursive-include docs *
@@ -11,6 +15,9 @@ recursive-include licenses *
 recursive-include cextern *
 recursive-include scripts *
 
+# Include the docs and examples
+recursive-include docs *
+recursive-include examples *
 prune build
 prune docs/_build
 prune docs/api
@@ -29,10 +36,9 @@ include astropy_helpers/ah_bootstrap.py
 
 recursive-include astropy_helpers/astropy_helpers *.py *.pyx *.c *.h *.rst
 recursive-include astropy_helpers/astropy_helpers.egg-info *
-# include the sphinx stuff with "*" because there are css/html/rst/etc.
-recursive-include astropy_helpers/astropy_helpers/sphinx *
 
 prune astropy_helpers/build
 prune astropy_helpers/astropy_helpers/tests
 
+# Globally exclude compiled files
 global-exclude *.pyc *.o

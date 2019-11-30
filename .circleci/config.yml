@@ -11,6 +11,18 @@ merge-check: &merge-check
       git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
     fi
 
+apt-install: &apt-install
+  name: Install apt packages
+  command: |
+    apt update
+    apt install -y graphviz build-essential libfftw3-dev libopenjp2-7 git
+
+apt-install-sudo: &apt-install-sudo
+  name: Install apt packages
+  command: |
+    sudo apt update
+    sudo apt install -y graphviz build-essential libfftw3-dev libopenjp2-7 git
+
 permission-run: &permission-run
   name: Fix permssions for installing
   command: |
@@ -18,17 +30,24 @@ permission-run: &permission-run
     sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
     sudo chown -R circleci:circleci /usr/local/share/
 
-apt-run: &apt-install
-  name: Install apt packages
+tox-install: &tox-install
+  name: Install Tox
   command: |
-    apt update
-    apt install -y graphviz build-essential libopenjp2-7 git
+    pip install tox
 
-sudo-apt-run: &sudo-apt-install
-  name: Install apt packages
+tox-conda-install: &tox-conda-install
+  name: Install Tox-Conda
   command: |
-    sudo apt update
-    sudo apt install -y graphviz build-essential libopenjp2-7 git
+    pip install tox-conda
+
+image-run: &image-tests
+  name: Run image tests
+  environment:
+    MPLBACKEND: Agg
+  command: |
+    tox -e figure
+    pip install codecov
+    codecov
 
 version: 2
 jobs:
@@ -69,12 +88,11 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
-      - run: *sudo-apt-install
+      - run: *apt-install-sudo
       - run: *permission-run
       - run: pip install -U pip
       - run: pip install --progress-bar off .[all,dev]
       - run: pip install -e .[all,dev]
-      - run: python setup.py develop
 
   figure-tests-37:
     docker:
@@ -84,9 +102,9 @@ jobs:
       - run: *skip-check
       - run: *merge-check
       - run: *apt-install
-      - run: pip install -U tox tox-conda codecov
-      - run: tox -e figure
-      - run: codecov
+      - run: *tox-install
+      - run: *tox-conda-install
+      - run: *image-tests
       - store_artifacts:
           path: figure_test_images
       - run:
@@ -100,13 +118,12 @@ jobs:
       - checkout
       - run: *skip-check
       - run: *merge-check
+      - run: *apt-install-sudo
       - run: *permission-run
-      - run: *sudo-apt-install
-      - run: pip install -U tox
+      - run: *tox-install
       - run: tox -e build_docs
       - store_artifacts:
           path: docs/_build/html
-
       - run:
           name: "Built documentation is available at:"
           command: DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"; echo $DOCS_URL

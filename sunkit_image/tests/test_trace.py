@@ -22,8 +22,7 @@ from sunkit_image.trace import (
 def image_remote():
 
     im = astropy.io.fits.getdata(
-        "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits",
-        ignore_missing_end=True,
+        "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
     )
     return im
 
@@ -39,9 +38,7 @@ def filepath_IDL():
 def test_occult2_remote(image_remote, filepath_IDL):
 
     # Testing on the same input files as in the IDL tutorial
-    loops = occult2(
-        image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
-    )
+    loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     # Taking all the x and y coordinates in seperate lists
     x = []
@@ -91,9 +88,7 @@ def test_occult2_remote(image_remote, filepath_IDL):
 def test_occult2_fig(image_remote):
 
     # A figure test for occult2, the plot is same as the one in the IDL tutorial
-    loops = occult2(
-        image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
-    )
+    loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     for loop in loops:
 
@@ -134,9 +129,7 @@ def test_occult2(test_image, image_test):
     # Set of checks which does not require remote data
 
     # The first test were valid loops are detected
-    loops = occult2(
-        image_test, nsm1=1, rmin=30, lmin=0, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
-    )
+    loops = occult2(image_test, nsm1=1, rmin=30, lmin=0, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     for loop in loops:
 
@@ -153,16 +146,12 @@ def test_occult2(test_image, image_test):
     assert np.allclose(np.round(y), np.arange(11, 3, -1))
 
     # This check will return an empty list as no loop is detected
-    loops = occult2(
-        image_test, nsm1=1, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
-    )
+    loops = occult2(image_test, nsm1=1, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
     assert not loops
 
     # This check is used to verify whether the RuntimeError is triggered
     with pytest.raises(RuntimeError) as record:
-        _ = occult2(
-            test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
-        )
+        _ = occult2(test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     assert (
         str(record.value)
@@ -173,12 +162,7 @@ def test_occult2(test_image, image_test):
 
 @pytest.fixture
 def test_map():
-    map_test = [
-        [1.0, 1.0, 1.0, 1.0],
-        [1.0, 5.0, 5.0, 1.0],
-        [1.0, 5.0, 5.0, 1.0],
-        [1.0, 1.0, 1.0, 1.0],
-    ]
+    map_test = [[1.0, 1.0, 1.0, 1.0], [1.0, 5.0, 5.0, 1.0], [1.0, 5.0, 5.0, 1.0], [1.0, 1.0, 1.0, 1.0]]
 
     return np.array(map_test)
 
@@ -351,9 +335,7 @@ def test_add_loop(parameters_add_loop):
     # We call the add_loop function and the values should be placed in the structures
     loops, iloop = loop_add(*parameters_add_loop)
 
-    expect_loops = [
-        [[7.0, 11.0], [7.0, 10.0], [7.0, 9.0], [7.0, 8.0], [7.0, 7.0], [7.0, 6.0], [7.0, 5.0]]
-    ]
+    expect_loops = [[[7.0, 11.0], [7.0, 10.0], [7.0, 9.0], [7.0, 8.0], [7.0, 7.0], [7.0, 6.0], [7.0, 5.0]]]
 
     assert np.allclose(loops, expect_loops)
     assert np.allclose(iloop, 1)

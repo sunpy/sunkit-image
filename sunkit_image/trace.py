@@ -89,9 +89,9 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
     # ERASE BOUNDARIES ZONES (SMOOTHING EFFECTS)
     image2[:, 0:nsm2] = 0.0
-    image2[:, ny - nsm2:] = 0.0
+    image2[:, ny - nsm2 :] = 0.0
     image2[0:nsm2, :] = 0.0
-    image2[nx - nsm2:, :] = 0.0
+    image2[nx - nsm2 :, :] = 0.0
 
     if (not np.count_nonzero(image2)) is True:
         raise RuntimeError(
@@ -161,14 +161,12 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
                 # The below function call will return the coordinate, flux and angle
                 # of the next point.
-                xl, yl, zl, al = curvature_radius(
-                    residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir
-                )
+                xl, yl, zl, al = curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
 
                 # This decides when to stop tracing the loop; when then last `ngap` pixels traced
                 # are below zero, the tracing will stop.
                 iz1 = max((ip + 1 - ngap), 0)
-                if np.max(zl[iz1:ip + 2]) <= 0:
+                if np.max(zl[iz1 : ip + 2]) <= 0:
                     ip = max(iz1 - 1, 0)
                     break  # goto endsegm
 
@@ -178,15 +176,15 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             # After the forward pass the loop points are flipped as the backward pass starts
             # from the maximum flux point
             if idir == 0:
-                xloop = np.flip(xl[0:ip + 1])
-                yloop = np.flip(yl[0:ip + 1])
-                zloop = np.flip(zl[0:ip + 1])
+                xloop = np.flip(xl[0 : ip + 1])
+                yloop = np.flip(yl[0 : ip + 1])
+                zloop = np.flip(zl[0 : ip + 1])
                 continue
             # After the backward pass the forward and backward traces are concatenated
             if idir == 1 and ip >= 1:
-                xloop = np.concatenate([xloop, xl[1:ip + 1]])
-                yloop = np.concatenate([yloop, yl[1:ip + 1]])
-                zloop = np.concatenate([zloop, zl[1:ip + 1]])
+                xloop = np.concatenate([xloop, xl[1 : ip + 1]])
+                yloop = np.concatenate([yloop, yl[1 : ip + 1]])
+                zloop = np.concatenate([zloop, zl[1 : ip + 1]])
             else:
                 break
 
@@ -263,7 +261,8 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
 
 def smooth(image, width, nanopt="replace"):
     """
-    Python implementation of the IDL `smooth <https://www.harrisgeospatial.com/docs/smooth.html>`__.
+    Python implementation of the IDL `smooth
+    <https://www.harrisgeospatial.com/docs/smooth.html>`__.
 
     Parameters
     ----------
@@ -357,7 +356,7 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     xend = min(istart + width, nx - 1)
     ystart = max(jstart - width, 0)
     yend = min(jstart + width, ny - 1)
-    image[xstart:xend + 1, ystart:yend + 1] = 0.0
+    image[xstart : xend + 1, ystart : yend + 1] = 0.0
 
     # All the points surrounding the loops are zeroed out
     for point in range(0, len(xloop)):
@@ -368,7 +367,7 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
         j0 = min(max(int(yloop[point]), 0), ny - 1)
         ystart = max(int(j0 - width), 0)
         yend = min(int(j0 + width), ny - 1)
-        image[xstart:xend + 1, ystart:yend + 1] = 0.0
+        image[xstart : xend + 1, ystart : yend + 1] = 0.0
 
     return image
 

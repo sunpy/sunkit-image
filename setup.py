@@ -8,8 +8,9 @@ from setuptools.config import read_configuration
 
 # Append cwd for pip 19
 sys.path.append(os.path.abspath("."))
-import ah_bootstrap  # noqa
-from astropy_helpers.setup_helpers import get_package_info, register_commands  # noqa
+import ah_bootstrap  # noqa isort:skip
+from astropy_helpers.setup_helpers import get_package_info, register_commands  # noqa  isort:skip
+
 
 ################################################################################
 # Override the default Astropy Test Command
