@@ -5,8 +5,18 @@ import numpy as np
 
 import astropy.units as u
 from sunpy.map.maputils import all_coordinates_from_map
+from skimage import measure
+from scipy.interpolate import interp2d
 
-__all__ = ["equally_spaced_bins", "bin_edge_summary", "find_pixel_radii", "get_radial_intensity_summary"]
+__all__ = [
+    "equally_spaced_bins",
+    "bin_edge_summary",
+    "find_pixel_radii",
+    "get_radial_intensity_summary",
+    "reform2d",
+    "points_in_poly",
+    "remove_duplicate",
+]
 
 
 def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
@@ -112,7 +122,9 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / scale)
 
 
-def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
+def get_radial_intensity_summary(
+    smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs
+):
     """
     Get a summary statistic of the intensity in a map as a function of radius.
 
@@ -161,5 +173,110 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
 
     # Calculate the summary statistic in the radial bins.
     return np.asarray(
-        [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)]
+        [
+            summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs)
+            for i in range(0, nbins)
+        ]
     )
+
+def reform2d(array, factor=1):
+    """
+    Reform a 2d array by a given factor
+
+    Parameters
+    ----------
+    array : `numpy.ndarray`
+        2d array to be reformed
+
+    factor : `int`
+        The array is going to be magnified by the factor. Default is 1.
+
+    Returns
+    -------
+        `numpy.ndarray`
+        reformed array
+
+    """
+    if not isinstance(factor, int):
+        raise ValueError("Parameter 'factor' must be an integer!")
+
+    if len(np.shape(array)) != 2:
+        raise ValueError("Input array must be 2d!")
+
+    if factor > 1:
+        congridx = interp2d(np.arange(0, array.shape[0]),
+                            np.arange(0, array.shape[1]), array.T)
+        array = congridx(np.arange(0, array.shape[0], 1/factor),
+                         np.arange(0, array.shape[1], 1/factor)).T
+
+    return array
+
+
+def points_in_poly(poly):
+    """
+    Return polygon as grid of points inside polygon. Only works for polygons
+    defined with points which are all integers
+
+    Parameters
+    ----------
+    poly : `list` or `numpy.ndarray`
+        n x 2 list, defines all points at the edge of a polygon
+
+    Returns
+    -------
+        `list`
+        n x 2 array, all points within the polygon
+
+    """
+    if np.shape(poly)[1] != 2:
+        raise ValueError("Polygon must be defined as a n x 2 array!")
+
+    # convert to integers
+    poly = np.array(poly, dtype=int).tolist()
+
+    xs, ys = zip(*poly)
+    minx, maxx = min(xs), max(xs)
+    miny, maxy = min(ys), max(ys)
+    # New polygon with the staring point as [0, 0]
+    newPoly = [(int(x - minx), int(y - miny)) for (x, y) in poly]
+    mask = measure.grid_points_in_poly((round(maxx - minx) + 1,
+                                        round(maxy - miny) + 1), newPoly)
+    # all points in polygon
+    points = [[x + minx, y + miny] for (x, y) in zip(*np.nonzero(mask))]
+
+    # add edge points if missing
+    for p in poly:
+        if p not in points:
+            points.append(p)
+
+    return points
+
+
+def remove_duplicate(edge):
+    """
+    Remove duplicated points in a the edge of a polygon
+
+    Parameters
+    ----------
+    edge : `list` or `numpy.ndarray`
+        n x 2 list, defines all points at the edge of a polygon
+
+    Returns
+    -------
+        `list`
+        same as edge, but with duplicated points removed
+    """
+
+    shape = np.shape(edge)
+    if shape[1] != 2:
+        raise ValueError("Polygon must be defined as a n x 2 array!")
+
+    new_edge = []
+    for i in range(shape[0]):
+        p = edge[i]
+        if not isinstance(p, list):
+            p = p.tolist()
+        if p not in new_edge:
+            new_edge.append(p)
+    
+    return new_edge
