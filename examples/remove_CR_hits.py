@@ -58,9 +58,7 @@ lasco_map.plot()
 # to clean the high intensity bright cosmic ray hits.
 # We also modify the ``readnoise`` parameter to obtain better results.
 
-mask, clean_data = astroscrappy.detect_cosmics(
-    lasco_map.data, sigclip=2, objlim=2, readnoise=4, verbose=True
-)
+mask, clean_data = astroscrappy.detect_cosmics(lasco_map.data, sigclip=2, objlim=2, readnoise=4, verbose=True)
 # This returns two variables - mask is a boolean array depicting whether there is
 # a cosmic ray hit at that pixel, clean_data is the cleaned image after removing those
 # hits.

@@ -3,14 +3,16 @@ import os
 from glob import glob
 from distutils.core import Extension
 
-from astropy_helpers import setup_helpers
+import numpy as np
+from astropy_helpers import setup_helpers  # NOQA
 
 ROOT = os.path.dirname(__file__)
 
 
 def get_extensions():
     cfg = setup_helpers.DistutilsExtensionArgs()
-    cfg["include_dirs"].extend(["numpy", "/usr/include/"])
+    cfg["include_dirs"].append(np.get_include())
+    cfg["include_dirs"].append("/usr/include/")
     cfg["sources"].extend(sorted(glob(os.path.join(ROOT, "src", "*.c"))))
     cfg["sources"].extend(sorted(glob(os.path.join(ROOT, "src", "pyflct.pyx"))))
     cfg["libraries"].extend(["m", "fftw3"])

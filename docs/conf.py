@@ -1,7 +1,6 @@
 import os
 import sys
 import datetime
-
 # Get configuration information from setup.cfg
 from configparser import ConfigParser
 
