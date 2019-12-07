@@ -2,19 +2,20 @@
 This module contains a collection of functions of general utility.
 """
 import numpy as np
+from scipy.interpolate import interp2d
+from skimage import measure
 
 import astropy.units as u
-from sunpy.map.maputils import all_coordinates_from_map
-from skimage import measure
-from scipy.interpolate import interp2d
+from sunpy.map import all_coordinates_from_map
 
 __all__ = [
-    "equally_spaced_bins",
     "bin_edge_summary",
+    "calc_gamma",
+    "equally_spaced_bins",
     "find_pixel_radii",
     "get_radial_intensity_summary",
-    "reform2d",
     "points_in_poly",
+    "reform2d",
     "remove_duplicate",
 ]
 
@@ -28,16 +29,15 @@ def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     ----------
     inner_value : `float`
         The inner value of the bins.
-
     outer_value : `float`
         The outer value of the bins.
-
     nbins : `int`
-        Number of bins
+        Number of bins.
 
     Returns
     -------
-    An array of shape (2, nbins) containing the bin edges.
+    `numpy.ndarray`
+        An array of shape ``(2, nbins)`` containing the bin edges.
     """
     if inner_value >= outer_value:
         raise ValueError("The inner value must be strictly less than the outer value.")
@@ -57,16 +57,16 @@ def bin_edge_summary(r, binfit):
 
     Parameters
     ----------
-    r : `numpy.ndarray` like
+    r : `numpy.ndarray`
         An array of bin edges of shape (2, nbins) where nbins is the number of
         bins.
-
-    binfit : 'center' | 'left' | 'right'
+    binfit : {'center' | 'left' | 'right'}
         How to summarize the bin edges.
 
     Returns
     -------
-    A one dimensional array of values that summarize the location of the bins.
+    `numpy.ndarray`
+        A one dimensional array of values that summarize the location of the bins.
     """
     if r.ndim != 2:
         raise ValueError("The bin edges must be two-dimensional with shape (2, nbins).")
@@ -91,17 +91,16 @@ def find_pixel_radii(smap, scale=None):
 
     Parameters
     ----------
-    smap :
-        A sunpy map object.
-
-    scale : None | `~astropy.units.Quantity`
+    smap :`sunpy.map.Map`
+        A SunPy map.
+    scale : {`None` | `astropy.units.Quantity`}, optional
         The radius of the Sun expressed in map units. For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds. If None then the map is queried for the scale.
 
     Returns
     -------
-    radii : `~astropy.units.Quantity`
+    radii : `astropy.units.Quantity`
         An array the same shape as the input map. Each entry in the array
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
@@ -122,37 +121,31 @@ def find_pixel_radii(smap, scale=None):
         return u.R_sun * (radii / scale)
 
 
-def get_radial_intensity_summary(
-    smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs
-):
+def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
     """
     Get a summary statistic of the intensity in a map as a function of radius.
 
     Parameters
     ----------
-    smap : `~sunpy.map.Map`
+    smap : `sunpy.map.Map`
         A SunPy map.
-
-    radial_bin_edges : `~astropy.units.Quantity`
-        A two-dimensional array of bin edges of shape (2, nbins) where nbins is
+    radial_bin_edges : `astropy.units.Quantity`
+        A two-dimensional array of bin edges of shape ``(2, nbins)`` where "nbins" is
         the number of bins.
-
-    scale : None, `~astropy.units.Quantity`
+    scale : {``None`` | `astropy.units.Quantity`}, optional
         A length scale against which radial distances are measured, expressed
         in the map spatial units. For example, in AIA helioprojective
         Cartesian maps a useful length scale is the solar radius and is
         expressed in units of arcseconds.
-
-    summary : `~function`
+    summary : ``function``, optional
         A function that returns a summary statistic of the distribution of intensity,
-        at a given radius, for example `~numpy.std`.
-
-    summary_kwargs :`~dict`
+        at a given radius, for example `numpy.std`.
+    summary_kwargs :`dict`, optional
         Keywords applicable to the summary function.
 
     Returns
     -------
-    intensity summary : `~numpy.array`
+    intensity summary : `numpy.ndarray`
         A summary statistic of the radial intensity in the bins defined by the
         bin edges.
     """
@@ -173,29 +166,25 @@ def get_radial_intensity_summary(
 
     # Calculate the summary statistic in the radial bins.
     return np.asarray(
-        [
-            summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs)
-            for i in range(0, nbins)
-        ]
+        [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)]
     )
+
 
 def reform2d(array, factor=1):
     """
-    Reform a 2d array by a given factor
+    Reform a 2d array by a given factor.
 
     Parameters
     ----------
     array : `numpy.ndarray`
-        2d array to be reformed
-
-    factor : `int`
+        2d array to be reformed/
+    factor : `int`, optional
         The array is going to be magnified by the factor. Default is 1.
 
     Returns
     -------
-        `numpy.ndarray`
-        reformed array
-
+    `numpy.ndarray`
+        Reformed array.
     """
     if not isinstance(factor, int):
         raise ValueError("Parameter 'factor' must be an integer!")
@@ -204,10 +193,8 @@ def reform2d(array, factor=1):
         raise ValueError("Input array must be 2d!")
 
     if factor > 1:
-        congridx = interp2d(np.arange(0, array.shape[0]),
-                            np.arange(0, array.shape[1]), array.T)
-        array = congridx(np.arange(0, array.shape[0], 1/factor),
-                         np.arange(0, array.shape[1], 1/factor)).T
+        congridx = interp2d(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array.T)
+        array = congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor)).T
 
     return array
 
@@ -215,18 +202,17 @@ def reform2d(array, factor=1):
 def points_in_poly(poly):
     """
     Return polygon as grid of points inside polygon. Only works for polygons
-    defined with points which are all integers
+    defined with points which are all integers.
 
     Parameters
     ----------
     poly : `list` or `numpy.ndarray`
-        n x 2 list, defines all points at the edge of a polygon
+        N x 2 list which defines all points at the edge of a polygon.
 
     Returns
     -------
-        `list`
-        n x 2 array, all points within the polygon
-
+    `list`
+        N x 2 array, all points within the polygon.
     """
     if np.shape(poly)[1] != 2:
         raise ValueError("Polygon must be defined as a n x 2 array!")
@@ -239,10 +225,9 @@ def points_in_poly(poly):
     miny, maxy = min(ys), max(ys)
     # New polygon with the staring point as [0, 0]
     newPoly = [(int(x - minx), int(y - miny)) for (x, y) in poly]
-    mask = measure.grid_points_in_poly((round(maxx - minx) + 1,
-                                        round(maxy - miny) + 1), newPoly)
+    mask = measure.grid_points_in_poly((round(maxx - minx) + 1, round(maxy - miny) + 1), newPoly)
     # all points in polygon
-    points = [[x + minx, y + miny] for (x, y) in zip(*np.nonzero(mask))]
+    points = [[x + minx, y + miny] for x, y in zip(*np.nonzero(mask))]
 
     # add edge points if missing
     for p in poly:
@@ -254,17 +239,17 @@ def points_in_poly(poly):
 
 def remove_duplicate(edge):
     """
-    Remove duplicated points in a the edge of a polygon
+    Remove duplicated points in a the edge of a polygon.
 
     Parameters
     ----------
     edge : `list` or `numpy.ndarray`
-        n x 2 list, defines all points at the edge of a polygon
+        N x 2 list which defines all points at the edge of a polygon.
 
     Returns
     -------
-        `list`
-        same as edge, but with duplicated points removed
+    `list`
+        Same as edge, but with duplicated points removed.
     """
 
     shape = np.shape(edge)
@@ -278,5 +263,46 @@ def remove_duplicate(edge):
             p = p.tolist()
         if p not in new_edge:
             new_edge.append(p)
-    
+
     return new_edge
+
+
+def calc_gamma(pm, vel, pnorm, N):
+    """
+    Calculate gamma values.
+
+    Parameters
+    ----------
+    pm : `numpy.ndarray`
+        Vector from point "p" to point "m".
+    vel : `numpy.ndarray`
+        Velocity vector.
+    pnorm : `numpy.ndarray`
+        Mode of ``pm``.
+    N : `int`
+        Number of points.
+
+    Returns
+    -------
+    `numpy.ndarray`
+        calculated gamma values for velocity vector vel
+
+    References
+    ----------
+    * Equation (8) in Laurent Graftieaux, Marc Michard and Nathalie Grosjean.
+      Combining PIV, POD and vortex identification algorithms for the
+      study of unsteady turbulent swirling flows.
+      Meas. Sci. Technol. 12, 1422, 2001.
+      (https://doi.org/10.1088/0957-0233/12/9/307)
+    * Equation (1) in Jiajia Liu, Chris Nelson, Robert Erdelyi.
+      Automated Swirl Detection Algorithm (ASDA) and Its Application to
+      Simulation and Observational Data.
+      Astrophys. J., 872, 22, 2019.
+      (https://doi.org/10.3847/1538-4357/aabd34)
+    """
+
+    cross = np.cross(pm, vel)
+    vel_norm = np.linalg.norm(vel, axis=2)
+    sint = cross / (pnorm * vel_norm + 1e-10)
+
+    return np.nansum(sint, axis=1) / N
