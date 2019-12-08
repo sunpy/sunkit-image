@@ -57,6 +57,11 @@ jobs:
       test_extras: 'dev'
       test_command: 'pytest -p no:warnings --doctest-rst -m "not figure" --pyargs sunkit_image'
       submodules: false
+      libraries:
+        apt:
+          - libfftw3-dev
+        brew:
+          - fftw
       targets:
         - wheels_linux
         - wheels_macos

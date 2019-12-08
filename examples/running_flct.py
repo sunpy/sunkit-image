@@ -7,9 +7,9 @@ This example applies Fourier Local Correlation Tracking (FLCT)
 to a set of two arrays using `~sunkit_image.flct.flct`.
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 
-import matplotlib.pyplot as plt
 import sunkit_image.flct as flct
 
 ###########################################################################

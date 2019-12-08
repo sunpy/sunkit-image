@@ -14,10 +14,8 @@ results compared to the IDL version.
 # sphinx_gallery_thumbnail_number = 2
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 import astropy
-import sunpy.cm
 
 import sunkit_image.trace as trace
 
@@ -41,9 +39,7 @@ plt.imshow(image, cmap="hmimag", origin="lower")
 # The base flux and median flux ratio ``qthresh1`` is 0.0.
 # The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
 # For the meaning of these parameters please consult the OCCULT2 article.
-loops = trace.occult2(
-    image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
-)
+loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
 ###############################################################################
 # `~sunkit_image.trace.occult2` returns a list, each element of which is a detected loop.

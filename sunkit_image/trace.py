@@ -261,8 +261,7 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
 
 def smooth(image, width, nanopt="replace"):
     """
-    Python implementation of the IDL `smooth
-    <https://www.harrisgeospatial.com/docs/smooth.html>`__.
+    Python implementation of the IDL `smooth <https://www.harrisgeospatial.com/docs/smooth.html>`__.
 
     Parameters
     ----------
