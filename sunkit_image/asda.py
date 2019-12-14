@@ -289,7 +289,6 @@ class Asda:
 
 
 class Lamb_Oseen(Asda):
-
     """
     Creates an Lamb Oseen vortex.
 
