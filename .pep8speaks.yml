@@ -1,10 +1,4 @@
 pycodestyle:
   max-line-length: 110
-  exclude:
-    - setup.py
-    - ez_setup.py
-    - ah_bootstrap.py
-    - astropy_helpers/
-    - docs/conf.py
   descending_issues_order: True
   only_mention_files_with_errors: True

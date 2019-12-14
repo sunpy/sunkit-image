@@ -1,11 +1,13 @@
 import os
 import sys
 import datetime
-# Get configuration information from setup.cfg
 from configparser import ConfigParser
 
+# ITS THE WILD WEST IN HERE
+# flake8: NOQA
+
 try:
-    from sphinx_astropy.conf.v1 import *  # noqa
+    from sphinx_astropy.conf.v1 import *
 except ImportError:
     print("ERROR: the documentation requires the sphinx-astropy package to be installed")
     sys.exit(1)
@@ -13,6 +15,7 @@ except ImportError:
 try:
     import sphinx_gallery
 
+    sphinx_gallery.__version__
     if on_rtd and os.environ.get("READTHEDOCS_PROJECT").lower() != "sunpy":
         # Gallery takes too long on RTD to build unless you have extra build time.
         has_sphinx_gallery = False
@@ -101,12 +104,13 @@ Write the latest changelog into the documentation.
 target_file = os.path.abspath("./whatsnew/latest_changelog.txt")
 try:
     from sunpy.util.towncrier import generate_changelog_for_docs
+
     if is_development:
         generate_changelog_for_docs("../", target_file)
 except Exception as e:
     print(f"Failed to add changelog to docs with error {e}.")
 # Make sure the file exists or else sphinx will complain.
-open(target_file, 'a').close()
+open(target_file, "a").close()
 
 
 def setup(app):
