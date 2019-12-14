@@ -58,30 +58,6 @@ image-run: &image-tests
 
 version: 2
 jobs:
-  egg-info-36:
-    docker:
-      - image: circleci/python:3.6
-    steps:
-      - checkout
-      - run: *skip-check
-      - run: *merge-check
-      - run: *apt-install-sudo
-      - run: *permission-run-36
-      - run: python -m pip install -U numpy astropy_helpers | cat
-      - run: python setup.py egg_info
-
-  egg-info-37:
-    docker:
-      - image: circleci/python:3.7
-    steps:
-      - checkout
-      - run: *skip-check
-      - run: *merge-check
-      - run: *apt-install-sudo
-      - run: *permission-run
-      - run: python -m pip install -U numpy astropy_helpers | cat
-      - run: python setup.py egg_info
-
   twine-check:
     docker:
       - image: circleci/python:3.7
@@ -91,9 +67,8 @@ jobs:
       - run: *merge-check
       - run: *apt-install-sudo
       - run: *permission-run
-      - run: python -m pip install -U --force-reinstall twine
-      - run: python -m pip install -U numpy astropy_helpers | cat
-      - run: python setup.py sdist
+      - run: python -m pip install -U --force-reinstall twine pep517
+      - run: python -m pep517.build --source .
       - run: python -m twine check dist/*
 
   pip-install:
@@ -106,8 +81,8 @@ jobs:
       - run: *apt-install-sudo
       - run: *permission-run
       - run: pip install -U pip
-      - run: pip install --progress-bar off .[all,dev]
-      - run: pip install -e .[all,dev]
+      - run: pip install --progress-bar off .[dev]
+      - run: pip install -e .[dev]
 
   figure-tests-37:
     docker:
@@ -145,11 +120,6 @@ jobs:
 
 workflows:
   version: 2
-
-  egg-info:
-    jobs:
-      - egg-info-36
-      - egg-info-37
 
   twine-check:
     jobs:

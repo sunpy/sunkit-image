@@ -4,9 +4,8 @@ requires = [
   "setuptools_scm",
   "wheel",
   "cython==0.29.13",
-  "numpy==1.14.5; python_version<='3.7'",
-  "numpy==1.17.3; python_version>='3.8'",
-  "astropy-helpers==3.2.2"
+  "oldest-supported-numpy",
+  "extension-helpers"
 ]
 build-backend = 'setuptools.build_meta'
 
@@ -25,9 +24,8 @@ exclude = '''
     | buck-out
     | build
     | dist
-    | astropy_helpers
     | docs
-    | .history
+    | \.history
   )/
   | ah_bootstrap.py
   | docs/conf.py
