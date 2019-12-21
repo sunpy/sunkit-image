@@ -2,7 +2,7 @@
 import sys
 from itertools import chain
 
-from extension_helpers.setup_helpers import get_extensions
+from extension_helpers import get_extensions
 from setuptools import setup
 from setuptools.config import read_configuration
 

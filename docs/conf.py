@@ -13,7 +13,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    import sphinx_gallery
+    pass
 
     sphinx_gallery.__version__
     if on_rtd and os.environ.get("READTHEDOCS_PROJECT").lower() != "sunpy":
