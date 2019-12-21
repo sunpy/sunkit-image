@@ -124,15 +124,12 @@ workflows:
   twine-check:
     jobs:
       - twine-check
-
   pip-install:
     jobs:
       - pip-install
-
   figure-tests:
     jobs:
       - figure-tests-37
-
   test-documentation:
     jobs:
       - html-docs
