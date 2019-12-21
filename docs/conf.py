@@ -13,8 +13,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    pass
-
+    import sphinx_gallery
     sphinx_gallery.__version__
     if on_rtd and os.environ.get("READTHEDOCS_PROJECT").lower() != "sunpy":
         # Gallery takes too long on RTD to build unless you have extra build time.
