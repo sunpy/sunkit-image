@@ -65,7 +65,7 @@ License
 This project is Copyright (c) SunPy Developers and licensed under the terms of the BSD 3-Clause license. See the licenses folder for more information.
 
 .. _installation guide: https://docs.sunpy.org/en/stable/guide/installation/index.html
-.. _SunPy Matrix Channel: https://riot.im/app/#/room/#sunpy:matrix.org
+.. _SunPy Matrix Channel: https://openastronomy.riot.im/#/room/#sunpy:openastronomy.org
 .. _SunPy mailing list: https://groups.google.com/forum/#!forum/sunpy
 .. _`Developer’s Guide`: https://docs.sunpy.org/en/latest/dev_guide/index.html
 .. _`#sunpy:matrix.org`: https://riot.im/app/#/room/#sunpy:matrix.org
