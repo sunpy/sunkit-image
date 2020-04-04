@@ -1,8 +1,6 @@
 ### Python: https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 
 # Package Specific files
-sunkit_image/flct/pyflct.c
-sunkit_image/flct/src/pyflct.c
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

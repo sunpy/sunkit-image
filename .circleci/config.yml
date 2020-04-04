@@ -15,13 +15,13 @@ apt-install: &apt-install
   name: Install apt packages
   command: |
     apt update
-    apt install -y graphviz build-essential libfftw3-dev libopenjp2-7 git
+    apt install -y graphviz build-essential libopenjp2-7 git
 
 apt-install-sudo: &apt-install-sudo
   name: Install apt packages
   command: |
     sudo apt update
-    sudo apt install -y graphviz build-essential libfftw3-dev libopenjp2-7 git
+    sudo apt install -y graphviz build-essential libopenjp2-7 git
 
 permission-run: &permission-run
   name: Fix permssions for installing
