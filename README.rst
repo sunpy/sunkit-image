@@ -19,23 +19,14 @@ Installation
 ------------
 
 If you want help develop sunkit-image you will need to install it from GitHub.
-You will also need the master version of SunPy (until 1.0 is launched).
-The best way to do this is to create a new conda environment::
+The best way to do this is to create a new python virtual environment (either with ``pipenv`` or ``conda``).
+Once you have that virtual environment::
 
-    $ conda config --append channels conda-forge
-    $ conda create -n sunkit-dev sunpy
-    $ source activate sunkit-dev
-    $ conda remove --force sunpy
-    $ git clone https://github.com/sunpy/sunpy.git sunpy
-    $ cd sunpy
-    $ pip install -e .[all,dev]
-    $ cd ..
-    $ git clone https://github.com/sunpy/sunkit-image.git sunkit-image
+    $ git clone https://github.com/<username>/sunkit-image.git
     $ cd sunkit-image
-    $ pip install -e .[all,dev]
+    $ pip install -e .[dev]
 
-For detailed (general) installation instructions, see the `installation guide`_ in
-the SunPy docs.
+For detailed (general) installation instructions, see the `installation guide`_ in the SunPy docs.
 
 Getting Help
 ------------
