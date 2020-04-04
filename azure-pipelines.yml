@@ -29,14 +29,8 @@ trigger:
 jobs:
 - template: run-tox-env.yml@OpenAstronomy
   parameters:
-    submodules: false
     coverage: codecov
     posargs:
-    libraries:
-      apt:
-        - libfftw3-dev
-      brew:
-        - fftw
     envs:
       - macos: py37-offline
         name: py37_offline
@@ -48,26 +42,19 @@ jobs:
         name: py37_online
 
 # On branches which aren't master, and not Pull Requests, build the wheels but only upload them on tags
-# Fix one day
-# - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), not(contains(variables['Build.SourceBranch'], 'master'))) }}:
-#   - template: publish.yml@OpenAstronomy
-#     parameters:
-#       # Only Upload to PyPI on tags
-#       ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
-#         pypi_connection_name : 'PyPI'
-#       test_extras: 'dev'
-#       test_command: 'pytest -p no:warnings --doctest-rst -m "not figure" --pyargs sunkit_image'
-#       submodules: false
-#       libraries:
-#         apt:
-#           - libfftw3-dev
-#         brew:
-#           - fftw
-#       targets:
-#         - wheels_linux
-#         - wheels_macos
-#         - sdist
-#       dependsOn:
-#         - py37_offline
-#         - py36_offline
-#         - py37_online
+- ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), not(contains(variables['Build.SourceBranch'], 'master'))) }}:
+  - template: publish.yml@OpenAstronomy
+    parameters:
+      # Only Upload to PyPI on tags
+      ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
+        pypi_connection_name : 'PyPI'
+      test_extras: 'dev'
+      test_command: 'pytest -p no:warnings --doctest-rst -m "not figure" --pyargs sunkit_image'
+      targets:
+        - wheels_linux
+        - wheels_macos
+        - sdist
+      dependsOn:
+        - py37_offline
+        - py36_offline
+        - py37_online

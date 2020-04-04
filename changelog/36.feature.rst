@@ -1,2 +1,0 @@
-Added a subpackage (`sunkit_image.flct`) for applying Fourier Local Correlation Tracking
-between two images.
