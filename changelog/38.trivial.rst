@@ -1,1 +1,0 @@
-Transferred sunkit_image.utils.noise.NoiseLevelEstimation from class object into a series of functions.
