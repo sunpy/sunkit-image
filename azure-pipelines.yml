@@ -51,8 +51,6 @@ jobs:
       test_extras: 'dev'
       test_command: 'pytest -p no:warnings --doctest-rst -m "not figure" --pyargs sunkit_image'
       targets:
-        - wheels_linux
-        - wheels_macos
         - sdist
       dependsOn:
         - py37_offline

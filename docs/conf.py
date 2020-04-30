@@ -12,6 +12,7 @@ except ImportError:
 
 try:
     import sphinx_gallery
+
     sphinx_gallery.__version__
     if on_rtd and os.environ.get("READTHEDOCS_PROJECT").lower() != "sunpy":
         # Gallery takes too long on RTD to build unless you have extra build time.
@@ -81,6 +82,7 @@ github_issues_url = "https://github.com/{0}/issues/".format(setup_cfg["github_pr
 # -- Options for the Sphinx gallery -------------------------------------------
 if has_sphinx_gallery:
     import pathlib
+
     extensions += ["sphinx_gallery.gen_gallery"]
     path = pathlib.Path.cwd()
     example_dir = path.parent.joinpath("examples")
@@ -100,6 +102,7 @@ Write the latest changelog into the documentation.
 target_file = os.path.abspath("./whatsnew/latest_changelog.txt")
 try:
     from sunpy.util.towncrier import generate_changelog_for_docs
+
     if is_development:
         generate_changelog_for_docs("../", target_file)
 except Exception as e:
@@ -111,6 +114,7 @@ open(target_file, "a").close()
 def setup(app):
     if not has_sphinx_gallery:
         import warnings
+
         warnings.warn(
             "The sphinx_gallery extension is not installed, so the "
             "gallery will not be built. You will probably see "
