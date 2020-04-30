@@ -39,8 +39,9 @@ jobs:
       - linux: py38-online
         name: py38_online
 
-      - linux: py38-devdeps
-        name: py38_devdeps
+      # Broken due to numpy not found for scikit-image, fix later.
+      # - linux: py38-devdeps
+      #   name: py38_devdeps
 
       - linux: py36-oldestdeps
         name: py36_oldestdeps

@@ -1,6 +1,6 @@
 {
-    "sunkit_image.tests.test_enhance.test_mgn": "a9ead4186ac2a371175bb27bd8c2cdc8b67772e05993a0241c639c575742bffb",
-    "sunkit_image.tests.test_radial.test_fig_nrgf": "83e0027b78ad32087fadab973977973c69035ab44cfdcf8ab0b1b4d3b69cbe1c",
-    "sunkit_image.tests.test_radial.test_fig_fnrgf": "07663ac57456335ee1d15faf424827fe688a99e3c84da745a862d44af1ef5c3f",
-    "sunkit_image.tests.test_trace.test_occult2_fig": "05a26bb6b2111456e0d26c0c00619fe1a8adf13ea04fc751407e981ed6fd1861"
+    "sunkit_image.tests.test_enhance.test_mgn": "34f474839a3e59533985395798f96982b2c3e6c86e578cddd9cf27d8281c02ee",
+    "sunkit_image.tests.test_radial.test_fig_fnrgf": "94a04bc6c002aea8005735f24bdc800c27e43cd1151dedc6a40e43670d908545",
+    "sunkit_image.tests.test_radial.test_fig_nrgf": "65b875980622535abfa88699e2d580d82621381e091a884bfa9d7c4c6bd08f91",
+    "sunkit_image.tests.test_trace.test_occult2_fig": "c0c4dfeb2a6ff5dd74ae27a42f73dd97d118bd8e76db70b9a3c4a4546b2bfce0"
 }
