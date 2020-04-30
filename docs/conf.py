@@ -5,27 +5,12 @@ import datetime
 from configparser import ConfigParser
 
 try:
-    from sphinx_astropy.conf.v1 import *
-except ImportError:
-    print("ERROR: the documentation requires the sphinx-astropy package to be installed")
-    sys.exit(1)
-
-try:
     import sphinx_gallery
+
     sphinx_gallery.__version__
-    if on_rtd and os.environ.get("READTHEDOCS_PROJECT").lower() != "sunpy":
-        # Gallery takes too long on RTD to build unless you have extra build time.
-        has_sphinx_gallery = False
-    else:
-        has_sphinx_gallery = True
+    has_sphinx_gallery = True
 except ImportError:
     has_sphinx_gallery = False
-
-if on_rtd:
-    os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
-    os.environ["HOME"] = "/home/docs/"
-    os.environ["LANG"] = "C"
-    os.environ["LC_ALL"] = "C"
 
 
 conf = ConfigParser()
@@ -62,25 +47,29 @@ except ImportError:
 html_title = "{0} v{1}".format(project, release)
 htmlhelp_basename = project + "doc"
 
-# -- Options for the edit_on_github extension ---------------------------------
-if eval(setup_cfg.get("edit_on_github")):
-    extensions += ["sphinx_astropy.ext.edit_on_github"]
+# -- General configuration ---------------------------------------------------
 
-    edit_on_github_project = setup_cfg["github_project"]
-    if "v" in release:
-        edit_on_github_branch = "v" + release
-    else:
-        edit_on_github_branch = "master"
-
-    edit_on_github_source_root = ""
-    edit_on_github_doc_root = "docs"
-
-# -- Resolving issue number to links in changelog -----------------------------
-github_issues_url = "https://github.com/{0}/issues/".format(setup_cfg["github_project"])
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.inheritance_diagram",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.doctest",
+    "sphinx.ext.mathjax",
+    "sphinx_automodapi.automodapi",
+    "sphinx_automodapi.smart_resolver",
+]
 
 # -- Options for the Sphinx gallery -------------------------------------------
 if has_sphinx_gallery:
     import pathlib
+
     extensions += ["sphinx_gallery.gen_gallery"]
     path = pathlib.Path.cwd()
     example_dir = path.parent.joinpath("examples")
@@ -100,6 +89,7 @@ Write the latest changelog into the documentation.
 target_file = os.path.abspath("./whatsnew/latest_changelog.txt")
 try:
     from sunpy.util.towncrier import generate_changelog_for_docs
+
     if is_development:
         generate_changelog_for_docs("../", target_file)
 except Exception as e:
@@ -111,6 +101,7 @@ open(target_file, "a").close()
 def setup(app):
     if not has_sphinx_gallery:
         import warnings
+
         warnings.warn(
             "The sphinx_gallery extension is not installed, so the "
             "gallery will not be built. You will probably see "

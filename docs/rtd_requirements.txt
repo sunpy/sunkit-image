@@ -1,3 +1,0 @@
-sunpy
-sunpy-sphinx-theme
-sphinx-astropy

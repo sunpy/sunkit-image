@@ -1,1 +1,0 @@
-Added a class (`sunkit_image.utils.noise.NoiseLevelEstimation`) for noise level estimation of an image.

@@ -23,14 +23,14 @@ def test_asda_artificial():
     center_edge = lo.center_edge()
     (ve, vr, vc, ia) = lo.vortex_property()
 
-    assert ve == (0.39996991917753405,)
-    assert vr == (1.999849595887626,)
+    np.testing.assert_almost_equal(ve[0], 0.39996991917753405)
+    np.testing.assert_almost_equal(vr[0], 1.999849595887626)
     assert vc == ([0.0, 0.0],)
     assert ia == (None,)
     assert len(center_edge) == 5
     np.testing.assert_allclose(center_edge["center"], np.array([[100.0, 100.0]]))
-    assert center_edge["peak"] == (0.9605688248523583,)
-    assert center_edge["radius"] == (50.0732161286822,)
+    np.testing.assert_almost_equal(center_edge["peak"], 0.9605688248523583)
+    np.testing.assert_almost_equal(center_edge["radius"], 50.0732161286822)
     assert len(center_edge["points"][0]) == 7877
     assert len(center_edge["edge"][0]) == 280
 
