@@ -39,6 +39,18 @@ jobs:
       - linux: py38-online
         name: py38_online
 
+      - linux: py38-online
+        name: py38_online
+
+      - linux: py38-devdeps
+        name: py38_devdeps
+
+      - linux: py36-oldestdeps
+        name: py36_oldestdeps
+
+      - linux: codestyle
+        name: codestyle
+
 # On branches which aren't master, and not Pull Requests, build the wheels but only upload them on tags
 - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), not(contains(variables['Build.SourceBranch'], 'master'))) }}:
   - template: publish.yml@OpenAstronomy
