@@ -119,7 +119,7 @@ jobs:
     docker:
       - image: cimg/base:2020.01
     environment:
-      GIT_SSH_COMMAND=ssh -i ~/.ssh/id_rsa_7b8fc81c13a3b446ec9aa50d3f626978
+      GIT_SSH_COMMAND=ssh -i ~/.ssh/id_rsa_6464b6a8248237ca368fd4690777d921
     steps:
       - attach_workspace:
           at: .tmp
@@ -127,7 +127,7 @@ jobs:
       - run: ssh-add -D
       # Add private key for deploying to the figure tests repo
       - add_ssh_keys:
-          fingerprints: "7b:8f:c8:1c:13:a3:b4:46:ec:9a:a5:0d:3f:62:69:78"
+          fingerprints: "64:64:b6:a8:24:82:37:ca:36:8f:d4:69:07:77:d9:21"
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run: git clone git@github.com:sunpy/sunpy-figure-tests.git -b sunkit-image-${CIRCLE_BRANCH} ~/sunpy-figure-tests/
       - run: cd .tmp/ && find . -maxdepth 1 -name "figure_*" -type d -exec bash -c 'mkdir ~/sunpy-figure-tests/figures/$1; cp -v "$1"/figure_test_images/*png "/home/circleci/sunpy-figure-tests/figures/$1"' Cp {} \;
