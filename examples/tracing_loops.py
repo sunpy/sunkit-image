@@ -15,18 +15,29 @@ results compared to the IDL version.
 
 import matplotlib.pyplot as plt
 
-import astropy
+import numpy as np 
+
+import astropy.io
+
+from astropy import units as u
+
+import sunpy.map 
 
 import sunkit_image.trace as trace
 
 ###########################################################################
-# We will be using `astropy.io.fits.getdata` to read the FITS file from the tutorial website.
-image = astropy.io.fits.getdata(
+# We will be using `astropy.io.fits.open` to read the FITS file from the tutorial website
+# and read in the header and data information.
+hdu = astropy.io.fits.open(
     "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
-)
+)[0]
 
-# The original image shows coronal loops.
-plt.imshow(image, cmap="hmimag", origin="lower")
+# We can now make this into a `sunpy.map.GenericMap`. There is currently not an instrument specific 
+# class for the TRACE instrument.
+trace_map = sunpy.map.Map(hdu.data, hdu.header)
+
+# We can now plot the map, of which we can see coronal loops.
+trace_map.plot()
 
 ###########################################################################
 # Now the loop tracing will begin. We will use the same set of parameters
@@ -39,27 +50,30 @@ plt.imshow(image, cmap="hmimag", origin="lower")
 # The base flux and median flux ratio ``qthresh1`` is 0.0.
 # The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
 # For the meaning of these parameters please consult the OCCULT2 article.
-loops = trace.occult2(image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
+loops = trace.occult2(trace_map.data, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
 ###############################################################################
 # `~sunkit_image.trace.occult2` returns a list, each element of which is a detected loop.
 # Each detected loop is stored as a list of ``x`` positions in image pixels, and a list of ``y``
 # positions in image pixels, of the pixels traced out by OCCULT2.
-# Now plot all the detected loops on the original image.
+# Now plot all the detected loops on the original image, we convert the image pixels to
+# to world coordinates to be plotted on the map.
 
 fig = plt.figure()
 
-plt.imshow(image, cmap="hmimag", origin="lower")
+ax = plt.subplot(projection=trace_map)
 
+trace_map.plot()
+
+# We can now plot each loop in the list of loops. We plot these in world coordinates, converting them 
+# through the `pixel_to_world` functionality which converts the pixel coordinates to coordinates (in arcsec)
+# on the `trace_map`.
 for loop in loops:
 
-    # We collect all the ``x`` and ``y`` coordinates in seperate lists for plotting.
-    x = []
-    y = []
-    for points in loop:
-        x.append(points[0])
-        y.append(points[1])
+	loop = np.array(loop) # convert to array as easier to index `x` and `y` coordinates
 
-    plt.plot(x, y, "b")
+	coord_loops = trace_map.pixel_to_world(loop[:,0]*u.pixel, loop[:,1]*u.pixel)
+
+	ax.plot_coord(coord_loops, color="b")
 
 plt.show()
