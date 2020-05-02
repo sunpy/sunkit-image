@@ -37,6 +37,11 @@ release = package.__version__.split("+")[0]
 # Is this version a development release
 is_development = ".dev" in release
 
+
+def fix_circleci(x):
+    return None
+
+
 try:
     from sunpy_sphinx_theme.conf import *
 
@@ -108,3 +113,6 @@ def setup(app):
             "additional warnings about undefined references due "
             "to this."
         )
+
+    # The theme conf provides a fix for circle ci redirections
+    fix_circleci(app)
