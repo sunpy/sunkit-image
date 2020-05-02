@@ -14,14 +14,11 @@ results compared to the IDL version.
 # sphinx_gallery_thumbnail_number = 2
 
 import matplotlib.pyplot as plt
-
-import numpy as np 
+import numpy as np
 
 import astropy.io
-
+import sunpy.map
 from astropy import units as u
-
-import sunpy.map 
 
 import sunkit_image.trace as trace
 
@@ -32,7 +29,7 @@ hdu = astropy.io.fits.open(
     "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
 )[0]
 
-# We can now make this into a `sunpy.map.GenericMap`. There is currently not an instrument specific 
+# We can now make this into a `sunpy.map.GenericMap`. There is currently not an instrument specific
 # class for the TRACE instrument.
 trace_map = sunpy.map.Map(hdu.data, hdu.header)
 
@@ -50,7 +47,9 @@ trace_map.plot()
 # The base flux and median flux ratio ``qthresh1`` is 0.0.
 # The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
 # For the meaning of these parameters please consult the OCCULT2 article.
-loops = trace.occult2(trace_map.data, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
+loops = trace.occult2(
+    trace_map.data, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0
+)
 
 ###############################################################################
 # `~sunkit_image.trace.occult2` returns a list, each element of which is a detected loop.
@@ -65,15 +64,15 @@ ax = plt.subplot(projection=trace_map)
 
 trace_map.plot()
 
-# We can now plot each loop in the list of loops. We plot these in world coordinates, converting them 
+# We can now plot each loop in the list of loops. We plot these in world coordinates, converting them
 # through the `pixel_to_world` functionality which converts the pixel coordinates to coordinates (in arcsec)
 # on the `trace_map`.
 for loop in loops:
 
-	loop = np.array(loop) # convert to array as easier to index `x` and `y` coordinates
+    loop = np.array(loop)  # convert to array as easier to index `x` and `y` coordinates
 
-	coord_loops = trace_map.pixel_to_world(loop[:,0]*u.pixel, loop[:,1]*u.pixel)
+    coord_loops = trace_map.pixel_to_world(loop[:, 0] * u.pixel, loop[:, 1] * u.pixel)
 
-	ax.plot_coord(coord_loops, color="b")
+    ax.plot_coord(coord_loops, color="b")
 
 plt.show()
