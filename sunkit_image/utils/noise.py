@@ -186,7 +186,11 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
         if decim > 0:
             XtrX = np.transpose(np.concatenate((Xtr, X), axis=0))
-            XtrX = np.transpose(XtrX[XtrX[:, 0].argsort(),])
+            XtrX = np.transpose(
+                XtrX[
+                    XtrX[:, 0].argsort(),
+                ]
+            )
             p = np.floor(XtrX.shape[1] / (decim + 1))
             p = np.expand_dims(np.arange(0, p) * (decim + 1), 0)
             Xtr = XtrX[0, p.astype("int")]
