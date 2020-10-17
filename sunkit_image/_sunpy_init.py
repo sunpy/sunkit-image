@@ -20,6 +20,7 @@ except ImportError:
 
 if not _SUNPY_SETUP_:
     import os
+
     from sunpy.tests.runner import SunPyTestRunner
 
     self_test = SunPyTestRunner.make_test_runner_in(os.path.dirname(__file__))
