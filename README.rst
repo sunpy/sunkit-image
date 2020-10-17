@@ -13,7 +13,7 @@ sunkit-image
    :target: http://numfocus.org
 
 sunkit-image is a a open-source toolbox for solar physics image processing.
-Currently it is experimental library for various solar physics specific image processing routines.
+Currently it is an experimental library for various solar physics specific image processing routines.
 
 Installation
 ------------
