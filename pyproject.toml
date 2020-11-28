@@ -3,7 +3,6 @@ requires = [
   "setuptools",
   "setuptools_scm",
   "wheel",
-  "cython==0.29.13",
   "oldest-supported-numpy",
   "extension-helpers"
 ]
@@ -32,50 +31,25 @@ exclude = '''
 )
 '''
 
-[ tool.sunpy-bot ]
-  # disable astropy checks
-  changelog_check = false
-  autoclose_stale_pull_request = false
 
-  # SunPy Checks
-  check_towncrier_changelog = true
-  check_milestone = true
-  post_pr_comment = true
+[ tool.gilesbot ]
+  [ tool.gilesbot.circleci_artifacts ]
+    enabled = true
 
-  all_passed_message = """
+  [ tool.gilesbot.pull_requests ]
+    enabled = true
 
-  Thanks for the pull request @{pr_handler.user}! Everything looks great!
-"""
-
-  [ tool.sunpy-bot.towncrier_changelog ]
+  [ tool.gilesbot.towncrier_changelog ]
+    enabled = true
     verify_pr_number = true
     changelog_skip_label = "No Changelog Entry Needed"
-    help_url = "https://github.com/sunpy/sunkit-image/blob/towncrier/changelog/README.rst"
+    help_url = "https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst"
 
-    missing_file_message = """
+    changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst)."
 
+    type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst)"
 
-* I didn't detect a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst).
-"""
-    wrong_type_message = """
-
-
-* The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst)
-"""
-
-    wrong_number_message = """
-
-
-* The number in the changelog file you added does not match the number of this pull request. Please rename the file.
-"""
-
-  [ tool.sunpy-bot.milestone_checker ]
-
-    missing_message = """
-
-
-* This pull request does not have a milestone assigned to it. Only maintainers can change this, so you don't need to worry about it. :smile:
-"""
+    number_incorrect_long = "The number in the changelog file you added does not match the number of this pull request. Please rename the file."
 
 [tool.towncrier]
     package = "sunkit_image"

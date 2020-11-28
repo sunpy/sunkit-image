@@ -209,6 +209,7 @@ sunpydata.sqlite
 sunpydata.sqlite-journal
 sunkit_image/_compiler.c
 sunkit_image/cython_version.py
+sunkit_image/_version.py
 docs/_build
 docs/generated
 docs/api/
