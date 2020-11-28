@@ -11,7 +11,6 @@ __all__ = ["noise_estimation", "noiselevel", "conv2d_matrix", "weak_texture_mask
 
 
 def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=3):
-
     """
     Estimates the noise level of an image.
 
@@ -158,10 +157,10 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
     imgv = imgv[1 : imgv.shape[0] - 1, :, :]
     imgv = imgv * imgv
 
-    Dh = np.matrix(conv2d_matrix(np.squeeze(kh, 2), patchsize, patchsize))
-    Dv = np.matrix(conv2d_matrix(np.squeeze(kv, 2), patchsize, patchsize))
+    Dh = conv2d_matrix(np.squeeze(kh, 2), patchsize, patchsize)
+    Dv = conv2d_matrix(np.squeeze(kv, 2), patchsize, patchsize)
 
-    DD = Dh.getH() * Dh + Dv.getH() * Dv
+    DD = np.transpose(Dh) @ Dh + np.transpose(Dv) @ Dv
 
     r = np.double(np.linalg.matrix_rank(DD))
     Dtr = np.trace(DD)
@@ -202,7 +201,7 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
         if X.shape[1] < X.shape[0]:
             sig2 = 0
         else:
-            cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
+            cov = (X @ np.transpose(X)) / (X.shape[1] - 1)
             d = np.flip(np.linalg.eig(cov)[0], axis=0)
             sig2 = d[0]
 
@@ -217,7 +216,7 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
             if X.shape[1] < X.shape[0]:
                 break
 
-            cov = (np.asmatrix(X) @ np.asmatrix(X).getH()) / (X.shape[1] - 1)
+            cov = (X @ np.transpose(X)) / (X.shape[1] - 1)
             d = np.flip(np.linalg.eig(cov)[0], axis=0)
             sig2 = d[0]
 

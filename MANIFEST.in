@@ -23,3 +23,7 @@ prune docs/api
 
 # Globally exclude compiled files
 global-exclude *.pyc *.o
+
+# This subpackage is only used in development checkouts and should not be
+# included in built tarballs
+prune sunkit_image/_dev

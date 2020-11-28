@@ -1,15 +1,11 @@
 import os
-import json
-import pathlib
 import tempfile
-import warnings
 import importlib
 
 import pytest
 
-import sunpy.tests.helpers
-from sunpy.tests.helpers import generate_figure_webpage, new_hash_library
-from sunpy.util.exceptions import SunpyDeprecationWarning
+import astropy
+import astropy.config.paths
 
 # Force MPL to use non-gui backends for testing.
 try:
@@ -24,27 +20,8 @@ else:
 remotedata_spec = importlib.util.find_spec("pytest_remotedata")
 HAVE_REMOTEDATA = remotedata_spec is not None
 
-
-def pytest_addoption(parser):
-    parser.addoption("--figure_dir", action="store", default="./figure_test_images")
-
-
-# Bypass sunpy's figure hash library.
-HASH_LIBRARY_NAME = "figure_hashes_py37.json"
-HASH_LIBRARY_FILE = os.path.join(os.path.dirname(__file__), "tests", HASH_LIBRARY_NAME)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def hash_base_dir(request):
-    sunpy.tests.hash.HASH_LIBRARY_NAME = HASH_LIBRARY_NAME
-    sunpy.tests.hash.HASH_LIBRARY_FILE = HASH_LIBRARY_FILE
-    with open(HASH_LIBRARY_FILE) as infile:
-        sunpy.tests.hash.hash_library = json.load(infile)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def figure_base_dir(request):
-    sunpy.tests.helpers.figure_base_dir = pathlib.Path(request.config.getoption("--figure_dir"))
+# Do not collect the sample data file because this would download the sample data.
+collect_ignore = ["data/sample.py"]
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -52,9 +29,18 @@ def tmp_config_dir(request):
     """
     Globally set the default config for all tests.
     """
-    os.environ["SUNPY_CONFIGDIR"] = str(pathlib.Path(__file__).parent / "data")
+    tmpdir = tempfile.TemporaryDirectory()
+
+    os.environ["SUNPY_CONFIGDIR"] = str(tmpdir.name)
+    astropy.config.paths.set_temp_config._temp_path = str(tmpdir.name)
+    astropy.config.paths.set_temp_cache._temp_path = str(tmpdir.name)
+
     yield
+
     del os.environ["SUNPY_CONFIGDIR"]
+    tmpdir.cleanup()
+    astropy.config.paths.set_temp_config._temp_path = None
+    astropy.config.paths.set_temp_cache._temp_path = None
 
 
 @pytest.fixture()
@@ -98,38 +84,3 @@ def pytest_runtest_setup(item):
     if isinstance(item, pytest.Function):
         if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
             pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
-
-
-def pytest_unconfigure(config):
-
-    # If at least one figure test has been run, print result image directory
-    if len(new_hash_library) > 0:
-        # Write the new hash library in JSON
-        figure_base_dir = pathlib.Path(config.getoption("--figure_dir"))
-        hashfile = figure_base_dir / HASH_LIBRARY_NAME
-        with open(hashfile, "w") as outfile:
-            json.dump(new_hash_library, outfile, sort_keys=True, indent=4, separators=(",", ": "))
-
-        """
-        Turn on internet when generating the figure comparison webpage.
-        """
-        if HAVE_REMOTEDATA:
-            from pytest_remotedata.disable_internet import turn_off_internet, turn_on_internet
-        else:
-
-            def turn_on_internet():
-                pass
-
-            def turn_off_internet():
-                pass
-
-        turn_on_internet()
-        generate_figure_webpage(new_hash_library)
-        turn_off_internet()
-
-        print("All images from image tests can be found in {0}".format(figure_base_dir.resolve()))
-        print("The corresponding hash library is {0}".format(hashfile.resolve()))
-
-
-def pytest_sessionstart(session):
-    warnings.simplefilter("error", SunpyDeprecationWarning)

@@ -179,14 +179,14 @@ class Asda:
 
         # Initial dictionary setup
         self.edge_prop = {"center": (), "edge": (), "points": (), "peak": (), "radius": ()}
-        cs = np.array(measure.find_contours(self.gamma[..., 1].T, -2 / np.pi))
-        cs_pos = np.array(measure.find_contours(self.gamma[..., 1].T, 2 / np.pi))
+        cs = np.array(measure.find_contours(self.gamma[..., 1].T, -2 / np.pi), dtype=object)
+        cs_pos = np.array(measure.find_contours(self.gamma[..., 1].T, 2 / np.pi), dtype=object)
         if len(cs) == 0:
             cs = cs_pos
         elif len(cs_pos) != 0:
             cs = np.append(cs, cs_pos, 0)
         for i in range(np.shape(cs)[0]):
-            v = np.rint(cs[i])
+            v = np.rint(cs[i].astype(np.float))
             v = remove_duplicate(v)
             # find all points in the contour
             ps = points_in_poly(v)

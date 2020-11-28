@@ -3,9 +3,9 @@ import pytest
 
 import sunpy.data.sample
 import sunpy.map
-from sunpy.tests.helpers import figure_test
 
 import sunkit_image.enhance as enhance
+from sunkit_image.tests.helpers import figure_test
 
 
 @pytest.fixture

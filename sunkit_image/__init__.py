@@ -1,27 +1,30 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+sunkit-image
+============
 
-# Packages may add whatever they like to this file, but
-# Enforce Python version check during package import.
-# This is the same check as the one at the top of setup.py
+A image processing toolbox for Solar Physics.
+
+* Homepage: https://sunpy.org
+* Documentation: https://sunkit-image.readthedocs.io/en/latest/
+"""
 import sys
 
-from ._sunpy_init import *
+from .version import version as __version__  # NOQA
 
-# ----------------------------------------------------------------------------
-
-
-__minimum_python_version__ = "3.6"
+# Enforce Python version check during package import.
+__minimum_python_version__ = "3.7"
 
 
 class UnsupportedPythonError(Exception):
-    pass
+    """
+    Running on an unsupported version of Python.
+    """
 
 
-if sys.version_info < tuple((int(val) for val in __minimum_python_version__.split("."))):
+if sys.version_info < tuple(int(val) for val in __minimum_python_version__.split(".")):
+    # This has to be .format to keep backwards compatibly.
     raise UnsupportedPythonError(
         "sunkit_image does not support Python < {}".format(__minimum_python_version__)
     )
 
-if not _SUNPY_SETUP_:
-    # For egg_info test builds to pass, put package imports here.
-    pass
+__all__ = []

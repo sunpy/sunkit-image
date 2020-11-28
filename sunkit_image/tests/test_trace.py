@@ -1,11 +1,13 @@
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-import astropy
-from sunpy.tests.helpers import figure_test
+from astropy.io import fits
 
 import sunkit_image.data.test as data
+from sunkit_image.tests.helpers import figure_test
 from sunkit_image.trace import (
     bandpass_filter,
     curvature_radius,
@@ -20,11 +22,12 @@ from sunkit_image.trace import (
 @pytest.fixture
 @pytest.mark.remote_data
 def image_remote():
-
-    im = astropy.io.fits.getdata(
-        "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
-    )
-    return im
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=fits.verify.VerifyWarning)
+        im = fits.getdata(
+            "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
+        )
+        return im
 
 
 @pytest.fixture

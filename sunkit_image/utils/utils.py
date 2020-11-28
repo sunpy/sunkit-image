@@ -1,6 +1,8 @@
 """
 This module contains a collection of functions of general utility.
 """
+import warnings
+
 import numpy as np
 from scipy.interpolate import interp2d
 from skimage import measure
@@ -165,9 +167,12 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
     upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
 
     # Calculate the summary statistic in the radial bins.
-    return np.asarray(
-        [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)]
-    )
+    with warnings.catch_warnings():
+        # We want to ignore RuntimeWarning: Mean of empty slice
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        return np.asarray(
+            [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)]
+        )
 
 
 def reform2d(array, factor=1):
