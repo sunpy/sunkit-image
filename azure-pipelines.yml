@@ -76,7 +76,7 @@ stages:
             posargs: " "
             pytest: false
 
-          - linux: py39-online
+          - linux: py38-online
 
           - linux: py37-oldestdeps
 
