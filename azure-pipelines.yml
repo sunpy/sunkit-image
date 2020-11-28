@@ -116,7 +116,7 @@ stages:
           # Only Upload to PyPI on tags
           ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags/') }}:
             pypi_connection_name : 'PyPI'
-          test_extras: 'test'
+          test_extras: 'tests'
           test_command: 'pytest -p no:warnings --doctest-rst --pyargs sunkit_image'
           submodules: false
           targets:
