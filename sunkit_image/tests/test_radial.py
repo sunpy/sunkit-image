@@ -19,7 +19,7 @@ def map_test1():
     test_data1 *= 10
     test_data1 = 28 - test_data1
     test_data1 = np.round(test_data1)
-    header = {"cunit1": "arcsec", "cunit2": "arcsec"}
+    header = {"cunit1": "arcsec", "cunit2": "arcsec", "CTYPE1": "HPLN-TAN", "CTYPE2": "HPLT-TAN"}
     test_map1 = sunpy.map.Map((test_data1, header))
     return test_map1
 
@@ -32,7 +32,7 @@ def map_test2():
     test_data1 *= 10
     test_data1 = 28 - test_data1
     test_data1 = np.round(test_data1)
-    header = {"cunit1": "arcsec", "cunit2": "arcsec"}
+    header = {"cunit1": "arcsec", "cunit2": "arcsec", "CTYPE1": "HPLN-TAN", "CTYPE2": "HPLT-TAN"}
     test_data2 = np.where(test_data1[:, 0:2] == 6, 8, test_data1[:, 0:2])
     test_data2 = np.concatenate((test_data2, test_data1[:, 2:]), axis=1)
     test_map2 = sunpy.map.Map((test_data2, header))
@@ -90,7 +90,6 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
     )
-
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
 
@@ -119,11 +118,11 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     order = 5
 
     result = [
-        [0.0, 90.528, 124.8, 90.528, 0.0],
-        [90.528, 207.2, 280.8, 207.2, 90.528],
-        [124.8, 280.8, 0.0, 280.8, 124.8],
-        [90.528, 207.2, 280.8, 207.2, 90.528],
-        [0.0, 90.528, 124.8, 90.528, 0.0],
+        [-0.0, 90.52799999982116, 126.73137084989847, 90.52799999984676, -0.0],
+        [90.52800000024544, 207.2, 285.14558441227155, 207.2, 90.5280000001332],
+        [126.73137084983244, 285.1455844119744, 0.0, 280.05441558770406, 124.4686291500961],
+        [90.52800000015233, 207.2, 280.05441558772844, 207.2, 90.5280000000401],
+        [0.0, 90.52799999986772, 124.46862915010152, 90.52799999989331, -0.0],
     ]
 
     attenuation_coefficients = rad.set_attenuation_coefficients(order)
@@ -140,11 +139,11 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data, result)
 
     result = [
-        [0.0, 120.55347471, 124.8, 90.67852529, 0.0],
-        [120.70526403, 207.2, 280.8, 207.2, 90.52673597],
-        [124.8, 280.8, 0.0, 280.8, 124.8],
-        [120.70526403, 207.2, 280.8, 207.2, 90.52673597],
-        [0.0, 120.55347471, 124.8, 90.67852529, 0.0],
+        [-0.0, 120.55347470594926, 126.73137084989847, 90.67852529365966, -0.0],
+        [120.70526403418884, 207.2, 285.14558441227155, 207.2, 90.52673596626707],
+        [126.73137084983244, 285.1455844119744, 0.0, 280.05441558770406, 124.4686291500961],
+        [120.70526403406846, 207.2, 280.05441558772844, 207.2, 90.52673596617021],
+        [0.0, 120.55347470601022, 124.46862915010152, 90.67852529370734, -0.0],
     ]
 
     attenuation_coefficients = rad.set_attenuation_coefficients(order)
