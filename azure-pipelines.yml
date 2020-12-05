@@ -93,17 +93,7 @@ stages:
           toxdeps: tox-pypi-filter
           posargs: -n=4
 
-          libraries:
-            yum:
-              - openssl-devel
-              - freetype-devel
-              - libpng-devel
-              - hdf5-devel
-
           envs:
-            - linux32: py38-32bit
-              manylinux_image: manylinux2010_i686
-
             - linux: py38-devdeps
 
   # On branches which aren't master, and not Pull Requests, build the wheels but only upload them on tags
