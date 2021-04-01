@@ -471,8 +471,8 @@ def initial_direction_finding(image, xstart, ystart, nlen):
     y_pos = ystart + np.matmul(trace_seg_bi, np.float32(np.sin(angles)))
 
     # Taking the ceil as images can be indexed by pixels
-    ix = np.int_(x_pos + 0.5)
-    iy = np.int_(y_pos + 0.5)
+    ix = (x_pos + 0.5).astype(int)
+    iy = (y_pos + 0.5).astype(int)
 
     # All the coordinate values should be within the input range
     ix = np.clip(ix, 0, nx - 1)
@@ -573,8 +573,8 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     y_pos = ycen_i - rad_i * np.float32(np.sin(beta_i))
 
     # Taking the ceil as images can be indexed by pixels
-    ix = np.int_(x_pos + 0.5)
-    iy = np.int_(y_pos + 0.5)
+    ix = (x_pos + 0.5).astype(int)
+    iy = (y_pos + 0.5).astype(int)
 
     # All the coordinate values should be within the input range
     ix = np.clip(ix, 0, nx - 1)

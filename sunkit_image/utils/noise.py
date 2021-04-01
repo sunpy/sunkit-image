@@ -169,16 +169,16 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
     for cha in range(img.shape[2]):
         X = view_as_windows(img[:, :, cha], (patchsize, patchsize))
-        X = X.reshape(np.int(X.size / patchsize ** 2), patchsize ** 2, order="F").transpose()
+        X = X.reshape(int(X.size / patchsize ** 2), patchsize ** 2, order="F").transpose()
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
         Xh = Xh.reshape(
-            np.int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
         ).transpose()
 
         Xv = view_as_windows(imgv[:, :, cha], (patchsize - 2, patchsize))
         Xv = Xv.reshape(
-            np.int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
         ).transpose()
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
@@ -304,16 +304,16 @@ def weak_texture_mask(img, patchsize, thresh):
 
     for cha in range(s[2]):
         m = view_as_windows(img[:, :, cha], (patchsize, patchsize))
-        m = np.zeros_like(m.reshape(np.int(m.size / patchsize ** 2), patchsize ** 2, order="F").transpose())
+        m = np.zeros_like(m.reshape(int(m.size / patchsize ** 2), patchsize ** 2, order="F").transpose())
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
         Xh = Xh.reshape(
-            np.int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
         ).transpose()
 
         Xv = view_as_windows(imgv[:, :, cha], (patchsize - 2, patchsize))
         Xv = Xv.reshape(
-            np.int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
         ).transpose()
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)

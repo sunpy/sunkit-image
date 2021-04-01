@@ -186,7 +186,7 @@ class Asda:
         elif len(cs_pos) != 0:
             cs = np.append(cs, cs_pos, 0)
         for i in range(np.shape(cs)[0]):
-            v = np.rint(cs[i].astype(np.float))
+            v = np.rint(cs[i].astype(np.float32))
             v = remove_duplicate(v)
             # find all points in the contour
             ps = points_in_poly(v)
