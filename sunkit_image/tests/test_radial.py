@@ -267,12 +267,12 @@ def test_intensity_enhance(map_test1):
     fit_range = [1, 1.5] * u.R_sun
     normalization_radius = 1 * u.R_sun
     summarize_bin_edges = "center"
-    scale = 1 * smap.rsun_obs
+
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
 
     radial_intensity = utils.get_radial_intensity_summary(smap, radial_bin_edges, scale=scale)
 
-    map_r = utils.find_pixel_radii(smap).to(u.R_sun)
+    map_r = utils.find_pixel_radii(map_test1).to(u.R_sun)
 
     radial_bin_summary = utils.bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(u.R_sun)
 
