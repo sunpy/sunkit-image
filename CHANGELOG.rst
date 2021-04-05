@@ -1,4 +1,13 @@
-Sunkit_Image 0.1.0 (2020-04-30)
+sunkit_image 0.2.0 (2021-04-05)
+===============================
+
+Trivial/Internal Changes
+------------------------
+
+- Increased minimum supported version of sunpy to 2.0.0
+- Many internal package updates to documentation, the continuous integration and etc.
+
+sunkit_image 0.1.0 (2020-04-30)
 ===============================
 
 Features

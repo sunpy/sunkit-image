@@ -16,18 +16,16 @@ results compared to the IDL version.
 import matplotlib.pyplot as plt
 import numpy as np
 
-import astropy.io
 import sunpy.map
 from astropy import units as u
+from astropy.io import fits
 
 import sunkit_image.trace as trace
 
 ###########################################################################
 # We will be using `astropy.io.fits.open` to read the FITS file from the tutorial website
 # and read in the header and data information.
-hdu = astropy.io.fits.open(
-    "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
-)[0]
+hdu = fits.open("http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits")[0]
 
 # We can now make this into a `sunpy.map.GenericMap`. There is currently not an instrument specific
 # class for the TRACE instrument.
