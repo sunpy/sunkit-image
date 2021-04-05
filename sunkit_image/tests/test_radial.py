@@ -260,3 +260,35 @@ def test_normalize_fit_radial_intensity():
     )
 
     assert np.allclose(rad.normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)
+
+
+def test_intensity_enhance(map_test1):
+    degree = 1
+    fit_range = [1, 1.5] * u.R_sun
+    normalization_radius = 1 * u.R_sun
+    summarize_bin_edges = "center"
+    scale = 1 * smap.rsun_obs
+    radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
+
+    radial_intensity = utils.get_radial_intensity_summary(smap, radial_bin_edges, scale=scale)
+
+    map_r = utils.find_pixel_radii(smap).to(u.R_sun)
+
+    radial_bin_summary = utils.bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(u.R_sun)
+
+    fit_here = np.logical_and(
+        fit_range[0].to(u.R_sun).value <= radial_bin_summary.to(u.R_sun).value,
+        radial_bin_summary.to(u.R_sun).value <= fit_range[1].to(u.R_sun).value,
+    )
+
+    polynomial = rad.fit_polynomial_to_log_radial_intensity(
+        radial_bin_summary[fit_here], radial_intensity[fit_here], degree
+    )
+
+    enhancement = 1 / rad.normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
+    enhancement[map_r < normalization_radius] = 1
+
+    assert np.allclose(
+        enhancement * map_test1.data,
+        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale),
+    )
