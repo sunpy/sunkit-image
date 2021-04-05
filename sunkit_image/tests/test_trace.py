@@ -24,9 +24,7 @@ from sunkit_image.trace import (
 def image_remote():
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=fits.verify.VerifyWarning)
-        im = fits.getdata(
-            "http://www.lmsal.com/~aschwand/software/tracing/TRACE_19980519.fits", ignore_missing_end=True
-        )
+        im = fits.getdata("http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits")
         return im
 
 
