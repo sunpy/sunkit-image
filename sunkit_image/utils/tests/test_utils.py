@@ -152,6 +152,4 @@ def test_calculate_gamma():
 
     expected = np.nansum(sint, axis=1) / N
 
-    assert np.allclose(
-        utils.calc_gamma(expected, utils.calc_gamma(pm, vel[..., 0], pnorm, N)
-    )
+    assert np.allclose(expected, utils.calc_gamma(pm, vel[..., 0], pnorm, N))
