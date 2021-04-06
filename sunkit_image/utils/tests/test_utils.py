@@ -146,7 +146,7 @@ def test_calculate_gamma():
 
     pnorm = np.linalg.norm(pm, axis=1)
 
-    cross = np.cross(pm, vel)
+    cross = np.cross(pm, vel[..., 0])
     vel_norm = np.linalg.norm(vel, axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
 
