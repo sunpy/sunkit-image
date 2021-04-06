@@ -147,7 +147,7 @@ def test_calculate_gamma():
     pnorm = np.linalg.norm(pm, axis=1)
 
     cross = np.cross(pm, vel[..., 0])
-    vel_norm = np.linalg.norm(vel, axis=2)
+    vel_norm = np.linalg.norm(vel[..., 0], axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
 
     expected = np.nansum(sint, axis=1) / N
@@ -158,6 +158,36 @@ def test_calculate_gamma():
 def test_remove_duplicate():
 
     test_data = np.random.rand(5, 2)
-    tt = np.append(test_data, [test_data[0]], axis=0)
-    expected = np.delete(tt, -1, 0)
+    data_ = np.append(test_data, [test_data[0]], axis=0)
+    expected = np.delete(data_, -1, 0)
     assert (utils.remove_duplicate(tt) == expected).all()
+
+
+def test_points_in_poly():
+
+    test_data = np.asarray([[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 0]])
+    expected = [[0, 0], [0, 1], [1, 0], [1, 1], [0, 2], [1, 2], [2, 2], [2, 0]]
+    assert expected == utils.points_in_poly(test_data)
+
+
+def test_reform_2d():
+
+    test_data = np.asarray([[0, 0], [1, 2], [3, 4]])
+
+    with pytest.raises(ValueError, match="Parameter 'factor' must be an integer!"):
+        utils.reform2d(test_data, 2.2)
+    with pytest.raises(ValueError, match="Input array must be 2d!"):
+        utils.reform2d(test_data[0], 2)
+
+    expected = np.asarray(
+        [
+            [0.0, 0.0, 0.0, 0.0],
+            [0.5, 0.75, 1.0, 1.0],
+            [1.0, 1.5, 2.0, 2.0],
+            [2.0, 2.5, 3.0, 3.0],
+            [3.0, 3.5, 4.0, 4.0],
+            [3.0, 3.5, 4.0, 4.0],
+        ]
+    )
+
+    assert np.allclose(utils.reform2d(test_data, 2), expected)
