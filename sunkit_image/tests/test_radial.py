@@ -267,10 +267,10 @@ def test_intensity_enhance(map_test1):
     fit_range = [1, 1.5] * u.R_sun
     normalization_radius = 1 * u.R_sun
     summarize_bin_edges = "center"
-
+    scale = 1 * (945.436708 * u.arcsec)
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
 
-    radial_intensity = utils.get_radial_intensity_summary(smap, radial_bin_edges)
+    radial_intensity = utils.get_radial_intensity_summary(map_test1, radial_bin_edges, scale=scale)
 
     map_r = utils.find_pixel_radii(map_test1).to(u.R_sun)
 
@@ -290,5 +290,5 @@ def test_intensity_enhance(map_test1):
 
     assert np.allclose(
         enhancement * map_test1.data,
-        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges),
+        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale).data,
     )

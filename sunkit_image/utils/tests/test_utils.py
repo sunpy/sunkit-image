@@ -166,7 +166,7 @@ def test_remove_duplicate():
 def test_points_in_poly():
 
     test_data = np.asarray([[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 0]])
-    expected = [[0, 0], [0, 1], [1, 0], [1, 1], [0, 2], [1, 2], [2, 2], [2, 0]]
+    expected = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
     assert expected == utils.points_in_poly(test_data)
 
 
