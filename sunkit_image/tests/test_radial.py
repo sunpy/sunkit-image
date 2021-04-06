@@ -267,7 +267,7 @@ def test_intensity_enhance(map_test1):
     fit_range = [1, 1.5] * u.R_sun
     normalization_radius = 1 * u.R_sun
     summarize_bin_edges = "center"
-    scale = 1 * (945.436708 * u.arcsec)
+    scale = 1 * map_test1.rsun_obs
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
 
     radial_intensity = utils.get_radial_intensity_summary(map_test1, radial_bin_edges, scale=scale)
@@ -287,6 +287,11 @@ def test_intensity_enhance(map_test1):
 
     enhancement = 1 / rad.normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
     enhancement[map_r < normalization_radius] = 1
+
+    with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
+        rad.intensity_enhance(
+            smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale, fit_range=fit_range[::-1]
+        )
 
     assert np.allclose(
         enhancement * map_test1.data,
