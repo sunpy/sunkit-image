@@ -160,7 +160,7 @@ def test_remove_duplicate():
     test_data = np.random.rand(5, 2)
     data_ = np.append(test_data, [test_data[0]], axis=0)
     expected = np.delete(data_, -1, 0)
-    assert (utils.remove_duplicate(tt) == expected).all()
+    assert (utils.remove_duplicate(data_) == expected).all()
 
 
 def test_points_in_poly():
