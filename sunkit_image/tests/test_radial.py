@@ -290,5 +290,5 @@ def test_intensity_enhance(map_test1):
 
     assert np.allclose(
         enhancement * map_test1.data,
-        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale),
+        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges),
     )
