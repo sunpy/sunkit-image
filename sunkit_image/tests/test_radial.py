@@ -270,7 +270,7 @@ def test_intensity_enhance(map_test1):
 
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
 
-    radial_intensity = utils.get_radial_intensity_summary(smap, radial_bin_edges, scale=scale)
+    radial_intensity = utils.get_radial_intensity_summary(smap, radial_bin_edges)
 
     map_r = utils.find_pixel_radii(map_test1).to(u.R_sun)
 
