@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pytest
 import skimage
@@ -116,9 +118,23 @@ def test_find_pixel_radii(smap):
     assert_quantity_allclose(np.max(pixel_radii).value, known_maximum_pixel_radius / 2)
 
 
-def test_get_radial_intensity_summary():
-    # TODO: Write some tests.
-    pass
+def test_get_radial_intensity_summary(smap):
+
+    radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
+    summary = np.mean
+
+    map_r = utils.find_pixel_radii(smap, scale=smap.rsun_obs).to(u.R_sun)
+
+    nbins = radial_bin_edges.shape[1]
+
+    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
+    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(0, nbins)])
+
+    assert np.allclose(utils.get_radial_intensity_summary(smap, radial_bin_edges=radial_bin_edges), expected)
 
 
 def test_calculate_gamma():
