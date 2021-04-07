@@ -68,7 +68,7 @@ jobs:
       - run: ssh-add -D
       # Add private key for deploying to the figure tests repo
       - add_ssh_keys:
-          fingerprints: "7b:8f:c8:1c:13:a3:b4:46:ec:9a:a5:0d:3f:62:69:78"
+          fingerprints: "64:64:b6:a8:24:82:37:ca:36:8f:d4:69:07:77:d9:21"
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run: git config --global user.email "sunpy@circleci" && git config --global user.name "SunPy Circle CI"
       - run: git clone git@github.com:sunpy/sunpy-figure-tests.git --depth 1 -b sunkit-image-${CIRCLE_BRANCH} ~/sunpy-figure-tests/
