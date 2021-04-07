@@ -1,5 +1,7 @@
 import numpy as np
 import pytest
+import skimage
+from packaging import version
 
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
@@ -166,7 +168,11 @@ def test_remove_duplicate():
 def test_points_in_poly():
 
     test_data = np.asarray([[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 0]])
-    expected = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+
+    if version.parse(skimage.__version__) < version.parse("0.18.0"):
+        expected = [[0, 0], [0, 1], [1, 0], [1, 1], [0, 2], [1, 2], [2, 2], [2, 0]]
+    else:
+        expected = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
     assert expected == utils.points_in_poly(test_data)
 
 
