@@ -189,10 +189,7 @@ def test_points_in_poly():
     with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):
         utils.points_in_poly(test_data.T)
 
-    if version.parse(skimage.__version__) < version.parse("0.18.0"):
-        expected = [[0, 0], [0, 1], [1, 0], [1, 1], [0, 2], [1, 2], [2, 2], [2, 0]]
-    else:
-        expected = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
+    expected = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
     assert expected == utils.points_in_poly(test_data)
 
 
