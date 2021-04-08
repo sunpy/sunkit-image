@@ -119,7 +119,7 @@ def test_find_pixel_radii(smap):
 @pytest.mark.remote_data
 def test_get_radial_intensity_summary(smap):
 
-    radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
+    radial_bin_edges = u.Quantity(utils.equally_spaced_bins(inner_value=1, outer_value=1.5)) * u.R_sun
     summary = np.mean
 
     map_r = utils.find_pixel_radii(smap, scale=smap.rsun_obs).to(u.R_sun)
@@ -130,10 +130,13 @@ def test_get_radial_intensity_summary(smap):
     upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
 
     with warnings.catch_warnings():
+        # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
         expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(0, nbins)])
 
-    assert np.allclose(utils.get_radial_intensity_summary(smap, radial_bin_edges=radial_bin_edges), expected)
+    assert np.allclose(
+        utils.get_radial_intensity_summary(smap=smap, radial_bin_edges=radial_bin_edges), expected
+    )
 
 
 def test_calculate_gamma():
