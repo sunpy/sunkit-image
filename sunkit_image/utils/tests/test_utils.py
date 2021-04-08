@@ -118,6 +118,7 @@ def test_find_pixel_radii(smap):
     assert_quantity_allclose(np.max(pixel_radii).value, known_maximum_pixel_radius / 2)
 
 
+@pytest.mark.remote_data
 def test_get_radial_intensity_summary(smap):
 
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
@@ -184,6 +185,9 @@ def test_remove_duplicate():
 def test_points_in_poly():
 
     test_data = np.asarray([[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 0]])
+
+    with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):
+        utils.points_in_poly(test_data.T)
 
     if version.parse(skimage.__version__) < version.parse("0.18.0"):
         expected = [[0, 0], [0, 1], [1, 0], [1, 1], [0, 2], [1, 2], [2, 2], [2, 0]]
