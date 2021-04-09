@@ -180,6 +180,10 @@ def test_remove_duplicate():
     test_data = np.random.rand(5, 2)
     data_ = np.append(test_data, [test_data[0]], axis=0)
     expected = np.delete(data_, -1, 0)
+
+    with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):
+        utils.remove_duplicate(data_.T)
+
     assert (utils.remove_duplicate(data_) == expected).all()
 
 
