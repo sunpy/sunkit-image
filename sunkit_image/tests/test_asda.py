@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from sunkit_image import asda
 from sunkit_image.data.test import get_test_filepath
@@ -13,9 +14,28 @@ def test_asda_artificial():
     vmax = 2.0  # rotating speed
     rmax = 50  # radius
     ratio = 0.2  # ratio of expanding speed over rotating speed
+    with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
+        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1, r=1.2)
+
+    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
+        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
+
+    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
+        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
+
+    with pytest.warns(
+        UserWarning, match="One of the input parameters is missing," + "setting both to 'None'"
+    ):
+        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, gamma=0.5, ratio_vradial=ratio, factor=1)
+
     lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1)
     # Generate vx and vy
-    vx, vy = lo.get_vxvy(x_range=[-100, 100], y_range=[-100, 100])
+    with pytest.warns(
+        UserWarning, match="One of the input parameters is missing, setting " + " both to 'None'"
+    ):
+        vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200], x=np.meshgrid)
+
+    vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200])
 
     # perform vortex detection
     lo.gamma_values()
