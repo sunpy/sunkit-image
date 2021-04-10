@@ -230,3 +230,70 @@ def test_set_attenuation_coefficients():
         _ = rad.set_attenuation_coefficients(order, cutoff=5)
 
     assert str(record.value) == "Cutoff cannot be greater than order + 1."
+
+
+def test_fit_polynomial_to_log_radial_intensity():
+
+    radii = (0.001, 0.002) * u.R_sun
+    intensity = np.asarray([1, 2])
+    degree = 1
+    expected = np.polyfit(radii.to(u.R_sun).value, np.log(intensity), degree)
+
+    assert np.allclose(rad.fit_polynomial_to_log_radial_intensity(radii, intensity, degree), expected)
+
+
+def test_calculate_fit_radial_intensity():
+
+    polynomial = np.asarray([1, 2, 3])
+    radii = (0.001, 0.002) * u.R_sun
+    expected = np.exp(np.poly1d(polynomial)(radii.to(u.R_sun).value))
+
+    assert np.allclose(rad.calculate_fit_radial_intensity(radii, polynomial), expected)
+
+
+def test_normalize_fit_radial_intensity():
+    polynomial = np.asarray([1, 2, 3])
+    radii = (0.001, 0.002) * u.R_sun
+    normalization_radii = (0.003, 0.004) * u.R_sun
+    expected = rad.calculate_fit_radial_intensity(radii, polynomial) / rad.calculate_fit_radial_intensity(
+        normalization_radii, polynomial
+    )
+
+    assert np.allclose(rad.normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)
+
+
+def test_intensity_enhance(map_test1):
+    degree = 1
+    fit_range = [1, 1.5] * u.R_sun
+    normalization_radius = 1 * u.R_sun
+    summarize_bin_edges = "center"
+    scale = 1 * map_test1.rsun_obs
+    radial_bin_edges = u.Quantity(utils.equally_spaced_bins()) * u.R_sun
+
+    radial_intensity = utils.get_radial_intensity_summary(map_test1, radial_bin_edges, scale=scale)
+
+    map_r = utils.find_pixel_radii(map_test1).to(u.R_sun)
+
+    radial_bin_summary = utils.bin_edge_summary(radial_bin_edges, summarize_bin_edges).to(u.R_sun)
+
+    fit_here = np.logical_and(
+        fit_range[0].to(u.R_sun).value <= radial_bin_summary.to(u.R_sun).value,
+        radial_bin_summary.to(u.R_sun).value <= fit_range[1].to(u.R_sun).value,
+    )
+
+    polynomial = rad.fit_polynomial_to_log_radial_intensity(
+        radial_bin_summary[fit_here], radial_intensity[fit_here], degree
+    )
+
+    enhancement = 1 / rad.normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
+    enhancement[map_r < normalization_radius] = 1
+
+    with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
+        rad.intensity_enhance(
+            smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale, fit_range=fit_range[::-1]
+        )
+
+    assert np.allclose(
+        enhancement * map_test1.data,
+        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale).data,
+    )

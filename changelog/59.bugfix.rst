@@ -1,0 +1,1 @@
+Increased the minimum version of "skimage" to 0.18.0, preventing faulty code in :meth:`sunkit-image.utils.points_in_poly`.
