@@ -8,7 +8,8 @@ import scipy.ndimage as ndimage
 __all__ = ["mgn"]
 
 
-def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights=None, truncate=3, clip=True):
+def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights=None, truncate=3, clip=True,
+        gamma_min=None, gamma_max=None):
     """
     Multi-scale Gaussian normalization.
 
@@ -40,6 +41,10 @@ def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights
         The value used to calculate the global gamma-transformed image.
         Ideally should be between 2.5 to 4 according to the paper.
         Defaults to 3.2.
+    gamma_min : `float`, optional
+        Minimum input to the gamma transform. Defaults to minimum value of `data`
+    gamma_max : `float`, optional
+        Maximum input to the gamma transform. Defaults to maximum value of `data`
     h : `float`, optional
         Weight of global filter to Gaussian filters.
         Defaults to 0.7.
@@ -111,11 +116,11 @@ def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights
 
     # 9. Calculate global gamma-transformed image C'g
     # Refer to equation (4) in the paper
-    data_min = data.min()
-    data_max = data.max()
-    Cprime_g = data - data_min
-    if (data_max - data_min) != 0.0:
-        Cprime_g /= data_max - data_min
+    gamma_min = data.min() if gamma_min is None else gamma_min
+    gamma_max = data.max() if gamma_max is None else gamma_max
+    Cprime_g = data - gamma_min
+    if (gamma_max - gamma_min) != 0.0:
+        Cprime_g /= gamma_max - gamma_min
     Cprime_g **= 1 / gamma
     Cprime_g *= h
 
