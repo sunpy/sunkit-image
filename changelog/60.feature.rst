@@ -1,0 +1,1 @@
+The minimum and maximum values of the gamma transform can now be specified for :func:`sunkit_image.enhance.mgn`.
