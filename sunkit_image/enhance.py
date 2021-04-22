@@ -8,8 +8,18 @@ import scipy.ndimage as ndimage
 __all__ = ["mgn"]
 
 
-def mgn(data, sigma=[1.25, 2.5, 5, 10, 20, 40], k=0.7, gamma=3.2, h=0.7, weights=None, truncate=3, clip=True,
-        gamma_min=None, gamma_max=None):
+def mgn(
+    data,
+    sigma=[1.25, 2.5, 5, 10, 20, 40],
+    k=0.7,
+    gamma=3.2,
+    h=0.7,
+    weights=None,
+    truncate=3,
+    clip=True,
+    gamma_min=None,
+    gamma_max=None,
+):
     """
     Multi-scale Gaussian normalization.
 
