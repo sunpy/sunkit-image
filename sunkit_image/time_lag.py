@@ -13,7 +13,10 @@ __all__ = [
 
 
 def get_lags(time):
-    """"""
+    """
+    Convert an array of evenly spaced times to an array of time lags
+    evenly spaced between ``-max(time)`` and ``max(time)``.
+    """
     delta_t = np.diff(time)
     if not np.allclose(delta_t, delta_t[0]):
         raise ValueError("Times must be evenly sampled")
@@ -30,15 +33,16 @@ def cross_correlation(signal_a, signal_b, lags):
 
     .. math::
 
-        \mathcal{C}_{AB}(\\tau) &= \mathcal{I}_A(t)\star\mathcal{I}_B(t) = \mathcal{I}_A(-t)\\ast\mathcal{I}_B(t) \\
-        &= \inversefourier{\\fourier{\mathcal{I}_A(-t)}\\fourier{\mathcal{I}_B(t)}}
+        \mathcal{C}_{AB}(\\tau) &= \mathcal{I}_A(t)\star\mathcal{I}_B(t) \\\\
+        &= \mathcal{I}_A(-t)\\ast\mathcal{I}_B(t) \\\\
+        &= \mathscr{F}^{-1}\{\mathscr{F}\{\mathcal{I}_A(-t)\}\mathscr{F}\{\mathcal{I}_B(t)\}\}
 
     where each signal has been centered and scaled by its mean and standard
     deviation,
 
     .. math::
 
-        \mathcal{I}_c(t)=\frac{I_c(t)-\bar{I}_c}{\sigma_{c}}
+        \mathcal{I}_c(t)=\\frac{I_c(t)-\\bar{I}_c}{\sigma_{c}}
 
     Additionally, :math:`\mathcal{C}_{AB}` is normalized by the length of
     the time series.
@@ -55,6 +59,13 @@ def cross_correlation(signal_a, signal_b, lags):
         `signal_a` and `signal_b` running from ``-max(time)`` to
         ``max(time)``. This is easily constructed using :func:`get_lags`
 
+    Returns
+    -------
+    array-like
+        Cross-correlation as a function of `lags`. The first dimension will be
+        the same as that of `lags` and the subsequent dimensions will be
+        consistent with dimensions of `signal_a` and `signal_b`.
+
     See Also
     ---------
     get_lags
@@ -63,12 +74,12 @@ def cross_correlation(signal_a, signal_b, lags):
 
     References
     -----------
-    - https://en.wikipedia.org/wiki/Convolution_theorem
-    - Viall, N.M. and Klimchuk, J.A.
+    * https://en.wikipedia.org/wiki/Convolution_theorem
+    * Viall, N.M. and Klimchuk, J.A.
       Evidence for Widespread Cooling in an Active Region Observed with the SDO Atmospheric Imaging Assembly
       ApJ, 753, 35, 2012
       (https://doi.org/10.1088/0004-637X/753/1/35)
-    - Appendix C in Barnes, W.T., Bradshaw, S.J., Viall, N.M.
+    * Appendix C in Barnes, W.T., Bradshaw, S.J., Viall, N.M.
       Understanding Heating in Active Region Cores through Machine Learning. I. Numerical Modeling and Predicted Observables
       ApJ, 880, 56, 2019
       (https://doi.org/10.3847/1538-4357/ab290c)
@@ -114,7 +125,23 @@ def _get_bounds_indices(lags, bounds):
 
 
 def time_lag(signal_a, signal_b, time, lag_bounds=None):
-    """"""
+    """
+    Compute the time lag that maximizes the cross-correlation
+    between `signal_a` and `signal_b`.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    References
+    ----------
+    * Viall, N.M. and Klimchuk, J.A.
+      Evidence for Widespread Cooling in an Active Region Observed with the SDO Atmospheric Imaging Assembly
+      ApJ, 753, 35, 2012
+      (https://doi.org/10.1088/0004-637X/753/1/35)
+    """
     lags = get_lags(time)
     cc = cross_correlation(signal_a, signal_b, lags)
     start, stop = _get_bounds_indices(lags, lag_bounds)
@@ -125,7 +152,24 @@ def time_lag(signal_a, signal_b, time, lag_bounds=None):
 
 
 def max_cross_correlation(signal_a, signal_b, time, lag_bounds=None):
-    """"""
+    """
+    Compute the maximum value of the cross-correlation between `signal_a`
+    and `signal_b`. This will always be between -1 (perfectly anti-correlatated)
+    and +1 (perfectly correlated).
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+    References
+    ----------
+    * Viall, N.M. and Klimchuk, J.A.
+      Evidence for Widespread Cooling in an Active Region Observed with the SDO Atmospheric Imaging Assembly
+      ApJ, 753, 35, 2012
+      (https://doi.org/10.1088/0004-637X/753/1/35)
+    """
     lags = get_lags(time)
     cc = cross_correlation(signal_a, signal_b, lags)
     start, stop = _get_bounds_indices(lags, lag_bounds)
