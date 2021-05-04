@@ -1,3 +1,24 @@
+Sunkit_Image v0.2.0 (2021-05-04)
+================================
+
+Features
+--------
+
+- The minimum and maximum values of the gamma transform can now be specified for :func:`sunkit_image.enhance.mgn`. (`#60 <https://github.com/sunpy/sunkit-image/pull/60>`__)
+
+
+Bug Fixes
+---------
+
+- Increased the minimum version of "skimage" to 0.18.0, preventing faulty code in :meth:`sunkit-image.utils.points_in_poly`. (`#59 <https://github.com/sunpy/sunkit-image/pull/59>`__)
+
+
+Trivial/Internal Changes
+------------------------
+
+- Added multiple unit tests to increase code coverage. (`#59 <https://github.com/sunpy/sunkit-image/pull/59>`__)
+
+
 sunkit_image 0.2.0 (2021-04-05)
 ===============================
 
