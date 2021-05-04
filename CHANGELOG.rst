@@ -1,5 +1,5 @@
-Sunkit_Image v0.2.0 (2021-05-04)
-================================
+v0.2.0 (2021-05-04)
+===================
 
 Features
 --------
@@ -17,19 +17,11 @@ Trivial/Internal Changes
 ------------------------
 
 - Added multiple unit tests to increase code coverage. (`#59 <https://github.com/sunpy/sunkit-image/pull/59>`__)
-
-
-sunkit_image 0.2.0 (2021-04-05)
-===============================
-
-Trivial/Internal Changes
-------------------------
-
 - Increased minimum supported version of sunpy to 2.0.0
 - Many internal package updates to documentation, the continuous integration and etc.
 
-sunkit_image 0.1.0 (2020-04-30)
-===============================
+0.1.0 (2020-04-30)
+==================
 
 Features
 --------
