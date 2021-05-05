@@ -4,6 +4,8 @@ lag between intensity cubes.
 """
 import numpy as np
 
+import astropy.units as u
+
 __all__ = [
     "cross_correlation",
     "get_lags",
@@ -12,7 +14,8 @@ __all__ = [
 ]
 
 
-def get_lags(time):
+@u.quantity_input
+def get_lags(time: u.s):
     """
     Convert an array of evenly spaced times to an array of time lags
     evenly spaced between ``-max(time)`` and ``max(time)``.
@@ -24,7 +27,8 @@ def get_lags(time):
     return np.hstack([-delta_t[::-1], np.array([0]), delta_t])
 
 
-def cross_correlation(signal_a, signal_b, lags):
+@u.quantity_input
+def cross_correlation(signal_a, signal_b, lags: u.s):
     """
     Compute cross-correlation between two signals, as a function of lag
 
@@ -54,7 +58,7 @@ def cross_correlation(signal_a, signal_b, lags):
         and must have length ``(len(lags) + 1)/2``
     signal_b : array-like
         Must have the same dimensions as `signal_a`
-    lags : array-like
+    lags : `~astropy.units.Quantity`
         Evenly spaced time lags corresponding to the time dimension of
         `signal_a` and `signal_b` running from ``-max(time)`` to
         ``max(time)``. This is easily constructed using :func:`get_lags`
@@ -87,7 +91,7 @@ def cross_correlation(signal_a, signal_b, lags):
     # NOTE: it is assumed that the arrays have already been appropriately
     # interpolated and chunked (if using Dask)
     delta_lags = np.diff(lags)
-    if not np.allclose(delta_lags, delta_lags[0]):
+    if not u.allclose(delta_lags, delta_lags[0]):
         raise ValueError("Lags must be evenly sampled")
     n_time = (lags.shape[0] + 1) // 2
     if signal_a.shape != signal_b.shape:
@@ -124,16 +128,67 @@ def _get_bounds_indices(lags, bounds):
     return start, stop
 
 
-def time_lag(signal_a, signal_b, time, lag_bounds=None):
+def _check_array(signal, lags):
+    # This is to avoid having to specify time as a Dask array so that it
+    # can be specified as a quantity and so that the time lag can be
+    # returned as a Dask quantity and not computed eagerly
+    try:
+        import dask.array  # do this here so that Dask is not a hard requirement
+    except ImportError:
+        return lags
+    else:
+        if isinstance(signal, dask.array.Array):
+            return dask.array.from_array(lags, chunks=lags.shape)
+        else:
+            return lags
+
+
+@u.quantity_input
+def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
     """
     Compute the time lag that maximizes the cross-correlation
     between `signal_a` and `signal_b`.
 
+    For a pair of signals :math:`A,B`, e.g. time series from two EUV channels
+    on AIA, the time lag is the lag which maximizes the cross-correlation,
+
+    .. math::
+
+        \\tau_{AB} = \\argmax_{\\tau}\mathcal{C}_{AB},
+
+    where :math:`\mathcal{C}_{AB}` is the cross-correlation as a function of
+    lag (computed in :func:`cross_correlation`). Qualitatively, this can be
+    thought of as how much `signal_a` needs to be shifted in time to best
+    "match" `signal_b`. Note that the sign of :math:`\\tau_{AB}`` is determined
+    by the ordering of the two signals such that,
+
+    .. math::
+
+        \\tau_{AB} = -\\tau_{BA}.
+
     Parameters
     ----------
+    signal_a : array-like
+        The first dimension must be the same length as `time`
+    signal_b : array-like
+        Must have the same dimensions as `signal_a`
+    time : `~astropy.units.Quantity`
+        Time array corresponding to the intensity time series
+        `signal_a` and `signal_b`
+    lag_bounds : `~astropy.units.Quantity`, optional
+        Minimum and maximum lag to consider when finding the time
+        lag that maximizes the cross-correlation. This is useful
+        for minimizing boundary effects.
 
     Returns
     -------
+    array-like
+        Lag which maximizes the cross-correlation. The dimensions will be
+        consistent with those of `signal_a` and `signal_b`, i.e. if the
+        input arrays are of dimension ``(K,M,N)``, the resulting array
+        will have dimensions ``(M,N)``. Similarly, if the input signals
+        are one-dimensional time series ``(K,)``, the result will have
+        dimension ``(1,)``.
 
     References
     ----------
@@ -148,20 +203,44 @@ def time_lag(signal_a, signal_b, time, lag_bounds=None):
     i_max_cc = cc[start:stop].argmax(axis=0)
     # The flatten + reshape is needed here because Dask does not like
     # "fancy" multidimensional indexing
+    lags = _check_array(signal_a, lags)
     return lags[start:stop][i_max_cc.flatten()].reshape(i_max_cc.shape)
 
 
-def max_cross_correlation(signal_a, signal_b, time, lag_bounds=None):
+@u.quantity_input
+def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
     """
     Compute the maximum value of the cross-correlation between `signal_a`
-    and `signal_b`. This will always be between -1 (perfectly anti-correlatated)
-    and +1 (perfectly correlated).
+    and `signal_b`.
+
+    This is the maximum value of the cross-correlation as a function of
+    lag (computed in :func:`cross_correlation`). This will always be between
+    -1 (perfectly anti-correlatated) and +1 (perfectly correlated) though
+    in practice is nearly always between 0 and +1.
 
     Parameters
     ----------
+    signal_a : array-like
+        The first dimension must be the same length as `time`
+    signal_b : array-like
+        Must have the same dimensions as `signal_a`
+    time : array-like
+        Time array corresponding to the intensity time series
+        `signal_a` and `signal_b`
+    lag_bounds : `tuple`, optional
+        Minimum and maximum lag to consider when finding the time
+        lag that maximizes the cross-correlation. This is useful
+        for minimizing boundary effects.
 
     Returns
     -------
+    array-like
+        Maximum value of the cross-correlation. The dimensions will be
+        consistent with those of `signal_a` and `signal_b`, i.e. if the
+        input arrays are of dimension ``(K,M,N)``, the resulting array
+        will have dimensions ``(M,N)``. Similarly, if the input signals
+        are one-dimensional time series ``(K,)``, the result will have
+        dimension ``(1,)``.
 
     References
     ----------
