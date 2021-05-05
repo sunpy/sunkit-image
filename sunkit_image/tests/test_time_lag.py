@@ -2,6 +2,8 @@ import dask.array
 import numpy as np
 import pytest
 
+import astropy.units as u
+
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
 
@@ -11,7 +13,7 @@ from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correla
 def test_cross_correlation_array_shapes(shape_in, shape_out):
     s_a = np.random.rand(*shape_in)
     s_b = np.random.rand(*shape_in)
-    time = np.linspace(0, 1, shape_in[0])
+    time = np.linspace(0, 1, shape_in[0]) * u.s
     lags = get_lags(time)
     cc = cross_correlation(s_a, s_b, lags)
     assert cc.shape == shape_out
@@ -19,7 +21,7 @@ def test_cross_correlation_array_shapes(shape_in, shape_out):
 
 @pytest.mark.parametrize("shape", [((5, 5)), ((10,)), ((1,))])
 def test_max_cc_time_lag_array_shapes(shape):
-    time = np.linspace(0, 1, 10)
+    time = np.linspace(0, 1, 10) * u.s
     shape_in = time.shape + shape
     s_a = np.random.rand(*shape_in)
     s_b = np.random.rand(*shape_in)
@@ -40,17 +42,55 @@ def test_max_cc_time_lag_array_shapes(shape):
 def test_preserve_array_types(shape_in):
     s_a = np.random.rand(*shape_in)
     s_b = np.random.rand(*shape_in)
-    time = np.linspace(0, 1, shape_in[0])
+    time = np.linspace(0, 1, shape_in[0]) * u.s
     # Numpy arrays
     max_cc = max_cross_correlation(s_a, s_b, time)
     tl = time_lag(s_a, s_b, time)
     assert isinstance(max_cc, np.ndarray)
-    assert isinstance(tl, np.ndarray)
+    assert isinstance(tl, u.Quantity)
     # Dask arrays
     s_a = dask.array.from_array(s_a)
     s_b = dask.array.from_array(s_b)
-    time = dask.array.from_array(time)
     max_cc = max_cross_correlation(s_a, s_b, time)
     tl = time_lag(s_a, s_b, time)
+    assert isinstance(max_cc, dask.array.Array)
+    assert isinstance(tl, dask.array.Array)
+
+
+@pytest.mark.parametrize(
+    "shape_a,shape_b,lags,exception",
+    [
+        ((10, 1), (10, 1), np.array([-1, -0.5, 0.1, 1]) * u.s, "Lags must be evenly sampled"),
+        ((10, 2, 3), (10, 2, 4), np.linspace(-1, 1, 19) * u.s, "Signals must have same shape."),
+        (
+            (20, 5),
+            (20, 5),
+            np.linspace(-1, 1, 10) * u.s,
+            "First dimension of signal must be equal in length to time array.",
+        ),
+    ],
+)
+def test_exceptions(shape_a, shape_b, lags, exception):
+    s_a = np.random.rand(*shape_a)
+    s_b = np.random.rand(*shape_b)
+    with pytest.raises(ValueError, match=exception):
+        _ = cross_correlation(s_a, s_b, lags)
+
+
+def test_bounds():
+    time = np.linspace(0, 1, 10) * u.s
+    shape = time.shape + (5, 5)
+    s_a = np.random.rand(*shape)
+    s_b = np.random.rand(*shape)
+    bounds = (-0.5, 0.5) * u.s
+    max_cc = max_cross_correlation(s_a, s_b, time, lag_bounds=bounds)
+    tl = time_lag(s_a, s_b, time, lag_bounds=bounds)
+    assert isinstance(max_cc, np.ndarray)
+    assert isinstance(tl, u.Quantity)
+    # Make sure this works with Dask and that these are still Dask arrays
+    s_a = dask.array.from_array(s_a, chunks=s_a.shape)
+    s_b = dask.array.from_array(s_b, chunks=s_b.shape)
+    max_cc = max_cross_correlation(s_a, s_b, time, lag_bounds=bounds)
+    tl = time_lag(s_a, s_b, time, lag_bounds=bounds)
     assert isinstance(max_cc, dask.array.Array)
     assert isinstance(tl, dask.array.Array)
