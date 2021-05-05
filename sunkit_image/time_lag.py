@@ -154,7 +154,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
 
     .. math::
 
-        \\tau_{AB} = \\argmax_{\\tau}\mathcal{C}_{AB},
+        \\tau_{AB} = \mathop{\mathrm{arg\,max}}_{\\tau}\mathcal{C}_{AB},
 
     where :math:`\mathcal{C}_{AB}` is the cross-correlation as a function of
     lag (computed in :func:`cross_correlation`). Qualitatively, this can be
