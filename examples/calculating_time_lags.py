@@ -112,7 +112,7 @@ tl_map = time_lag(s_a, s_b, time[:, 0, 0])
 print(tl_map)
 
 ###################################################################
-# Rather than being computed "eagerly", :func:`time_lag` returns
+# Rather than being computed "eagerly", :func:`~sunkit_image.time_lag.time_lag` returns
 # a graph of the computation that can be handed off to a distributed
 # scheduler to be run in parallel. This is extremely advantageous for
 # large data cubes as these operations are likely to exceed the

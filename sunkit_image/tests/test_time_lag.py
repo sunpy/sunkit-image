@@ -58,6 +58,28 @@ def test_preserve_array_types(shape_in):
 
 
 @pytest.mark.parametrize(
+    "shape_in",
+    [
+        ((20, 5, 5)),
+        ((100, 10)),
+        ((1000, 1)),
+    ],
+)
+def test_dask_numpy_consistent(shape_in):
+    s_a = np.random.rand(*shape_in)
+    s_b = np.random.rand(*shape_in)
+    time = np.linspace(0, 1, shape_in[0]) * u.s
+    max_cc = max_cross_correlation(s_a, s_b, time)
+    tl = time_lag(s_a, s_b, time)
+    s_a = dask.array.from_array(s_a)
+    s_b = dask.array.from_array(s_b)
+    max_cc_dask = max_cross_correlation(s_a, s_b, time)
+    tl_dask = time_lag(s_a, s_b, time)
+    assert u.allclose(tl, tl_dask.compute(), rtol=0.0, atol=None)
+    assert u.allclose(max_cc, max_cc_dask.compute(), rtol=0.0, atol=None)
+
+
+@pytest.mark.parametrize(
     "shape_a,shape_b,lags,exception",
     [
         ((10, 1), (10, 1), np.array([-1, -0.5, 0.1, 1]) * u.s, "Lags must be evenly sampled"),
