@@ -55,20 +55,20 @@ def cross_correlation(signal_a, signal_b, lags: u.s):
     -----------
     signal_a : array-like
         The first dimension should correspond to the time dimension
-        and must have length ``(len(lags) + 1)/2``
+        and must have length ``(len(lags) + 1)/2``.
     signal_b : array-like
-        Must have the same dimensions as `signal_a`
+        Must have the same dimensions as ``signal_a``.
     lags : `~astropy.units.Quantity`
         Evenly spaced time lags corresponding to the time dimension of
-        `signal_a` and `signal_b` running from ``-max(time)`` to
+        ``signal_a`` and ``signal_b`` running from ``-max(time)`` to
         ``max(time)``. This is easily constructed using :func:`get_lags`
 
     Returns
     -------
     array-like
-        Cross-correlation as a function of `lags`. The first dimension will be
-        the same as that of `lags` and the subsequent dimensions will be
-        consistent with dimensions of `signal_a` and `signal_b`.
+        Cross-correlation as a function of ``lags``. The first dimension will be
+        the same as that of ``lags`` and the subsequent dimensions will be
+        consistent with dimensions of ``signal_a`` and ``signal_b``.
 
     See Also
     ---------
@@ -147,7 +147,7 @@ def _check_array(signal, lags):
 def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
     """
     Compute the time lag that maximizes the cross-correlation
-    between `signal_a` and `signal_b`.
+    between ``signal_a`` and ``signal_b``.
 
     For a pair of signals :math:`A,B`, e.g. time series from two EUV channels
     on AIA, the time lag is the lag which maximizes the cross-correlation,
@@ -169,12 +169,12 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
     Parameters
     ----------
     signal_a : array-like
-        The first dimension must be the same length as `time`
+        The first dimension must be the same length as ``time``.
     signal_b : array-like
-        Must have the same dimensions as `signal_a`
+        Must have the same dimensions as ``signal_a``.
     time : `~astropy.units.Quantity`
         Time array corresponding to the intensity time series
-        `signal_a` and `signal_b`
+        ``signal_a`` and ``signal_b``.
     lag_bounds : `~astropy.units.Quantity`, optional
         Minimum and maximum lag to consider when finding the time
         lag that maximizes the cross-correlation. This is useful
@@ -184,7 +184,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
     -------
     array-like
         Lag which maximizes the cross-correlation. The dimensions will be
-        consistent with those of `signal_a` and `signal_b`, i.e. if the
+        consistent with those of ``signal_a`` and ``signal_b``, i.e. if the
         input arrays are of dimension ``(K,M,N)``, the resulting array
         will have dimensions ``(M,N)``. Similarly, if the input signals
         are one-dimensional time series ``(K,)``, the result will have
@@ -210,8 +210,8 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
 @u.quantity_input
 def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
     """
-    Compute the maximum value of the cross-correlation between `signal_a`
-    and `signal_b`.
+    Compute the maximum value of the cross-correlation between ``signal_a``
+    and ``signal_b``.
 
     This is the maximum value of the cross-correlation as a function of
     lag (computed in :func:`cross_correlation`). This will always be between
@@ -221,12 +221,12 @@ def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None)
     Parameters
     ----------
     signal_a : array-like
-        The first dimension must be the same length as `time`
+        The first dimension must be the same length as ``time``.
     signal_b : array-like
-        Must have the same dimensions as `signal_a`
+        Must have the same dimensions as ``signal_a``.
     time : array-like
         Time array corresponding to the intensity time series
-        `signal_a` and `signal_b`
+        ``signal_a`` and ``signal_b``.
     lag_bounds : `tuple`, optional
         Minimum and maximum lag to consider when finding the time
         lag that maximizes the cross-correlation. This is useful
@@ -236,7 +236,7 @@ def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None)
     -------
     array-like
         Maximum value of the cross-correlation. The dimensions will be
-        consistent with those of `signal_a` and `signal_b`, i.e. if the
+        consistent with those of ``signal_a`` and ``signal_b``, i.e. if the
         input arrays are of dimension ``(K,M,N)``, the resulting array
         will have dimensions ``(M,N)``. Similarly, if the input signals
         are one-dimensional time series ``(K,)``, the result will have
