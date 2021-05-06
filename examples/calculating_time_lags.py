@@ -9,15 +9,15 @@ those temporal offsets which maximize the cross-correlation
 between the two signals, back to an image pixel.
 This method
 was developed for studying temporal evolution of AIA intensities
-by `Viall and Klimchuk (2012) <https://doi.org/10.1088/0004-637X/753/1/35>`_.
+by `Viall and Klimchuk (2012) <https://doi.org/10.1088/0004-637X/753/1/35>`__.
 The specific implementation in this package is described in detail
-in Appendix C of `Barnes et al. (2019) <https://doi.org/10.3847/1538-4357/ab290c>`_.
+in Appendix C of `Barnes et al. (2019) <https://doi.org/10.3847/1538-4357/ab290c>`__.
 """
+# sphinx_gallery_thumbnail_number = 4
 import dask.array
 import matplotlib.pyplot as plt
 import numpy as np
 
-# sphinx_gallery_thumbnail_number = 4
 import astropy.units as u
 
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
@@ -28,7 +28,8 @@ from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correla
 # interval. We will create a toy model with two Gaussian pulses. In
 # practice, this method is often applied to many AIA light curves
 # and is described in detail in
-# `Viall and Klimchuk (2012) <https://doi.org/10.1088/0004-637X/753/1/35>`_.
+# `Viall and Klimchuk (2012) <https://doi.org/10.1088/0004-637X/753/1/35>`__.
+
 def gaussian_pulse(x, x0, sigma):
     return np.exp(-((x - x0) ** 2) / (2 * sigma ** 2))
 
@@ -48,6 +49,7 @@ plt.plot(time, s_b)
 # narrowband channels and thus two temperatures. To find this,
 # we can compute the cross-correlation between the two signals
 # and find which "lag" yields the highest correlation.
+
 lags = get_lags(time)
 cc = cross_correlation(s_a, s_b, lags)
 plt.plot(lags, cc)
@@ -56,6 +58,7 @@ plt.show()
 ###################################################################
 # Additionally, we can also easily calculate the maximum value of the
 # cross-correlation and the associate lag, or the time lag.
+
 tl = time_lag(s_a, s_b, time)
 max_cc = max_cross_correlation(s_a, s_b, time)
 plt.plot(lags, cc)
@@ -66,13 +69,15 @@ plt.show()
 # As expected from the first intensity plot, we find that the lag
 # which maximizes the cross-correlation is approximately the separation
 # between the mean values of the Gaussian pulses.
-print("Time lag, A->B = ", tl)
+
+print("Time lag, A -> B = ", tl)
 
 ###################################################################
 # Note that a positive time lag indicates that signal A has to be
 # shifted forward in time to match signal B. By reversing the order
 # of the inputs, we also reverse the sign of the time lag.
-print("Time lag, B->A =", time_lag(s_b, s_a, time))
+
+print("Time lag, B -> A =", time_lag(s_b, s_a, time))
 
 ###################################################################
 # The real power in the time lag approach is it's ability to reveal
@@ -82,6 +87,7 @@ print("Time lag, B->A =", time_lag(s_b, s_a, time))
 #
 # As an example, we'll create a fake data cube by repeating Gaussian
 # pulses with varying means and then add some noise to them
+
 time = np.tile(time, (10, 10, 1)).T
 means_a = np.tile(np.random.rand(*time.shape[1:]), (time.shape[0], 1, 1)) * u.s
 means_b = np.tile(np.random.rand(*time.shape[1:]), (time.shape[0], 1, 1)) * u.s
@@ -90,7 +96,8 @@ s_a = gaussian_pulse(time, means_a, 0.02 * u.s) + noise
 s_b = gaussian_pulse(time, means_b, 0.02 * u.s) + noise
 
 ###################################################################
-# We can now compute a map of the time lag and maximum cross correlation
+# We can now compute a map of the time lag and maximum cross correlation.
+
 max_cc_map = max_cross_correlation(s_a, s_b, time[:, 0, 0])
 tl_map = time_lag(s_a, s_b, time[:, 0, 0])
 plt.subplot(121)
@@ -106,6 +113,7 @@ plt.show()
 # GB, such that doing operations like these on them can be prohibitively
 # expensive. All of these operations can be parallelized and distributed
 # easily by passing in the intensity cubes as Dask arrays.
+
 s_a = dask.array.from_array(s_a, chunks=s_a.shape[:1] + (5, 5))
 s_b = dask.array.from_array(s_b, chunks=s_b.shape[:1] + (5, 5))
 tl_map = time_lag(s_a, s_b, time[:, 0, 0])
