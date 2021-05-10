@@ -128,7 +128,7 @@ def _get_bounds_indices(lags, bounds):
     return start, stop
 
 
-def _check_array(signal, lags):
+def _dask_check(signal, lags):
     # This is to avoid having to specify time as a Dask array so that it
     # can be specified as a quantity and so that the time lag can be
     # returned as a Dask quantity and not computed eagerly
@@ -136,15 +136,14 @@ def _check_array(signal, lags):
         import dask.array  # do this here so that Dask is not a hard requirement
     except ImportError:
         return lags
+    if isinstance(signal, dask.array.Array):
+        return dask.array.from_array(lags, chunks=lags.shape)
     else:
-        if isinstance(signal, dask.array.Array):
-            return dask.array.from_array(lags, chunks=lags.shape)
-        else:
-            return lags
+        return lags
 
 
 @u.quantity_input
-def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
+def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kwargs):
     """
     Compute the time lag that maximizes the cross-correlation
     between ``signal_a`` and ``signal_b``.
@@ -180,6 +179,18 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
         lag that maximizes the cross-correlation. This is useful
         for minimizing boundary effects.
 
+    Other Parameters
+    ----------------
+    pre_check_hook : function
+        Function to apply to `lags` array prior to selecting maximum lags. This
+        is usful when `signal_a` and `signal_b` are of a type besides `~numpy.ndarray`.
+        This function should accept `signal_a` and `lags` and return an array that
+        looks like `lags`.
+    post_check_hook : function
+        Function to apply to the resulting time lag result. This should take in the
+        result of the time lag selection and return something that an array that looks
+        like the time lag selection.
+
     Returns
     -------
     array-like
@@ -197,14 +208,16 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
       ApJ, 753, 35, 2012
       (https://doi.org/10.1088/0004-637X/753/1/35)
     """
+    pre_check = kwargs.get("pre_check_hook", _dask_check)
+    post_check = kwargs.get("post_check_hook", lambda x: x)
     lags = get_lags(time)
     cc = cross_correlation(signal_a, signal_b, lags)
     start, stop = _get_bounds_indices(lags, lag_bounds)
     i_max_cc = cc[start:stop].argmax(axis=0)
     # The flatten + reshape is needed here because Dask does not like
     # "fancy" multidimensional indexing
-    lags = _check_array(signal_a, lags)
-    return lags[start:stop][i_max_cc.flatten()].reshape(i_max_cc.shape)
+    lags = pre_check(signal_a, lags)
+    return post_check(lags[start:stop][i_max_cc.flatten()].reshape(i_max_cc.shape))
 
 
 @u.quantity_input
@@ -215,7 +228,7 @@ def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None)
 
     This is the maximum value of the cross-correlation as a function of
     lag (computed in :func:`cross_correlation`). This will always be between
-    -1 (perfectly anti-correlatated) and +1 (perfectly correlated) though
+    -1 (perfectly anti-correlated) and +1 (perfectly correlated) though
     in practice is nearly always between 0 and +1.
 
     Parameters
