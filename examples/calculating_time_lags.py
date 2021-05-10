@@ -23,13 +23,13 @@ import astropy.units as u
 
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
-
 ###################################################################
 # Consider two timeseries whose peaks are separated in time by some
 # interval. We will create a toy model with two Gaussian pulses. In
 # practice, this method is often applied to many AIA light curves
 # and is described in detail in
 # `Viall and Klimchuk (2012) <https://doi.org/10.1088/0004-637X/753/1/35>`__.
+
 
 def gaussian_pulse(x, x0, sigma):
     return np.exp(-((x - x0) ** 2) / (2 * sigma ** 2))
@@ -38,8 +38,12 @@ def gaussian_pulse(x, x0, sigma):
 time = np.linspace(0, 1, 500) * u.s
 s_a = gaussian_pulse(time, 0.4 * u.s, 0.02 * u.s)
 s_b = gaussian_pulse(time, 0.6 * u.s, 0.02 * u.s)
-plt.plot(time, s_a)
-plt.plot(time, s_b)
+plt.plot(time, s_a, label="A")
+plt.plot(time, s_b, label="B")
+plt.xlabel("Time [s]")
+plt.ylabel("Signal")
+plt.legend()
+plt.show()
 
 ###################################################################
 # The problem we are concerned with is how much do we need shift
@@ -54,6 +58,8 @@ plt.plot(time, s_b)
 lags = get_lags(time)
 cc = cross_correlation(s_a, s_b, lags)
 plt.plot(lags, cc)
+plt.xlabel("Lag [s]")
+plt.ylabel("Cross-correlation, AB")
 plt.show()
 
 ###################################################################
@@ -64,6 +70,8 @@ tl = time_lag(s_a, s_b, time)
 max_cc = max_cross_correlation(s_a, s_b, time)
 plt.plot(lags, cc)
 plt.plot(tl, max_cc, marker="o", ls="", markersize=4)
+plt.xlabel("Lag [s]")
+plt.ylabel("Cross-correlation, AB")
 plt.show()
 
 ###################################################################
@@ -89,18 +97,17 @@ print("Time lag, B -> A =", time_lag(s_b, s_a, time))
 # As an example, we'll create a fake data cube by repeating Gaussian
 # pulses with varying means and then add some noise to them
 
-time = np.tile(time, (10, 10, 1)).T
-means_a = np.tile(np.random.rand(*time.shape[1:]), (time.shape[0], 1, 1)) * u.s
-means_b = np.tile(np.random.rand(*time.shape[1:]), (time.shape[0], 1, 1)) * u.s
+means_a = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
+means_b = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
 noise = 0.2 * (-0.5 + np.random.rand(*means_a.shape))
-s_a = gaussian_pulse(time, means_a, 0.02 * u.s) + noise
-s_b = gaussian_pulse(time, means_b, 0.02 * u.s) + noise
+s_a = gaussian_pulse(np.tile(time, means_a.shape[1:] + (1,)).T, means_a, 0.02 * u.s) + noise
+s_b = gaussian_pulse(np.tile(time, means_b.shape[1:] + (1,)).T, means_b, 0.02 * u.s) + noise
 
 ###################################################################
 # We can now compute a map of the time lag and maximum cross correlation.
 
-max_cc_map = max_cross_correlation(s_a, s_b, time[:, 0, 0])
-tl_map = time_lag(s_a, s_b, time[:, 0, 0])
+max_cc_map = max_cross_correlation(s_a, s_b, time)
+tl_map = time_lag(s_a, s_b, time)
 fig = plt.figure(figsize=(10, 5))
 ax = fig.add_subplot(121)
 im = ax.imshow(tl_map, cmap="RdBu", vmin=-1, vmax=1)
@@ -123,7 +130,7 @@ plt.show()
 
 s_a = dask.array.from_array(s_a, chunks=s_a.shape[:1] + (5, 5))
 s_b = dask.array.from_array(s_b, chunks=s_b.shape[:1] + (5, 5))
-tl_map = time_lag(s_a, s_b, time[:, 0, 0])
+tl_map = time_lag(s_a, s_b, time)
 print(tl_map)
 
 ###################################################################
