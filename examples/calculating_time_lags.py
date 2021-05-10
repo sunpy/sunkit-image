@@ -17,6 +17,7 @@ in Appendix C of `Barnes et al. (2019) <https://doi.org/10.3847/1538-4357/ab290c
 import dask.array
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
 import astropy.units as u
 
@@ -91,7 +92,7 @@ print("Time lag, B -> A =", time_lag(s_b, s_a, time))
 time = np.tile(time, (10, 10, 1)).T
 means_a = np.tile(np.random.rand(*time.shape[1:]), (time.shape[0], 1, 1)) * u.s
 means_b = np.tile(np.random.rand(*time.shape[1:]), (time.shape[0], 1, 1)) * u.s
-noise = -0.05 + 0.1 * np.random.rand(*means_a.shape)
+noise = 0.2 * (-0.5 + np.random.rand(*means_a.shape))
 s_a = gaussian_pulse(time, means_a, 0.02 * u.s) + noise
 s_b = gaussian_pulse(time, means_b, 0.02 * u.s) + noise
 
@@ -100,12 +101,18 @@ s_b = gaussian_pulse(time, means_b, 0.02 * u.s) + noise
 
 max_cc_map = max_cross_correlation(s_a, s_b, time[:, 0, 0])
 tl_map = time_lag(s_a, s_b, time[:, 0, 0])
-plt.subplot(121)
-im = plt.imshow(tl_map, cmap="RdBu", vmin=-1, vmax=1)
-plt.colorbar(im)
-plt.subplot(122)
-im = plt.imshow(max_cc_map, vmin=0, vmax=1)
-plt.colorbar(im)
+fig = plt.figure(figsize=(10, 5))
+ax = fig.add_subplot(121)
+im = ax.imshow(tl_map, cmap="RdBu", vmin=-1, vmax=1)
+cax = make_axes_locatable(ax).append_axes("right", size="5%", pad="1%")
+cb = fig.colorbar(im, cax=cax)
+cb.set_label(r"$\tau_{AB}$ [s]")
+ax = fig.add_subplot(122)
+im = ax.imshow(max_cc_map, vmin=0, vmax=1, cmap="magma")
+cax = make_axes_locatable(ax).append_axes("right", size="5%", pad="1%")
+cb = fig.colorbar(im, cax=cax)
+cb.set_label(r"Max cross-correlation")
+plt.tight_layout()
 plt.show()
 
 ###################################################################
