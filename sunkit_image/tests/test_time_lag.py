@@ -31,6 +31,20 @@ def test_max_cc_time_lag_array_shapes(shape):
     assert tl.shape == shape
 
 
+@pytest.mark.parametrize("shape", [((5, 5)), ((10,)), ((1,))])
+def test_time_lag_calculation(shape):
+    def gaussian_pulse(x, x0, sigma):
+        return np.exp(-((x - x0) ** 2) / (2 * sigma ** 2))
+
+    time = np.linspace(0, 1, 500) * u.s
+    s_a = gaussian_pulse(time, 0.4 * u.s, 0.02 * u.s)
+    s_b = gaussian_pulse(time, 0.6 * u.s, 0.02 * u.s)
+    s_a = s_a * np.ones(shape + time.shape)
+    s_b = s_b * np.ones(shape + time.shape)
+    tl = time_lag(s_a.T, s_b.T, time)
+    assert u.allclose(tl, 0.2 * u.s, rtol=5e-3)
+
+
 @pytest.mark.parametrize(
     "shape_in",
     [
