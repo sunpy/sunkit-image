@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/ambv/black
-    rev: 20.8b1
+    rev: 21.5b1
     hooks:
     - id: black
 -   repo: https://github.com/myint/autoflake
@@ -16,7 +16,7 @@ repos:
         args: ['--sp','setup.cfg']
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|docs/conf.py)$"
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.0
     hooks:
       - id: check-ast
       - id: check-case-conflict
