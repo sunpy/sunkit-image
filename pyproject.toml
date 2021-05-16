@@ -1,10 +1,10 @@
 [build-system]
 requires = [
-  "setuptools",
-  "setuptools_scm",
-  "wheel",
+  "extension-helpers",
   "oldest-supported-numpy",
-  "extension-helpers"
+  "setuptools_scm",
+  "setuptools",
+  "wheel",
 ]
 build-backend = 'setuptools.build_meta'
 
@@ -43,11 +43,11 @@ exclude = '''
     enabled = true
     verify_pr_number = true
     changelog_skip_label = "No Changelog Entry Needed"
-    help_url = "https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst"
+    help_url = "https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst"
 
-    changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst)."
+    changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst)."
 
-    type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/sunpy/sunkit-image/blob/master/changelog/README.rst)"
+    type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst)"
 
     number_incorrect_long = "The number in the changelog file you added does not match the number of this pull request. Please rename the file."
 
@@ -56,6 +56,7 @@ exclude = '''
     filename = "CHANGELOG.rst"
     directory = "changelog/"
     issue_format = "`#{issue} <https://github.com/sunpy/sunkit-image/pull/{issue}>`__"
+    title_format = "{version} ({project_date})"
 
     [[tool.towncrier.type]]
         directory = "breaking"
