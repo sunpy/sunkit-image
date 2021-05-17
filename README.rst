@@ -34,7 +34,8 @@ Getting Help
 
 For more information or to ask questions about sunkit-image or sunpy, check out:
 
--  `SunPy Matrix Channel`_
+-  `#sunpy:matrix.org`_
+-  `sunkit-image Documentation`_
 
 Contributing
 ------------
@@ -58,3 +59,4 @@ This project is Copyright (c) SunPy Developers and licensed under the terms of t
 .. _issues page: https://github.com/sunpy/sunkit-image/issues
 .. _contributing guide: https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html
 .. _Code of Conduct: https://sunpy.org/coc
+.. _sunkit-image Documentation: https://docs.sunpy.org/projects/sunkit-image/en/stable/
