@@ -29,7 +29,7 @@ def get_lags(time: u.s):
 
 @u.quantity_input
 def cross_correlation(signal_a, signal_b, lags: u.s):
-    """
+    r"""
     Compute cross-correlation between two signals, as a function of lag
 
     By the convolution theorem the cross-correlation between two signals
@@ -37,8 +37,8 @@ def cross_correlation(signal_a, signal_b, lags: u.s):
 
     .. math::
 
-        \mathcal{C}_{AB}(\\tau) &= \mathcal{I}_A(t)\star\mathcal{I}_B(t) \\\\
-        &= \mathcal{I}_A(-t)\\ast\mathcal{I}_B(t) \\\\
+        \mathcal{C}_{AB}(\tau) &= \mathcal{I}_A(t)\star\mathcal{I}_B(t) \\
+        &= \mathcal{I}_A(-t)\ast\mathcal{I}_B(t) \\
         &= \mathscr{F}^{-1}\{\mathscr{F}\{\mathcal{I}_A(-t)\}\mathscr{F}\{\mathcal{I}_B(t)\}\}
 
     where each signal has been centered and scaled by its mean and standard
@@ -46,7 +46,7 @@ def cross_correlation(signal_a, signal_b, lags: u.s):
 
     .. math::
 
-        \mathcal{I}_c(t)=\\frac{I_c(t)-\\bar{I}_c}{\sigma_{c}}
+        \mathcal{I}_c(t)=\frac{I_c(t)-\bar{I}_c}{\sigma_{c}}
 
     Additionally, :math:`\mathcal{C}_{AB}` is normalized by the length of
     the time series.
@@ -144,7 +144,7 @@ def _dask_check(signal, lags):
 
 @u.quantity_input
 def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kwargs):
-    """
+    r"""
     Compute the time lag that maximizes the cross-correlation
     between ``signal_a`` and ``signal_b``.
 
@@ -153,7 +153,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
 
     .. math::
 
-        \\tau_{AB} = \mathop{\mathrm{arg\,max}}_{\\tau}\mathcal{C}_{AB},
+        \tau_{AB} = \mathop{\mathrm{arg\,max}}_{\tau}\mathcal{C}_{AB},
 
     where :math:`\mathcal{C}_{AB}` is the cross-correlation as a function of
     lag (computed in :func:`cross_correlation`). Qualitatively, this can be
@@ -163,7 +163,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
 
     .. math::
 
-        \\tau_{AB} = -\\tau_{BA}.
+        \tau_{AB} = -\tau_{BA}.
 
     Parameters
     ----------
