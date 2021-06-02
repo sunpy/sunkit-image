@@ -1,2 +1,0 @@
-The `sunkit_image.time_lag` module provides functions for computing the cross-correlation,
-time lag, and peak cross-correlation for N-dimensional time series.

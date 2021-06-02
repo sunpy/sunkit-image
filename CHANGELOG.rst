@@ -1,3 +1,13 @@
+0.3.0 (2021-06-02)
+==================
+
+Features
+--------
+
+- The `sunkit_image.time_lag` module provides functions for computing the cross-correlation,
+  time lag, and peak cross-correlation for N-dimensional time series. (`#61 <https://github.com/sunpy/sunkit-image/pull/61>`__)
+- Increased the minimum version of "sunpy" to 3.0.0, the new LTS release
+
 0.2.0 (2021-05-04)
 ==================
 
