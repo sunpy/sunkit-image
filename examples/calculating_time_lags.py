@@ -138,5 +138,5 @@ print(tl_map)
 # a graph of the computation that can be handed off to a distributed
 # scheduler to be run in parallel. This is extremely advantageous for
 # large data cubes as these operations are likely to exceed the
-# memory limits of most desktop machines are easily accelerated through
+# memory limits of most desktop machines and are easily accelerated through
 # parallelism.
