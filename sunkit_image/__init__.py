@@ -9,7 +9,7 @@ A image processing toolbox for Solar Physics.
 """
 import sys
 
-from .version import version as __version__  # NOQA
+from .version import version as __version__
 
 # Enforce Python version check during package import.
 __minimum_python_version__ = "3.7"

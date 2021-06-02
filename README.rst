@@ -7,7 +7,7 @@ sunkit-image
    :target: https://www.sunpy.org
 .. |Latest Version| image:: https://img.shields.io/pypi/v/sunkit-image.svg
    :target: https://pypi.python.org/pypi/sunkit-image/
-.. |codecov| image:: https://codecov.io/gh/sunpy/sunpy/branch/master/graph/badge.svg
+.. |codecov| image:: https://codecov.io/gh/sunpy/sunpy/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/sunpy/sunkit-image
 .. |Powered by NumFOCUS| image:: https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A
    :target: http://numfocus.org
@@ -18,32 +18,31 @@ Currently it is an experimental library for various solar physics specific image
 Installation
 ------------
 
+For detailed (general) installation instructions, see the `installation guide`_ in the SunPy docs.
+This takes you through the options for installing sunpy, but they are the same for sunkit-image.
+
 If you want help develop sunkit-image you will need to install it from GitHub.
 The best way to do this is to create a new python virtual environment (either with ``pipenv`` or ``conda``).
-Once you have that virtual environment::
+Once you have that virtual environment, you will want to fork the repo and then run::
 
     $ git clone https://github.com/<username>/sunkit-image.git
     $ cd sunkit-image
     $ pip install -e .[dev]
 
-For detailed (general) installation instructions, see the `installation guide`_ in the SunPy docs.
-
 Getting Help
 ------------
 
-For more information or to ask questions about SunPy, check out:
+For more information or to ask questions about sunkit-image or sunpy, check out:
 
--  `SunPy Mailing List`_
--  `SunPy Matrix Channel`_
+-  `#sunpy:matrix.org`_
+-  `sunkit-image Documentation`_
 
 Contributing
 ------------
 
-If you would like to get involved, start by joining the `SunPy mailing list`_ and check out the `Developer’s Guide`_ section of the SunPy docs.
+If you would like to get involved, please read our `contributing guide`_.
 Stop by our chat room `#sunpy:matrix.org`_ if you have any questions.
 Help is always welcome so let us know what you like to work on, or check out the `issues page`_ for the list of known outstanding items.
-
-For more information on contributing, please read our `contributing guide`_.
 
 Code of Conduct
 ---------------
@@ -56,10 +55,8 @@ License
 This project is Copyright (c) SunPy Developers and licensed under the terms of the BSD 3-Clause license. See the licenses folder for more information.
 
 .. _installation guide: https://docs.sunpy.org/en/stable/guide/installation/index.html
-.. _SunPy Matrix Channel: https://openastronomy.riot.im/#/room/#sunpy:openastronomy.org
-.. _SunPy mailing list: https://groups.google.com/forum/#!forum/sunpy
-.. _`Developer’s Guide`: https://docs.sunpy.org/en/latest/dev_guide/index.html
-.. _`#sunpy:matrix.org`: https://riot.im/app/#/room/#sunpy:matrix.org
+.. _`#sunpy:matrix.org`: https://app.element.io/#/room/#sunpy:openastronomy.org
 .. _issues page: https://github.com/sunpy/sunkit-image/issues
-.. _contributing guide: https://docs.sunpy.org/en/stable/dev_guide/newcomers.html#newcomers
-.. _Code of Conduct: https://docs.sunpy.org/en/stable/coc.html
+.. _contributing guide: https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html
+.. _Code of Conduct: https://sunpy.org/coc
+.. _sunkit-image Documentation: https://docs.sunpy.org/projects/sunkit-image/en/stable/
