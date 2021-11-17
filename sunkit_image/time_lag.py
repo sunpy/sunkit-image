@@ -118,13 +118,12 @@ def cross_correlation(signal_a, signal_b, lags: u.s):
 def _get_bounds_indices(lags, bounds):
     # The start and stop indices are computed in this way
     # because Dask does not like "fancy" multidimensional indexing
+    start = 0
+    stop = lags.shape[0] + 1
     if bounds is not None:
         (indices,) = np.where(np.logical_and(lags >= bounds[0], lags <= bounds[1]))
         start = indices[0]
         stop = indices[-1] + 1
-    else:
-        start = 0
-        stop = lags.shape[0] + 1
     return start, stop
 
 
@@ -138,8 +137,7 @@ def _dask_check(signal, lags):
         return lags
     if isinstance(signal, dask.array.Array):
         return dask.array.from_array(lags, chunks=lags.shape)
-    else:
-        return lags
+    return lags
 
 
 @u.quantity_input
@@ -217,7 +215,11 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
     # The flatten + reshape is needed here because Dask does not like
     # "fancy" multidimensional indexing
     lags = pre_check(signal_a, lags)
-    return post_check(lags[start:stop][i_max_cc.flatten()].reshape(i_max_cc.shape))
+    if not isinstance(i_max_cc, np.ndarray):
+        idx = i_max_cc.flatten().compute()
+    else:
+        idx = i_max_cc.flatten()
+    return post_check(lags[start:stop][idx].reshape(i_max_cc.shape))
 
 
 @u.quantity_input
