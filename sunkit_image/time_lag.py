@@ -140,6 +140,29 @@ def _dask_check(signal, lags):
     return lags
 
 
+def _dask_check(signal, lags):
+    # This is to avoid having to specify time as a Dask array so that it
+    # can be specified as a quantity and so that the time lag can be
+    # returned as a Dask quantity and not computed eagerly
+    try:
+        import dask.array  # do this here so that Dask is not a hard requirement
+    except ImportError:
+        return lags
+    if isinstance(signal, dask.array.Array):
+        return dask.array.from_array(lags, chunks=lags.shape)
+    return lags
+
+
+def _deal_with_dask(array):
+    try:
+        import dask.array  # do this here so that Dask is not a hard requirement
+    except ImportError:
+        return array
+    if isinstance(array, dask.array.Array):
+        return array.compute()
+    return array
+
+
 @u.quantity_input
 def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kwargs):
     r"""
@@ -181,7 +204,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
     ----------------
     pre_check_hook : function
         Function to apply to `lags` array prior to selecting maximum lags. This
-        is usful when `signal_a` and `signal_b` are of a type besides `~numpy.ndarray`.
+        is useful when `signal_a` and `signal_b` are of a type besides `~numpy.ndarray`.
         This function should accept `signal_a` and `lags` and return an array that
         looks like `lags`.
     post_check_hook : function
@@ -211,15 +234,12 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
     lags = get_lags(time)
     cc = cross_correlation(signal_a, signal_b, lags)
     start, stop = _get_bounds_indices(lags, lag_bounds)
+    cc = _deal_with_dask(cc)
     i_max_cc = cc[start:stop].argmax(axis=0)
     # The flatten + reshape is needed here because Dask does not like
     # "fancy" multidimensional indexing
     lags = pre_check(signal_a, lags)
-    if not isinstance(i_max_cc, np.ndarray):
-        idx = i_max_cc.flatten().compute()
-    else:
-        idx = i_max_cc.flatten()
-    return post_check(lags[start:stop][idx].reshape(i_max_cc.shape))
+    return post_check(lags[start:stop][i_max_cc.flatten()].reshape(i_max_cc.shape))
 
 
 @u.quantity_input
