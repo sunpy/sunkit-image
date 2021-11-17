@@ -140,19 +140,6 @@ def _dask_check(signal, lags):
     return lags
 
 
-def _dask_check(signal, lags):
-    # This is to avoid having to specify time as a Dask array so that it
-    # can be specified as a quantity and so that the time lag can be
-    # returned as a Dask quantity and not computed eagerly
-    try:
-        import dask.array  # do this here so that Dask is not a hard requirement
-    except ImportError:
-        return lags
-    if isinstance(signal, dask.array.Array):
-        return dask.array.from_array(lags, chunks=lags.shape)
-    return lags
-
-
 def _deal_with_dask(array):
     try:
         import dask.array  # do this here so that Dask is not a hard requirement
