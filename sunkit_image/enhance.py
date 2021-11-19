@@ -1,6 +1,7 @@
 """
 This module contains functions that will enhance the entire image.
 """
+import warnings
 
 import numpy as np
 import scipy.ndimage as ndimage
@@ -79,6 +80,12 @@ def mgn(
       arXiv preprint arXiv:1403.6613 (2014).
       Ref: Sol Phys (2014) 289: 2945. doi:10.1007/s11207-014-0523-9
     """
+    if np.isnan(data).any():
+        warnings.warn(
+            "One or more entries in the input data are NaN. This implementation does not account "
+            "for the presence of NaNs in the input data. As such, this may result in undefined "
+            "behavior."
+        )
 
     if weights is None:
         weights = np.ones(len(sigma))
