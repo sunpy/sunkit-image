@@ -126,10 +126,13 @@ plt.show()
 # In practice, these data cubes are often very large, sometimes many
 # GB, such that doing operations like these on them can be prohibitively
 # expensive. All of these operations can be parallelized and distributed
-# easily by passing in the intensity cubes as Dask arrays.
+# easily by passing in the intensity cubes as Dask arrays. Note that we
+# strip the units off of our signal arrays before creating the Dask arrays
+# from the as creating a Dask array from an `~astropy.units.Quantity` may
+# result in undefined behavior.
 
-s_a = dask.array.from_array(s_a, chunks=s_a.shape[:1] + (5, 5))
-s_b = dask.array.from_array(s_b, chunks=s_b.shape[:1] + (5, 5))
+s_a = dask.array.from_array(s_a.value, chunks=s_a.shape[:1] + (5, 5))
+s_b = dask.array.from_array(s_b.value, chunks=s_b.shape[:1] + (5, 5))
 tl_map = time_lag(s_a, s_b, time)
 print(tl_map)
 
