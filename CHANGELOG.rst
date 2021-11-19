@@ -1,10 +1,18 @@
-0.3.1 (2021-11-18)
+0.3.1 (2021-11-19)
 ==================
 
-Bug Fixes
----------
+- Fixed a bug where a `~astropy.units.UnitConversionError` was thrown if a non-dimensionless
+  `~astropy.units.Quantity` object was input for the signal in `~sunkit_image.time_lag.cross_correlation`. (`#72 <https://github.com/sunpy/sunkit-image/pull/72>`__)
+- Fixed a bug where the way we dealt with `~astropy.unit.Quantity` objects was inconsistent with
+  `~dask.array.Array` objects in newer versions of `~numpy`. The `pre_check_hook` option keyword
+  argument has also been removed from `~sunkit_image.time_lag.time_lag` and `post_check_hook`
+  has been renamed to `array_check` and now accepts two arguments. (`#72 <https://github.com/sunpy/sunkit-image/pull/72>`__)
 
-- Fixed issue with ``time_lag`` and dask arrays.
+
+Trivial/Internal Changes
+------------------------
+
+- A warning is now raised if the input data to `~sunkit_image.enhance.mgn` contain any NaNs. (`#73 <https://github.com/sunpy/sunkit-image/pull/73>`__)
 
 0.3.0 (2021-06-02)
 ==================

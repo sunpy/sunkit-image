@@ -1,2 +1,0 @@
-Fixed a bug where a `~astropy.units.UnitConversionError` was thrown if a non-dimensionless
-`~astropy.units.Quantity` object was input for the signal in `~sunkit_image.time_lag.cross_correlation`.

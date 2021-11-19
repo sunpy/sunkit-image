@@ -229,7 +229,6 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
     lags = get_lags(time)
     cc = cross_correlation(signal_a, signal_b, lags)
     start, stop = _get_bounds_indices(lags, lag_bounds)
-    cc = _deal_with_dask(cc)
     i_max_cc = cc[start:stop].argmax(axis=0)
     return array_check(lags[start:stop], i_max_cc)
 
