@@ -6,6 +6,14 @@ import numpy as np
 
 import astropy.units as u
 
+DASK_INSTALLED = False
+try:
+    import dask.array  # do this here so that Dask is not a hard requirement
+
+    DASK_INSTALLED = True
+except ImportError:
+    pass
+
 __all__ = [
     "cross_correlation",
     "get_lags",
@@ -128,18 +136,23 @@ def _get_bounds_indices(lags, bounds):
     return start, stop
 
 
-def _dask_check(signal, lags):
-    # This is to avoid having to specify time as a Dask array so that it
-    # can be specified as a quantity and so that the time lag can be
-    # returned as a Dask quantity and not computed eagerly
-    try:
-        import dask.array  # do this here so that Dask is not a hard requirement
-    except ImportError:
-        return lags
-    if isinstance(signal, dask.array.Array):
-        return dask.array.from_array(lags, chunks=lags.shape)
+def _dask_check(lags, indices):
+    # In order for the time lag to be returned as a Dask array, the lags array,
+    # which is, in general, a Quantity, must also be a Dask array.
+    # This function is needed for two reasons:
+    # 1. astropy.units.Quantity do not play nice with each other and their behavior
+    #    seems to vary from one numpy version to the next. To avoid this ill-defined
+    #    behavior, we will do all of our Dask-ing on a Dask array created from the
+    #    bare numpy array and re-attach the units at the end.
+    # 2. Dask arrays do not like "fancy" multidimensional indexing. Therefore, we must
+    #    flatten the indices first and then reshape the time lag array in order to
+    #    preserve the laziness of the array evaluation.
+    if DASK_INSTALLED and isinstance(indices, dask.array.Array):
+        lags_lazy = dask.array.from_array(lags.value, chunks=lags.shape)
+        lags_unit = lags.unit
+        return lags_lazy[indices.flatten()].reshape(indices.shape) * lags_unit
     else:
-        return lags
+        return lags[indices]
 
 
 @u.quantity_input
@@ -181,15 +194,13 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
 
     Other Parameters
     ----------------
-    pre_check_hook : function
-        Function to apply to `lags` array prior to selecting maximum lags. This
-        is usful when `signal_a` and `signal_b` are of a type besides `~numpy.ndarray`.
-        This function should accept `signal_a` and `lags` and return an array that
-        looks like `lags`.
-    post_check_hook : function
+    array_check_hook : function
         Function to apply to the resulting time lag result. This should take in the
-        result of the time lag selection and return something that an array that looks
-        like the time lag selection.
+        `lags` array and the indices that specify the location of the maximum of the
+        cross-correlation and return an array that has used those indices to select
+        the `lags` which maximize the cross-correlation. As an example, if `lags`
+        and `indices` are both `~numpy.ndarray` objects, this would just return
+        `lags[indices]`.
 
     Returns
     -------
@@ -208,16 +219,12 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
       ApJ, 753, 35, 2012
       (https://doi.org/10.1088/0004-637X/753/1/35)
     """
-    pre_check = kwargs.get("pre_check_hook", _dask_check)
-    post_check = kwargs.get("post_check_hook", lambda x: x)
+    array_check = kwargs.get("array_check_hook", _dask_check)
     lags = get_lags(time)
     cc = cross_correlation(signal_a, signal_b, lags)
     start, stop = _get_bounds_indices(lags, lag_bounds)
     i_max_cc = cc[start:stop].argmax(axis=0)
-    # The flatten + reshape is needed here because Dask does not like
-    # "fancy" multidimensional indexing
-    lags = pre_check(signal_a, lags)
-    return post_check(lags[start:stop][i_max_cc.flatten()].reshape(i_max_cc.shape))
+    return array_check(lags[start:stop], i_max_cc)
 
 
 @u.quantity_input
