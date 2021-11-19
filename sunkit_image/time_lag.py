@@ -109,11 +109,16 @@ def cross_correlation(signal_a, signal_b, lags: u.s):
     # Reverse the first timeseries
     signal_a = signal_a[::-1]
     # Normalize by mean and standard deviation
+    fill_value = signal_a.max()
     std_a = signal_a.std(axis=0)
-    std_a = np.where(std_a == 0, 1, std_a)  # avoid dividing by zero
+    # Avoid dividing by zero by replacing with some non-zero dummy value. Note that
+    # what this value is does not matter as it will be mulitplied by zero anyway
+    # since std_dev == 0 any place that signal - signal_mean == 0. We use the max
+    # of the signal as the fill_value in order to support Quantities.
+    std_a = np.where(std_a == 0, fill_value, std_a)
     v_a = (signal_a - signal_a.mean(axis=0)[np.newaxis]) / std_a[np.newaxis]
     std_b = signal_b.std(axis=0)
-    std_b = np.where(std_b == 0, 1, std_b)
+    std_b = np.where(std_b == 0, fill_value, std_b)
     v_b = (signal_b - signal_b.mean(axis=0)[np.newaxis]) / std_b[np.newaxis]
     # Cross-correlation is inverse of product of FFTS (by convolution theorem)
     fft_a = np.fft.rfft(v_a, axis=0, n=lags.shape[0])

@@ -94,6 +94,26 @@ def test_dask_numpy_consistent(shape_in):
 
 
 @pytest.mark.parametrize(
+    "shape_in",
+    [
+        ((20, 5, 5)),
+        ((100, 10)),
+        ((1000, 1)),
+    ],
+)
+def test_quantity_numpy_consistent(shape_in):
+    # Test that Quantities can be used as inputs for the signals and that
+    # it gives equivalent results to using bare numpy arrays
+    s_a = np.random.rand(*shape_in) * u.ct / u.s
+    s_b = np.random.rand(*shape_in) * u.ct / u.s
+    time = np.linspace(0, 1, shape_in[0]) * u.s
+    for func in [time_lag, max_cross_correlation]:
+        result_numpy = func(s_a.value, s_b.value, time)
+        result_quantity = func(s_a, s_b, time)
+        assert u.allclose(result_numpy, result_quantity, rtol=0.0, atol=None)
+
+
+@pytest.mark.parametrize(
     "shape_a,shape_b,lags,exception",
     [
         ((10, 1), (10, 1), np.array([-1, -0.5, 0.1, 1]) * u.s, "Lags must be evenly sampled"),
