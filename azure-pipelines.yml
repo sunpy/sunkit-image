@@ -46,7 +46,7 @@ stages:
             name: style_check
             pytest: false
             libraries: {}
-          - linux: py38
+          - linux: py310
 
   - stage: SecondPhaseTests
     displayName: Stage 2 Tests
@@ -67,7 +67,7 @@ stages:
           - linux: build_docs
             posargs: " "
             pytest: false
-          - linux: py38-online
+          - linux: py39-online
           - linux: py37-oldestdeps
 
   - ${{ if or(eq(variables['Build.Reason'], 'Schedule'), eq(variables['Build.Reason'], 'Manual')) }}:
@@ -82,7 +82,7 @@ stages:
           coverage: codecov
           toxdeps: tox-pypi-filter
           envs:
-            - linux: py38-devdeps
+            - linux: py310-devdeps
 
   # On branches which aren't main, and not Pull Requests, build the wheels but only upload them on tags
   - ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), or(ne(variables['Build.SourceBranchName'], 'main'), eq(variables['Build.Reason'], 'Schedule'), eq(variables['Build.Reason'], 'Manual'))) }}:

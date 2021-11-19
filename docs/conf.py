@@ -5,6 +5,7 @@ isort:skip_file
 # flake8: NOQA: E402
 
 # -- stdlib imports ------------------------------------------------------------
+import pathlib
 import os
 import sys
 import datetime
@@ -187,7 +188,6 @@ graphviz_dot_args = [
 ]
 
 # -- Options for the Sphinx gallery -------------------------------------------
-import pathlib
 
 path = pathlib.Path.cwd()
 example_dir = path.parent.joinpath("examples")
@@ -198,5 +198,7 @@ sphinx_gallery_conf = {
     "gallery_dirs": path.joinpath("generated", "gallery"),
     "default_thumb_file": path.joinpath("logo", "sunpy_icon_128x128.png"),
     "abort_on_example_error": False,
-    "plot_gallery": True,
+    "plot_gallery": "True",
+    "remove_config_comments": True,
+    "only_warn_on_example_error": True,
 }

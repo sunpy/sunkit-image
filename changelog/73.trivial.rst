@@ -1,1 +1,0 @@
-A warning is now raised if the input data to `~sunkit_image.enhance.mgn` contain any NaNs.

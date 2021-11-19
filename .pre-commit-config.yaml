@@ -1,6 +1,6 @@
 repos:
 -   repo: https://github.com/ambv/black
-    rev: 21.5b1
+    rev: 21.11b0
     hooks:
     - id: black
 -   repo: https://github.com/myint/autoflake
@@ -10,13 +10,13 @@ repos:
         args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|__init__.py|docs/conf.py)$"
 -   repo: https://github.com/timothycrosley/isort
-    rev: 5.8.0
+    rev: 5.10.1
     hooks:
       - id: isort
         args: ['--sp','setup.cfg']
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|docs/conf.py)$"
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.0
+    rev: v4.0.1
     hooks:
       - id: check-ast
       - id: check-case-conflict
