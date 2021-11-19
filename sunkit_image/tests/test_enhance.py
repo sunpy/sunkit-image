@@ -56,3 +56,9 @@ def test_multiscale_gaussian(map_test):
     expect4 = enhance.mgn(map_test)
 
     assert np.allclose(result2, expect4)
+
+
+def test_nans_raise_warning(map_test):
+    map_test[0, 0] = np.nan
+    with pytest.warns(UserWarning, match="One or more entries in the input data are NaN."):
+        _ = enhance.mgn(map_test)
