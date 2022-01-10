@@ -1,3 +1,5 @@
+ci:
+  autofix_prs: false
 repos:
 -   repo: https://github.com/psf/black
     rev: 21.12b0
