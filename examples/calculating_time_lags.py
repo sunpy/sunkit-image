@@ -31,7 +31,7 @@ from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correla
 
 
 def gaussian_pulse(x, x0, sigma):
-    return np.exp(-((x - x0) ** 2) / (2 * sigma ** 2))
+    return np.exp(-((x - x0) ** 2) / (2 * sigma**2))
 
 
 time = np.linspace(0, 1, 500) * u.s

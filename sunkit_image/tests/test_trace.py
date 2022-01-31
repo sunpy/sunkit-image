@@ -75,7 +75,7 @@ def test_occult2_remote(image_remote, filepath_IDL):
     # We devise one more test where we will find the distance between the Python and IDL points
     # For the algorithm to work correctly this distance should be very small.
     diff = coords_idl - coords_py
-    square_diff = diff ** 2
+    square_diff = diff**2
     sum_diff = np.sum(square_diff, axis=1)
 
     distance = np.sqrt(sum_diff)
