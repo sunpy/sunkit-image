@@ -114,7 +114,7 @@ def find_pixel_radii(smap, scale=None):
 
     # Calculate the radii of every pixel in helioprojective Cartesian
     # co-ordinate distance units.
-    radii = np.sqrt(coords.Tx ** 2 + coords.Ty ** 2)
+    radii = np.sqrt(coords.Tx**2 + coords.Ty**2)
 
     # Re-scale the output to solar radii
     if scale is None:

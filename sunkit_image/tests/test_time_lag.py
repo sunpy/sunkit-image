@@ -34,7 +34,7 @@ def test_max_cc_time_lag_array_shapes(shape):
 @pytest.mark.parametrize("shape", [((5, 5)), ((10,)), ((1,))])
 def test_time_lag_calculation(shape):
     def gaussian_pulse(x, x0, sigma):
-        return np.exp(-((x - x0) ** 2) / (2 * sigma ** 2))
+        return np.exp(-((x - x0) ** 2) / (2 * sigma**2))
 
     time = np.linspace(0, 1, 500) * u.s
     s_a = gaussian_pulse(time, 0.4 * u.s, 0.02 * u.s)

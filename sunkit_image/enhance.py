@@ -108,7 +108,7 @@ def mgn(
         # resulting image to give ‘local standard deviation’ image sigmaw
         # Refer to equation (2) in the paper
         conv = data - conv
-        ndimage.filters.gaussian_filter(conv ** 2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw)
+        ndimage.filters.gaussian_filter(conv**2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw)
         np.sqrt(sigmaw, out=sigmaw)
 
         # 5. Normalize the gaussian transformed image to give C_i.
