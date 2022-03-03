@@ -69,6 +69,8 @@ stages:
             pytest: false
           - linux: py39-online
           - linux: py37-oldestdeps
+          - windows: py39-conda
+            libraries: {}
 
   - ${{ if or(eq(variables['Build.Reason'], 'Schedule'), eq(variables['Build.Reason'], 'Manual')) }}:
     - stage: CronTests

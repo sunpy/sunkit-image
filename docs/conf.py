@@ -145,10 +145,7 @@ intersphinx_mapping = {
         "https://docs.scipy.org/doc/scipy/reference/",
         (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
     ),
-    "matplotlib": (
-        "https://matplotlib.org/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/matplotlib.inv"),
-    ),
+    "matplotlib": ("https://matplotlib.org/stable", None),
     "sunpy": (
         "https://sunpy.org/",
         (None, "https://docs.sunpy.org/en/stable/"),
