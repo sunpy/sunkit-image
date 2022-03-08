@@ -1,3 +1,11 @@
+0.3.2 (2022-03-08)
+==================
+
+Trivial/Internal Changes
+------------------------
+
+- Minor changes to ensure that sunkit-image is buildable on conda-forge.
+
 0.3.1 (2021-11-19)
 ==================
 

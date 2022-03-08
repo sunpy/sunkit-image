@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pytest
 
 import sunpy
+from sunpy.tests.helpers import skip_windows  # NOQA
 
 import sunkit_image
 
