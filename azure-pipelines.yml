@@ -42,10 +42,6 @@ stages:
         coverage: codecov
         toxdeps: tox-pypi-filter
         envs:
-          - linux: codestyle
-            name: style_check
-            pytest: false
-            libraries: {}
           - linux: py310
 
   - stage: SecondPhaseTests
@@ -69,7 +65,7 @@ stages:
             pytest: false
           - linux: py39-online
           - linux: py37-oldestdeps
-          - windows: py39-conda
+          - linux: py39-conda
             libraries: {}
 
   - ${{ if or(eq(variables['Build.Reason'], 'Schedule'), eq(variables['Build.Reason'], 'Manual')) }}:
