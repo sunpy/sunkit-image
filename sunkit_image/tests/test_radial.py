@@ -8,7 +8,7 @@ import sunpy.map
 
 import sunkit_image.radial as rad
 import sunkit_image.utils as utils
-from sunkit_image.tests.helpers import figure_test
+from sunkit_image.tests.helpers import figure_test, skip_windows
 
 
 @pytest.fixture
@@ -262,6 +262,7 @@ def test_normalize_fit_radial_intensity():
     assert np.allclose(rad.normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)
 
 
+@skip_windows
 def test_intensity_enhance(map_test1):
     degree = 1
     fit_range = [1, 1.5] * u.R_sun
