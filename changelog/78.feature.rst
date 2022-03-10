@@ -1,0 +1,1 @@
+Add the `~sunkit_image.coalignment` module ported from `~sunpy.image.coalignment`.
