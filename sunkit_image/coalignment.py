@@ -23,17 +23,23 @@ from scipy.ndimage import shift
 from skimage.feature import match_template
 
 import astropy.units as u
-
 import sunpy.map
 from sunpy.map.mapbase import GenericMap
 from sunpy.util.exceptions import warn_user
 
-__all__ = ['calculate_shift', 'clip_edges', 'calculate_clipping',
-           'match_template_to_layer', 'find_best_match_location',
-           'get_correlation_shifts', 'parabolic_turning_point',
-           'check_for_nonfinite_entries',
-           'apply_shifts', 'mapsequence_coalign_by_match_template',
-           'calculate_match_template_shift']
+__all__ = [
+    "calculate_shift",
+    "clip_edges",
+    "calculate_clipping",
+    "match_template_to_layer",
+    "find_best_match_location",
+    "get_correlation_shifts",
+    "parabolic_turning_point",
+    "check_for_nonfinite_entries",
+    "apply_shifts",
+    "mapsequence_coalign_by_match_template",
+    "calculate_match_template_shift",
+]
 
 
 def _default_fmap_function(data):
@@ -102,8 +108,9 @@ def clip_edges(data, yclips: u.pix, xclips: u.pix):
     nx = data.shape[1]
     # The purpose of the int below is to ensure integer type since by default
     # astropy quantities are converted to floats.
-    return data[int(yclips[0].value): ny - int(yclips[1].value),
-                int(xclips[0].value): nx - int(xclips[1].value)]
+    return data[
+        int(yclips[0].value) : ny - int(yclips[1].value), int(xclips[0].value) : nx - int(xclips[1].value)
+    ]
 
 
 @u.quantity_input
@@ -135,8 +142,10 @@ def calculate_clipping(y: u.pix, x: u.pix):
         columns). The parameters ``y0, y1, x0, x1`` have the type
         `~astropy.units.Quantity`.
     """
-    return ([_lower_clip(y.value), _upper_clip(y.value)] * u.pix,
-            [_lower_clip(x.value), _upper_clip(x.value)] * u.pix)
+    return (
+        [_lower_clip(y.value), _upper_clip(y.value)] * u.pix,
+        [_lower_clip(x.value), _upper_clip(x.value)] * u.pix,
+    )
 
 
 def _upper_clip(z):
@@ -205,8 +214,10 @@ def find_best_match_location(corr):
     cor_max_x, cor_max_y = ij[::-1]
 
     # Get the correlation function around the maximum
-    array_maximum = corr[np.max([0, cor_max_y - 1]): np.min([cor_max_y + 2, corr.shape[0] - 1]),
-                         np.max([0, cor_max_x - 1]): np.min([cor_max_x + 2, corr.shape[1] - 1])]
+    array_maximum = corr[
+        np.max([0, cor_max_y - 1]) : np.min([cor_max_y + 2, corr.shape[0] - 1]),
+        np.max([0, cor_max_x - 1]) : np.min([cor_max_x + 2, corr.shape[1] - 1]),
+    ]
     y_shift_maximum, x_shift_maximum = get_correlation_shifts(array_maximum)
 
     # Get shift relative to correlation array
@@ -297,18 +308,22 @@ def check_for_nonfinite_entries(layer_image, template_image):
         A two-dimensional `numpy.ndarray`.
     """
     if not np.all(np.isfinite(layer_image)):
-        warn_user('The layer image has nonfinite entries. '
-                  'This could cause errors when calculating shift between two '
-                  'images. Please make sure there are no infinity or '
-                  'Not a Number values. For instance, replacing them with a '
-                  'local mean.')
+        warn_user(
+            "The layer image has nonfinite entries. "
+            "This could cause errors when calculating shift between two "
+            "images. Please make sure there are no infinity or "
+            "Not a Number values. For instance, replacing them with a "
+            "local mean."
+        )
 
     if not np.all(np.isfinite(template_image)):
-        warn_user('The template image has nonfinite entries. '
-                  'This could cause errors when calculating shift between two '
-                  'images. Please make sure there are no infinity or '
-                  'Not a Number values. For instance, replacing them with a '
-                  'local mean.')
+        warn_user(
+            "The template image has nonfinite entries. "
+            "This could cause errors when calculating shift between two "
+            "images. Please make sure there are no infinity or "
+            "Not a Number values. For instance, replacing them with a "
+            "local mean."
+        )
 
 
 @u.quantity_input
@@ -356,11 +371,11 @@ def apply_shifts(mc, yshift: u.pix, xshift: u.pix, clip=True, **kwargs):
         # portion of the data.
         if clip:
             shifted_data = clip_edges(shifted_data, yclips, xclips)
-            new_meta['naxis1'] = shifted_data.shape[1]
-            new_meta['naxis2'] = shifted_data.shape[0]
+            new_meta["naxis1"] = shifted_data.shape[1]
+            new_meta["naxis2"] = shifted_data.shape[0]
             # Add one to go from zero-based to one-based indexing
-            new_meta['crpix1'] = m.reference_pixel.x.value + 1 + xshift[i].value - xshift[0].value
-            new_meta['crpix2'] = m.reference_pixel.y.value + 1 + yshift[i].value - yshift[0].value
+            new_meta["crpix1"] = m.reference_pixel.x.value + 1 + xshift[i].value - xshift[0].value
+            new_meta["crpix2"] = m.reference_pixel.y.value + 1 + yshift[i].value - yshift[0].value
 
         new_map = sunpy.map.Map(shifted_data, new_meta)
 
@@ -370,8 +385,7 @@ def apply_shifts(mc, yshift: u.pix, xshift: u.pix, clip=True, **kwargs):
     return sunpy.map.Map(new_mc, sequence=True)
 
 
-def calculate_match_template_shift(mc, template=None, layer_index=0,
-                                   func=_default_fmap_function):
+def calculate_match_template_shift(mc, template=None, layer_index=0, func=_default_fmap_function):
     """
     Calculate the arcsecond shifts necessary to co-register the layers in a
     `~sunpy.map.MapSequence` according to a template taken from that
@@ -415,14 +429,13 @@ def calculate_match_template_shift(mc, template=None, layer_index=0,
     # Calculate a template.  If no template is passed then define one
     # from the index layer.
     if template is None:
-        tplate = mc.maps[layer_index].data[int(ny/4): int(3*ny/4),
-                                           int(nx/4): int(3*nx/4)]
+        tplate = mc.maps[layer_index].data[int(ny / 4) : int(3 * ny / 4), int(nx / 4) : int(3 * nx / 4)]
     elif isinstance(template, GenericMap):
         tplate = template.data
     elif isinstance(template, np.ndarray):
         tplate = template
     else:
-        raise ValueError('Invalid template.')
+        raise ValueError("Invalid template.")
 
     # Apply the function to the template
     tplate = func(tplate)
@@ -461,9 +474,9 @@ def calculate_match_template_shift(mc, template=None, layer_index=0,
 
 
 # Coalignment by matching a template
-def mapsequence_coalign_by_match_template(mc, template=None, layer_index=0,
-                                          func=_default_fmap_function, clip=True,
-                                          shift=None, **kwargs):
+def mapsequence_coalign_by_match_template(
+    mc, template=None, layer_index=0, func=_default_fmap_function, clip=True, shift=None, **kwargs
+):
     """
     Co-register the layers in a `~sunpy.map.MapSequence` according to a
     template taken from that `~sunpy.map.MapSequence`. This method REQUIRES
@@ -540,19 +553,17 @@ def mapsequence_coalign_by_match_template(mc, template=None, layer_index=0,
     yshift_keep = np.zeros_like(xshift_keep)
 
     if shift is None:
-        shifts = calculate_match_template_shift(mc, template=template,
-                                                layer_index=layer_index,
-                                                func=func)
-        xshift_arcseconds = shifts['x']
-        yshift_arcseconds = shifts['y']
+        shifts = calculate_match_template_shift(mc, template=template, layer_index=layer_index, func=func)
+        xshift_arcseconds = shifts["x"]
+        yshift_arcseconds = shifts["y"]
     else:
-        xshift_arcseconds = shift['x']
-        yshift_arcseconds = shift['y']
+        xshift_arcseconds = shift["x"]
+        yshift_arcseconds = shift["y"]
 
     # Calculate the pixel shifts
     for i, m in enumerate(mc):
-        xshift_keep[i] = (xshift_arcseconds[i] / m.scale[0])
-        yshift_keep[i] = (yshift_arcseconds[i] / m.scale[1])
+        xshift_keep[i] = xshift_arcseconds[i] / m.scale[0]
+        yshift_keep[i] = yshift_arcseconds[i] / m.scale[1]
 
     # Apply the shifts and return the coaligned mapsequence
     return apply_shifts(mc, -yshift_keep, -xshift_keep, clip=clip, **kwargs)
