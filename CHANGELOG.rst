@@ -1,3 +1,12 @@
+0.4.0 (2022-03-11)
+==================
+
+Features
+--------
+
+- Add the `~sunkit_image.coalignment` module ported from `~sunpy.image.coalignment`. (`#78 <https://github.com/sunpy/sunkit-image/pull/78>`__)
+
+
 0.3.2 (2022-03-08)
 ==================
 
