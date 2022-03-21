@@ -1,0 +1,116 @@
+version: 2.1
+
+no-backports: &no-backports
+  name: Skip any branches called cherry-pick
+  command: |
+    if [[ "${CIRCLE_BRANCH}" == *"cherry-pick"* || "${CIRCLE_BRANCH}" == *"backport"* ]]; then
+      circleci step halt
+    fi
+
+skip-check: &skip-check
+  name: Check for [ci skip]
+  command: bash .circleci/early_exit.sh
+
+merge-check: &merge-check
+  name: Check if we need to merge upstream main
+  command: |
+    if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
+      git fetch origin --tags
+      git fetch origin +refs/pull/$CIRCLE_PR_NUMBER/merge:pr/$CIRCLE_PR_NUMBER/merge
+      git checkout -qf pr/$CIRCLE_PR_NUMBER/merge
+    fi
+
+apt-run: &apt-install
+  name: Install apt packages
+  command: |
+    sudo apt update
+    sudo apt install -y graphviz build-essential libopenjp2-7 python3-dev
+
+jobs:
+  figure:
+    parameters:
+      jobname:
+        type: string
+    docker:
+      - image: circleci/python:3.8
+    environment:
+      TOXENV=<< parameters.jobname >>
+    steps:
+      - run: *no-backports
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: *apt-install
+      - run: pip install --user -U tox tox-pypi-filter
+      - run: tox
+      - run: curl -s https://codecov.io/bash | bash
+      - store_artifacts:
+          path: .tmp/<< parameters.jobname >>/figure_test_images
+      - run:
+          name: "Image comparison page is available at: "
+          command: echo "${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/.tmp/${TOXENV}/figure_test_images/fig_comparison.html"
+
+  deploy-reference-images:
+    parameters:
+      jobname:
+        type: string
+    docker:
+      - image: circleci/python:3.8
+    environment:
+      TOXENV: << parameters.jobname >>
+      GIT_SSH_COMMAND: ssh -i ~/.ssh/id_rsa_6464b6a8248237ca368fd4690777d921
+    steps:
+      - checkout
+      - run: *skip-check
+      - run: *merge-check
+      - run: *apt-install
+      # Clear out all the ssh keys so that it always uses the write deploy key
+      - run: ssh-add -D
+      # Add private key for deploying to the figure tests repo
+      - add_ssh_keys:
+          fingerprints: "64:64:b6:a8:24:82:37:ca:36:8f:d4:69:07:77:d9:21"
+      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run: git config --global user.email "sunpy@circleci" && git config --global user.name "SunPy Circle CI"
+      - run: git clone git@github.com:sunpy/sunpy-figure-tests.git --depth 1 -b sunkit-image-${CIRCLE_BRANCH} ~/sunpy-figure-tests/
+      # Generate Reference images
+      - run: pip install --user -U tox tox-pypi-filter
+      - run: tox -- --mpl-generate-path=/home/circleci/sunpy-figure-tests/figures/$TOXENV | tee toxlog
+      - run: |
+          hashlib=$(grep "^figure_hashes.*\.json$" toxlog)
+          cp ./sunkit_image/tests/$hashlib /home/circleci/sunpy-figure-tests/figures/$TOXENV/
+      - run: |
+          cd ~/sunpy-figure-tests/
+          git pull
+          git status
+          git add .
+          git commit -m "Update reference figures from ${CIRCLE_BRANCH}" || echo "No changes to reference images to deploy"
+          git push
+
+workflows:
+  version: 2
+
+  figure-tests:
+    jobs:
+      - figure:
+          name: << matrix.jobname >>
+          matrix:
+            parameters:
+              jobname:
+                - "py38-figure"
+
+      - deploy-reference-images:
+          name: baseline-<< matrix.jobname >>
+          matrix:
+            parameters:
+              jobname:
+                - "py38-figure"
+          requires:
+            - "py38-figure"
+          filters:
+            branches:
+              only:
+                - main
+
+notify:
+  webhooks:
+    - url: https://giles.cadair.dev/circleci
