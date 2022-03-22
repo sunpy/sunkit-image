@@ -412,15 +412,15 @@ def aia171_test_mapsequence(aia171_test_submap):
     return sunpy.map.Map([aia171_test_submap, m2, m3], sequence=True)
 
 
-# Known displacements for these mapsequence layers when the layer index is set to 0
 @pytest.fixture
 def known_displacements_layer_index0():
+    # Known displacements for these mapsequence layers when the layer index is set to 0
     return {"x": np.asarray([0.0, -9.827465, -19.676442]), "y": np.asarray([0.0, 0.251137, 0.490014])}
 
 
-# Known displacements for these mapsequence layers when the layer index is set to 1
 @pytest.fixture
 def known_displacements_layer_index1():
+    # Known displacements for these mapsequence layers when the layer index is set to 1
     return {"x": np.asarray([9.804878, 0.0, -9.827465]), "y": np.asarray([-0.263369, 0.0, 0.251137])}
 
 

@@ -608,25 +608,19 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
         `sunpy.physics.differential_rotation.solar_rotate_coordinate`.
     Returns
     -------
-    x, y : `~astropy.units.Quantity`, ~astropy.units.Quantity`
+    `~astropy.units.Quantity`, ~astropy.units.Quantity`
         The shifts relative to the index layer that can be applied
         to the input mapsequence in order to compensate for solar rotation.
         The shifts are given in arcseconds as understood in helioprojective
         coordinates systems.
     """
-    # Size of the data
     nt = len(mc.maps)
-
-    # Storage for the shifts in arcseconds
     xshift_arcseconds = np.zeros(nt) * u.arcsec
     yshift_arcseconds = np.zeros_like(xshift_arcseconds)
-
-    # Layer that
     rotate_to_this_layer = mc.maps[layer_index]
 
-    # Calculate the rotations and the shifts
     for i, m in enumerate(mc):
-        # Skip the reference layer
+        # The shift of the reference layer is always zero by definition.
         if i == layer_index:
             continue
 
@@ -637,7 +631,6 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
             m.center, observer=rotate_to_this_layer.observer_coordinate, **kwargs
         )
 
-        # Calculate the shift in arcseconds
         xshift_arcseconds[i] = new_coordinate.Tx - rotate_to_this_layer.center.Tx
         yshift_arcseconds[i] = new_coordinate.Ty - rotate_to_this_layer.center.Ty
 
@@ -647,9 +640,10 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
 def mapsequence_coalign_by_rotation(mc, layer_index=0, clip=True, shift=None, **kwargs):
     """
     Move the layers in a mapsequence according to the input shifts.
+
     If an input shift is not given, the shifts due to
     solar rotation relative to an index layer is calculated and
-    applied.  When using this functionality, it is a good idea to check
+    applied. When using this functionality, it is a good idea to check
     that the shifts that were applied to were reasonable and expected.
     One way of checking this is to animate the original mapsequence, animate
     the derotated mapsequence, and compare the differences you see to the
@@ -662,17 +656,17 @@ def mapsequence_coalign_by_rotation(mc, layer_index=0, clip=True, shift=None, **
         the mapsequence.
     layer_index : int
         Solar derotation shifts of all maps in the mapsequence are assumed
-        to be relative to the layer in the mapsequence indexed by layer_index.
+        to be relative to the layer in the mapsequence indexed by ``layer_index``.
     clip : bool
         If True, then clip off x, y edges in the datasequence that are potentially
         affected by edges effects.
     ``**kwargs``
-        These keywords are passed to the function
-        `sunpy.physics.solar_rotation.calculate_solar_rotate_shift`.
+        These keywords are passed to
+        `~sunkit_image.coalignment.calculate_solar_rotate_shift`.
 
     Returns
     -------
-    output : `sunpy.map.MapSequence`
+    `sunpy.map.MapSequence`
         The results of the shifts applied to the input mapsequence.
 
     Examples
@@ -686,25 +680,17 @@ def mapsequence_coalign_by_rotation(mc, layer_index=0, clip=True, shift=None, **
     >>> derotated_mc = mapsequence_solar_derotate(mc, layer_index=-1)  # doctest: +SKIP
     >>> derotated_mc = mapsequence_solar_derotate(mc, clip=False)  # doctest: +SKIP
     """
-
-    # Size of the data
     nt = len(mc.maps)
-
-    # Storage for the pixel shifts and the shifts in arcseconds
     xshift_keep = np.zeros(nt) * u.pix
     yshift_keep = np.zeros_like(xshift_keep)
 
-    # If no shifts are passed in, calculate them.  Otherwise,
-    # use the shifts passed in.
     if shift is None:
         shift = calculate_solar_rotate_shift(mc, layer_index=layer_index, **kwargs)
     xshift_arcseconds = shift["x"]
     yshift_arcseconds = shift["y"]
 
-    # Calculate the pixel shifts
     for i, m in enumerate(mc):
         xshift_keep[i] = xshift_arcseconds[i] / m.scale[0]
         yshift_keep[i] = yshift_arcseconds[i] / m.scale[1]
 
-    # Apply the pixel shifts and return the mapsequence
     return apply_shifts(mc, yshift_keep, xshift_keep, clip=clip)
