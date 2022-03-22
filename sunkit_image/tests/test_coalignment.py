@@ -26,7 +26,7 @@ from sunkit_image.coalignment import (
     find_best_match_location,
     get_correlation_shifts,
     mapsequence_coalign_by_match_template,
-    mapsequence_solar_derotate,
+    mapsequence_coalign_by_rotation,
     match_template_to_layer,
     parabolic_turning_point,
 )
@@ -450,7 +450,7 @@ def test_calculate_solar_rotate_shift(
 
 def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap):
     # Test that a mapsequence is returned when the clipping is False.
-    tmc = mapsequence_solar_derotate(aia171_test_mapsequence, clip=False)
+    tmc = mapsequence_coalign_by_rotation(aia171_test_mapsequence, clip=False)
     assert isinstance(tmc, sunpy.map.MapSequence)
 
     # Test that all entries have the same shape when clipping is False
@@ -458,7 +458,7 @@ def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap)
         assert m.data.shape == aia171_test_submap.data.shape
 
     # Test that a mapsequence is returned on default clipping (clipping is True)
-    tmc = mapsequence_solar_derotate(aia171_test_mapsequence)
+    tmc = mapsequence_coalign_by_rotation(aia171_test_mapsequence)
     assert isinstance(tmc, sunpy.map.MapSequence)
 
     # Test that the shape of data is correct when clipped
@@ -468,7 +468,7 @@ def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap)
 
     # Test that the returned reference pixels are correctly displaced.
     layer_index = 0
-    derotated = mapsequence_solar_derotate(aia171_test_mapsequence, clip=True, layer_index=layer_index)
+    derotated = mapsequence_coalign_by_rotation(aia171_test_mapsequence, clip=True, layer_index=layer_index)
     tshift = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=layer_index)
     derotated_reference_pixel_at_layer_index = derotated[layer_index].reference_pixel
     for i, m_derotated in enumerate(derotated):

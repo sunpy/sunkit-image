@@ -1,20 +1,7 @@
 """
 This module provides routines for the co-alignment of images and
-`~sunpy.map.mapsequence.MapSequence`.
-
-Currently this module provides image co-alignment by template matching.
-Which is partially inspired by the SSWIDL routine
-`tr_get_disp.pro <http://www.heliodocs.com/php/xdoc_print.php?file=$SSW/trace/idl/util/tr_get_disp.pro>`__.
-
-In this implementation, the template matching is handled via the scikit-image
-routine `skimage.feature.match_template`.
-
-References
-----------
-* http://scribblethink.org/Work/nvisionInterface/nip.html
-* J.P. Lewis, Fast Template Matching, Vision Interface 95, Canadian Image
-   Processing and Pattern Recognition Society, Quebec City, Canada, May 15-19,
-   1995, p. 120-123 http://www.scribblethink.org/Work/nvisionInterface/vi95_lewis.pdf.
+`~sunpy.map.mapsequence.MapSequence` objects through both template
+matching and corrections due to solar rotation.
 """
 from copy import deepcopy
 
@@ -43,7 +30,7 @@ __all__ = [
     "mapsequence_coalign_by_match_template",
     "calculate_match_template_shift",
     "calculate_solar_rotate_shift",
-    "mapsequence_solar_derotate",
+    "mapsequence_coalign_by_rotation",
 ]
 
 
@@ -478,18 +465,24 @@ def calculate_match_template_shift(mc, template=None, layer_index=0, func=_defau
     return {"x": xshift_arcseconds, "y": yshift_arcseconds}
 
 
-# Coalignment by matching a template
 def mapsequence_coalign_by_match_template(
     mc, template=None, layer_index=0, func=_default_fmap_function, clip=True, shift=None, **kwargs
 ):
     """
     Co-register the layers in a `~sunpy.map.MapSequence` according to a
-    template taken from that `~sunpy.map.MapSequence`. This method REQUIRES
-    that scikit-image be installed. When using this functionality, it is a good
-    idea to check that the shifts that were applied to were reasonable and
+    template taken from that `~sunpy.map.MapSequence`.
+
+    When using this functionality, it is a good
+    idea to check that the shifts that were applied were reasonable and
     expected. One way of checking this is to animate the original
     `~sunpy.map.MapSequence`, animate the coaligned `~sunpy.map.MapSequence`,
     and compare the differences you see to the calculated shifts.
+
+    Currently this module provides image co-alignment by template matching.
+    and is partially inspired by the SSWIDL routine
+    `tr_get_disp.pro <http://www.heliodocs.com/php/xdoc_print.php?file=$SSW/trace/idl/util/tr_get_disp.pro>`__.
+    In this implementation, the template matching is handled via
+    `skimage.feature.match_template`.
 
     Parameters
     ----------
@@ -533,7 +526,7 @@ def mapsequence_coalign_by_match_template(
 
     Notes
     -----
-    The remaining keyword arguments are sent to `sunpy.image.coalignment.apply_shifts`.
+    The remaining keyword arguments are sent to `~sunkit_image.coalignment.apply_shifts`.
 
     Returns
     -------
@@ -549,6 +542,13 @@ def mapsequence_coalign_by_match_template(
     >>> coaligned_mc = mc_coalign(mc, template=sunpy_map)   # doctest: +SKIP
     >>> coaligned_mc = mc_coalign(mc, template=two_dimensional_ndarray)   # doctest: +SKIP
     >>> coaligned_mc = mc_coalign(mc, func=np.log)   # doctest: +SKIP
+
+    References
+    ----------
+    * http://scribblethink.org/Work/nvisionInterface/nip.html
+    * J.P. Lewis, Fast Template Matching, Vision Interface 95, Canadian Image
+    Processing and Pattern Recognition Society, Quebec City, Canada, May 15-19,
+    1995, p. 120-123 http://www.scribblethink.org/Work/nvisionInterface/vi95_lewis.pdf.
     """
     # Number of maps
     nt = len(mc.maps)
@@ -641,7 +641,7 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
     return {"x": xshift_arcseconds, "y": yshift_arcseconds}
 
 
-def mapsequence_solar_derotate(mc, layer_index=0, clip=True, shift=None, **kwargs):
+def mapsequence_coalign_by_rotation(mc, layer_index=0, clip=True, shift=None, **kwargs):
     """
     Move the layers in a mapsequence according to the input shifts.
     If an input shift is not given, the shifts due to
