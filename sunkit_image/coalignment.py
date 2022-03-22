@@ -3,6 +3,7 @@ This module provides routines for the co-alignment of images and
 `~sunpy.map.mapsequence.MapSequence` objects through both template
 matching and corrections due to solar rotation.
 """
+import warnings
 from copy import deepcopy
 
 import numpy as np
@@ -13,7 +14,7 @@ import astropy.units as u
 import sunpy.map
 from sunpy.map.mapbase import GenericMap
 from sunpy.physics.differential_rotation import solar_rotate_coordinate
-from sunpy.util.exceptions import warn_user
+from sunpy.util.exceptions import SunpyUserWarning
 
 __author__ = "J. Ireland"
 
@@ -300,21 +301,23 @@ def check_for_nonfinite_entries(layer_image, template_image):
         A two-dimensional `numpy.ndarray`.
     """
     if not np.all(np.isfinite(layer_image)):
-        warn_user(
+        warnings.warn(
             "The layer image has nonfinite entries. "
             "This could cause errors when calculating shift between two "
             "images. Please make sure there are no infinity or "
             "Not a Number values. For instance, replacing them with a "
-            "local mean."
+            "local mean.",
+            SunpyUserWarning,
         )
 
     if not np.all(np.isfinite(template_image)):
-        warn_user(
+        warnings.warn(
             "The template image has nonfinite entries. "
             "This could cause errors when calculating shift between two "
             "images. Please make sure there are no infinity or "
             "Not a Number values. For instance, replacing them with a "
-            "local mean."
+            "local mean.",
+            SunpyUserWarning,
         )
 
 
