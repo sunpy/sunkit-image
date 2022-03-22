@@ -1,5 +1,6 @@
 import os
 import warnings
+from copy import deepcopy
 
 import numpy as np
 import pytest
@@ -8,23 +9,27 @@ from scipy.ndimage import shift as sp_shift
 
 import astropy.units as u
 import sunpy.data.test
-from sunpy.image.coalignment import (
+from astropy.coordinates import SkyCoord
+from sunpy.map import Map, MapSequence
+from sunpy.util import SunpyUserWarning
+
+from sunkit_image.coalignment import (
     _default_fmap_function,
     _lower_clip,
     _upper_clip,
     apply_shifts,
     calculate_clipping,
     calculate_match_template_shift,
+    calculate_solar_rotate_shift,
     check_for_nonfinite_entries,
     clip_edges,
     find_best_match_location,
     get_correlation_shifts,
     mapsequence_coalign_by_match_template,
+    mapsequence_solar_derotate,
     match_template_to_layer,
     parabolic_turning_point,
 )
-from sunpy.map import Map, MapSequence
-from sunpy.util import SunpyUserWarning
 
 
 @pytest.fixture
@@ -387,3 +392,90 @@ def test_apply_shifts(aia171_test_map):
     )
     test_mc2 = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"], clip=False)
     assert np.all(test_mc1[1].data[:, -1] != test_mc2[1].data[:, -1])
+
+
+@pytest.fixture
+def aia171_test_submap(aia171_test_map):
+    return aia171_test_map.submap(
+        SkyCoord(((0, 0), (400, 500)) * u.arcsec, frame=aia171_test_map.coordinate_frame)
+    )
+
+
+@pytest.fixture
+def aia171_test_mapsequence(aia171_test_submap):
+    m2header = deepcopy(aia171_test_submap.meta)
+    m2header["date-obs"] = "2011-02-15T01:00:00.34"
+    m2 = sunpy.map.Map((aia171_test_submap.data, m2header))
+    m3header = deepcopy(aia171_test_submap.meta)
+    m3header["date-obs"] = "2011-02-15T02:00:00.34"
+    m3 = sunpy.map.Map((aia171_test_submap.data, m3header))
+    return sunpy.map.Map([aia171_test_submap, m2, m3], sequence=True)
+
+
+# Known displacements for these mapsequence layers when the layer index is set to 0
+@pytest.fixture
+def known_displacements_layer_index0():
+    return {"x": np.asarray([0.0, -9.827465, -19.676442]), "y": np.asarray([0.0, 0.251137, 0.490014])}
+
+
+# Known displacements for these mapsequence layers when the layer index is set to 1
+@pytest.fixture
+def known_displacements_layer_index1():
+    return {"x": np.asarray([9.804878, 0.0, -9.827465]), "y": np.asarray([-0.263369, 0.0, 0.251137])}
+
+
+def test_calculate_solar_rotate_shift(
+    aia171_test_mapsequence, known_displacements_layer_index0, known_displacements_layer_index1
+):
+    # Test that the default works
+    test_output = calculate_solar_rotate_shift(aia171_test_mapsequence)
+    assert_allclose(
+        test_output["x"].to("arcsec").value, known_displacements_layer_index0["x"], rtol=5e-2, atol=1e-5
+    )
+    assert_allclose(
+        test_output["y"].to("arcsec").value, known_displacements_layer_index0["y"], rtol=5e-2, atol=1e-5
+    )
+
+    # Test that the rotation relative to a nonzero layer_index works
+    test_output = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=1)
+    print(test_output["x"].to("arcsec").value)
+    print(test_output["y"].to("arcsec").value)
+    assert_allclose(
+        test_output["x"].to("arcsec").value, known_displacements_layer_index1["x"], rtol=5e-2, atol=1e-5
+    )
+    assert_allclose(
+        test_output["y"].to("arcsec").value, known_displacements_layer_index1["y"], rtol=5e-2, atol=1e-5
+    )
+
+
+def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap):
+    # Test that a mapsequence is returned when the clipping is False.
+    tmc = mapsequence_solar_derotate(aia171_test_mapsequence, clip=False)
+    assert isinstance(tmc, sunpy.map.MapSequence)
+
+    # Test that all entries have the same shape when clipping is False
+    for m in tmc:
+        assert m.data.shape == aia171_test_submap.data.shape
+
+    # Test that a mapsequence is returned on default clipping (clipping is True)
+    tmc = mapsequence_solar_derotate(aia171_test_mapsequence)
+    assert isinstance(tmc, sunpy.map.MapSequence)
+
+    # Test that the shape of data is correct when clipped
+    clipped_shape = (26, 20)
+    for m in tmc:
+        assert m.data.shape == clipped_shape
+
+    # Test that the returned reference pixels are correctly displaced.
+    layer_index = 0
+    derotated = mapsequence_solar_derotate(aia171_test_mapsequence, clip=True, layer_index=layer_index)
+    tshift = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=layer_index)
+    derotated_reference_pixel_at_layer_index = derotated[layer_index].reference_pixel
+    for i, m_derotated in enumerate(derotated):
+        for i_s, s in enumerate(["x", "y"]):
+            diff_in_rotated_reference_pixel = (
+                derotated[i].reference_pixel[i_s] - derotated_reference_pixel_at_layer_index[i_s]
+            )
+            diff_arcsec = tshift[s][i] - tshift[s][layer_index]
+            diff_pixel = diff_arcsec / m.scale[0]
+            u.assert_quantity_allclose(diff_in_rotated_reference_pixel, diff_pixel, rtol=5e-2)
