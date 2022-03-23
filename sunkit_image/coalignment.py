@@ -550,8 +550,8 @@ def mapsequence_coalign_by_match_template(
     ----------
     * http://scribblethink.org/Work/nvisionInterface/nip.html
     * J.P. Lewis, Fast Template Matching, Vision Interface 95, Canadian Image
-    Processing and Pattern Recognition Society, Quebec City, Canada, May 15-19,
-    1995, p. 120-123 http://www.scribblethink.org/Work/nvisionInterface/vi95_lewis.pdf.
+      Processing and Pattern Recognition Society, Quebec City, Canada, May 15-19,
+      1995, p. 120-123 http://www.scribblethink.org/Work/nvisionInterface/vi95_lewis.pdf.
     """
     # Number of maps
     nt = len(mc.maps)
