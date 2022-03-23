@@ -10,6 +10,7 @@ from scipy.ndimage import shift as sp_shift
 import astropy.units as u
 import sunpy.data.test
 from astropy.coordinates import SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
 from sunpy.map import Map, MapSequence
 from sunpy.util import SunpyUserWarning
 
@@ -478,4 +479,4 @@ def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap)
             )
             diff_arcsec = tshift[s][i] - tshift[s][layer_index]
             diff_pixel = diff_arcsec / m.scale[0]
-            u.assert_quantity_allclose(diff_in_rotated_reference_pixel, diff_pixel, rtol=5e-2)
+            assert_quantity_allclose(diff_in_rotated_reference_pixel, diff_pixel, rtol=5e-2)
