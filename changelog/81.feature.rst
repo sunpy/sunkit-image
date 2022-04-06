@@ -1,3 +1,0 @@
-Add `~sunkit_image.coalignment.calculate_solar_rotate_shift` and
-`~sunkit_image.coalignment.mapsequence_solar_derotate` to
-the `sunkit_image.coalignment` module.

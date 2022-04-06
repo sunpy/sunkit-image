@@ -1,3 +1,14 @@
+0.4.1 (2022-04-05)
+==================
+
+Features
+--------
+
+- Add `~sunkit_image.coalignment.calculate_solar_rotate_shift` and
+  `~sunkit_image.coalignment.mapsequence_solar_derotate` to
+  the `sunkit_image.coalignment` module. (`#81 <https://github.com/sunpy/sunkit-image/pull/81>`__)
+
+
 0.4.0 (2022-03-11)
 ==================
 
