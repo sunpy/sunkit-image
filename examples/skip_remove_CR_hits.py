@@ -32,7 +32,7 @@ instrument = a.Instrument("LASCO")
 detector = a.Detector("C2")
 result = Fido.search(time_range, instrument)
 
-downloaded_files = Fido.fetch(result[0])
+downloaded_files = Fido.fetch(result)
 data, header = read_file(downloaded_files[0])[0]
 
 # Add the missing meta information to the header
