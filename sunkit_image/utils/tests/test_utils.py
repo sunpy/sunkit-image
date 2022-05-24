@@ -134,9 +134,7 @@ def test_get_radial_intensity_summary(smap):
         warnings.simplefilter("ignore", category=RuntimeWarning)
         expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(0, nbins)])
 
-    assert np.allclose(
-        utils.get_radial_intensity_summary(smap=smap, radial_bin_edges=radial_bin_edges), expected
-    )
+    assert np.allclose(utils.get_radial_intensity_summary(smap=smap, radial_bin_edges=radial_bin_edges), expected)
 
 
 def test_calculate_gamma():

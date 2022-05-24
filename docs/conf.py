@@ -1,5 +1,6 @@
 """
 Configuration file for the Sphinx documentation builder.
+
 isort:skip_file
 """
 # flake8: NOQA: E402

@@ -25,9 +25,9 @@ def get_hash_library_name():
 def figure_test(test_function):
     """
     A decorator which marks the test as comparing the hash of the returned
-    figure to the hash library in the repository.
-    A `matplotlib.figure.Figure` object should be returned or ``plt.gcf()``
-    will be called to get the figure object to compare to.
+    figure to the hash library in the repository. A `matplotlib.figure.Figure`
+    object should be returned or ``plt.gcf()`` will be called to get the figure
+    object to compare to.
 
     Examples
     --------

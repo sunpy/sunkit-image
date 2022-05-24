@@ -32,7 +32,7 @@ jobs:
       jobname:
         type: string
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.9
     environment:
       TOXENV=<< parameters.jobname >>
     steps:
@@ -55,7 +55,7 @@ jobs:
       jobname:
         type: string
     docker:
-      - image: circleci/python:3.8
+      - image: cimg/python:3.9
     environment:
       TOXENV: << parameters.jobname >>
       GIT_SSH_COMMAND: ssh -i ~/.ssh/id_rsa_6464b6a8248237ca368fd4690777d921

@@ -140,9 +140,7 @@ class Asda:
         vel = self.gen_vel(index[1], index[0])
         # Iterate over the array gamma
         for d, (i, j) in enumerate(
-            product(
-                np.arange(self.r, self.dshape[0] - self.r, 1), np.arange(self.r, self.dshape[1] - self.r, 1)
-            )
+            product(np.arange(self.r, self.dshape[0] - self.r, 1), np.arange(self.r, self.dshape[1] - self.r, 1))
         ):
             self.gamma[i, j, 0], self.gamma[i, j, 1] = calc_gamma(pm, vel[..., d], pnorm, N)
         # Transpose back vx & vy

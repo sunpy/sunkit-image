@@ -92,16 +92,12 @@ def test_check_for_nonfinite_entries():
             a[i] = non_number
             b = a.reshape(3, 3)
 
-            with pytest.warns(
-                SunpyUserWarning, match="The layer image has nonfinite entries."
-            ) as warning_list:
+            with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries.") as warning_list:
                 check_for_nonfinite_entries(b, np.ones((3, 3)))
 
             assert len(warning_list) == 1
 
-            with pytest.warns(
-                SunpyUserWarning, match="The template image has nonfinite entries."
-            ) as warning_list:
+            with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries.") as warning_list:
                 check_for_nonfinite_entries(np.ones((3, 3)), b)
 
             assert len(warning_list) == 1
@@ -162,9 +158,7 @@ def test_find_best_match_location(aia171_test_map_layer, aia171_test_template, a
 
     result = match_template_to_layer(aia171_test_map_layer, aia171_test_template)
     match_location = u.Quantity(find_best_match_location(result))
-    assert_allclose(
-        match_location.value, np.array(result.shape) / 2.0 - 0.5 + aia171_test_shift, rtol=1e-3, atol=0
-    )
+    assert_allclose(match_location.value, np.array(result.shape) / 2.0 - 0.5 + aia171_test_shift, rtol=1e-3, atol=0)
 
 
 def test_lower_clip(aia171_test_clipping):
@@ -214,10 +208,8 @@ def aia171_test_mc_pixel_displacements():
 @pytest.fixture
 def aia171_mc_arcsec_displacements(aia171_test_mc_pixel_displacements, aia171_test_map):
     return {
-        "x": np.asarray([0.0, aia171_test_mc_pixel_displacements[1] * aia171_test_map.scale[0].value])
-        * u.arcsec,
-        "y": np.asarray([0.0, aia171_test_mc_pixel_displacements[0] * aia171_test_map.scale[1].value])
-        * u.arcsec,
+        "x": np.asarray([0.0, aia171_test_mc_pixel_displacements[1] * aia171_test_map.scale[0].value]) * u.arcsec,
+        "y": np.asarray([0.0, aia171_test_mc_pixel_displacements[0] * aia171_test_map.scale[1].value]) * u.arcsec,
     }
 
 
@@ -381,9 +373,7 @@ def test_apply_shifts(aia171_test_map):
 
     # Test that keywords are correctly passed
     # Test for an individual keyword
-    test_mc = apply_shifts(
-        mc, astropy_displacements["y"], astropy_displacements["x"], clip=False, cval=np.nan
-    )
+    test_mc = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"], clip=False, cval=np.nan)
     assert np.all(np.logical_not(np.isfinite(test_mc[1].data[:, -1])))
 
     # Test for a combination of keywords, and that changing the interpolation
@@ -397,9 +387,7 @@ def test_apply_shifts(aia171_test_map):
 
 @pytest.fixture
 def aia171_test_submap(aia171_test_map):
-    return aia171_test_map.submap(
-        SkyCoord(((0, 0), (400, 500)) * u.arcsec, frame=aia171_test_map.coordinate_frame)
-    )
+    return aia171_test_map.submap(SkyCoord(((0, 0), (400, 500)) * u.arcsec, frame=aia171_test_map.coordinate_frame))
 
 
 @pytest.fixture
@@ -430,23 +418,15 @@ def test_calculate_solar_rotate_shift(
 ):
     # Test that the default works
     test_output = calculate_solar_rotate_shift(aia171_test_mapsequence)
-    assert_allclose(
-        test_output["x"].to("arcsec").value, known_displacements_layer_index0["x"], rtol=5e-2, atol=1e-5
-    )
-    assert_allclose(
-        test_output["y"].to("arcsec").value, known_displacements_layer_index0["y"], rtol=5e-2, atol=1e-5
-    )
+    assert_allclose(test_output["x"].to("arcsec").value, known_displacements_layer_index0["x"], rtol=5e-2, atol=1e-5)
+    assert_allclose(test_output["y"].to("arcsec").value, known_displacements_layer_index0["y"], rtol=5e-2, atol=1e-5)
 
     # Test that the rotation relative to a nonzero layer_index works
     test_output = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=1)
     print(test_output["x"].to("arcsec").value)
     print(test_output["y"].to("arcsec").value)
-    assert_allclose(
-        test_output["x"].to("arcsec").value, known_displacements_layer_index1["x"], rtol=5e-2, atol=1e-5
-    )
-    assert_allclose(
-        test_output["y"].to("arcsec").value, known_displacements_layer_index1["y"], rtol=5e-2, atol=1e-5
-    )
+    assert_allclose(test_output["x"].to("arcsec").value, known_displacements_layer_index1["x"], rtol=5e-2, atol=1e-5)
+    assert_allclose(test_output["y"].to("arcsec").value, known_displacements_layer_index1["y"], rtol=5e-2, atol=1e-5)
 
 
 def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap):

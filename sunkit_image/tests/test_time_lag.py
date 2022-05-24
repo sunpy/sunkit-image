@@ -7,9 +7,7 @@ import astropy.units as u
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
 
-@pytest.mark.parametrize(
-    "shape_in,shape_out", [((20, 5, 5), (39, 5, 5)), ((100, 10), (199, 10)), ((1000,), (1999,))]
-)
+@pytest.mark.parametrize("shape_in,shape_out", [((20, 5, 5), (39, 5, 5)), ((100, 10), (199, 10)), ((1000,), (1999,))])
 def test_cross_correlation_array_shapes(shape_in, shape_out):
     s_a = np.random.rand(*shape_in)
     s_b = np.random.rand(*shape_in)

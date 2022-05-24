@@ -290,9 +290,7 @@ def test_intensity_enhance(map_test1):
     enhancement[map_r < normalization_radius] = 1
 
     with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
-        rad.intensity_enhance(
-            smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale, fit_range=fit_range[::-1]
-        )
+        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale, fit_range=fit_range[::-1])
 
     assert np.allclose(
         enhancement * map_test1.data,
