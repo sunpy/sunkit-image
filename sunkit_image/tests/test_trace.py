@@ -236,17 +236,13 @@ def test_erase_loop_in_image(image, test_map):
 
     result = erase_loop_in_image(image, istart, jstart, width, xloop, yloop)
 
-    expect = np.array(
-        [[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]]
-    )
+    expect = np.array([[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]])
 
     assert np.allclose(expect, result)
 
     result = erase_loop_in_image(test_map, istart, jstart, width, xloop, yloop)
 
-    expect = np.array(
-        [[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]]
-    )
+    expect = np.array([[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]])
 
     assert np.allclose(expect, result)
 
@@ -321,9 +317,7 @@ def parameters_add_loop():
     lengths = np.zeros((np1), dtype=np.float32)
 
     for ip in range(1, np1):
-        lengths[ip] = lengths[ip - 1] + np.sqrt(
-            (xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2
-        )
+        lengths[ip] = lengths[ip - 1] + np.sqrt((xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2)
 
     # The empty structures in which the first loop is stored
     loops = []

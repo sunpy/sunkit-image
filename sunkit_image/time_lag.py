@@ -25,8 +25,8 @@ __all__ = [
 @u.quantity_input
 def get_lags(time: u.s):
     """
-    Convert an array of evenly spaced times to an array of time lags
-    evenly spaced between ``-max(time)`` and ``max(time)``.
+    Convert an array of evenly spaced times to an array of time lags evenly
+    spaced between ``-max(time)`` and ``max(time)``.
     """
     delta_t = np.diff(time)
     if not np.allclose(delta_t, delta_t[0]):
@@ -236,8 +236,8 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
 @u.quantity_input
 def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
     """
-    Compute the maximum value of the cross-correlation between ``signal_a``
-    and ``signal_b``.
+    Compute the maximum value of the cross-correlation between ``signal_a`` and
+    ``signal_b``.
 
     This is the maximum value of the cross-correlation as a function of
     lag (computed in :func:`cross_correlation`). This will always be between

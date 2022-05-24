@@ -1,7 +1,7 @@
 """
 This module provides routines for the co-alignment of images and
-`~sunpy.map.mapsequence.MapSequence` objects through both template
-matching and corrections due to solar rotation.
+`~sunpy.map.mapsequence.MapSequence` objects through both template matching and
+corrections due to solar rotation.
 """
 import warnings
 from copy import deepcopy
@@ -101,9 +101,7 @@ def clip_edges(data, yclips: u.pix, xclips: u.pix):
     nx = data.shape[1]
     # The purpose of the int below is to ensure integer type since by default
     # astropy quantities are converted to floats.
-    return data[
-        int(yclips[0].value) : ny - int(yclips[1].value), int(xclips[0].value) : nx - int(xclips[1].value)
-    ]
+    return data[int(yclips[0].value) : ny - int(yclips[1].value), int(xclips[0].value) : nx - int(xclips[1].value)]
 
 
 @u.quantity_input
@@ -291,7 +289,8 @@ def parabolic_turning_point(y):
 
 def check_for_nonfinite_entries(layer_image, template_image):
     """
-    Issue a warning if there is any nonfinite entry in the layer or template images.
+    Issue a warning if there is any nonfinite entry in the layer or template
+    images.
 
     Parameters
     ----------
@@ -579,8 +578,8 @@ def mapsequence_coalign_by_match_template(
 
 def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
     """
-    Calculate the shift that must be applied to each map contained in a mapsequence
-    in order to compensate for solar rotation.
+    Calculate the shift that must be applied to each map contained in a
+    mapsequence in order to compensate for solar rotation.
 
     The center of the map is used to calculate the position of each mapsequence
     layer. Shifts are calculated relative to a specified layer in the mapsequence.
@@ -627,9 +626,7 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
         # Calculate the rotation of the center of the map 'm' at its
         # observation time to the observation time of the reference layer
         # indicated by "layer_index".
-        new_coordinate = solar_rotate_coordinate(
-            m.center, observer=rotate_to_this_layer.observer_coordinate, **kwargs
-        )
+        new_coordinate = solar_rotate_coordinate(m.center, observer=rotate_to_this_layer.observer_coordinate, **kwargs)
 
         xshift_arcseconds[i] = new_coordinate.Tx - rotate_to_this_layer.center.Tx
         yshift_arcseconds[i] = new_coordinate.Ty - rotate_to_this_layer.center.Ty

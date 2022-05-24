@@ -2,14 +2,14 @@
 requires = [
   "extension-helpers",
   "oldest-supported-numpy",
-  "setuptools_scm",
-  "setuptools",
+  "setuptools>=56,!=61.0.0",
+  "setuptools_scm[toml]>=6.2",
   "wheel",
 ]
 build-backend = 'setuptools.build_meta'
 
 [tool.black]
-line-length = 110
+line-length = 120
 include = '\.pyi?$'
 exclude = '''
 (

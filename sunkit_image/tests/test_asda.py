@@ -23,16 +23,12 @@ def test_asda_artificial():
     with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
         lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
 
-    with pytest.warns(
-        UserWarning, match="One of the input parameters is missing," + "setting both to 'None'"
-    ):
+    with pytest.warns(UserWarning, match="One of the input parameters is missing," + "setting both to 'None'"):
         lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, gamma=0.5, ratio_vradial=ratio, factor=1)
 
     lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1)
     # Generate vx and vy
-    with pytest.warns(
-        UserWarning, match="One of the input parameters is missing, setting " + " both to 'None'"
-    ):
+    with pytest.warns(UserWarning, match="One of the input parameters is missing, setting " + " both to 'None'"):
         vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200], x=np.meshgrid)
 
     vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200])

@@ -23,8 +23,6 @@ class UnsupportedPythonError(Exception):
 
 if sys.version_info < tuple(int(val) for val in __minimum_python_version__.split(".")):
     # This has to be .format to keep backwards compatibly.
-    raise UnsupportedPythonError(
-        "sunkit_image does not support Python < {}".format(__minimum_python_version__)
-    )
+    raise UnsupportedPythonError("sunkit_image does not support Python < {}".format(__minimum_python_version__))
 
 __all__ = []

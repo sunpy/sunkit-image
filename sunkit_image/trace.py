@@ -209,9 +209,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             looplen = 0
             if np1 >= 2:
                 for ip in range(1, np1):
-                    s[ip] = s[ip - 1] + np.sqrt(
-                        (xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2
-                    )
+                    s[ip] = s[ip - 1] + np.sqrt((xloop[ip] - xloop[ip - 1]) ** 2 + (yloop[ip] - yloop[ip - 1]) ** 2)
             looplen = s[np1 - 1]
 
         # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum
@@ -548,9 +546,9 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
         ib2 = int(min(ir[ip] + 1, rad_segments - 1))
 
     # See Eqn. 6 in the paper. Getting the values of all the valid radii
-    rad_i = rmin / (
-        -1.0 + 2.0 * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(rad_segments - 1)
-    ).reshape((1, -1))
+    rad_i = rmin / (-1.0 + 2.0 * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(rad_segments - 1)).reshape(
+        (1, -1)
+    )
 
     # See Eqn 16.
     beta0 = al[ip] + np.float32(np.pi / 2)
