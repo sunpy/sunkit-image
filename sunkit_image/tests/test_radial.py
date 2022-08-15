@@ -47,7 +47,6 @@ def radial_bin_edges():
 
 
 def test_nrgf(map_test1, map_test2, radial_bin_edges):
-
     result = np.zeros_like(map_test1.data)
     expect = rad.nrgf(map_test1, radial_bin_edges, application_radius=0.001 * u.R_sun)
 
@@ -70,7 +69,6 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
 
 def test_fnrgf(map_test1, map_test2, radial_bin_edges):
-
     order = 1
 
     # Hand calculated
@@ -183,7 +181,6 @@ def smap():
 @figure_test
 @pytest.mark.remote_data
 def test_fig_nrgf(smap):
-
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
     out = rad.nrgf(smap, radial_bin_edges)
@@ -194,7 +191,6 @@ def test_fig_nrgf(smap):
 @figure_test
 @pytest.mark.remote_data
 def test_fig_fnrgf(smap):
-
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
 
@@ -206,7 +202,6 @@ def test_fig_fnrgf(smap):
 
 
 def test_set_attenuation_coefficients():
-
     order = 1
     # Hand calculated
     expect1 = [[1, 0.0], [1, 0.0]]
@@ -233,7 +228,6 @@ def test_set_attenuation_coefficients():
 
 
 def test_fit_polynomial_to_log_radial_intensity():
-
     radii = (0.001, 0.002) * u.R_sun
     intensity = np.asarray([1, 2])
     degree = 1
@@ -243,7 +237,6 @@ def test_fit_polynomial_to_log_radial_intensity():
 
 
 def test_calculate_fit_radial_intensity():
-
     polynomial = np.asarray([1, 2, 3])
     radii = (0.001, 0.002) * u.R_sun
     expected = np.exp(np.poly1d(polynomial)(radii.to(u.R_sun).value))

@@ -30,14 +30,12 @@ def image_remote():
 
 @pytest.fixture
 def filepath_IDL():
-
     filepath = data.get_test_filepath("IDL.txt")
     return filepath
 
 
 @pytest.mark.remote_data
 def test_occult2_remote(image_remote, filepath_IDL):
-
     # Testing on the same input files as in the IDL tutorial
     loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
@@ -87,7 +85,6 @@ def test_occult2_remote(image_remote, filepath_IDL):
 @figure_test
 @pytest.mark.remote_data
 def test_occult2_fig(image_remote):
-
     # A figure test for occult2, the plot is same as the one in the IDL tutorial
     loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
@@ -105,7 +102,6 @@ def test_occult2_fig(image_remote):
 
 @pytest.fixture
 def test_image():
-
     # An image containing a loop in a straight line
     ima = np.zeros((3, 3), dtype=np.float32)
     ima[0, 1] = 5
@@ -116,7 +112,6 @@ def test_image():
 
 @pytest.fixture
 def image_test():
-
     # An image containing a loop in a straight line
     ima = np.zeros((15, 15), dtype=np.float32)
     ima[:, 7] = 1
@@ -126,7 +121,6 @@ def image_test():
 
 
 def test_occult2(test_image, image_test):
-
     # Set of checks which does not require remote data
 
     # The first test were valid loops are detected
@@ -174,7 +168,6 @@ def image():
 
 
 def test_bandpass_filter(image, test_map):
-
     expect = np.zeros((4, 4))
     result = bandpass_filter(image)
 
@@ -200,7 +193,6 @@ def test_bandpass_filter(image, test_map):
 
 
 def test_smooth(image, test_map):
-
     filtered = smooth(image, 1)
     assert np.allclose(filtered, image)
 
@@ -224,7 +216,6 @@ def test_smooth(image, test_map):
 
 
 def test_erase_loop_in_image(image, test_map):
-
     # The starting point of a dummy loop
     istart = 0
     jstart = 1
@@ -249,7 +240,6 @@ def test_erase_loop_in_image(image, test_map):
 
 @pytest.fixture
 def test_image():
-
     # An image containing a loop in a straight line
     ima = np.zeros((3, 3), dtype=np.float32)
     ima[0, 1] = 5
@@ -259,7 +249,6 @@ def test_image():
 
 
 def test_initial_direction_finding(test_image):
-
     # The starting point of the loop i.e. the maximumflux position
     xstart = 0
     ystart = 1
@@ -274,7 +263,6 @@ def test_initial_direction_finding(test_image):
 
 
 def test_curvature_radius(test_image):
-
     xl = np.zeros((3), dtype=np.float32)
     yl = np.zeros((3), dtype=np.float32)
     zl = np.zeros((3), dtype=np.float32)
@@ -304,7 +292,6 @@ def test_curvature_radius(test_image):
 
 @pytest.fixture
 def parameters_add_loop():
-
     # Here we are creating dummy coordinates and flux for a loop
     xloop = np.ones(8, dtype=np.float32) * 7
     yloop = np.arange(11, 3, -1, dtype=np.float32)
@@ -326,7 +313,6 @@ def parameters_add_loop():
 
 
 def test_add_loop(parameters_add_loop):
-
     # We call the add_loop function and the values should be placed in the structures
     loops, iloop = loop_add(*parameters_add_loop)
 
@@ -337,7 +323,6 @@ def test_add_loop(parameters_add_loop):
 
 
 def test_parameters_add_loop(parameters_add_loop):
-
     lengths, xloop, yloop, zloop, iloop, loops = parameters_add_loop
 
     assert np.allclose(lengths, np.arange(0, 8))
