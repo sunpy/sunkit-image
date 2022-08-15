@@ -38,7 +38,7 @@ def get_lags(time: u.s):
 @u.quantity_input
 def cross_correlation(signal_a, signal_b, lags: u.s):
     r"""
-    Compute cross-correlation between two signals, as a function of lag
+    Compute cross-correlation between two signals, as a function of lag.
 
     By the convolution theorem the cross-correlation between two signals
     can be computed as,
@@ -162,8 +162,8 @@ def _dask_check(lags, indices):
 @u.quantity_input
 def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kwargs):
     r"""
-    Compute the time lag that maximizes the cross-correlation
-    between ``signal_a`` and ``signal_b``.
+    Compute the time lag that maximizes the cross-correlation between
+    ``signal_a`` and ``signal_b``.
 
     For a pair of signals :math:`A,B`, e.g. time series from two EUV channels
     on AIA, the time lag is the lag which maximizes the cross-correlation,

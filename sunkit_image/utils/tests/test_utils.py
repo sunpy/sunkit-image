@@ -118,7 +118,6 @@ def test_find_pixel_radii(smap):
 
 @pytest.mark.remote_data
 def test_get_radial_intensity_summary(smap):
-
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins(inner_value=1, outer_value=1.5)) * u.R_sun
     summary = np.mean
 
@@ -174,7 +173,6 @@ def test_calculate_gamma():
 
 
 def test_remove_duplicate():
-
     test_data = np.random.rand(5, 2)
     data_ = np.append(test_data, [test_data[0]], axis=0)
     expected = np.delete(data_, -1, 0)
@@ -186,7 +184,6 @@ def test_remove_duplicate():
 
 
 def test_points_in_poly():
-
     test_data = np.asarray([[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 0]])
 
     with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):
@@ -197,7 +194,6 @@ def test_points_in_poly():
 
 
 def test_reform_2d():
-
     test_data = np.asarray([[0, 0], [1, 2], [3, 4]])
 
     with pytest.raises(ValueError, match="Parameter 'factor' must be an integer!"):
