@@ -1,0 +1,1 @@
+Add two examples demonstrating the usage of :func:`~sunkit_image.coalignment.mapsequence_coalign_by_match_template` and :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation`.

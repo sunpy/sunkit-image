@@ -17,18 +17,24 @@ of the image processing library
 `scikit-image <https://scikit-image.org/docs/stable/install.html>`__.
 """
 import matplotlib.pyplot as plt
+
 import sunpy.data.sample
-from sunkit_image import coalignment
 from sunpy.map import Map
+
+from sunkit_image import coalignment
 
 ###############################################################################
 # Create a `~sunpy.map.MapSequence` using sample data.
-mc = Map([sunpy.data.sample.AIA_193_CUTOUT01_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT02_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT03_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT04_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT05_IMAGE],
-         sequence=True)
+mc = Map(
+    [
+        sunpy.data.sample.AIA_193_CUTOUT01_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT02_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT03_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT04_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT05_IMAGE,
+    ],
+    sequence=True,
+)
 
 ###############################################################################
 # Plot an animation of the `~sunpy.map.MapSequence` that we can compare with

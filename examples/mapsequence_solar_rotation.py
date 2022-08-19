@@ -13,18 +13,24 @@ to account for the differential rotation of the Sun is demonstrated using the
 :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation` function.
 """
 import matplotlib.pyplot as plt
+
 import sunpy.data.sample
-from sunkit_image import coalignment
 from sunpy.map import Map
+
+from sunkit_image import coalignment
 
 ###############################################################################
 # First, create a `~sunpy.map.MapSequence` with sample data.
-mc = Map([sunpy.data.sample.AIA_193_CUTOUT01_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT02_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT03_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT04_IMAGE,
-          sunpy.data.sample.AIA_193_CUTOUT05_IMAGE],
-         sequence=True)
+mc = Map(
+    [
+        sunpy.data.sample.AIA_193_CUTOUT01_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT02_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT03_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT04_IMAGE,
+        sunpy.data.sample.AIA_193_CUTOUT05_IMAGE,
+    ],
+    sequence=True,
+)
 
 ###############################################################################
 # Let's plot the MapSequence so we can later compare it with the shifted
