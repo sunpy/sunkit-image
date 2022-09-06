@@ -1,5 +1,5 @@
-sunkit-image
-============
+``sunkit-image``
+================
 
 |Latest Version| |codecov| |Powered by NumFOCUS| |Powered by Sunpy|
 
@@ -12,16 +12,16 @@ sunkit-image
 .. |Powered by NumFOCUS| image:: https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A
    :target: http://numfocus.org
 
-sunkit-image is a a open-source toolbox for solar physics image processing.
+``sunkit-image`` is a a open-source toolbox for solar physics image processing.
 Currently it is an experimental library for various solar physics specific image processing routines.
 
 Installation
 ------------
 
-For detailed (general) installation instructions, see the `installation guide`_ in the SunPy docs.
-This takes you through the options for installing sunpy, but they are the same for sunkit-image.
+For detailed (general) installation instructions, see the `installation guide`_ in the ``sunpy`` docs.
+This takes you through the options for installing sunpy, but they are the same for ``sunkit-image``.
 
-If you want help develop sunkit-image you will need to install it from GitHub.
+If you want help develop ``sunkit-image`` you will need to install it from GitHub.
 The best way to do this is to create a new python virtual environment (either with ``pipenv`` or ``conda``).
 Once you have that virtual environment, you will want to fork the repo and then run::
 
@@ -32,7 +32,7 @@ Once you have that virtual environment, you will want to fork the repo and then 
 Getting Help
 ------------
 
-For more information or to ask questions about sunkit-image or sunpy, check out:
+For more information or to ask questions about ``sunkit-image`` or ``sunpy``, check out:
 
 -  `#sunpy:matrix.org`_
 -  `sunkit-image Documentation`_
