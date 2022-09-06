@@ -38,7 +38,8 @@ def test_multiscale_gaussian(map_test):
     expect3 = enhance.mgn(map_test, [1])
     assert np.allclose(result1, expect3)
 
-    # This is a dummy test. These values were not verified by hand rather they were
+    # This is a dummy test.
+    # These values were not verified by hand rather they were
     # generated using the code itself.
     result2 = np.array(
         [
