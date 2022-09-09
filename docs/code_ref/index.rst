@@ -11,6 +11,7 @@ Code Reference
    coalignment
    enhance
    radial
+   reproject
    time_lag
    trace
    utils
