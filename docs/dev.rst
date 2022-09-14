@@ -1,7 +1,9 @@
-****************
-Formatting Style
-****************
+***********
+Development
+***********
 
+Formatting style
+================
 This outlines some of the code style that sunkit-image follows::
 
   $ autoflake -r --in-place --remove-unused-variables --remove-all-unused-imports --exclude=__init__.py ./sunkit_image

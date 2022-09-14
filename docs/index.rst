@@ -1,16 +1,32 @@
-**************************
-sunkit-image Documentation
-**************************
+************
+sunkit-image
+************
 
-Welcome to the sunkit-image documentation. sunkit-image is a community-developed,
-free and open-source solar data image analysis environment for Python.
+.. grid:: 3
 
-We have a documentation :any:`index <genindex>` and a :any:`module <modindex>` list.
+    .. grid-item::
 
-.. toctree::
-  :maxdepth: 2
+        A toolbox of useful image processing routines applicable to solar physics data.
 
-  code_ref/index
-  generated/gallery/index
-  whatsnew/index
-  format
+
+
+    .. grid-item-card:: Sub-modules
+
+        .. toctree::
+          :maxdepth: 1
+
+          code_ref/coalignment
+          code_ref/enhance
+          code_ref/radial
+          code_ref/time_lag
+          code_ref/trace
+          code_ref/utils
+
+    .. grid-item-card:: Other info
+
+        .. toctree::
+          :maxdepth: 1
+
+          generated/gallery/index
+          whatsnew/index
+          dev
