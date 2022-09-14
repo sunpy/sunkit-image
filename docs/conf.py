@@ -83,6 +83,7 @@ suppress_warnings = [
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx_design",
     "sphinx_gallery.gen_gallery",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_automodapi.automodapi",
