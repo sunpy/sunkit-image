@@ -19,7 +19,6 @@ from sunpy.util.exceptions import SunpyUserWarning
 __author__ = "J. Ireland"
 
 __all__ = [
-    "calculate_shift",
     "match_template_to_layer",
     "apply_shifts",
     "mapsequence_coalign_by_match_template",
@@ -39,7 +38,7 @@ def _default_fmap_function(data):
     return np.float64(data)
 
 
-def calculate_shift(this_layer, template):
+def _calculate_shift(this_layer, template):
     """
     Calculates the pixel shift required to put the template in the "best"
     position on a layer.
@@ -442,7 +441,7 @@ def calculate_match_template_shift(mc, template=None, layer_index=0, func=_defau
         this_layer = func(m.data)
 
         # Calculate the y and x shifts in pixels
-        yshift, xshift = calculate_shift(this_layer, tplate)
+        yshift, xshift = _calculate_shift(this_layer, tplate)
 
         # Keep shifts in pixels
         yshift_keep[i] = yshift
@@ -599,6 +598,7 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
     ``**kwargs``
         These keywords are passed to the function
         `sunpy.physics.differential_rotation.solar_rotate_coordinate`.
+
     Returns
     -------
     `~astropy.units.Quantity`, ~astropy.units.Quantity`
