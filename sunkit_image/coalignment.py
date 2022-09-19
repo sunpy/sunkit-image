@@ -21,7 +21,6 @@ __author__ = "J. Ireland"
 __all__ = [
     "calculate_shift",
     "clip_edges",
-    "calculate_clipping",
     "match_template_to_layer",
     "find_best_match_location",
     "get_correlation_shifts",
@@ -104,7 +103,7 @@ def clip_edges(data, yclips: u.pix, xclips: u.pix):
 
 
 @u.quantity_input
-def calculate_clipping(y: u.pix, x: u.pix):
+def _calculate_clipping(y: u.pix, x: u.pix):
     """
     Return the upper and lower clipping values for the "y" and "x" directions.
 
@@ -354,7 +353,7 @@ def apply_shifts(mc, yshift: u.pix, xshift: u.pix, clip=True, **kwargs):
 
     # Calculate the clipping
     if clip:
-        yclips, xclips = calculate_clipping(-yshift, -xshift)
+        yclips, xclips = _calculate_clipping(-yshift, -xshift)
 
     # Shift the data and construct the mapsequence
     for i, m in enumerate(mc):

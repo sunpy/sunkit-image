@@ -15,12 +15,12 @@ from sunpy.map import Map, MapSequence
 from sunpy.util import SunpyUserWarning
 
 from sunkit_image.coalignment import (
+    _calculate_clipping,
     _default_fmap_function,
     _lower_clip,
     _parabolic_turning_point,
     _upper_clip,
     apply_shifts,
-    calculate_clipping,
     calculate_match_template_shift,
     calculate_solar_rotate_shift,
     check_for_nonfinite_entries,
@@ -175,7 +175,7 @@ def test_upper_clip(aia171_test_clipping):
 
 
 def test_calculate_clipping(aia171_test_clipping):
-    answer = calculate_clipping(aia171_test_clipping * u.pix, aia171_test_clipping * u.pix)
+    answer = _calculate_clipping(aia171_test_clipping * u.pix, aia171_test_clipping * u.pix)
     assert_array_almost_equal(answer, ([2.0, 1.0] * u.pix, [2.0, 1.0] * u.pix))
 
 
@@ -281,7 +281,7 @@ def test_mapsequence_coalign_by_match_template(aia171_test_mc, aia171_test_map_l
     test_mc = mapsequence_coalign_by_match_template(aia171_test_mc)
     x_displacement_pixels = test_displacements["x"] / test_mc[0].scale[0]
     y_displacement_pixels = test_displacements["y"] / test_mc[0].scale[1]
-    expected_clipping = calculate_clipping(y_displacement_pixels, x_displacement_pixels)
+    expected_clipping = _calculate_clipping(y_displacement_pixels, x_displacement_pixels)
     number_of_pixels_clipped = [np.sum(np.abs(expected_clipping[0])), np.sum(np.abs(expected_clipping[1]))]
 
     assert test_mc[0].data.shape == (
@@ -299,7 +299,7 @@ def test_mapsequence_coalign_by_match_template(aia171_test_mc, aia171_test_map_l
     test_mc = mapsequence_coalign_by_match_template(aia171_test_mc, clip=True)
     x_displacement_pixels = test_displacements["x"] / test_mc[0].scale[0]
     y_displacement_pixels = test_displacements["y"] / test_mc[0].scale[1]
-    expected_clipping = calculate_clipping(y_displacement_pixels, x_displacement_pixels)
+    expected_clipping = _calculate_clipping(y_displacement_pixels, x_displacement_pixels)
     number_of_pixels_clipped = [np.sum(np.abs(expected_clipping[0])), np.sum(np.abs(expected_clipping[1]))]
 
     assert test_mc[0].data.shape == (
@@ -357,7 +357,7 @@ def test_apply_shifts(aia171_test_map):
     # original layer by a known amount.
     test_mc = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"], clip=True)
     for i in range(0, len(test_mc.maps)):
-        clipped = calculate_clipping(astropy_displacements["y"], astropy_displacements["x"])
+        clipped = _calculate_clipping(astropy_displacements["y"], astropy_displacements["x"])
         assert test_mc[i].data.shape[0] == mc[i].data.shape[0] - np.max(clipped[0].value)
         assert test_mc[i].data.shape[1] == mc[i].data.shape[1] - np.max(clipped[1].value)
 
@@ -366,7 +366,7 @@ def test_apply_shifts(aia171_test_map):
     # than the original layer by a known amount.
     test_mc = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"])
     for i in range(0, len(test_mc.maps)):
-        clipped = calculate_clipping(astropy_displacements["y"], astropy_displacements["x"])
+        clipped = _calculate_clipping(astropy_displacements["y"], astropy_displacements["x"])
         assert test_mc[i].data.shape[0] == mc[i].data.shape[0] - np.max(clipped[0].value)
         assert test_mc[i].data.shape[1] == mc[i].data.shape[1] - np.max(clipped[1].value)
 
