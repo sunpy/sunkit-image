@@ -6,3 +6,4 @@ If you need to use them in your own code create a copy of the functions from the
 - ``calculate_clipping``
 - ``check_for_nonfinite_entries``
 - ``get_correlation_shifts``
+- ``clip_edges``

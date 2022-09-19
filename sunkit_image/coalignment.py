@@ -20,7 +20,6 @@ __author__ = "J. Ireland"
 
 __all__ = [
     "calculate_shift",
-    "clip_edges",
     "match_template_to_layer",
     "find_best_match_location",
     "apply_shifts",
@@ -69,7 +68,7 @@ def calculate_shift(this_layer, template):
 
 
 @u.quantity_input
-def clip_edges(data, yclips: u.pix, xclips: u.pix):
+def _clip_edges(data, yclips: u.pix, xclips: u.pix):
     """
     Clips off the "y" and "x" edges of a 2D array according to a list of pixel
     values. This function is useful for removing data at the edge of 2d images
@@ -360,7 +359,7 @@ def apply_shifts(mc, yshift: u.pix, xshift: u.pix, clip=True, **kwargs):
         # Clip if required.  Use the submap function to return the appropriate
         # portion of the data.
         if clip:
-            shifted_data = clip_edges(shifted_data, yclips, xclips)
+            shifted_data = _clip_edges(shifted_data, yclips, xclips)
             new_meta["naxis1"] = shifted_data.shape[1]
             new_meta["naxis2"] = shifted_data.shape[0]
             # Add one to go from zero-based to one-based indexing

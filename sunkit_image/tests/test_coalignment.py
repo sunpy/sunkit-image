@@ -17,6 +17,7 @@ from sunpy.util import SunpyUserWarning
 from sunkit_image.coalignment import (
     _calculate_clipping,
     _check_for_nonfinite_entries,
+    _clip_edges,
     _default_fmap_function,
     _get_correlation_shifts,
     _lower_clip,
@@ -25,7 +26,6 @@ from sunkit_image.coalignment import (
     apply_shifts,
     calculate_match_template_shift,
     calculate_solar_rotate_shift,
-    clip_edges,
     find_best_match_location,
     mapsequence_coalign_by_match_template,
     mapsequence_coalign_by_rotation,
@@ -183,7 +183,7 @@ def test_clip_edges():
     a = np.zeros(shape=(341, 156))
     yclip = [4, 0] * u.pix
     xclip = [1, 2] * u.pix
-    new_a = clip_edges(a, yclip, xclip)
+    new_a = _clip_edges(a, yclip, xclip)
     assert a.shape[0] - (yclip[0].value + yclip[1].value) == new_a.shape[0]
     assert a.shape[1] - (xclip[0].value + xclip[1].value) == new_a.shape[1]
 
