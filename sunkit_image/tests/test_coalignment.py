@@ -16,6 +16,7 @@ from sunpy.util import SunpyUserWarning
 
 from sunkit_image.coalignment import (
     _calculate_clipping,
+    _check_for_nonfinite_entries,
     _default_fmap_function,
     _lower_clip,
     _parabolic_turning_point,
@@ -23,7 +24,6 @@ from sunkit_image.coalignment import (
     apply_shifts,
     calculate_match_template_shift,
     calculate_solar_rotate_shift,
-    check_for_nonfinite_entries,
     clip_edges,
     find_best_match_location,
     get_correlation_shifts,
@@ -82,7 +82,7 @@ def test_check_for_nonfinite_entries():
     with warnings.catch_warnings(record=True) as warning_list:
         a = np.zeros((3, 3))
         b = np.ones((3, 3))
-        check_for_nonfinite_entries(a, b)
+        _check_for_nonfinite_entries(a, b)
 
     assert len(warning_list) == 0
 
@@ -93,17 +93,17 @@ def test_check_for_nonfinite_entries():
             b = a.reshape(3, 3)
 
             with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries.") as warning_list:
-                check_for_nonfinite_entries(b, np.ones((3, 3)))
+                _check_for_nonfinite_entries(b, np.ones((3, 3)))
 
             assert len(warning_list) == 1
 
             with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries.") as warning_list:
-                check_for_nonfinite_entries(np.ones((3, 3)), b)
+                _check_for_nonfinite_entries(np.ones((3, 3)), b)
 
             assert len(warning_list) == 1
 
             with pytest.warns(Warning) as warning_list:
-                check_for_nonfinite_entries(b, b)
+                _check_for_nonfinite_entries(b, b)
 
             assert len(warning_list) == 2
 

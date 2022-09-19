@@ -24,7 +24,6 @@ __all__ = [
     "match_template_to_layer",
     "find_best_match_location",
     "get_correlation_shifts",
-    "check_for_nonfinite_entries",
     "apply_shifts",
     "mapsequence_coalign_by_match_template",
     "calculate_match_template_shift",
@@ -63,7 +62,7 @@ def calculate_shift(this_layer, template):
         to the input array.
     """
     # Warn user if any NANs, Infs, etc are present in the layer or the template
-    check_for_nonfinite_entries(this_layer, template)
+    _check_for_nonfinite_entries(this_layer, template)
     # Calculate the correlation array matching the template to this layer
     corr = match_template_to_layer(this_layer, template)
     # Calculate the y and x shifts in pixels
@@ -285,7 +284,7 @@ def _parabolic_turning_point(y):
     return numerator / denominator
 
 
-def check_for_nonfinite_entries(layer_image, template_image):
+def _check_for_nonfinite_entries(layer_image, template_image):
     """
     Issue a warning if there is any nonfinite entry in the layer or template
     images.
