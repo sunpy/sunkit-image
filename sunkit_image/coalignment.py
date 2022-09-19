@@ -23,7 +23,6 @@ __all__ = [
     "clip_edges",
     "match_template_to_layer",
     "find_best_match_location",
-    "get_correlation_shifts",
     "apply_shifts",
     "mapsequence_coalign_by_match_template",
     "calculate_match_template_shift",
@@ -206,7 +205,7 @@ def find_best_match_location(corr):
         np.max([0, cor_max_y - 1]) : np.min([cor_max_y + 2, corr.shape[0] - 1]),
         np.max([0, cor_max_x - 1]) : np.min([cor_max_x + 2, corr.shape[1] - 1]),
     ]
-    y_shift_maximum, x_shift_maximum = get_correlation_shifts(array_maximum)
+    y_shift_maximum, x_shift_maximum = _get_correlation_shifts(array_maximum)
 
     # Get shift relative to correlation array
     y_shift_correlation_array = y_shift_maximum + cor_max_y * u.pix
@@ -215,7 +214,7 @@ def find_best_match_location(corr):
     return y_shift_correlation_array, x_shift_correlation_array
 
 
-def get_correlation_shifts(array):
+def _get_correlation_shifts(array):
     """
     Estimate the location of the maximum of a fit to the input array. The
     estimation in the "x" and "y" directions are done separately. The location
