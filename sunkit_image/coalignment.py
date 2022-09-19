@@ -25,7 +25,6 @@ __all__ = [
     "match_template_to_layer",
     "find_best_match_location",
     "get_correlation_shifts",
-    "parabolic_turning_point",
     "check_for_nonfinite_entries",
     "apply_shifts",
     "mapsequence_coalign_by_match_template",
@@ -251,19 +250,19 @@ def get_correlation_shifts(array):
     # Otherwise, just return the location of the maximum in a particular
     # direction.
     if ny == 3:
-        y_location = parabolic_turning_point(array[:, x_max_location])
+        y_location = _parabolic_turning_point(array[:, x_max_location])
     else:
         y_location = 1.0 * y_max_location
 
     if nx == 3:
-        x_location = parabolic_turning_point(array[y_max_location, :])
+        x_location = _parabolic_turning_point(array[y_max_location, :])
     else:
         x_location = 1.0 * x_max_location
 
     return y_location * u.pix, x_location * u.pix
 
 
-def parabolic_turning_point(y):
+def _parabolic_turning_point(y):
     """
     Find the location of the turning point for a parabola
     ``y(x) = ax^2 + bx + c``, given input values ``y(-1), y(0), y(1)``.

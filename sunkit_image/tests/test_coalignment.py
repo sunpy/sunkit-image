@@ -17,6 +17,7 @@ from sunpy.util import SunpyUserWarning
 from sunkit_image.coalignment import (
     _default_fmap_function,
     _lower_clip,
+    _parabolic_turning_point,
     _upper_clip,
     apply_shifts,
     calculate_clipping,
@@ -29,7 +30,6 @@ from sunkit_image.coalignment import (
     mapsequence_coalign_by_match_template,
     mapsequence_coalign_by_rotation,
     match_template_to_layer,
-    parabolic_turning_point,
 )
 
 
@@ -75,7 +75,7 @@ def aia171_test_template_shape(aia171_test_template):
 
 
 def test_parabolic_turning_point():
-    assert parabolic_turning_point(np.asarray([6.0, 2.0, 0.0])) == 1.5
+    assert _parabolic_turning_point(np.asarray([6.0, 2.0, 0.0])) == 1.5
 
 
 def test_check_for_nonfinite_entries():
