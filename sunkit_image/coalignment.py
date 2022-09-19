@@ -21,7 +21,6 @@ __author__ = "J. Ireland"
 __all__ = [
     "calculate_shift",
     "match_template_to_layer",
-    "find_best_match_location",
     "apply_shifts",
     "mapsequence_coalign_by_match_template",
     "calculate_match_template_shift",
@@ -64,7 +63,7 @@ def calculate_shift(this_layer, template):
     # Calculate the correlation array matching the template to this layer
     corr = match_template_to_layer(this_layer, template)
     # Calculate the y and x shifts in pixels
-    return find_best_match_location(corr)
+    return _find_best_match_location(corr)
 
 
 @u.quantity_input
@@ -179,7 +178,7 @@ def match_template_to_layer(layer, template):
     return match_template(layer, template)
 
 
-def find_best_match_location(corr):
+def _find_best_match_location(corr):
     """
     Calculate an estimate of the location of the peak of the correlation result
     in image pixels.

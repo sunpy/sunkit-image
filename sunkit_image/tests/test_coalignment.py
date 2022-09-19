@@ -19,6 +19,7 @@ from sunkit_image.coalignment import (
     _check_for_nonfinite_entries,
     _clip_edges,
     _default_fmap_function,
+    _find_best_match_location,
     _get_correlation_shifts,
     _lower_clip,
     _parabolic_turning_point,
@@ -26,7 +27,6 @@ from sunkit_image.coalignment import (
     apply_shifts,
     calculate_match_template_shift,
     calculate_solar_rotate_shift,
-    find_best_match_location,
     mapsequence_coalign_by_match_template,
     mapsequence_coalign_by_rotation,
     match_template_to_layer,
@@ -156,7 +156,7 @@ def test_get_correlation_shifts():
 
 def test_find_best_match_location(aia171_test_map_layer, aia171_test_template, aia171_test_shift):
     result = match_template_to_layer(aia171_test_map_layer, aia171_test_template)
-    match_location = u.Quantity(find_best_match_location(result))
+    match_location = u.Quantity(_find_best_match_location(result))
     assert_allclose(match_location.value, np.array(result.shape) / 2.0 - 0.5 + aia171_test_shift, rtol=1e-3, atol=0)
 
 
