@@ -19,14 +19,7 @@ from sunpy.util.exceptions import SunpyUserWarning
 __author__ = "J. Ireland"
 
 __all__ = [
-    "calculate_shift",
-    "clip_edges",
-    "calculate_clipping",
     "match_template_to_layer",
-    "find_best_match_location",
-    "get_correlation_shifts",
-    "parabolic_turning_point",
-    "check_for_nonfinite_entries",
     "apply_shifts",
     "mapsequence_coalign_by_match_template",
     "calculate_match_template_shift",
@@ -45,7 +38,7 @@ def _default_fmap_function(data):
     return np.float64(data)
 
 
-def calculate_shift(this_layer, template):
+def _calculate_shift(this_layer, template):
     """
     Calculates the pixel shift required to put the template in the "best"
     position on a layer.
@@ -65,15 +58,15 @@ def calculate_shift(this_layer, template):
         to the input array.
     """
     # Warn user if any NANs, Infs, etc are present in the layer or the template
-    check_for_nonfinite_entries(this_layer, template)
+    _check_for_nonfinite_entries(this_layer, template)
     # Calculate the correlation array matching the template to this layer
     corr = match_template_to_layer(this_layer, template)
     # Calculate the y and x shifts in pixels
-    return find_best_match_location(corr)
+    return _find_best_match_location(corr)
 
 
 @u.quantity_input
-def clip_edges(data, yclips: u.pix, xclips: u.pix):
+def _clip_edges(data, yclips: u.pix, xclips: u.pix):
     """
     Clips off the "y" and "x" edges of a 2D array according to a list of pixel
     values. This function is useful for removing data at the edge of 2d images
@@ -105,7 +98,7 @@ def clip_edges(data, yclips: u.pix, xclips: u.pix):
 
 
 @u.quantity_input
-def calculate_clipping(y: u.pix, x: u.pix):
+def _calculate_clipping(y: u.pix, x: u.pix):
     """
     Return the upper and lower clipping values for the "y" and "x" directions.
 
@@ -184,7 +177,7 @@ def match_template_to_layer(layer, template):
     return match_template(layer, template)
 
 
-def find_best_match_location(corr):
+def _find_best_match_location(corr):
     """
     Calculate an estimate of the location of the peak of the correlation result
     in image pixels.
@@ -209,7 +202,7 @@ def find_best_match_location(corr):
         np.max([0, cor_max_y - 1]) : np.min([cor_max_y + 2, corr.shape[0] - 1]),
         np.max([0, cor_max_x - 1]) : np.min([cor_max_x + 2, corr.shape[1] - 1]),
     ]
-    y_shift_maximum, x_shift_maximum = get_correlation_shifts(array_maximum)
+    y_shift_maximum, x_shift_maximum = _get_correlation_shifts(array_maximum)
 
     # Get shift relative to correlation array
     y_shift_correlation_array = y_shift_maximum + cor_max_y * u.pix
@@ -218,7 +211,7 @@ def find_best_match_location(corr):
     return y_shift_correlation_array, x_shift_correlation_array
 
 
-def get_correlation_shifts(array):
+def _get_correlation_shifts(array):
     """
     Estimate the location of the maximum of a fit to the input array. The
     estimation in the "x" and "y" directions are done separately. The location
@@ -251,19 +244,19 @@ def get_correlation_shifts(array):
     # Otherwise, just return the location of the maximum in a particular
     # direction.
     if ny == 3:
-        y_location = parabolic_turning_point(array[:, x_max_location])
+        y_location = _parabolic_turning_point(array[:, x_max_location])
     else:
         y_location = 1.0 * y_max_location
 
     if nx == 3:
-        x_location = parabolic_turning_point(array[y_max_location, :])
+        x_location = _parabolic_turning_point(array[y_max_location, :])
     else:
         x_location = 1.0 * x_max_location
 
     return y_location * u.pix, x_location * u.pix
 
 
-def parabolic_turning_point(y):
+def _parabolic_turning_point(y):
     """
     Find the location of the turning point for a parabola
     ``y(x) = ax^2 + bx + c``, given input values ``y(-1), y(0), y(1)``.
@@ -287,7 +280,7 @@ def parabolic_turning_point(y):
     return numerator / denominator
 
 
-def check_for_nonfinite_entries(layer_image, template_image):
+def _check_for_nonfinite_entries(layer_image, template_image):
     """
     Issue a warning if there is any nonfinite entry in the layer or template
     images.
@@ -355,7 +348,7 @@ def apply_shifts(mc, yshift: u.pix, xshift: u.pix, clip=True, **kwargs):
 
     # Calculate the clipping
     if clip:
-        yclips, xclips = calculate_clipping(-yshift, -xshift)
+        yclips, xclips = _calculate_clipping(-yshift, -xshift)
 
     # Shift the data and construct the mapsequence
     for i, m in enumerate(mc):
@@ -364,7 +357,7 @@ def apply_shifts(mc, yshift: u.pix, xshift: u.pix, clip=True, **kwargs):
         # Clip if required.  Use the submap function to return the appropriate
         # portion of the data.
         if clip:
-            shifted_data = clip_edges(shifted_data, yclips, xclips)
+            shifted_data = _clip_edges(shifted_data, yclips, xclips)
             new_meta["naxis1"] = shifted_data.shape[1]
             new_meta["naxis2"] = shifted_data.shape[0]
             # Add one to go from zero-based to one-based indexing
@@ -448,7 +441,7 @@ def calculate_match_template_shift(mc, template=None, layer_index=0, func=_defau
         this_layer = func(m.data)
 
         # Calculate the y and x shifts in pixels
-        yshift, xshift = calculate_shift(this_layer, tplate)
+        yshift, xshift = _calculate_shift(this_layer, tplate)
 
         # Keep shifts in pixels
         yshift_keep[i] = yshift
@@ -605,6 +598,7 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
     ``**kwargs``
         These keywords are passed to the function
         `sunpy.physics.differential_rotation.solar_rotate_coordinate`.
+
     Returns
     -------
     `~astropy.units.Quantity`, ~astropy.units.Quantity`
