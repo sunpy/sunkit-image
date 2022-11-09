@@ -15,6 +15,6 @@ jobs:
   dispatch_workflows:
     runs-on: ubuntu-latest
     steps:
-      - run: gh workflow run ci.yml --repo sunpy/sunkit_image --ref main
+      - run: gh workflow run ci.yml --repo sunpy/sunkit-image --ref main
     env:
       GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
