@@ -71,6 +71,28 @@ jobs:
       envs: |
         - linux: py39-online
 
+  cron:
+    if: |
+      github.event_name == 'workflow_dispatch' || (
+        github.event_name == 'pull_request' &&
+        contains(github.event.pull_request.labels.*.name, 'Run cron CI')
+      )
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      default_python: '3.8'
+      submodules: false
+      coverage: codecov
+      toxdeps: tox-pypi-filter
+      posargs: -n auto
+      libraries: |
+        apt:
+          # This can be removed when there are binaries for h5py on 3.11
+          - libhdf5-dev
+      envs: |
+        - linux: py311-devdeps
+        - linux: py39-conda
+          libraries: ''
+
   publish:
     # Build wheels when pushing to any branch except main
     # publish.yml will only publish if tagged ^v.*
