@@ -530,7 +530,7 @@ def mapsequence_coalign_by_match_template(
 
     Examples
     --------
-    >>> from sunpy.image.coalignment import mapsequence_coalign_by_match_template as mc_coalign
+    >>> from sunkit_image.coalignment import mapsequence_coalign_by_match_template as mc_coalign
     >>> coaligned_mc = mc_coalign(mc)   # doctest: +SKIP
     >>> coaligned_mc = mc_coalign(mc, layer_index=-1)   # doctest: +SKIP
     >>> coaligned_mc = mc_coalign(mc, clip=False)   # doctest: +SKIP
@@ -663,13 +663,13 @@ def mapsequence_coalign_by_rotation(mc, layer_index=0, clip=True, shift=None, **
     Examples
     --------
     >>> import sunpy.data.sample  # doctest: +REMOTE_DATA
-    >>> from sunpy.physics.solar_rotation import mapsequence_solar_derotate
+    >>> from sunkit_image.coalignment import mapsequence_coalign_by_rotation
     >>> map1 = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)  # doctest: +REMOTE_DATA
     >>> map2 = sunpy.map.Map(sunpy.data.sample.EIT_195_IMAGE)  # doctest: +REMOTE_DATA
     >>> mc = sunpy.map.Map([map1, map2], sequence=True)  # doctest: +REMOTE_DATA
-    >>> derotated_mc = mapsequence_solar_derotate(mc)  # doctest: +SKIP
-    >>> derotated_mc = mapsequence_solar_derotate(mc, layer_index=-1)  # doctest: +SKIP
-    >>> derotated_mc = mapsequence_solar_derotate(mc, clip=False)  # doctest: +SKIP
+    >>> derotated_mc = mapsequence_coalign_by_rotation(mc)  # doctest: +SKIP
+    >>> derotated_mc = mapsequence_coalign_by_rotation(mc, layer_index=-1)  # doctest: +SKIP
+    >>> derotated_mc = mapsequence_coalign_by_rotation(mc, clip=False)  # doctest: +SKIP
     """
     nt = len(mc.maps)
     xshift_keep = np.zeros(nt) * u.pix
