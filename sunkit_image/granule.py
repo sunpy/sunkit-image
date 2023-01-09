@@ -377,8 +377,8 @@ def cross_correlation(segment1, segment2):
     percentage_agreement_intergranules = \
         intergranule_agreement_count / total_intergranules
     try:
-        confidence = np.mean(percentage_agreement_granules,
-                             percentage_agreement_intergranules)
+        confidence = np.mean([percentage_agreement_granules,
+                             percentage_agreement_intergranules])
     except TypeError:
         confidence = 0
 
