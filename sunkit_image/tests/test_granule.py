@@ -1,7 +1,4 @@
-import sys
-sys.path.append('..')  # nopep8
 import unittest
-import granule
 import random
 import numpy as np
 import sunpy
@@ -9,12 +6,13 @@ import sunpy.map as sm
 from sunpy.coordinates import frames
 from astropy.io import fits
 import os
-import pathlib as pl
-import scipy
-import scipy.io as sio
+# import pathlib as pl
+# import scipy
+# import scipy.io as sio
 import shutil
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+import sunkit_image.granule as granule
 
 
 class TestUtils(unittest.TestCase):
@@ -29,7 +27,7 @@ class TestUtils(unittest.TestCase):
         #cls.dkist_res = 0.016
         cls.res =  0.016
 
-        mock_data =  fits.open('granule_testdata.fits')[0].data
+        mock_data =  fits.open('sunkit_image/tests/granule_testdata.fits')[0].data
         coord = SkyCoord(np.nan * u.arcsec,
                     np.nan * u.arcsec,
                     obstime='1111-11-11 11:11',
@@ -45,8 +43,7 @@ class TestUtils(unittest.TestCase):
                                       telescope='Unknown',
                                       instrument='Unknown',
                                       wavelength=np.nan * u.angstrom)
-        data_map = sunpy.map.Map(mock_data, mock_header)
-        cls.data_map = 
+        cls.data_map = sunpy.map.Map(mock_data, mock_header)
 
         # cls.dkist_fileid = 'DKIST_example'
         # cls.ibis_fileid = 'IBIS_example'
@@ -83,6 +80,7 @@ class TestUtils(unittest.TestCase):
         segmented = granule.segment(self.id, self.data_map,
                                     self.test_method, self.res,
                                     True, False, 'test_output/')
+
         test_type = type(segmented)
         # Test 1: check that the returned type is correct
         self.assertEqual(test_type, sunpy.map.mapbase.GenericMap)
@@ -106,7 +104,7 @@ class TestUtils(unittest.TestCase):
         # ------ error raising tests ------ :
         # Test 5: check that errors are raised for incorrect inputs
         self.assertRaises(TypeError, granule.segment, self.id,
-                          np.array([1,2,3], [1,2,3]), self.test_method,
+                          np.array([[1,2,3], [1,2,3]]), self.test_method,
                           self.res)
         self.assertRaises(TypeError, granule.segment, self.id,
                           self.data_map, 'method',
@@ -188,7 +186,7 @@ class TestUtils(unittest.TestCase):
         thresholded = np.uint8(self.data_map.data > np.nanmedian(self.data_map.data))
         faculae_marked = granule.mark_faculae(thresholded,
                                               self.data_map.data,
-                                              res=self.ibis_res)
+                                              res=self.res)
 
         # Test 1: check that the correct dimensions are returned
         self.assertEqual(thresholded.shape,
@@ -207,7 +205,7 @@ class TestUtils(unittest.TestCase):
                           granule.mark_faculae,
                           self.data_map.data,
                           self.data_map.data,
-                          res=self.ibis_res)
+                          res=self.res)
 
     def test_kmeans_segment(self):
         """ Unit tests for test_kmeans() function
