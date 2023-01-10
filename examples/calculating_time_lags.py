@@ -95,6 +95,7 @@ print("Time lag, B -> A =", time_lag(s_b, s_a, time))
 # As an example, we'll create a fake data cube by repeating Gaussian
 # pulses with varying means and then add some noise to them
 
+
 means_a = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
 means_b = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
 noise = 0.2 * (-0.5 + np.random.rand(*means_a.shape))
@@ -108,14 +109,13 @@ max_cc_map = max_cross_correlation(s_a, s_b, time)
 tl_map = time_lag(s_a, s_b, time)
 
 fig = plt.figure(figsize=(10, 5))
-
 ax = fig.add_subplot(121)
-im = ax.imshow(tl_map, cmap="RdBu", vmin=-1, vmax=1)
+im = ax.imshow(tl_map.value, cmap="RdBu", vmin=-1, vmax=1)
 cax = make_axes_locatable(ax).append_axes("right", size="5%", pad="1%")
 cb = fig.colorbar(im, cax=cax)
 cb.set_label(r"$\tau_{AB}$ [s]")
 ax = fig.add_subplot(122)
-im = ax.imshow(max_cc_map, vmin=0, vmax=1, cmap="magma")
+im = ax.imshow(max_cc_map.value, vmin=0, vmax=1, cmap="magma")
 cax = make_axes_locatable(ax).append_axes("right", size="5%", pad="1%")
 cb = fig.colorbar(im, cax=cax)
 cb.set_label(r"Max cross-correlation")
