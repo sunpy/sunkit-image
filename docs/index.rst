@@ -26,7 +26,7 @@ sunkit-image
           :maxdepth: 1
 
           generated/gallery/index
-          whatsnew/index
+          changelog
 
 Installation
 ============
