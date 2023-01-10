@@ -25,7 +25,7 @@ jobs:
     with:
       submodules: false
       coverage: codecov
-      toxdeps: tox-pypi-filter
+      toxdeps: "'tox<4' tox-pypi-filter"
       posargs: -n auto
       envs: |
         - linux: py310
@@ -36,7 +36,7 @@ jobs:
     with:
       submodules: false
       coverage: codecov
-      toxdeps: tox-pypi-filter
+      toxdeps: "'tox<4' tox-pypi-filter"
       posargs: -n auto
       envs: |
         - macos: py310
@@ -50,7 +50,7 @@ jobs:
       default_python: '3.9'
       submodules: false
       pytest: false
-      toxdeps: tox-pypi-filter
+      toxdeps: "'tox<4' tox-pypi-filter"
       cache-key: docs-${{ github.run_id }}
       libraries: |
         apt:
@@ -66,7 +66,7 @@ jobs:
       default_python: '3.8'
       submodules: false
       coverage: codecov
-      toxdeps: tox-pypi-filter
+      toxdeps: "'tox<4' tox-pypi-filter"
       posargs: -n auto --dist loadgroup
       envs: |
         - linux: py39-online
@@ -82,7 +82,7 @@ jobs:
       default_python: '3.8'
       submodules: false
       coverage: codecov
-      toxdeps: tox-pypi-filter
+      toxdeps: "'tox<4' tox-pypi-filter"
       posargs: -n auto
       libraries: |
         apt:

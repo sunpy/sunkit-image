@@ -41,7 +41,7 @@ jobs:
       - run: *skip-check
       - run: *merge-check
       - run: *apt-install
-      - run: pip install --user -U tox tox-pypi-filter
+      - run: pip install --user -U "tox<4" tox-pypi-filter
       - run: tox -v
       - run:
           name: Running codecov
