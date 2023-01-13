@@ -1,6 +1,5 @@
 """
-This module contains functions that will segment images for 
-granule detection.
+This module contains functions that will segment images for granule detection.
 """
 
 import os
