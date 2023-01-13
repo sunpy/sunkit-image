@@ -60,7 +60,7 @@ def segment(id, data_map, skimage_method, res, plot_intermed=True,
         SunPy map containing segmentated image (with the original header)
     """
 
-    if type(data_map) != sunpy.map.mapbase.GenericMap:
+    if not isinstance(data_map, sunpy.map.mapbase.GenericMap):
         raise TypeError('Input must be sunpy map.')
 
     methods = ['otsu', 'li', 'isodata', 'mean', 'minimum', 'yen', 'triangle']
@@ -191,7 +191,7 @@ def get_threshold(data, method):
         Threshold value.
     """
 
-    if not type(data) == np.ndarray:
+    if not isinstance(data, np.ndarray):
         raise ValueError('Input data must be an array.')
 
     methods = ['otsu', 'li', 'isodata', 'mean', 'minimum', 'yen', 'triangle']
