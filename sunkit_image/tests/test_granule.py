@@ -148,8 +148,9 @@ def test_mark_faculae(test_inputs):
     # -------- positive tests -------- :
     #data_map = funclib.sav_to_map(self.ibis_testfile, self.test_band)
     thresholded = np.uint8(data_map.data > np.nanmedian(data_map.data))
-    faculae_marked = granule.mark_faculae(thresholded, data_map.data,
-                                          res=test_res)
+    faculae_marked, fac_cnt, gran_cnt = granule.mark_faculae(thresholded,
+                                                             data_map.data,
+                                                             res=test_res)
 
     # Test 1: check that the correct dimensions are returned
     assert thresholded.shape == faculae_marked.shape
