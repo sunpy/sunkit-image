@@ -9,34 +9,37 @@ import astropy.units as u
 from astropy.coordinates import SkyCoord
 import sunkit_image.granule as granule
 
+
 @pytest.fixture
 def test_inputs():
 
-    mock_data =  fits.open('sunkit_image/tests/granule_testdata.fits')[0].data
+    mock_data = fits.open('sunkit_image/tests/granule_testdata.fits')[0].data
     coord = SkyCoord(np.nan * u.arcsec,
-                np.nan * u.arcsec,
-                obstime='1111-11-11 11:11',
-                observer='earth',
-                frame=frames.Helioprojective)
-    mock_header = \
-    sunpy.map.make_fitswcs_header(data=np.empty((0, 0)),
-                                    coordinate=coord,
-                                    reference_pixel=[np.nan, np.nan]
-                                    * u.pixel,
-                                    scale=[np.nan, np.nan]
-                                    * u.arcsec / u.pixel,
-                                    telescope='Unknown',
-                                    instrument='Unknown',
-                                    wavelength=np.nan * u.angstrom)
+                     np.nan * u.arcsec,
+                     obstime='1111-11-11 11:11',
+                     observer='earth',
+                     frame=frames.Helioprojective)
+    mock_header = sunpy.map.make_fitswcs_header(data=np.empty((0, 0)),
+                                                coordinate=coord,
+                                                reference_pixel=[np.nan,
+                                                                 np.nan]
+                                                * u.pixel,
+                                                scale=[np.nan, np.nan]
+                                                * u.arcsec / u.pixel,
+                                                telescope='Unknown',
+                                                instrument='Unknown',
+                                                wavelength=np.nan
+                                                * u.angstrom)
     data_map = sunpy.map.Map(mock_data, mock_header)
 
-    test_res =  0.016
+    test_res = 0.016
     test_method = 'li'
 
     return data_map, test_res, test_method
 
+
 def test_segment(test_inputs):
-    """ 
+    """
     Unit tests for segment() function
     """
 
@@ -65,10 +68,13 @@ def test_segment(test_inputs):
 
     # ------ error raising tests ------ :
     # Test 5: check that errors are raised for incorrect inputs
-    with pytest.raises(TypeError, match = 'Input must be sunpy map.'):
-        granule.segment(np.array([[1,2,3], [1,2,3]]), test_method, test_res)
-    with pytest.raises(TypeError, match = 'Method must be one of: '):
+    with pytest.raises(TypeError, match='Input must be sunpy map.'):
+        granule.segment(np.array([[1, 2, 3], [1, 2, 3]]),
+                        test_method,
+                        test_res)
+    with pytest.raises(TypeError, match='Method must be one of: '):
         granule.segment(data_map, 'banana', test_res)
+
 
 def test_get_threshold(test_inputs):
     """
@@ -93,10 +99,11 @@ def test_get_threshold(test_inputs):
 
     # ------ error raising tests ------ :
     # Test 4: check that errors are raised for incorrect inputs
-    with pytest.raises(ValueError, match = 'Input data must be an array.'):
+    with pytest.raises(ValueError, match='Input data must be an array.'):
         granule.get_threshold([], test_method)
-    with pytest.raises(ValueError, match = 'Method must be one of: '):
+    with pytest.raises(ValueError, match='Method must be one of: '):
         granule.get_threshold(test_arr1, 'banana')
+
 
 def test_trim_intergranules(test_inputs):
     """
@@ -129,14 +136,15 @@ def test_trim_intergranules(test_inputs):
     # 0-valued pixels as input array (for a data set which we
     # know by eye should have some middle sections removed)
     middles_removed = granule.trim_intergranules(thresholded)
-    assert (np.count_nonzero(middles_removed) 
+    assert (np.count_nonzero(middles_removed)
             < np.count_nonzero(thresholded)) is False
 
     # ------ error raising tests ------ :
     # Test 5: check that raises error if passed array is not binary
     with pytest.raises(ValueError,
-                       match = 'segmented_image must have only values of 1 and 0'):
+                       match='segmented_image must have only values of 1 and 0'):
         granule.trim_intergranules(data_map)
+
 
 def test_mark_faculae(test_inputs):
     """
@@ -146,7 +154,6 @@ def test_mark_faculae(test_inputs):
     data_map, test_res, _ = test_inputs
 
     # -------- positive tests -------- :
-    #data_map = funclib.sav_to_map(self.ibis_testfile, self.test_band)
     thresholded = np.uint8(data_map.data > np.nanmedian(data_map.data))
     faculae_marked, fac_cnt, gran_cnt = granule.mark_faculae(thresholded,
                                                              data_map.data,
@@ -164,9 +171,10 @@ def test_mark_faculae(test_inputs):
 
     # ------ error raising tests ------ :
     # Test 4: check that errors are raised for incorrect inputs
-    with pytest.raises(ValueError, match = 'segmented_image must have only ' +
-                         'values of 1, 0 an 0.5 (if dim centers marked)'):
+    with pytest.raises(ValueError, match='segmented_image must have only ' +
+                       'values of 1, 0 an 0.5 (if dim centers marked)'):
         granule.mark_faculae(data_map.data, data_map.data, test_res)
+
 
 def test_kmeans_segment():
     """
@@ -181,7 +189,7 @@ def test_kmeans_segment():
     array_to_be_clustered[0, 0] = 1
     array_to_be_clustered[0, 1] = 2
     clustered_array = granule.kmeans_segment(array_to_be_clustered,
-                                                llambda_axis=-1)
+                                             llambda_axis=-1)
     assert np.shape(clustered_array)[0] == N
 
     # -------- negative tests -------- :
@@ -194,8 +202,9 @@ def test_kmeans_segment():
 
     # ------ error raising tests ------ :
     # Test 3: should error if passed in data of wrong shape
-    with pytest.raises(Exception, match = 'Wrong data shape.'):
+    with pytest.raises(Exception, match='Wrong data shape.'):
         granule.kmeans_segment(array_to_be_clustered, 3)
+
 
 def test_cross_correlation(self):
     """
@@ -210,7 +219,7 @@ def test_cross_correlation(self):
     test_array_1[0, 0] = 0
     test_array_2[0, 0] = 0
     self.assertEqual(0, granule.cross_correlation(test_array_1,
-                                                    test_array_2)[0])
+                                                  test_array_2)[0])
 
     # Test 2: if cross correlation too low, return -1:
     test_array_1 = np.ones((test_size, test_size))
@@ -229,5 +238,5 @@ def test_cross_correlation(self):
     # Test 1: error if no granules or intergranules in skimage cluster
     test_array_1 = np.ones((test_size, test_size))
     test_array_2 = np.ones((test_size, test_size))
-    with pytest.raises(Exception, match = 'clustering problematic'):
+    with pytest.raises(Exception, match='clustering problematic'):
         granule.cross_correlation(test_array_1, test_array_2)
