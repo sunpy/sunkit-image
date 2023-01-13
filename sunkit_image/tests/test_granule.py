@@ -6,9 +6,6 @@ import sunpy.map as sm
 from sunpy.coordinates import frames
 from astropy.io import fits
 import os
-# import pathlib as pl
-# import scipy
-# import scipy.io as sio
 import shutil
 import astropy.units as u
 from astropy.coordinates import SkyCoord
@@ -21,10 +18,7 @@ class TestUtils(unittest.TestCase):
     def setUpClass(cls):
         """ Set up for unit testing by creating toy data
         """
-        #cls.ibis_testfile = 'data/IBIS/IBIS_example.sav'
-        #cls.ibis_res = 0.096
-        #cls.dkist_testfile = 'data/DKIST/DKIST_example.fits'
-        #cls.dkist_res = 0.016
+
         cls.res =  0.016
 
         mock_data =  fits.open('sunkit_image/tests/granule_testdata.fits')[0].data
@@ -45,10 +39,6 @@ class TestUtils(unittest.TestCase):
                                       wavelength=np.nan * u.angstrom)
         cls.data_map = sunpy.map.Map(mock_data, mock_header)
 
-        # cls.dkist_fileid = 'DKIST_example'
-        # cls.ibis_fileid = 'IBIS_example'
-        # cls.ibis_instrument = 'IBIS'
-        # cls.dkist_instrument = 'DKIST'
         cls.id = 'example'
         cls.test_method = 'li'
         cls.test_band = 'rosa_gband'
@@ -59,14 +49,8 @@ class TestUtils(unittest.TestCase):
         """ Tear down unit testing toy data
         """
 
-        # cls.ibis_testfile = None
-        # cls.dkist_testfile = None
         cls.data_map =  None
-        # cls.ibis_fileid = None
-        # cls.dkist_fileid = None
         cls.id = None
-        # cls.ibis_instrument = None
-        # cls.dkist_instrument = None
         cls.test_method = None
         cls.test_band = None
         shutil.rmtree('test_output')
