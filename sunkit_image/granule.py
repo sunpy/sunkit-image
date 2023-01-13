@@ -1,6 +1,5 @@
 """
-This module contains functions that will segment images for 
-granule detection.
+This module contains functions that will segment images for granule detection.
 """
 
 import os
@@ -30,24 +29,35 @@ def segment(id, data_map, skimage_method, res, plot_intermed=True,
     """
     Segment optical image of the solar photosphere into tri-value maps
     with 0 = intergranule, 0.5 = faculae, 1 = granule.
+
+    Parameters
     ----------
-    Parameters:
-        id (string): identifying name of map to be segmented, for file naming
-        data_map (SunPy map): SunPy map containing data to segment
-        skimage_method (string): skimage thresholding method -
-                                options are 'otsu', 'li', 'isodata',
-                                'mean', 'minimum', 'yen', 'triangle'
-        plot_intermed (True or False): whether to plot and save intermediate
-                                data product image
-        mark_dim_centers (True or False): whether to mark dim granule centers
-                                as a seperate catagory for future exploration
-        out_dir (str): Desired directory in which to save intermediate data
-                                product image (if plot_intermed = True);
-        res (float): Spatial resolution (arcsec/pixel) of the data
-    ----------
-    Returns:
-        segmented_map (SunPy map): SunPy map containing segmentated image
-                              (with the original header)
+    id : `str`
+        Identifying name of map to be segmented, for file naming.
+    data_map : `SunPy map`
+        SunPy map containing data to segment
+    skimage_method : `str` 
+        skimage thresholding method, with options 'otsu', 'li', 'isodata',
+        'mean', 'minimum', 'yen', and 'triangle'.
+        Note - depending on input data, one or more of these methods may be
+        signifcantly better or worse than the others. Typically, 'li', 'otsu',
+        'mean', and 'isodata' are good choices, 'yen' and 'triangle' over-
+        identify intergranule material, and 'minimum' overidentifies granules.
+    plot_intermed : `bool`
+        Whether to plot and save intermediate data product image.
+    mark_dim_centers : `bool`
+        Whether to mark dim granule centers as a seperate catagory for future
+        exploration.
+    out_dir : `str` 
+        Desired directory in which to save intermediate data product image
+        (if plot_intermed = True).
+    res : `float` 
+        Spatial resolution (arcsec/pixel) of the data
+
+    Returns
+    -------
+    segmented_map : `SunPy map` 
+        SunPy map containing segmentated image (with the original header)
     """
 
     if type(data_map) != sunpy.map.mapbase.GenericMap:
@@ -166,14 +176,19 @@ def segment(id, data_map, skimage_method, res, plot_intermed=True,
 def get_threshold(data, method):
     """
     Get the threshold value using given skimage segmentation type.
+
+    Parameters
     ----------
-    Parameters:
-        data (numpy array): data to threshold
-        method (string): skimage thresholding method - options are 'otsu',
-                        'li', 'isodata', 'mean', 'minimum', 'yen', 'triangle'
-    ----------
-    Returns:
-        threshold (float): threshold
+    data : `numpy.ndarray` 
+        Data to threshold.
+    method : `str` 
+        Skimage thresholding method - options are 'otsu', 'li', 'isodata',
+        'mean', 'minimum', 'yen', 'triangle'.
+
+    Returns
+    -------
+    threshold `float`: 
+        Threshold value.
     """
 
     if not type(data) == np.ndarray:
@@ -182,19 +197,19 @@ def get_threshold(data, method):
     methods = ['otsu', 'li', 'isodata', 'mean', 'minimum', 'yen', 'triangle']
     if method not in methods:
         raise ValueError('Method must be one of: ' + str(methods))
-    if method == 'otsu':  # works ok, but classifies low-flux ganules as IG
+    if method == 'otsu':
         threshold = skimage.filters.threshold_otsu(data)
-    elif method == 'li':  # slightly better than otsu
+    elif method == 'li':
         threshold = skimage.filters.threshold_li(data)
-    elif method == 'yen':  # poor - overidentifies IG
+    elif method == 'yen':
         threshold = skimage.filters.threshold_yen(data)
-    elif method == 'mean':  # similar to li
+    elif method == 'mean':
         threshold = skimage.filters.threshold_mean(data)
-    elif method == 'minimum':  # terrible - identifies almost all as granule
+    elif method == 'minimum':
         threshold = skimage.filters.threshold_minimum(data)
-    elif method == 'triangle':  # overidentifies IG worse than yen
+    elif method == 'triangle':
         threshold = skimage.filters.threshold_triangle(data)
-    elif method == 'isodata':  # similar to otsu
+    elif method == 'isodata': 
         threshold = skimage.filters.threshold_isodata(data)
 
     return threshold
@@ -204,16 +219,20 @@ def trim_intergranules(segmented_image, mark=False):
     """
     Remove the erronous idenfication of intergranule material in the
     middle of granules that pure threshold segmentation produces.
+
+    Parameters
     ----------
-    Parameters:
-        segmented_image (numpy array): the segmented image containing
-                                       incorrect extra intergranules
-        mark (bool): if False, remove erronous intergranules. If True,
-                     mark them as 0.5 instead (for later examination).
-    ----------
-    Returns:
-        segmented_image_fixed (numpy array): the segmented image without
-                                             incorrect extra intergranules
+    segmented_image : `numpy.ndarray`
+        The segmented image containing incorrect extra intergranules.
+    mark : `bool` 
+        If False, remove erronous intergranules. If True, mark them as 0.5
+        instead (for later examination).
+
+
+    Returns
+    -------
+    segmented_image_fixed : `numpy.ndarray`
+        The segmented image without incorrect extra intergranules.
     """
 
     if len(np.unique(segmented_image)) > 2:
@@ -244,16 +263,20 @@ def trim_intergranules(segmented_image, mark=False):
 def mark_faculae(segmented_image, data, res):
     """
     Mark faculae seperatley from granules - give them a value of 2 not 1.
+
+    Parameters
     ----------
-    Parameters:
-        segmented_image (numpy array): the segmented image containing
-                                incorrect middles
-        data (numpy array): the original flux values
-        res (float): Spatial resolution (arcsec/pixel) of the data
-    ----------
-    Returns:
-        segmented_image_fixed (numpy array): the segmented image with faculae
-                                             marked as 1.5
+    segmented_image : `numpy.ndarray`
+        The segmented image containing incorrect middles.
+    data : `numpy array`
+        The original flux values.
+    res : `float`
+        Spatial resolution (arcsec/pixel) of the data.
+
+    Returns
+    -------
+    segmented_image_fixed : `numpy.ndrray`
+        The segmented image with faculae marked as 1.5.
     """
 
     fac_size_limit = 2  # max size of a faculae in sqaure arcsec
@@ -284,18 +307,24 @@ def mark_faculae(segmented_image, data, res):
     return segmented_image_fixed
 
 def kmeans_segment(data, llambda_axis=-1):
-    """kmeans clustering: uses a kmeans algorithm to cluster data,
-       in order to independently verify the skimage clustering method
-       (e.g using cross_correlation() below).
-        ----------
-       Parameters:
-            data (numpy array): data to be clustered
-            llambda_axis (int): index for wavelength, -1 if scalar array.
-        ----------
-        Returns:
-            labels (numpy array): an array of labels, with 0 = granules,
-                                  2 = intergranules, 1 = in-between.
-            """
+    """
+    kmeans clustering: uses a kmeans algorithm to cluster data,
+    in order to independently verify the skimage clustering method
+    (e.g using cross_correlation() below).
+
+    Parameters
+    ----------
+    data : `numpy array`
+        Data to be clustered.
+    llambda_axis : `int`
+        Index for wavelength, -1 if scalar array.
+
+    Returns
+    -------
+    labels : `numpy.ndarray`
+        An array of labels, with 0 = granules, 2 = intergranules,
+        1 = in-between.
+        """
 
     if llambda_axis not in [-1, 2]:
         raise Exception('Wrong data shape. \
@@ -334,21 +363,22 @@ def cross_correlation(segment1, segment2):
     Return -1 and print a message if the agreement between two
     arrays is low, 0 otherwise. Designed to be used with segment
     and segment_kmeans function.
+
+    Parameters
     ----------
-    Parameters:
-        segment1 (numpy array): 'main' array to compare the other input
-                                 array against.
-        segment2 (numpy array): 'other' array (i.e. data
-                                 segmented using kmeans).
-    ----------
-    Returns:
-        [label, confidence] (list): where
-        label is a label to summarize the confidence metric (int):
+    segment1 : `numpy.ndarray`
+        'main' array to compare the other input array against.
+    segment2 : `numpy.ndarray`
+        'other' array (i.e. data segmented using kmeans).
+
+    Returns
+    -------
+    [label, confidence] : `list`
+        'Label' (int) summarizes the confidence metric - 
             -1: if agreement is low (below 75%)
             0: otherwise
-        confidence is the actual confidence metric (float):
-            float between 0 and 1 (0 if no agreement,
-                                   1 if completely agrees)
+        'confidence' (float) is the numeric confidence metric -
+            float between 0 and 1 (0 if no agreement, 1 if completely agrees).
     """
 
     total_granules = np.count_nonzero(segment1 == 1)
