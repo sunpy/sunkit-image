@@ -25,7 +25,6 @@ __all__ = [
 
 def segment(id, data_map, skimage_method, res, plot_intermed=True,
             mark_dim_centers=False, out_dir='output/'):
-
     """
     Segment optical image of the solar photosphere into tri-value maps
     with 0 = intergranule, 0.5 = faculae, 1 = granule.
@@ -279,7 +278,7 @@ def mark_faculae(segmented_image, data, res):
         The segmented image with faculae marked as 1.5.
     """
 
-    fac_size_limit = 2  # max size of a faculae in sqaure arcsec
+    fac_size_limit = 2  # max size of a faculae in sqaure arcsec 
     fac_pix_limit = fac_size_limit / res
     fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
 
