@@ -18,6 +18,7 @@ __all__ = [
     "cross_correlation",
 ]
 
+
 def segment(data_map, skimage_method, res, mark_dim_centers=False):
     """
     Segment optical image of the solar photosphere into tri-value maps
@@ -27,14 +28,14 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
     ----------
     data_map : `SunPy map`
         SunPy map containing data to segment
-    skimage_method : `str` 
+    skimage_method : `str`
         skimage thresholding method, with options 'otsu', 'li', 'isodata',
         'mean', 'minimum', 'yen', and 'triangle'.
         Note - depending on input data, one or more of these methods may be
         signifcantly better or worse than the others. Typically, 'li', 'otsu',
         'mean', and 'isodata' are good choices, 'yen' and 'triangle' over-
         identify intergranule material, and 'minimum' overidentifies granules.
-    res : `float` 
+    res : `float`
         Spatial resolution (arcsec/pixel) of the data
     mark_dim_centers : `bool`
         Whether to mark dim granule centers as a seperate catagory for future
@@ -42,7 +43,7 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
 
     Returns
     -------
-    segmented_map : `SunPy map` 
+    segmented_map : `SunPy map`
         SunPy map containing segmentated image (with the original header)
     """
 
@@ -70,7 +71,7 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
 
     # mark faculae and get final granule and facule count
     seg_im_markfac, fac_cnt, gran_cnt = mark_faculae(seg_im_fixed, data, res)
-    print('Segmentation has identified ' + str(gran_cnt) + ' granules and '+ 
+    print('Segmentation has identified ' + str(gran_cnt) + ' granules and ' +
           str(fac_cnt) + 'faculae')
 
     # convert segmentated image back into SunPy map with original header
@@ -78,21 +79,22 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
 
     return segmented_map
 
+
 def get_threshold(data, method):
     """
     Get the threshold value using given skimage segmentation type.
 
     Parameters
     ----------
-    data : `numpy.ndarray` 
+    data : `numpy.ndarray`
         Data to threshold.
-    method : `str` 
+    method : `str`
         Skimage thresholding method - options are 'otsu', 'li', 'isodata',
         'mean', 'minimum', 'yen', 'triangle'.
 
     Returns
     -------
-    threshold `float`: 
+    threshold `float`:
         Threshold value.
     """
 
@@ -114,7 +116,7 @@ def get_threshold(data, method):
         threshold = skimage.filters.threshold_minimum(data)
     elif method == 'triangle':
         threshold = skimage.filters.threshold_triangle(data)
-    elif method == 'isodata': 
+    elif method == 'isodata':
         threshold = skimage.filters.threshold_isodata(data)
 
     return threshold
@@ -129,7 +131,7 @@ def trim_intergranules(segmented_image, mark=False):
     ----------
     segmented_image : `numpy.ndarray`
         The segmented image containing incorrect extra intergranules.
-    mark : `bool` 
+    mark : `bool`
         If False, remove erronous intergranules. If True, mark them as 0.5
         instead (for later examination).
 
@@ -184,7 +186,7 @@ def mark_faculae(segmented_image, data, res):
         The segmented image with faculae marked as 1.5.
     """
 
-    fac_size_limit = 2  # max size of a faculae in sqaure arcsec 
+    fac_size_limit = 2  # max size of a faculae in sqaure arcsec
     fac_pix_limit = fac_size_limit / res
     fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
 
@@ -211,9 +213,10 @@ def mark_faculae(segmented_image, data, res):
                     segmented_image_fixed[mask == 1] = 1.5
                     fac_count += 1
 
-    gran_count = len(values) - 1 - fac_count # subtract 1 for IG region     
+    gran_count = len(values) - 1 - fac_count  # subtract 1 for IG region
 
     return segmented_image_fixed, fac_count, gran_count
+
 
 def kmeans_segment(data, llambda_axis=-1):
     """
@@ -267,6 +270,7 @@ def kmeans_segment(data, llambda_axis=-1):
 
     return segmented_map
 
+
 def cross_correlation(segment1, segment2):
     """
     Return -1 and print a message if the agreement between two
@@ -283,7 +287,7 @@ def cross_correlation(segment1, segment2):
     Returns
     -------
     [label, confidence] : `list`
-        'Label' (int) summarizes the confidence metric - 
+        'Label' (int) summarizes the confidence metric -
             -1: if agreement is low (below 75%)
             0: otherwise
         'confidence' (float) is the numeric confidence metric -
