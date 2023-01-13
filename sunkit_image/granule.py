@@ -66,14 +66,15 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
     segmented_image = np.uint8(median_filtered > threshold)
 
     # fix the extra IGM bits in the middle of granules
-    segmented_image_fixed = trim_intergranules(segmented_image,
-                                               mark=mark_dim_centers)
+    seg_im_fixed = trim_intergranules(segmented_image, mark=mark_dim_centers)
 
-    # mark faculae
-    segmented_image_markfac = mark_faculae(segmented_image_fixed, data, res)
+    # mark faculae and get final granule and facule count
+    seg_im_markfac, fac_cnt, gran_cnt = mark_faculae(seg_im_fixed, data, res)
+    print('Segmentation has identified ' + str(gran_cnt) + ' granules and '+ 
+          str(fac_cnt) + 'faculae')
 
     # convert segmentated image back into SunPy map with original header
-    segmented_map = sunpy.map.Map(segmented_image_markfac, header)
+    segmented_map = sunpy.map.Map(seg_im_markfac, header)
 
     return segmented_map
 
@@ -195,6 +196,7 @@ def mark_faculae(segmented_image, data, res):
     segmented_image_fixed = np.copy(segmented_image.astype(float))
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
+    fac_count = 0
     for value in values:
         mask = np.zeros_like(segmented_image)
         mask[labeled_seg == value] = 1
@@ -207,8 +209,11 @@ def mark_faculae(segmented_image, data, res):
                 # check that avg flux very high
                 if tot_flux / region_size > fac_brightness_limit:
                     segmented_image_fixed[mask == 1] = 1.5
+                    fac_count += 1
 
-    return segmented_image_fixed
+    gran_count = len(values) - 1 - fac_count # subtract 1 for IG region     
+
+    return segmented_image_fixed, fac_count, gran_count
 
 def kmeans_segment(data, llambda_axis=-1):
     """
