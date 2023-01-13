@@ -31,25 +31,19 @@ def test_inputs():
     data_map = sunpy.map.Map(mock_data, mock_header)
 
     test_res =  0.016
-    test_id = 'example'
     test_method = 'li'
-    test_band = 'rosa_gband'
-    test_header = None
 
-    return data_map, test_res, test_id, test_method, test_band, test_header
+    return data_map, test_res, test_method
 
 def test_segment(test_inputs):
     """ 
     Unit tests for segment() function
     """
 
-    data_map, test_res, test_id, test_method, _, _ = test_inputs
+    data_map, test_res, test_method = test_inputs
 
     # -------- positive tests -------- :
-    # data_map = funclib.sav_to_map(self.ibis_testfile, self.test_band)
-    segmented = granule.segment(test_id, data_map,
-                                test_method, test_res,
-                                True, False, 'test_output/')
+    segmented = granule.segment(data_map, test_method, test_res, True)
 
     # Test 1: check that the returned type is correct
     assert type(segmented) is sunpy.map.mapbase.GenericMap
@@ -72,17 +66,16 @@ def test_segment(test_inputs):
     # ------ error raising tests ------ :
     # Test 5: check that errors are raised for incorrect inputs
     with pytest.raises(TypeError, match = 'Input must be sunpy map.'):
-        granule.segment(test_id, np.array([[1,2,3], [1,2,3]]), test_method,
-                        test_res)
+        granule.segment(np.array([[1,2,3], [1,2,3]]), test_method, test_res)
     with pytest.raises(TypeError, match = 'Method must be one of: '):
-        granule.segment(test_id, data_map, 'banana', test_res)
+        granule.segment(data_map, 'banana', test_res)
 
 def test_get_threshold(test_inputs):
     """
     Unit tests for get_threshold() function
     """
 
-    _, _, _, test_method, _, _ = test_inputs
+    _, _, test_method = test_inputs
 
     # -------- positive tests -------- :
     # Test 1: check type of output
@@ -110,10 +103,9 @@ def test_trim_intergranules(test_inputs):
     Unit tests for trim_intergranules() function
     """
 
-    data_map, _, _, _, _, _ = test_inputs
+    data_map, _, _ = test_inputs
 
     # -------- positive tests -------- :
-    # data_map = granule.sav_to_map(self.ibis_testfile, self.test_band)
     thresholded = np.uint8(data_map.data > np.nanmedian(data_map.data))
     # Test 1: check that returned array is not empty
     assert np.size(thresholded) > 0
@@ -151,7 +143,7 @@ def test_mark_faculae(test_inputs):
     Unit tests for mark_faculae() function
     """
 
-    data_map, test_res, _, _, _, _ = test_inputs
+    data_map, test_res, _ = test_inputs
 
     # -------- positive tests -------- :
     #data_map = funclib.sav_to_map(self.ibis_testfile, self.test_band)
