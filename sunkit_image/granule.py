@@ -2,11 +2,6 @@
 This module contains functions that will segment images for granule detection.
 """
 
-import os
-import matplotlib.pyplot as plt
-import matplotlib.lines as lines
-import matplotlib.patheffects as mpe
-import matplotlib.colors as colors
 import numpy as np
 import scipy.ndimage as sndi
 import skimage
@@ -23,16 +18,13 @@ __all__ = [
     "cross_correlation",
 ]
 
-def segment(id, data_map, skimage_method, res, plot_intermed=True,
-            mark_dim_centers=False, out_dir='output/'):
+def segment(data_map, skimage_method, res, mark_dim_centers=False):
     """
     Segment optical image of the solar photosphere into tri-value maps
     with 0 = intergranule, 0.5 = faculae, 1 = granule.
 
     Parameters
     ----------
-    id : `str`
-        Identifying name of map to be segmented, for file naming.
     data_map : `SunPy map`
         SunPy map containing data to segment
     skimage_method : `str` 
@@ -42,16 +34,11 @@ def segment(id, data_map, skimage_method, res, plot_intermed=True,
         signifcantly better or worse than the others. Typically, 'li', 'otsu',
         'mean', and 'isodata' are good choices, 'yen' and 'triangle' over-
         identify intergranule material, and 'minimum' overidentifies granules.
-    plot_intermed : `bool`
-        Whether to plot and save intermediate data product image.
+    res : `float` 
+        Spatial resolution (arcsec/pixel) of the data
     mark_dim_centers : `bool`
         Whether to mark dim granule centers as a seperate catagory for future
         exploration.
-    out_dir : `str` 
-        Desired directory in which to save intermediate data product image
-        (if plot_intermed = True).
-    res : `float` 
-        Spatial resolution (arcsec/pixel) of the data
 
     Returns
     -------
@@ -84,88 +71,6 @@ def segment(id, data_map, skimage_method, res, plot_intermed=True,
 
     # mark faculae
     segmented_image_markfac = mark_faculae(segmented_image_fixed, data, res)
-
-    if plot_intermed:
-        # show pipeline process
-        fig, ((ax0, ax1), (ax2, ax3)) = plt.subplots(2, 2, figsize=(14, 13))
-        s1 = 16
-        s2 = 22
-        fig.suptitle('Intermediate Processesing Steps \n', fontsize=s2)
-
-        # define colormap to bring out faculae and dim middles
-        col_dict = {0: "black",
-                    0.5: "blue",
-                    1: "white",
-                    1.5: "#ffc406"}
-        cmap = colors.ListedColormap([col_dict[x] for x in col_dict.keys()])
-        norm_bins = np.sort([*col_dict.keys()]) + 0.5
-        norm_bins = np.insert(norm_bins, 0, np.min(norm_bins) - 1.0)
-        norm = colors.BoundaryNorm(norm_bins, 4, clip=True)
-
-        im0 = ax0.imshow(data / np.max(data), origin='lower')
-        ax0.set_title('Scaled Intensity Data', fontsize=s1)
-        plt.colorbar(im0, ax=ax0, shrink=0.8)
-
-        im1 = ax1.imshow(segmented_image, norm=norm, cmap=cmap,
-                         interpolation='none', origin='lower')
-        ax1.set_title('Initial Thresholding', fontsize=s1)
-
-        im2 = ax2.imshow(segmented_image_fixed, norm=norm, cmap=cmap,
-                         interpolation='none', origin='lower')
-        if mark_dim_centers:
-            ax2.set_title('Dim IG Material Marked', fontsize=s1)
-        if not mark_dim_centers:
-            ax2.set_title('Extraneous IG Material Removed', fontsize=s1)
-
-        im3 = ax3.imshow(segmented_image_markfac, norm=norm, cmap=cmap,
-                         interpolation='none', origin='lower')
-        ax3.set_title('Faculae Identified', fontsize=s1)
-
-        plt.tight_layout()
-
-        # rescale axis
-        l0, b0, w0, h0 = ax0.get_position().bounds
-        newpos = [l0, b0-0.01, w0, h0]
-        ax0.set_position(newpos)
-        l1, b1, w1, h1 = ax1.get_position().bounds
-        newpos = [l1, b0-0.01, w0, h0]
-        ax1.set_position(newpos)
-        l2, b2, w2, h2 = ax2.get_position().bounds
-        newpos = [l0, b2, w0, h0]
-        ax2.set_position(newpos)
-        l3, b3, w3, h3 = ax3.get_position().bounds
-        newpos = [l3, b3, w0, h0]
-        ax3.set_position(newpos)
-
-        # add color bar at top
-        outline = mpe.withStroke(linewidth=5, foreground='black')
-        legax = plt.axes([0.1, 0.1, 0.8, 0.85], alpha=0)
-        legax.axis('off')
-        if mark_dim_centers:
-            labels = ['Granule', 'Intergranule', 'Faculae', 'Dim Centers']
-            custom_lines = [lines.Line2D([0], [0], color='white', lw=4,
-                                         path_effects=[outline]),
-                            lines.Line2D([0], [0], color='black', lw=4),
-                            lines.Line2D([0], [0], color="#ffc406", lw=4),
-                            lines.Line2D([0], [0], color='blue', lw=4)]
-            ncol = 4
-        if not mark_dim_centers:
-            labels = ['Granule', 'Intergranule', 'Faculae']
-            custom_lines = [lines.Line2D([0], [0], color='white', lw=4,
-                                         path_effects=[outline]),
-                            lines.Line2D([0], [0], color='black', lw=4),
-                            lines.Line2D([0], [0], color="#ffc406", lw=4)]
-            ncol = 3
-        legax.legend(custom_lines, labels, loc='upper center', ncol=ncol,
-                     fontsize='x-large')
-
-        if not os.path.exists(out_dir):
-            try:
-                os.mkdir(out_dir)
-            except Exception:
-                raise OSError('Could not make directory ' + out_dir)
-
-        plt.savefig(out_dir + 'segmentation_plots_' + id + '.png')
 
     # convert segmentated image back into SunPy map with original header
     segmented_map = sunpy.map.Map(segmented_image_markfac, header)
