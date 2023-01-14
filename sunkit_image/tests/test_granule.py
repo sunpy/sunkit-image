@@ -3,45 +3,29 @@ import random
 import numpy as np
 import pytest
 
-import astropy.units as u
 import sunpy
 import sunpy.map as sm
-from astropy.coordinates import SkyCoord
-from astropy.io import fits
-from sunpy.coordinates import frames
 
 import sunkit_image.granule as granule
 
 
-@pytest.fixture
-def test_inputs():
-    mock_data = fits.open("sunkit_image/tests/granule_testdata.fits")[0].data
-    coord = SkyCoord(
-        np.nan * u.arcsec, np.nan * u.arcsec, obstime="1111-11-11 11:11", observer="earth", frame=frames.Helioprojective
-    )
-    mock_header = sunpy.map.make_fitswcs_header(
-        data=np.empty((0, 0)),
-        coordinate=coord,
-        reference_pixel=[np.nan, np.nan] * u.pixel,
-        scale=[np.nan, np.nan] * u.arcsec / u.pixel,
-        telescope="Unknown",
-        instrument="Unknown",
-        wavelength=np.nan * u.angstrom,
-    )
-    data_map = sunpy.map.Map(mock_data, mock_header)
+@pytest.fixture(scope="session")
+def inputs():
+    import warnings
 
+    with warnings.catch_warnings():
+        data_map = sunpy.map.Map("sunkit_image/tests/granule_testdata.fits")
     test_res = 0.016
     test_method = "li"
-
     return data_map, test_res, test_method
 
 
-def test_segment(test_inputs):
+def test_segment(inputs):
     """
     Unit tests for segment() function.
     """
 
-    data_map, test_res, test_method = test_inputs
+    data_map, test_res, test_method = inputs
 
     # -------- positive tests -------- :
     segmented = granule.segment(data_map, test_method, test_res, True)
@@ -72,12 +56,12 @@ def test_segment(test_inputs):
         granule.segment(data_map, "banana", test_res)
 
 
-def test_get_threshold(test_inputs):
+def test_get_threshold(inputs):
     """
     Unit tests for get_threshold() function.
     """
 
-    _, _, test_method = test_inputs
+    _, _, test_method = inputs
 
     # -------- positive tests -------- :
     # Test 1: check type of output
@@ -101,12 +85,12 @@ def test_get_threshold(test_inputs):
         granule.get_threshold(test_arr1, "banana")
 
 
-def test_trim_intergranules(test_inputs):
+def test_trim_intergranules(inputs):
     """
     Unit tests for trim_intergranules() function.
     """
 
-    data_map, _, _ = test_inputs
+    data_map, _, _ = inputs
 
     # -------- positive tests -------- :
     thresholded = np.uint8(data_map.data > np.nanmedian(data_map.data))
@@ -136,12 +120,12 @@ def test_trim_intergranules(test_inputs):
         granule.trim_intergranules(data_map)
 
 
-def test_mark_faculae(test_inputs):
+def test_mark_faculae(inputs):
     """
     Unit tests for mark_faculae() function.
     """
 
-    data_map, test_res, _ = test_inputs
+    data_map, test_res, _ = inputs
 
     # -------- positive tests -------- :
     thresholded = np.uint8(data_map.data > np.nanmedian(data_map.data))
