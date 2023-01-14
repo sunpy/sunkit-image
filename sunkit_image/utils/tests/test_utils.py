@@ -7,8 +7,6 @@ import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 import sunkit_image.utils as utils
-from sunkit_image import asda
-from sunkit_image.data.test import get_test_filepath
 
 
 @pytest.fixture
@@ -134,82 +132,3 @@ def test_get_radial_intensity_summary(smap):
         expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(0, nbins)])
 
     assert np.allclose(utils.get_radial_intensity_summary(smap=smap, radial_bin_edges=radial_bin_edges), expected)
-
-
-def test_calculate_gamma():
-    vel_file = get_test_filepath("asda_vxvy.npz")
-    get_test_filepath("asda_correct.npz")
-    vxvy = np.load(vel_file, allow_pickle=True)
-    vx = vxvy["vx"]
-    vy = vxvy["vy"]
-    vxvy["data"]
-
-    factor = 1
-    lo = asda.Asda(vx, vy, factor=factor)
-
-    shape = vx.shape
-    r = 3
-
-    index = np.array([[i, j] for i in np.arange(r, shape[0] - r) for j in np.arange(r, shape[1] - r)])
-
-    vel = lo.gen_vel(index[1], index[0])
-
-    pm = np.array(
-        [[i, j] for i in np.arange(-lo.r, lo.r + 1) for j in np.arange(-lo.r, lo.r + 1)],
-        dtype=float,
-    )
-
-    N = (2 * lo.r + 1) ** 2
-
-    pnorm = np.linalg.norm(pm, axis=1)
-
-    cross = np.cross(pm, vel[..., 0])
-    vel_norm = np.linalg.norm(vel[..., 0], axis=2)
-    sint = cross / (pnorm * vel_norm + 1e-10)
-
-    expected = np.nansum(sint, axis=1) / N
-
-    assert np.allclose(expected, utils.calc_gamma(pm, vel[..., 0], pnorm, N))
-
-
-def test_remove_duplicate():
-    test_data = np.random.rand(5, 2)
-    data_ = np.append(test_data, [test_data[0]], axis=0)
-    expected = np.delete(data_, -1, 0)
-
-    with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):
-        utils.remove_duplicate(data_.T)
-
-    assert (utils.remove_duplicate(data_) == expected).all()
-
-
-def test_points_in_poly():
-    test_data = np.asarray([[0, 0], [0, 1], [0, 2], [1, 2], [2, 2], [2, 0]])
-
-    with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):
-        utils.points_in_poly(test_data.T)
-
-    expected = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
-    assert expected == utils.points_in_poly(test_data)
-
-
-def test_reform_2d():
-    test_data = np.asarray([[0, 0], [1, 2], [3, 4]])
-
-    with pytest.raises(ValueError, match="Parameter 'factor' must be an integer!"):
-        utils.reform2d(test_data, 2.2)
-    with pytest.raises(ValueError, match="Input array must be 2d!"):
-        utils.reform2d(test_data[0], 2)
-
-    expected = np.asarray(
-        [
-            [0.0, 0.0, 0.0, 0.0],
-            [0.5, 0.75, 1.0, 1.0],
-            [1.0, 1.5, 2.0, 2.0],
-            [2.0, 2.5, 3.0, 3.0],
-            [3.0, 3.5, 4.0, 4.0],
-            [3.0, 3.5, 4.0, 4.0],
-        ]
-    )
-
-    assert np.allclose(utils.reform2d(test_data, 2), expected)
