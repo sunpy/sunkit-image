@@ -5,9 +5,10 @@ This module contains functions that will segment images for granule detection.
 import numpy as np
 import scipy.ndimage as sndi
 import skimage
+from sklearn.cluster import KMeans as KMeans
+
 import sunpy
 import sunpy.map
-from sklearn.cluster import KMeans as KMeans
 
 __all__ = [
     "segment",
@@ -48,11 +49,11 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
     """
 
     if not isinstance(data_map, sunpy.map.mapbase.GenericMap):
-        raise TypeError('Input must be sunpy map.')
+        raise TypeError("Input must be sunpy map.")
 
-    methods = ['otsu', 'li', 'isodata', 'mean', 'minimum', 'yen', 'triangle']
+    methods = ["otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"]
     if skimage_method not in methods:
-        raise TypeError('Method must be one of: ' + str(methods))
+        raise TypeError("Method must be one of: " + str(methods))
 
     data = data_map.data
     header = data_map.meta
@@ -71,8 +72,7 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
 
     # mark faculae and get final granule and facule count
     seg_im_markfac, fac_cnt, gran_cnt = mark_faculae(seg_im_fixed, data, res)
-    print('Segmentation has identified ' + str(gran_cnt) + ' granules and ' +
-          str(fac_cnt) + 'faculae')
+    print("Segmentation has identified " + str(gran_cnt) + " granules and " + str(fac_cnt) + "faculae")
 
     # convert segmentated image back into SunPy map with original header
     segmented_map = sunpy.map.Map(seg_im_markfac, header)
@@ -99,24 +99,24 @@ def get_threshold(data, method):
     """
 
     if not isinstance(data, np.ndarray):
-        raise ValueError('Input data must be an array.')
+        raise ValueError("Input data must be an array.")
 
-    methods = ['otsu', 'li', 'isodata', 'mean', 'minimum', 'yen', 'triangle']
+    methods = ["otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"]
     if method not in methods:
-        raise ValueError('Method must be one of: ' + str(methods))
-    if method == 'otsu':
+        raise ValueError("Method must be one of: " + str(methods))
+    if method == "otsu":
         threshold = skimage.filters.threshold_otsu(data)
-    elif method == 'li':
+    elif method == "li":
         threshold = skimage.filters.threshold_li(data)
-    elif method == 'yen':
+    elif method == "yen":
         threshold = skimage.filters.threshold_yen(data)
-    elif method == 'mean':
+    elif method == "mean":
         threshold = skimage.filters.threshold_mean(data)
-    elif method == 'minimum':
+    elif method == "minimum":
         threshold = skimage.filters.threshold_minimum(data)
-    elif method == 'triangle':
+    elif method == "triangle":
         threshold = skimage.filters.threshold_triangle(data)
-    elif method == 'isodata':
+    elif method == "isodata":
         threshold = skimage.filters.threshold_isodata(data)
 
     return threshold
@@ -124,8 +124,8 @@ def get_threshold(data, method):
 
 def trim_intergranules(segmented_image, mark=False):
     """
-    Remove the erronous idenfication of intergranule material in the
-    middle of granules that pure threshold segmentation produces.
+    Remove the erronous idenfication of intergranule material in the middle of
+    granules that pure threshold segmentation produces.
 
     Parameters
     ----------
@@ -143,7 +143,7 @@ def trim_intergranules(segmented_image, mark=False):
     """
 
     if len(np.unique(segmented_image)) > 2:
-        raise ValueError('segmented_image must have only values of 1 and 0')
+        raise ValueError("segmented_image must have only values of 1 and 0")
 
     segmented_image_fixed = np.copy(segmented_image).astype(float)
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
@@ -191,8 +191,7 @@ def mark_faculae(segmented_image, data, res):
     fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
 
     if len(np.unique(segmented_image)) > 3:
-        raise ValueError('segmented_image must have only values of 1, 0, ' +
-                         'an 0.5 (if dim centers marked)')
+        raise ValueError("segmented_image must have only values of 1, 0, " + "an 0.5 (if dim centers marked)")
 
     segmented_image = segmented_image
     segmented_image_fixed = np.copy(segmented_image.astype(float))
@@ -220,9 +219,9 @@ def mark_faculae(segmented_image, data, res):
 
 def kmeans_segment(data, llambda_axis=-1):
     """
-    kmeans clustering: uses a kmeans algorithm to cluster data,
-    in order to independently verify the skimage clustering method
-    (e.g using cross_correlation() below).
+    kmeans clustering: uses a kmeans algorithm to cluster data, in order to
+    independently verify the skimage clustering method (e.g using
+    cross_correlation() below).
 
     Parameters
     ----------
@@ -236,11 +235,13 @@ def kmeans_segment(data, llambda_axis=-1):
     labels : `numpy.ndarray`
         An array of labels, with 0 = granules, 2 = intergranules,
         1 = in-between.
-        """
+    """
 
     if llambda_axis not in [-1, 2]:
-        raise Exception('Wrong data shape. \
-        (either scalar or (x, y, llambda) )')
+        raise Exception(
+            "Wrong data shape. \
+        (either scalar or (x, y, llambda) )"
+        )
     n_clusters = 3
     n_init = 20
     x_size = np.shape(data)[0]
@@ -252,8 +253,7 @@ def kmeans_segment(data, llambda_axis=-1):
     else:
         llambda_size = np.shape(data)[llambda_axis]
         data = np.reshape(data, (x_size * y_size, llambda_size))
-        labels = np.reshape(Kmeans(n_clusters, n_init).fit(data),
-                            (x_size, y_size))
+        labels = np.reshape(Kmeans(n_clusters, n_init).fit(data), (x_size, y_size))
 
     # make intergranules 0, granules 1:
     group0_mean = np.mean(data[labels == 0])
@@ -261,9 +261,7 @@ def kmeans_segment(data, llambda_axis=-1):
     group2_mean = np.mean(data[labels == 2])
 
     # intergranules
-    min_index = np.argmin([group0_mean,
-                           group1_mean,
-                           group2_mean])
+    min_index = np.argmin([group0_mean, group1_mean, group2_mean])
     segmented_map = np.ones(labels.shape)
 
     segmented_map[[labels[:, :] == min_index][0]] -= 1
@@ -273,9 +271,8 @@ def kmeans_segment(data, llambda_axis=-1):
 
 def cross_correlation(segment1, segment2):
     """
-    Return -1 and print a message if the agreement between two
-    arrays is low, 0 otherwise. Designed to be used with segment
-    and segment_kmeans function.
+    Return -1 and print a message if the agreement between two arrays is low, 0
+    otherwise. Designed to be used with segment and segment_kmeans function.
 
     Parameters
     ----------
@@ -298,10 +295,10 @@ def cross_correlation(segment1, segment2):
     total_intergranules = np.count_nonzero(segment1 == 0)
 
     if total_granules == 0:
-        raise Exception('clustering problematic (no granules found)')
+        raise Exception("clustering problematic (no granules found)")
 
     if total_intergranules == 0:
-        raise Exception('clustering problematic (no intergranules found)')
+        raise Exception("clustering problematic (no intergranules found)")
 
     x_size = np.shape(segment1)[0]
     y_size = np.shape(segment1)[1]
@@ -315,20 +312,18 @@ def cross_correlation(segment1, segment2):
             elif segment1[i, j] == 0 and segment2[i, j] == 0:
                 intergranule_agreement_count += 1
 
-    percentage_agreement_granules = \
-        granule_agreement_count / total_granules
-    percentage_agreement_intergranules = \
-        intergranule_agreement_count / total_intergranules
+    percentage_agreement_granules = granule_agreement_count / total_granules
+    percentage_agreement_intergranules = intergranule_agreement_count / total_intergranules
     try:
-        confidence = np.mean([percentage_agreement_granules,
-                             percentage_agreement_intergranules])
+        confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
     except TypeError:
         confidence = 0
 
-    if percentage_agreement_granules < 0.75 \
-            or percentage_agreement_intergranules < 0.75:
-        print('Low agreement with K-Means clustering. \
-                         Saved output has low confidence.')
+    if percentage_agreement_granules < 0.75 or percentage_agreement_intergranules < 0.75:
+        print(
+            "Low agreement with K-Means clustering. \
+                         Saved output has low confidence."
+        )
         return [-1, confidence]
     else:
         return [0, confidence]
