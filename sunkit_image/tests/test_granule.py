@@ -193,7 +193,7 @@ def test_kmeans_segment():
         granule.kmeans_segment(array_to_be_clustered, 3)
 
 
-def test_cross_correlation(self):
+def test_cross_correlation():
     """
     Unit tests for cross_correlation() function.
     """
@@ -205,7 +205,7 @@ def test_cross_correlation(self):
     test_array_2 = np.ones((test_size, test_size))
     test_array_1[0, 0] = 0
     test_array_2[0, 0] = 0
-    self.assertEqual(0, granule.cross_correlation(test_array_1, test_array_2)[0])
+    assert 0 == granule.cross_correlation(test_array_1, test_array_2)[0]
 
     # Test 2: if cross correlation too low, return -1:
     test_array_1 = np.ones((test_size, test_size))
