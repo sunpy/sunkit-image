@@ -1,0 +1,12 @@
+Removal of the Automated Swirl Detection Algorithm (ASDA).
+This is due to two reasons:
+1. This version was no longer supported and outdated.
+2. The original code was GPL and we never got the code relicensed and therefore can not be included.
+
+Please use the up to date and supported version: https://github.com/PyDL/ASDA
+
+This includes the following from ``utils``:
+* points_in_poly
+* reform2d
+* remove_duplicate
+* calc_gamma
