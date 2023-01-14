@@ -1,11 +1,12 @@
 """
 This module contains functions that will segment images for granule detection.
 """
+import logging
 
 import numpy as np
 import scipy.ndimage as sndi
 import skimage
-from sklearn.cluster import KMeans as KMeans
+from sklearn.cluster import KMeans
 
 import sunpy
 import sunpy.map
@@ -15,7 +16,7 @@ __all__ = [
     "get_threshold",
     "trim_intergranules",
     "mark_faculae",
-    "segment_kmeans",
+    "kmeans_segment",
     "cross_correlation",
 ]
 
@@ -72,7 +73,7 @@ def segment(data_map, skimage_method, res, mark_dim_centers=False):
 
     # mark faculae and get final granule and facule count
     seg_im_markfac, fac_cnt, gran_cnt = mark_faculae(seg_im_fixed, data, res)
-    print("Segmentation has identified " + str(gran_cnt) + " granules and " + str(fac_cnt) + "faculae")
+    logging.info("Segmentation has identified " + str(gran_cnt) + " granules and " + str(fac_cnt) + "faculae")
 
     # convert segmentated image back into SunPy map with original header
     segmented_map = sunpy.map.Map(seg_im_markfac, header)
@@ -253,7 +254,7 @@ def kmeans_segment(data, llambda_axis=-1):
     else:
         llambda_size = np.shape(data)[llambda_axis]
         data = np.reshape(data, (x_size * y_size, llambda_size))
-        labels = np.reshape(Kmeans(n_clusters, n_init).fit(data), (x_size, y_size))
+        labels = np.reshape(KMeans(n_clusters, n_init).fit(data), (x_size, y_size))
 
     # make intergranules 0, granules 1:
     group0_mean = np.mean(data[labels == 0])
@@ -271,8 +272,9 @@ def kmeans_segment(data, llambda_axis=-1):
 
 def cross_correlation(segment1, segment2):
     """
-    Return -1 and print a message if the agreement between two arrays is low, 0
-    otherwise. Designed to be used with segment and segment_kmeans function.
+    Return -1 and logging.info a message if the agreement between two arrays is
+    low, 0 otherwise. Designed to be used with segment and segment_kmeans
+    function.
 
     Parameters
     ----------
@@ -320,7 +322,7 @@ def cross_correlation(segment1, segment2):
         confidence = 0
 
     if percentage_agreement_granules < 0.75 or percentage_agreement_intergranules < 0.75:
-        print(
+        logging.info(
             "Low agreement with K-Means clustering. \
                          Saved output has low confidence."
         )
