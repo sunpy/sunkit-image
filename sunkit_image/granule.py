@@ -249,7 +249,7 @@ def kmeans_segment(data, llambda_axis=-1):
     y_size = np.shape(data)[1]
     if llambda_axis == -1:
         data_flat = np.reshape(data, (x_size * y_size, 1))
-        labels_flat = KMeans(n_clusters).fit(data_flat).labels_
+        labels_flat = KMeans(n_clusters, n_init).fit(data_flat).labels_
         labels = np.reshape(labels_flat, (x_size, y_size))
     else:
         llambda_size = np.shape(data)[llambda_axis]
