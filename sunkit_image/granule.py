@@ -20,7 +20,7 @@ __all__ = [
     "cross_correlation",
 ]
 
-METHODS = ["otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"]
+METHODS = ["li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"]
 
 
 def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
@@ -37,8 +37,8 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
         `~sunpy.map.GenericMap` containing data to segment.
     resolution : `float`
         Spatial resolution (arcsec/pixel) of the data.
-    skimage_method : {"otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"}
-        scikit-image thresholding method.
+    skimage_method : {"li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"}
+        scikit-image thresholding method, defaults to "li".
         Depending on input data, one or more of these methods may be
         significantly better or worse than the others. Typically, 'li', 'otsu',
         'mean', and 'isodata' are good choices, 'yen' and 'triangle' over-
@@ -77,7 +77,7 @@ def get_threshold(data, method):
     ----------
     data : `numpy.ndarray`
         Data to threshold.
-    method : {"otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"}
+    method : {"li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"}
         scikit-image thresholding method.
 
     Returns
@@ -87,10 +87,10 @@ def get_threshold(data, method):
     """
     if not isinstance(data, np.ndarray):
         raise ValueError("Input data must be an instance of a np.ndarray")
-    if method == "otsu":
-        threshold = skimage.filters.threshold_otsu(data)
     elif method == "li":
         threshold = skimage.filters.threshold_li(data)
+    if method == "otsu":
+        threshold = skimage.filters.threshold_otsu(data)
     elif method == "yen":
         threshold = skimage.filters.threshold_yen(data)
     elif method == "mean":
@@ -218,7 +218,7 @@ def kmeans_segment(data):
     x_size = np.shape(data)[0]
     y_size = np.shape(data)[1]
     data_flat = np.reshape(data, (x_size * y_size, 1))
-    labels_flat = KMeans(n_clusters=3, n_init=20).fit(data_flat).labels_
+    labels_flat = KMeans(n_clusters=3).fit(data_flat).labels_
     labels = np.reshape(labels_flat, (x_size, y_size))
     # Make intergranules = 0 and granules = 1.
     group0_mean = np.mean(data[labels == 0])
