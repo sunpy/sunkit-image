@@ -231,5 +231,5 @@ def test_cross_correlation3():
     # Check that error is raised if there are no granules or intergranules in image.
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))
-    with pytest.raises(Exception, match="clustering problematic"):
+    with pytest.raises(Exception, match="clustering failed"):
         granule.cross_correlation(test_array_1, test_array_2)

@@ -185,7 +185,7 @@ def mark_faculae(segmented_image, data, resolution):
 
     fac_size_limit = 2  # Max size of a faculae in sqaure arcsec.
     fac_pix_limit = fac_size_limit / resolution
-    fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
+    fac_brightness_limit = np.mean(data) + 0.5 * np.std(data) # General flux limit determined by visual inspection.
 
     if len(np.unique(segmented_image)) > 3:
         raise ValueError("segmented_image must have only values of 1, 0 and a 0.5 (if dim centers marked)")
@@ -301,10 +301,8 @@ def cross_correlation(segment1, segment2):
 
     percentage_agreement_granules = granule_agreement_count / total_granules
     percentage_agreement_intergranules = intergranule_agreement_count / total_intergranules
-    try:
-        confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
-    except TypeError:
-        confidence = 0
+    
+    confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
 
     if percentage_agreement_granules < 0.75 or percentage_agreement_intergranules < 0.75:
         logging.info("Low agreement with K-Means clustering. Saved output has low confidence.")
