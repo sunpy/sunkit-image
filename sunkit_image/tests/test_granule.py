@@ -14,26 +14,28 @@ def inputs():
     import warnings
 
     with warnings.catch_warnings():
-        data_map = sunpy.map.Map("sunkit_image/tests/granule_testdata.fits")
+        smap = sunpy.map.Map("sunkit_image/tests/granule_testdata.fits")
     test_res = 0.016
     test_method = "li"
-    return data_map, test_res, test_method
+    return smap, test_res, test_method
 
 
 def test_segment(inputs):
     """
+
     Unit tests for segment() function.
+
     """
 
-    data_map, test_res, test_method = inputs
+    smap, test_res, test_method = inputs
 
     # -------- positive tests -------- :
-    segmented = granule.segment(data_map, test_method, test_res, True)
+    segmented = granule.segment(smap, test_res, test_method, True)
 
     # Test 1: check that the returned type is correct
-    assert type(segmented) is sunpy.map.mapbase.GenericMap
+    assert isinstance(segmented, sunpy.map.mapbase.GenericMap)
     # Test 2: get an array of pixel values and check it is not empty
-    initial_pix = sm.all_pixel_indices_from_map(data_map).value
+    initial_pix = sm.all_pixel_indices_from_map(smap).value
     seg_pixels = sm.all_pixel_indices_from_map(segmented).value
     assert np.size(seg_pixels) > 0
     # Test 3: check that the returned shape is unchanged
@@ -41,24 +43,25 @@ def test_segment(inputs):
 
     # -------- negative tests -------- :
     # Test 4: check that the values in the array are changed
-    random.seed(42)
     # pick 10 random indices to check
-    x = random.sample(list(np.arange(0, data_map.data.shape[0], 1)), 10)
-    y = random.sample(list(np.arange(0, data_map.data.shape[1], 1)), 10)
+    x = random.sample(list(np.arange(0, smap.data.shape[0], 1)), 10)
+    y = random.sample(list(np.arange(0, smap.data.shape[1], 1)), 10)
     for i in range(len(x)):
-        assert data_map.data[x[i], y[i]] != segmented.data[x[i], y[i]]
+        assert smap.data[x[i], y[i]] != segmented.data[x[i], y[i]]
 
     # ------ error raising tests ------ :
     # Test 5: check that errors are raised for incorrect inputs
     with pytest.raises(TypeError, match="Input must be sunpy map."):
-        granule.segment(np.array([[1, 2, 3], [1, 2, 3]]), test_method, test_res)
+        granule.segment(np.array([[1, 2, 3], [1, 2, 3]]), test_res, test_method)
     with pytest.raises(TypeError, match="Method must be one of: "):
-        granule.segment(data_map, "banana", test_res)
+        granule.segment(smap, test_res, "banana")
 
 
 def test_get_threshold(inputs):
     """
+
     Unit tests for get_threshold() function.
+
     """
 
     _, _, test_method = inputs
@@ -87,13 +90,14 @@ def test_get_threshold(inputs):
 
 def test_trim_intergranules(inputs):
     """
+
     Unit tests for trim_intergranules() function.
     """
 
-    data_map, _, _ = inputs
+    smap, _, _ = inputs
 
     # -------- positive tests -------- :
-    thresholded = np.uint8(data_map.data > np.nanmedian(data_map.data))
+    thresholded = np.uint8(smap.data > np.nanmedian(smap.data))
     # Test 1: check that returned array is not empty
     assert np.size(thresholded) > 0
     # Test 2: check that the correct dimensions are returned
@@ -117,19 +121,20 @@ def test_trim_intergranules(inputs):
     # ------ error raising tests ------ :
     # Test 5: check that raises error if passed array is not binary
     with pytest.raises(ValueError, match="segmented_image must have only"):
-        granule.trim_intergranules(data_map)
+        granule.trim_intergranules(smap)
 
 
 def test_mark_faculae(inputs):
     """
     Unit tests for mark_faculae() function.
+
     """
 
-    data_map, test_res, _ = inputs
+    smap, test_res, _ = inputs
 
     # -------- positive tests -------- :
-    thresholded = np.uint8(data_map.data > np.nanmedian(data_map.data))
-    faculae_marked, fac_cnt, gran_cnt = granule.mark_faculae(thresholded, data_map.data, res=test_res)
+    thresholded = np.uint8(smap.data > np.nanmedian(smap.data))
+    faculae_marked, fac_cnt, gran_cnt = granule.mark_faculae(thresholded, smap.data, resolution=test_res)
 
     # Test 1: check that the correct dimensions are returned
     assert thresholded.shape == faculae_marked.shape
@@ -145,12 +150,13 @@ def test_mark_faculae(inputs):
     # Test 4: check that errors are raised for incorrect inputs
     with pytest.raises(
         ValueError, match="segmented_image must have only"):
-        granule.mark_faculae(data_map.data, data_map.data, test_res)
+        granule.mark_faculae(smap.data, smap.data, test_res)
 
 
 def test_kmeans_segment():
     """
     Unit tests for test_kmeans() function.
+
     """
 
     # -------- positive tests -------- :
@@ -160,7 +166,7 @@ def test_kmeans_segment():
     # give some fake different values, so kmeans has something to cluster,
     array_to_be_clustered[0, 0] = 1
     array_to_be_clustered[0, 1] = 2
-    clustered_array = granule.kmeans_segment(array_to_be_clustered, llambda_axis=-1)
+    clustered_array = granule.kmeans_segment(array_to_be_clustered)
     assert np.shape(clustered_array)[0] == N
 
     # -------- negative tests -------- :
