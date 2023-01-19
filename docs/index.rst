@@ -8,17 +8,12 @@ sunkit-image
 
         A toolbox of useful image processing routines applicable to solar physics data.
 
-    .. grid-item-card:: Sub-modules
+    .. grid-item-card:: API Reference
 
         .. toctree::
           :maxdepth: 1
 
-          code_ref/coalignment
-          code_ref/enhance
-          code_ref/radial
-          code_ref/time_lag
-          code_ref/trace
-          code_ref/utils
+          code_ref/index
 
     .. grid-item-card:: Other info
 
