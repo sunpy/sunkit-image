@@ -20,7 +20,7 @@ __all__ = [
     "cross_correlation",
 ]
 
-methods = ["otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"]
+METHODS = ["otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"]
 
 def segment(smap, resolution, skimage_method='li', mark_dim_centers=False):
     """
@@ -54,26 +54,22 @@ def segment(smap, resolution, skimage_method='li', mark_dim_centers=False):
     if not isinstance(smap, sunpy.map.mapbase.GenericMap):
         raise TypeError("Input must be an instance of a sunpy.map.GenericMap")
 
-    if skimage_method not in methods:
-        raise TypeError("Method must be one of: " + ", ".join(methods))
+    if skimage_method not in METHODS:
+        raise TypeError("Method must be one of: " + ", ".join(METHODS))
 
-    # Apply median filter
     median_filtered = sndi.median_filter(smap.data, size=3)
 
-    # Get initial skimage threshold
+    # Apply initial skimage threshold.
     threshold = get_threshold(median_filtered, skimage_method)
-
-    # Apply threshold 
     segmented_image = np.uint8(median_filtered > threshold)
 
-    # Fix the extra intergranule material bits in the middle of granules
+    # Fix the extra intergranule material bits in the middle of granules.
     seg_im_fixed = trim_intergranules(segmented_image, mark=mark_dim_centers)
 
-    # Mark faculae and get final granule and facule count
+    # Mark faculae and get final granule and facule count.
     seg_im_markfac, faculae_count, granule_count = mark_faculae(seg_im_fixed, smap.data, resolution)
-    logging.info("Segmentation has identified " + str(granule_count) + " granules and " + str(faculae_count) + "faculae")
+    logging.info(f"Segmentation has identified {granule_count} granules and {faculae_count} faculae")
 
-    # Convert segmentated image back into SunPy map with original header
     segmented_map = sunpy.map.Map(seg_im_markfac, smap.meta)
 
     return segmented_map
@@ -92,7 +88,7 @@ def get_threshold(data, method):
 
     Returns
     -------
-    threshold: `float`
+    threshold : `float`
         Threshold value.
     """
 
@@ -114,7 +110,7 @@ def get_threshold(data, method):
     elif method == "isodata":
         threshold = skimage.filters.threshold_isodata(data)
     else:
-        raise ValueError("Method must be one of: " + ", ".join(methods))
+        raise ValueError("Method must be one of: " + ", ".join(METHODS))
 
     return threshold
 
@@ -141,18 +137,18 @@ def trim_intergranules(segmented_image, mark=False):
     if len(np.unique(segmented_image)) > 2:
         raise ValueError("Input array must only have values of 1 and 0.")
 
-    segmented_image_fixed = np.copy(segmented_image).astype(float)
+    segmented_image_fixed = np.copy(segmented_image).astype(float) # Float conversion for correct region labeling.
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
 
-    # Find value of the large continuous 0-valued region
+    # Find value of the large continuous 0-valued region.
     size = 0
     for value in values:
         if len((labeled_seg[labeled_seg == value])) > size:
             real_IG_value = value
             size = len(labeled_seg[labeled_seg == value])
 
-    # Set all other 0 regions to mark value (1 or 0.5)
+    # Set all other 0 regions to mark value (1 or 0.5).
     for value in values:
         if np.sum(segmented_image[labeled_seg == value]) == 0:
             if value != real_IG_value:
@@ -187,7 +183,7 @@ def mark_faculae(segmented_image, data, resolution):
         The number of granules identified, after re-classifcation of faculae.
     """
 
-    fac_size_limit = 2  # Max size of a faculae in sqaure arcsec
+    fac_size_limit = 2  # Max size of a faculae in sqaure arcsec.
     fac_pix_limit = fac_size_limit / resolution
     fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
 
@@ -243,15 +239,13 @@ def kmeans_segment(data):
     labels_flat = KMeans(n_clusters=3, n_init=20).fit(data_flat).labels_
     labels = np.reshape(labels_flat, (x_size, y_size))
 
-    # Make intergranules = 0 and granules = 1
+    # Make intergranules = 0 and granules = 1.
     group0_mean = np.mean(data[labels == 0])
     group1_mean = np.mean(data[labels == 1])
     group2_mean = np.mean(data[labels == 2])
 
-    # Intergranules
     min_index = np.argmin([group0_mean, group1_mean, group2_mean])
     segmented_map = np.ones(labels.shape)
-
     segmented_map[[labels[:, :] == min_index][0]] -= 1
 
     return segmented_map
