@@ -4,230 +4,143 @@ import numpy as np
 import pytest
 
 import sunpy
-import sunpy.map as sm
+from sunpy.map import all_pixel_indices_from_map
 
 import sunkit_image.granule as granule
 
 
-@pytest.fixture(scope="session")
-def inputs():
-    import warnings
-
-    with warnings.catch_warnings():
-        smap = sunpy.map.Map("sunkit_image/tests/granule_testdata.fits")
-    test_res = 0.016
-    test_method = "li"
-    return smap, test_res, test_method
-
-
-def test_segment1(inputs):
-
-    smap, test_res, test_method = inputs
-
-    segmented = granule.segment(smap, test_res, test_method, True)
-
-    # Check returned object is SunPy map.
+@pytest.mark.remote_data
+def test_segment(test_granule_map):
+    segmented = granule.segment(test_granule_map, 0.016, skimage_method="li", mark_dim_centers=True)
     assert isinstance(segmented, sunpy.map.mapbase.GenericMap)
-
     # Check pixels are not empty.
-    initial_pix = sm.all_pixel_indices_from_map(smap).value
-    seg_pixels = sm.all_pixel_indices_from_map(segmented).value
+    initial_pix = all_pixel_indices_from_map(test_granule_map).value
+    seg_pixels = all_pixel_indices_from_map(segmented).value
     assert np.size(seg_pixels) > 0
-
-    # Check that the returned shape is unchanged.
     assert seg_pixels.shape == initial_pix.shape
-
     # Check that the values in the array are changed (pick 10 random indices to check).
-    x = random.sample(list(np.arange(0, smap.data.shape[0], 1)), 10)
-    y = random.sample(list(np.arange(0, smap.data.shape[1], 1)), 10)
+    x = random.sample(list(np.arange(0, test_granule_map.data.shape[0], 1)), 10)
+    y = random.sample(list(np.arange(0, test_granule_map.data.shape[1], 1)), 10)
     for i in range(len(x)):
-        assert smap.data[x[i], y[i]] != segmented.data[x[i], y[i]]
+        assert test_granule_map.data[x[i], y[i]] != segmented.data[x[i], y[i]]
 
 
-def test_segment2(inputs):
-
-    smap, test_res, test_method = inputs
-
-    # Check that errors are raised for incorrect inputs.
-    with pytest.raises(TypeError, match="Input must be sunpy map."):
-        granule.segment(np.array([[1, 2, 3], [1, 2, 3]]), test_res, test_method)
-    with pytest.raises(TypeError, match="Method must be one of: "):
-        granule.segment(smap, test_res, "banana")
+@pytest.mark.remote_data
+def test_segment_errors(test_granule_map):
+    with pytest.raises(TypeError, match="Input must be an instance of a sunpy.map.GenericMap"):
+        granule.segment(np.array([[1, 2, 3], [1, 2, 3]]), 0.016)
+    with pytest.raises(TypeError, match="Method must be one of: otsu, li, isodata, mean, minimum, yen, triangle"):
+        granule.segment(test_granule_map, 0.016, skimage_method="banana")
 
 
-def test_get_threshold1(inputs):
-
-    _, _, test_method = inputs
-
-    # Check type of output.
+def test_get_threshold():
     test_arr1 = np.array([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]])
-    threshold1 = granule.get_threshold(test_arr1, test_method)
-    assert type(threshold1) is np.float64
-
+    threshold1 = granule.get_threshold(test_arr1, "li")
+    assert isinstance(threshold1, np.float64)
     # Check that different arrays return different thresholds.
     test_arr2 = np.array([[2, 3, 4, 5, 6], [2, 3, 4, 5, 6]])
-    threshold2 = granule.get_threshold(test_arr2, test_method)
+    threshold2 = granule.get_threshold(test_arr2, "li")
     assert threshold1 != threshold2
 
 
-def test_get_threshold2(inputs):
-
-    _, _, test_method = inputs
-
-    # Check range of output.
+def test_get_threshold_range():
     test_arr1 = np.array([[1, 2, 3, 4, 5], [1, 2, 3, 4, 5]])
-    threshold1 = granule.get_threshold(test_arr1, test_method)
+    threshold1 = granule.get_threshold(test_arr1, "li")
     assert 0 < threshold1 < np.max(test_arr1)
 
 
-def test_get_threshold3(inputs):
-
-    _, _, test_method = inputs
-
-    # Check that errors are raised for incorrect inputs.
-    with pytest.raises(ValueError, match="Input data must be an array."):
-        granule.get_threshold([], test_method)
+def test_get_threshold_errors():
+    with pytest.raises(ValueError, match="Input data must be an instance of a np.ndarray"):
+        granule.get_threshold([], "li")
     with pytest.raises(ValueError, match="Method must be one of: "):
         granule.get_threshold(np.array([[1, 2], [1, 2]]), "banana")
 
 
-def test_trim_intergranules1(inputs):
-
-    smap, _, _ = inputs
-
-    thresholded = np.uint8(smap.data > np.nanmedian(smap.data))
-
+@pytest.mark.remote_data
+def test_trim_intergranules(test_granule_map):
+    thresholded = np.uint8(test_granule_map.data > np.nanmedian(test_granule_map.data))
     # Check that returned array is not empty.
     assert np.size(thresholded) > 0
-
     # Check that the correct dimensions are returned.
     assert thresholded.shape == granule.trim_intergranules(thresholded).shape
-
-    # Check that erronous material marked, not removed, when flag is True.
+    # Check that erroneous material marked, not removed, when flag is True.
     middles_marked = granule.trim_intergranules(thresholded, mark=True)
     marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 0.5])
     assert marked_erroneous != 0
-
     # Check that removed when flag is False (no 0.5 values).
     middles_marked = granule.trim_intergranules(thresholded, mark=False)
     marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 0.5])
     assert marked_erroneous == 0
-
-
-def test_trim_intergranules2(inputs):
-
-    smap, _, _ = inputs
-
-    thresholded = np.uint8(smap.data > np.nanmedian(smap.data))
-
     # Check that the returned array has fewer (or same number) 0-valued pixels as input
     # array (for a data set which we know by eye should have some middle sections removed).
     middles_removed = granule.trim_intergranules(thresholded)
-    assert (np.count_nonzero(middles_removed) < np.count_nonzero(thresholded)) is False
+    assert not np.count_nonzero(middles_removed) < np.count_nonzero(thresholded)
 
 
-def test_trim_intergranules3(inputs):
-
-    smap, _, _ = inputs
-
+def test_trim_intergranules_errors():
     # Check that raises error if passed array is not binary.
-    with pytest.raises(ValueError, match="segmented_image must have only"):
-        granule.trim_intergranules(smap)
+    data = np.random.randint(0, 10, size=(10, 10))
+    with pytest.raises(ValueError, match="segmented_image must only have values of 1 and 0."):
+        granule.trim_intergranules(data)
 
 
-def test_mark_faculae1(inputs):
-
-    smap, test_res, _ = inputs
-
-    thresholded = np.uint8(smap.data > np.nanmedian(smap.data))
-    faculae_marked, fac_cnt, gran_cnt = granule.mark_faculae(thresholded, smap.data, resolution=test_res)
-
+@pytest.mark.remote_data
+def test_mark_faculae(test_granule_map):
+    thresholded = np.uint8(test_granule_map.data > np.nanmedian(test_granule_map.data))
+    faculae_marked, _, _ = granule.mark_faculae(thresholded, test_granule_map.data, resolution=0.016)
     # Check that the correct dimensions are returned.
     assert thresholded.shape == faculae_marked.shape
-
     # Check that returned array is not empty.
-    assert (np.size(faculae_marked) > 0) is True
-
-
-def test_mark_faculae2(inputs):
-
-    smap, test_res, _ = inputs
-
-    thresholded = np.uint8(smap.data > np.nanmedian(smap.data))
-    faculae_marked, fac_cnt, gran_cnt = granule.mark_faculae(thresholded, smap.data, resolution=test_res)
-
-    # Check that the returned array has some 0.5 values (for a dataset that we know has
-    # faculae by eye).
+    assert np.size(faculae_marked) > 0
+    # Check that the returned array has some 0.5 values (for a dataset that we know has faculae by eye).
     assert len(np.where(faculae_marked == 1.5)[0]) != 0
 
 
-def test_mark_faculae3(inputs):
-
-    smap, test_res, _ = inputs
-
-    # Check that errors are raised for incorrect inputs.
-    with pytest.raises(
-        ValueError, match="segmented_image must have only"):
-        granule.mark_faculae(smap.data, smap.data, test_res)
+@pytest.mark.remote_data
+def test_mark_faculae_error(test_granule_map):
+    # Check that errors are raised for incorrect test_granule_map.
+    with pytest.raises(ValueError, match="segmented_image must have only"):
+        granule.mark_faculae(test_granule_map.data, test_granule_map.data, 0.016)
 
 
-def test_kmeans_segment1():
-
-    N = 10
-    array_to_be_clustered = np.ones((N, N))
-    array_to_be_clustered[0, 0] = 1 # Fake values to cluster.
+def test_kmeans_segment():
+    array_to_be_clustered = np.ones((10, 10))
+    array_to_be_clustered[0, 0] = 1  # Fake values to cluster.
     array_to_be_clustered[0, 1] = 2
     clustered_array = granule.kmeans_segment(array_to_be_clustered)
-
     # Check that returns numpy array of same shape as input.
-    assert np.shape(clustered_array)[0] == N
-
-
-def test_kmeans_segment2():
-
-    N = 10
-    array_to_be_clustered = np.ones((N, N))
-    array_to_be_clustered[0, 0] = 1 # Fake values to cluster.
-    array_to_be_clustered[0, 1] = 2
-    clustered_array = granule.kmeans_segment(array_to_be_clustered)
-
+    assert np.shape(clustered_array) == array_to_be_clustered.shape
     # Check that the returned labels don't contian labels other than 0 or 1.
     non_label = 3
     count_non_label_in_cluster = np.count_nonzero(clustered_array[clustered_array == non_label])
     assert count_non_label_in_cluster == 0
 
-    # Check that error is raised for incorrect input shape.
-    with pytest.raises(Exception, match="Wrong data shape."):
-        granule.kmeans_segment(array_to_be_clustered, 3)
 
-
-def test_cross_correlation1():
-
+def test_cross_correlation():
     # Check that if arrays agree, returns 0.
-    test_size = 10
-    test_array_1 = np.ones((test_size, test_size))
-    test_array_2 = np.ones((test_size, test_size))
+    test_array_1 = np.ones((10, 10))
+    test_array_2 = np.ones((10, 10))
     test_array_1[0, 0] = 0
     test_array_2[0, 0] = 0
     assert 0 == granule.cross_correlation(test_array_1, test_array_2)[0]
+    # Check that cross correlation isn't greater than 100% or less than 0%.
+    assert granule.cross_correlation(test_array_1, test_array_2)[1] <= 1
+    assert not granule.cross_correlation(test_array_1, test_array_2)[1] < 0
 
 
 def test_cross_correlation2():
-
     # Check that if cross correlation is too low, returns -1.
     test_array_1 = np.ones((10, 10))
     test_array_1[0, 0] = 0
     test_array_2 = np.ones((10, 10))
     test_array_2[0, 0] = 1
     assert granule.cross_correlation(test_array_1, test_array_2)[0] == -1
-
-
-def test_cross_correlation3():
-
     # Check that cross correlation isn't greater than 100% or less than 0%.
-    assert granule.cross_correlation(test_array_1, test_array_2)[1] < 1
-    assert granule.cross_correlation(test_array_1, test_array_2)[1] == 0
+    assert granule.cross_correlation(test_array_1, test_array_2)[1] <= 1
+    assert not granule.cross_correlation(test_array_1, test_array_2)[1] < 0
 
+
+def test_cross_correlation_errors():
     # Check that error is raised if there are no granules or intergranules in image.
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))

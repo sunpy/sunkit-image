@@ -22,10 +22,11 @@ __all__ = [
 
 METHODS = ["otsu", "li", "isodata", "mean", "minimum", "yen", "triangle"]
 
-def segment(smap, resolution, skimage_method='li', mark_dim_centers=False):
+
+def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
     """
     Segment an optical image of the solar photosphere into tri-value maps with:
-    
+
      * 0 as intergranule
      * 0.5 as faculae
      * 1 as granule
@@ -50,28 +51,21 @@ def segment(smap, resolution, skimage_method='li', mark_dim_centers=False):
     segmented_map : `~sunpy.map.GenericMap`
         `~sunpy.map.GenericMap` containing a segmented image (with the original header).
     """
-
     if not isinstance(smap, sunpy.map.mapbase.GenericMap):
         raise TypeError("Input must be an instance of a sunpy.map.GenericMap")
-
     if skimage_method not in METHODS:
         raise TypeError("Method must be one of: " + ", ".join(METHODS))
 
     median_filtered = sndi.median_filter(smap.data, size=3)
-
     # Apply initial skimage threshold.
     threshold = get_threshold(median_filtered, skimage_method)
     segmented_image = np.uint8(median_filtered > threshold)
-
     # Fix the extra intergranule material bits in the middle of granules.
     seg_im_fixed = trim_intergranules(segmented_image, mark=mark_dim_centers)
-
     # Mark faculae and get final granule and facule count.
     seg_im_markfac, faculae_count, granule_count = mark_faculae(seg_im_fixed, smap.data, resolution)
     logging.info(f"Segmentation has identified {granule_count} granules and {faculae_count} faculae")
-
     segmented_map = sunpy.map.Map(seg_im_markfac, smap.meta)
-
     return segmented_map
 
 
@@ -91,10 +85,8 @@ def get_threshold(data, method):
     threshold : `float`
         Threshold value.
     """
-
     if not isinstance(data, np.ndarray):
         raise ValueError("Input data must be an instance of a np.ndarray")
-
     if method == "otsu":
         threshold = skimage.filters.threshold_otsu(data)
     elif method == "li":
@@ -111,14 +103,13 @@ def get_threshold(data, method):
         threshold = skimage.filters.threshold_isodata(data)
     else:
         raise ValueError("Method must be one of: " + ", ".join(METHODS))
-
     return threshold
 
 
 def trim_intergranules(segmented_image, mark=False):
     """
-    Remove the erronous idenfication of intergranule material in the middle of
-    granules that pure threshold segmentation produces.
+    Remove the erroneous identification of intergranule material in the middle
+    of granules that the pure threshold segmentation produces.
 
     Parameters
     ----------
@@ -133,21 +124,18 @@ def trim_intergranules(segmented_image, mark=False):
     segmented_image_fixed : `numpy.ndarray`
         The segmented image without incorrect extra intergranules.
     """
-
     if len(np.unique(segmented_image)) > 2:
-        raise ValueError("Input array must only have values of 1 and 0.")
-
-    segmented_image_fixed = np.copy(segmented_image).astype(float) # Float conversion for correct region labeling.
+        raise ValueError("segmented_image must only have values of 1 and 0.")
+    # Float conversion for correct region labeling.
+    segmented_image_fixed = np.copy(segmented_image).astype(float)
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
-
     # Find value of the large continuous 0-valued region.
     size = 0
     for value in values:
         if len((labeled_seg[labeled_seg == value])) > size:
             real_IG_value = value
             size = len(labeled_seg[labeled_seg == value])
-
     # Set all other 0 regions to mark value (1 or 0.5).
     for value in values:
         if np.sum(segmented_image[labeled_seg == value]) == 0:
@@ -156,7 +144,6 @@ def trim_intergranules(segmented_image, mark=False):
                     segmented_image_fixed[labeled_seg == value] = 1
                 elif mark:
                     segmented_image_fixed[labeled_seg == value] = 0.5
-
     return segmented_image_fixed
 
 
@@ -182,14 +169,12 @@ def mark_faculae(segmented_image, data, resolution):
     granule_count: `int`
         The number of granules identified, after re-classifcation of faculae.
     """
-
-    fac_size_limit = 2  # Max size of a faculae in sqaure arcsec.
+    fac_size_limit = 2  # Max size of a faculae in square arcsec.
     fac_pix_limit = fac_size_limit / resolution
-    fac_brightness_limit = np.mean(data) + 0.5 * np.std(data) # General flux limit determined by visual inspection.
-
+    # General flux limit determined by visual inspection.
+    fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
     if len(np.unique(segmented_image)) > 3:
         raise ValueError("segmented_image must have only values of 1, 0 and a 0.5 (if dim centers marked)")
-
     segmented_image_fixed = np.copy(segmented_image.astype(float))
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
@@ -207,15 +192,13 @@ def mark_faculae(segmented_image, data, resolution):
                 if tot_flux / region_size > fac_brightness_limit:
                     segmented_image_fixed[mask == 1] = 1.5
                     fac_count += 1
-
     gran_count = len(values) - 1 - fac_count  # Subtract 1 for IG region.
-
     return segmented_image_fixed, fac_count, gran_count
 
 
 def kmeans_segment(data):
     """
-    Uses a k-means clustering algorithm to cluster data, in order to 
+    Uses a k-means clustering algorithm to cluster data, in order to
     independently verify the scikit-image clustering method.
 
     Parameters
@@ -227,37 +210,33 @@ def kmeans_segment(data):
     -------
     labels : `numpy.ndarray`
         An array of labels with:
-        
+
         * 0 are granules
         * 2 are intergranules
         * 1 are in-between regions
     """
-
     x_size = np.shape(data)[0]
     y_size = np.shape(data)[1]
     data_flat = np.reshape(data, (x_size * y_size, 1))
     labels_flat = KMeans(n_clusters=3, n_init=20).fit(data_flat).labels_
     labels = np.reshape(labels_flat, (x_size, y_size))
-
     # Make intergranules = 0 and granules = 1.
     group0_mean = np.mean(data[labels == 0])
     group1_mean = np.mean(data[labels == 1])
     group2_mean = np.mean(data[labels == 2])
-
     min_index = np.argmin([group0_mean, group1_mean, group2_mean])
     segmented_map = np.ones(labels.shape)
     segmented_map[[labels[:, :] == min_index][0]] -= 1
-
     return segmented_map
 
 
 def cross_correlation(segment1, segment2):
     """
-	Works out the cross correlation of two segmented arrays.
-	
-	-1 if the agreement between two arrays is low, 0 otherwise.
-	
-	Designed to be used with `segment` and `segment_kmeans` function.
+    Works out the cross correlation of two segmented arrays.
+
+        -1 if the agreement between two arrays is low, 0 otherwise.
+
+        Designed to be used with `segment` and `segment_kmeans` function.
 
     Parameters
     ----------
@@ -277,19 +256,14 @@ def cross_correlation(segment1, segment2):
             The numeric confidence metric:
             Between 0 and 1 where 0 if there is no agreement and 1 if completely agrees.
     """
-
     total_granules = np.count_nonzero(segment1 == 1)
     total_intergranules = np.count_nonzero(segment1 == 0)
-
     if total_granules == 0:
         raise ValueError("No granules in `segment1`. It is possible the clustering failed.")
-
     if total_intergranules == 0:
         raise ValueError("No intergranules in `segment1`. It is possible the clustering failed.")
-
     x_size = np.shape(segment1)[0]
     y_size = np.shape(segment1)[1]
-
     granule_agreement_count = 0
     intergranule_agreement_count = 0
     for i in range(x_size):
@@ -298,12 +272,9 @@ def cross_correlation(segment1, segment2):
                 granule_agreement_count += 1
             elif segment1[i, j] == 0 and segment2[i, j] == 0:
                 intergranule_agreement_count += 1
-
     percentage_agreement_granules = granule_agreement_count / total_granules
     percentage_agreement_intergranules = intergranule_agreement_count / total_intergranules
-    
     confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
-
     if percentage_agreement_granules < 0.75 or percentage_agreement_intergranules < 0.75:
         logging.info("Low agreement with K-Means clustering. Saved output has low confidence.")
         return [-1, confidence]

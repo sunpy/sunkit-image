@@ -6,6 +6,7 @@ import pytest
 
 import astropy
 import astropy.config.paths
+import sunpy.map
 
 # Force MPL to use non-gui backends for testing.
 try:
@@ -84,3 +85,9 @@ def pytest_runtest_setup(item):
     if isinstance(item, pytest.Function):
         if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
             pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
+
+
+@pytest.mark.remote_data
+@pytest.fixture(scope="session")
+def test_granule_map():
+    return sunpy.map.Map("https://github.com/sunpy/data/raw/main/sunkit-image/granule_testdata.fits")
