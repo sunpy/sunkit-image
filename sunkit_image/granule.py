@@ -218,7 +218,7 @@ def kmeans_segment(data):
     x_size = np.shape(data)[0]
     y_size = np.shape(data)[1]
     data_flat = np.reshape(data, (x_size * y_size, 1))
-    labels_flat = KMeans(n_clusters=3).fit(data_flat).labels_
+    labels_flat = KMeans(n_clusters=3, n_init='auto').fit(data_flat).labels_
     labels = np.reshape(labels_flat, (x_size, y_size))
     # Make intergranules = 0 and granules = 1.
     group0_mean = np.mean(data[labels == 0])
