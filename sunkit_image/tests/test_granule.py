@@ -105,13 +105,13 @@ def test_mark_faculae_error(test_granule_map):
 
 def test_kmeans_segment():
     array_to_be_clustered = np.ones((10, 10))
-    array_to_be_clustered[0, 0] = 1  # Fake values to cluster.
-    array_to_be_clustered[0, 1] = 2
+    array_to_be_clustered[0, 0] = 2  # Fake values to cluster.
+    array_to_be_clustered[0, 1] = 3
     clustered_array = granule.kmeans_segment(array_to_be_clustered)
     # Check that returns numpy array of same shape as input.
     assert np.shape(clustered_array) == array_to_be_clustered.shape
-    # Check that the returned labels don't contian labels other than 0 or 1.
-    non_label = 3
+    # Check that the returned labels don't contian labels other than 0, 1, or 2.
+    non_label = 4
     count_non_label_in_cluster = np.count_nonzero(clustered_array[clustered_array == non_label])
     assert count_non_label_in_cluster == 0
 
