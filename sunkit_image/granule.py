@@ -87,9 +87,9 @@ def get_threshold(data, method):
     """
     if not isinstance(data, np.ndarray):
         raise ValueError("Input data must be an instance of a np.ndarray")
-    elif method == "li":
+    if method == "li":
         threshold = skimage.filters.threshold_li(data)
-    if method == "otsu":
+    elif method == "otsu":
         threshold = skimage.filters.threshold_otsu(data)
     elif method == "yen":
         threshold = skimage.filters.threshold_yen(data)
