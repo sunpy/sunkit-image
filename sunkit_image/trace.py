@@ -57,7 +57,6 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
       Entropy, vol. 15, issue 8, pp. 3007-3030
       https://doi.org/10.3390/e15083007
     """
-
     image = image.astype(np.float32)
 
     # Image is transposed because IDL works column major and python is row major. This is done
@@ -246,7 +245,6 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
     `numpy.ndarray`
         Bandpass filtered image.
     """
-
     if nsm1 >= nsm2:
         raise ValueError("nsm1 should be less than nsm2")
 
@@ -281,7 +279,6 @@ def smooth(image, width, nanopt="replace"):
     * https://www.harrisgeospatial.com/docs/smooth.html
     * Emmalg's answer on stackoverflow https://stackoverflow.com/a/35777966
     """
-
     # Make a copy of the array for the output:
     filtered = np.copy(image)
 
@@ -346,7 +343,6 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     `numpy.ndarray`
         Image with the loop and surrounding points zeroed out..
     """
-
     nx, ny = image.shape
 
     # The points surrounding the first point of the loop are zeroed out
@@ -396,7 +392,6 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops):
         It contains three elements: the first one is the updated `loopfile`, the second
         one is the updated `loops` list and the third one is the current loop number.
     """
-
     # The resolution between the points
     reso = 1
 
@@ -449,7 +444,6 @@ def initial_direction_finding(image, xstart, ystart, nlen):
     `float`
         The angle of the starting point of the loop.
     """
-
     # The number of steps to be taken to move from one point to another
     step = 1
     na = 180
@@ -518,7 +512,6 @@ def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     `float`
         The angle of the starting point of the loop.
     """
-
     # Number of radial segments to be searched
     rad_segments = 30
 
