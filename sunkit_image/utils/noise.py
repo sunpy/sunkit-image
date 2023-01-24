@@ -73,7 +73,6 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
       IEEE Transactions on Image Processing, Vol.22, No.12, pp.5226-5237, December, 2013.
       DOI: 10.1109/TIP.2013.2283400
     """
-
     try:
         img = np.array(img)
     except:
