@@ -175,7 +175,7 @@ def mark_faculae(segmented_image, data, resolution):
     fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
     if len(np.unique(segmented_image)) > 3:
         raise ValueError("segmented_image must have only values of 1, 0 and a 0.5 (if dim centers marked)")
-    segmented_image_fixed = np.copy(segmented_image.astype(float))
+    segmented_image_fixed = np.copy(segmented_image.astype(float)) # Make type float to enable adding float values
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
     fac_count = 0
