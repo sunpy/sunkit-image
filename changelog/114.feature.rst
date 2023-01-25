@@ -1,0 +1,19 @@
+Addition of the sunkit_image/segment.py module. This module cntains functions to segment 
+granulation in images of the solar photosphere.
+
+The key functionality is contained in the `segment` function, which takes in a SunPy map 
+and a thresholding method and performs the segmentation, with the segmented image output 
+as a SunPy map. Calls to segment look like: ::
+
+    segmented_data = segment(smap, resolution, skimage_method)
+
+Where 
+
+*`smap` is a SunPy map containing an optical image of the solar photosphere
+*`resolution` is the spatial resolution of the telescope
+*`skimage_method` is the base sci-kit image (skimage) segmentation technique to use 
+*`mark_dim_centers` is a boleen flag indicating whether the user would like to mark dim 
+  intergranule centers for future exploration.
+
+We segment into tri-valued images with 0 = intergranule, 1 = granule, 1.5 = faculae, and 
+(if marking is desired) dim granule middles marked as 0.5.
