@@ -175,7 +175,8 @@ def mark_brightpoint(segmented_image, data, resolution):
     bp_size_limit = 0.1  # Approximate max size of a photosphere bright point in square arcsec (see Yanxiao et al., 2018)
     bp_pix_limit = bp_size_limit / (resolution**2)
     # General flux limit determined by visual inspection.
-    bp_brightness_limit = np.mean(data) + 0.5 * np.std(data)
+    stand_devs = 0.5
+    bp_brightness_limit = np.mean(data) + stand_devs * np.std(data)
     if len(np.unique(segmented_image)) > 3:
         raise ValueError("segmented_image must have only values of 1, 0 and a 0.5 (if dim centers marked)")
     segmented_image_fixed = np.copy(segmented_image.astype(float)) # Make type float to enable adding float values
