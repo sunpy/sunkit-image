@@ -172,8 +172,8 @@ def mark_brightpoint(segmented_image, data, resolution):
     granule_count: `int`
         The number of granules identified, after re-classifcation of brightpoint.
     """
-    bp_size_limit = 2  # Max size of a brightpoint in square arcsec.
-    bp_pix_limit = bp_size_limit / resolution
+    bp_size_limit = 0.1  # Approximate max size of a photosphere bright point in square arcsec (see Yanxiao et al., 2018)
+    bp_pix_limit = bp_size_limit / (resolution**2)
     # General flux limit determined by visual inspection.
     bp_brightness_limit = np.mean(data) + 0.5 * np.std(data)
     if len(np.unique(segmented_image)) > 3:
