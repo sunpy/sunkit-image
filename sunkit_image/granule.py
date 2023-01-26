@@ -233,9 +233,9 @@ def kmeans_segment(data):
     return segmented_map
 
 
-def cross_correlation(segment1, segment2):
+def correlation(segment1, segment2):
     """
-    Works out the cross correlation of two segmented arrays.
+    Compute the correlation of two segmented arrays.
 
         -1 if the agreement between two arrays is low, 0 otherwise.
 

@@ -116,33 +116,33 @@ def test_kmeans_segment():
     assert count_non_label_in_cluster == 0
 
 
-def test_cross_correlation():
+def test_correlation():
     # Check that if arrays agree, returns 0.
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))
     test_array_1[0, 0] = 0
     test_array_2[0, 0] = 0
-    assert 0 == granule.cross_correlation(test_array_1, test_array_2)[0]
-    # Check that cross correlation isn't greater than 100% or less than 0%.
-    assert granule.cross_correlation(test_array_1, test_array_2)[1] <= 1
-    assert not granule.cross_correlation(test_array_1, test_array_2)[1] < 0
+    assert 0 == granule.correlation(test_array_1, test_array_2)[0]
+    # Check that correlation isn't greater than 100% or less than 0%.
+    assert granule.correlation(test_array_1, test_array_2)[1] <= 1
+    assert not granule.correlation(test_array_1, test_array_2)[1] < 0
 
 
-def test_cross_correlation2():
-    # Check that if cross correlation is too low, returns -1.
+def test_correlation2():
+    # Check that if correlation is too low, returns -1.
     test_array_1 = np.ones((10, 10))
     test_array_1[0, 0] = 0
     test_array_2 = np.ones((10, 10))
     test_array_2[0, 0] = 1
-    assert granule.cross_correlation(test_array_1, test_array_2)[0] == -1
-    # Check that cross correlation isn't greater than 100% or less than 0%.
-    assert granule.cross_correlation(test_array_1, test_array_2)[1] <= 1
-    assert not granule.cross_correlation(test_array_1, test_array_2)[1] < 0
+    assert granule.correlation(test_array_1, test_array_2)[0] == -1
+    # Check that correlation isn't greater than 100% or less than 0%.
+    assert granule.correlation(test_array_1, test_array_2)[1] <= 1
+    assert not granule.correlation(test_array_1, test_array_2)[1] < 0
 
 
-def test_cross_correlation_errors():
+def test_correlation_errors():
     # Check that error is raised if there are no granules or intergranules in image.
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))
     with pytest.raises(Exception, match="clustering failed"):
-        granule.cross_correlation(test_array_1, test_array_2)
+        granule.correlation(test_array_1, test_array_2)
