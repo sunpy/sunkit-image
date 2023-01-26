@@ -17,7 +17,7 @@ __all__ = [
     "trim_intergranules",
     "mark_brightpoint",
     "kmeans_segment",
-    "cross_correlation",
+    "correlation",
 ]
 
 METHODS = ["li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"]
@@ -172,7 +172,7 @@ def mark_brightpoint(segmented_image, data, resolution):
     granule_count: `int`
         The number of granules identified, after re-classifcation of brightpoint.
     """
-    bp_size_limit = 0.1  # Approximate max size of a photosphere bright point in square arcsec (see Yanxiao et al., 2018)
+    bp_size_limit = 0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
     bp_pix_upper_limit = bp_size_limit / (resolution**2)
     bp_pix_lower_limit = 4 # Very small bright regions are likley artifacts
     # General flux limit determined by visual inspection.
