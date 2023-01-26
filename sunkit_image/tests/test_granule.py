@@ -92,7 +92,7 @@ def test_mark_faculae(test_granule_map):
     assert thresholded.shape == faculae_marked.shape
     # Check that returned array is not empty.
     assert np.size(faculae_marked) > 0
-    # Check that the returned array has some 0.5 values (for a dataset that we know has faculae by eye).
+    # Check that the returned array has some 1.5 values (for a dataset that we know has faculae by eye).
     assert len(np.where(faculae_marked == 1.5)[0]) != 0
 
 
