@@ -1,20 +1,3 @@
-Addition of the ``segment`` module and contains functions to segment granulation in images of the solar photosphere.
-
-The key functionality is contained in the `.segment` function, which takes a Map 
-and a thresholding method then performs the segmentation, with the segmented Map as output.
-
-Calls to segment look like:
-
-.. code-block:: python
-
-    segmented_data = segment(smap, resolution, skimage_method)
-
-where 
-
-*``smap`` is the Map containing an optical image of the solar photosphere.
-*``resolution`` is the spatial resolution of the telescope.
-*``skimage_method`` is the base scikit image segmentation technique to use.
-*``mark_dim_centers`` is a boolean flag indicating whether the user would like to mark dim intergranule centers for future exploration.
-*``bp_min_flux`` is the minimum flux per pixel for a region to be considered a brightpoint.
-
-We segment into tri-valued images with 0 = intergranule, 1 = granule, 1.5 = faculae, and if marking is desired, dim granule middles marked as 0.5.
+Addition of the `sunkit_image.granule` module and contains functions to segment granulation in images of the solar photosphere.
+The key functionality is contained in the `~sunkit_image.granule.segment` function, which 
+segments an image into intergranule, granule,  faculae, and, optionally, dim granule.
