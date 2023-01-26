@@ -28,8 +28,11 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
     Segment an optical image of the solar photosphere into tri-value maps with:
 
      * 0 as intergranule
-     * 0.5 as faculae
      * 1 as granule
+     * 1.5 as faculae 
+
+    If mark_dim_centers is set to True, an additional label, 0.5, will be assigned to
+    dim grnanule centers. 
 
     Parameters
     ----------
@@ -149,7 +152,7 @@ def trim_intergranules(segmented_image, mark=False):
 
 def mark_faculae(segmented_image, data, resolution):
     """
-    Mark faculae separately from granules - give them a value of 2 not 1.
+    Mark faculae separately from granules - give them a value of 1.5.
 
     Parameters
     ----------
