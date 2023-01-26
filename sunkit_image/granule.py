@@ -15,7 +15,7 @@ __all__ = [
     "segment",
     "get_threshold",
     "trim_intergranules",
-    "mark_faculae",
+    "mark_brightpoint",
     "kmeans_segment",
     "cross_correlation",
 ]
@@ -29,7 +29,7 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
 
      * 0 as intergranule
      * 1 as granule
-     * 1.5 as faculae 
+     * 1.5 as brightpoint 
 
     If mark_dim_centers is set to True, an additional label, 0.5, will be assigned to
     dim grnanule centers. 
@@ -65,10 +65,10 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
     segmented_image = np.uint8(median_filtered > threshold)
     # Fix the extra intergranule material bits in the middle of granules.
     seg_im_fixed = trim_intergranules(segmented_image, mark=mark_dim_centers)
-    # Mark faculae and get final granule and facule count.
-    seg_im_markfac, faculae_count, granule_count = mark_faculae(seg_im_fixed, smap.data, resolution)
-    logging.info(f"Segmentation has identified {granule_count} granules and {faculae_count} faculae")
-    segmented_map = sunpy.map.Map(seg_im_markfac, smap.meta)
+    # Mark brightpoint and get final granule and brightpoint count.
+    seg_im_markbp, brightpoint_count, granule_count = mark_brightpoint(seg_im_fixed, smap.data, resolution)
+    logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
+    segmented_map = sunpy.map.Map(seg_im_markbp, smap.meta)
     return segmented_map
 
 
@@ -150,9 +150,9 @@ def trim_intergranules(segmented_image, mark=False):
     return segmented_image_fixed
 
 
-def mark_faculae(segmented_image, data, resolution):
+def mark_brightpoint(segmented_image, data, resolution):
     """
-    Mark faculae separately from granules - give them a value of 1.5.
+    Mark brightpoints separately from granules - give them a value of 1.5.
 
     Parameters
     ----------
@@ -166,22 +166,22 @@ def mark_faculae(segmented_image, data, resolution):
     Returns
     -------
     segmented_image_fixed : `numpy.ndrray`
-        The segmented image with faculae marked as 1.5.
-    faculae_count: `int`
-        The number of faculae identified in the image.
+        The segmented image with brightpoints marked as 1.5.
+    brightpoint_count: `int`
+        The number of brightpoints identified in the image.
     granule_count: `int`
-        The number of granules identified, after re-classifcation of faculae.
+        The number of granules identified, after re-classifcation of brightpoint.
     """
-    fac_size_limit = 2  # Max size of a faculae in square arcsec.
-    fac_pix_limit = fac_size_limit / resolution
+    bp_size_limit = 2  # Max size of a brightpoint in square arcsec.
+    bp_pix_limit = bp_size_limit / resolution
     # General flux limit determined by visual inspection.
-    fac_brightness_limit = np.mean(data) + 0.5 * np.std(data)
+    bp_brightness_limit = np.mean(data) + 0.5 * np.std(data)
     if len(np.unique(segmented_image)) > 3:
         raise ValueError("segmented_image must have only values of 1, 0 and a 0.5 (if dim centers marked)")
     segmented_image_fixed = np.copy(segmented_image.astype(float)) # Make type float to enable adding float values
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
-    fac_count = 0
+    bp_count = 0
     for value in values:
         mask = np.zeros_like(segmented_image)
         mask[labeled_seg == value] = 1
@@ -190,13 +190,13 @@ def mark_faculae(segmented_image, data, resolution):
             region_size = len(segmented_image_fixed[mask == 1])
             tot_flux = np.sum(data[mask == 1])
             # check that region is small.
-            if region_size < fac_pix_limit:
+            if region_size < bp_pix_limit:
                 # Check that avg flux very high.
-                if tot_flux / region_size > fac_brightness_limit:
+                if tot_flux / region_size > bp_brightness_limit:
                     segmented_image_fixed[mask == 1] = 1.5
-                    fac_count += 1
-    gran_count = len(values) - 1 - fac_count  # Subtract 1 for IG region.
-    return segmented_image_fixed, fac_count, gran_count
+                    bp_count += 1
+    gran_count = len(values) - 1 - bp_count  # Subtract 1 for IG region.
+    return segmented_image_fixed, bp_count, gran_count
 
 
 def kmeans_segment(data):

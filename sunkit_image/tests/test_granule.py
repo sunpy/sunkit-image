@@ -85,22 +85,22 @@ def test_trim_intergranules_errors():
 
 
 @pytest.mark.remote_data
-def test_mark_faculae(test_granule_map):
+def test_mark_brightpoint(test_granule_map):
     thresholded = np.uint8(test_granule_map.data > np.nanmedian(test_granule_map.data))
-    faculae_marked, _, _ = granule.mark_faculae(thresholded, test_granule_map.data, resolution=0.016)
+    brightpoint_marked, _, _ = granule.mark_brightpoint(thresholded, test_granule_map.data, resolution=0.016)
     # Check that the correct dimensions are returned.
-    assert thresholded.shape == faculae_marked.shape
+    assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
-    assert np.size(faculae_marked) > 0
-    # Check that the returned array has some 1.5 values (for a dataset that we know has faculae by eye).
-    assert len(np.where(faculae_marked == 1.5)[0]) != 0
+    assert np.size(brightpoint_marked) > 0
+    # Check that the returned array has some 1.5 values (for a dataset that we know has brightpoints by eye).
+    assert len(np.where(brightpoint_marked == 1.5)[0]) != 0
 
 
 @pytest.mark.remote_data
-def test_mark_faculae_error(test_granule_map):
+def test_mark_brightpoint_error(test_granule_map):
     # Check that errors are raised for incorrect test_granule_map.
     with pytest.raises(ValueError, match="segmented_image must have only"):
-        granule.mark_faculae(test_granule_map.data, test_granule_map.data, 0.016)
+        granule.mark_brightpoint(test_granule_map.data, test_granule_map.data, 0.016)
 
 
 def test_kmeans_segment():

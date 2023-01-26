@@ -9,4 +9,4 @@ where
 *``resolution`` is the spatial resolution of the telescope.
 *``skimage_method`` is the base scikit image segmentation technique to use.
 *``mark_dim_centers`` is a boolean flag indicating whether the user would like to mark dim intergranule centers for future exploration.
-We segment into tri-valued images with 0 = intergranule, 1 = granule, 1.5 = faculae, and if marking is desired, dim granule middles marked as 0.5.
+We segment into tri-valued images with 0 = intergranule, 1 = granule, 1.5 = brightpoints, and if marking is desired, dim granule middles marked as 0.5.
