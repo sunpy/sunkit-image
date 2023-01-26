@@ -15,5 +15,6 @@ where
 *``resolution`` is the spatial resolution of the telescope.
 *``skimage_method`` is the base scikit image segmentation technique to use.
 *``mark_dim_centers`` is a boolean flag indicating whether the user would like to mark dim intergranule centers for future exploration.
+*``bp_min_flux`` is the minimum flux per pixel for a region to be considered a brightpoint.
 
 We segment into tri-valued images with 0 = intergranule, 1 = granule, 1.5 = faculae, and if marking is desired, dim granule middles marked as 0.5.

@@ -87,7 +87,7 @@ def test_trim_intergranules_errors():
 @pytest.mark.remote_data
 def test_mark_brightpoint(test_granule_map):
     thresholded = np.uint8(test_granule_map.data > np.nanmedian(test_granule_map.data))
-    brightpoint_marked, _, _ = granule.mark_brightpoint(thresholded, test_granule_map.data, resolution=0.016)
+    brightpoint_marked, _, _ = granule.mark_brightpoint(thresholded, test_granule_map.data, resolution=0.016, bp_min_flux=None)
     # Check that the correct dimensions are returned.
     assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
@@ -100,7 +100,7 @@ def test_mark_brightpoint(test_granule_map):
 def test_mark_brightpoint_error(test_granule_map):
     # Check that errors are raised for incorrect test_granule_map.
     with pytest.raises(ValueError, match="segmented_image must have only"):
-        granule.mark_brightpoint(test_granule_map.data, test_granule_map.data, 0.016)
+        granule.mark_brightpoint(test_granule_map.data, test_granule_map.data, 0.016, bp_min_flux=None)
 
 
 def test_kmeans_segment():
@@ -145,4 +145,4 @@ def test_correlation_errors():
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))
     with pytest.raises(Exception, match="clustering failed"):
-        granule.correlation(test_array_1, test_array_2)
+        granule.m(test_array_1, test_array_2)

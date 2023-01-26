@@ -23,7 +23,7 @@ __all__ = [
 METHODS = ["li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"]
 
 
-def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
+def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=None):
     """
     Segment an optical image of the solar photosphere into tri-value maps with:
 
@@ -48,6 +48,9 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
         identify intergranule material, and 'minimum' over identifies granules.
     mark_dim_centers : `bool`
         Whether to mark dim granule centers as a separate category for future exploration.
+    bp_min_flux: `float`
+        Minimum flux per pixel for a region to be considered a brightpoint. 
+        If None (the defualt), it will be computed as half an SD above the mean value. 
 
     Returns
     -------
@@ -66,7 +69,7 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False):
     # Fix the extra intergranule material bits in the middle of granules.
     seg_im_fixed = trim_intergranules(segmented_image, mark=mark_dim_centers)
     # Mark brightpoint and get final granule and brightpoint count.
-    seg_im_markbp, brightpoint_count, granule_count = mark_brightpoint(seg_im_fixed, smap.data, resolution)
+    seg_im_markbp, brightpoint_count, granule_count = mark_brightpoint(seg_im_fixed, smap.data, resolution, bp_min_flux)
     logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
     segmented_map = sunpy.map.Map(seg_im_markbp, smap.meta)
     return segmented_map
@@ -150,7 +153,7 @@ def trim_intergranules(segmented_image, mark=False):
     return segmented_image_fixed
 
 
-def mark_brightpoint(segmented_image, data, resolution):
+def mark_brightpoint(segmented_image, data, resolution, bp_min_flux):
     """
     Mark brightpoints separately from granules - give them a value of 1.5.
 
@@ -162,6 +165,8 @@ def mark_brightpoint(segmented_image, data, resolution):
         The original image.
     resolution : `float`
         Spatial resolution (arcsec/pixel) of the data.
+    bp_min_flux: `float`
+        Minimum flux per pixel for a region to be considered a brightpoint. 
 
     Returns
     -------
@@ -176,8 +181,11 @@ def mark_brightpoint(segmented_image, data, resolution):
     bp_pix_upper_limit = bp_size_limit / (resolution**2)
     bp_pix_lower_limit = 4 # Very small bright regions are likley artifacts
     # General flux limit determined by visual inspection.
-    stand_devs = 0.5
-    bp_brightness_limit = np.mean(data) + stand_devs * np.std(data)
+    if bp_min_flux == None:
+        stand_devs = 0.5
+        bp_brightness_limit = np.mean(data) + stand_devs * np.std(data)
+    else:
+         bp_brightness_limit = bp_min_flux
     if len(np.unique(segmented_image)) > 3:
         raise ValueError("segmented_image must have only values of 1, 0 and a 0.5 (if dim centers marked)")
     segmented_image_fixed = np.copy(segmented_image.astype(float)) # Make type float to enable adding float values
