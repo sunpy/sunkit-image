@@ -4,7 +4,7 @@ This module contains functions that will segment images for granule detection.
 import logging
 
 import numpy as np
-import scipy.ndimage as sndi
+import scipy
 import skimage
 from sklearn.cluster import KMeans
 
@@ -58,7 +58,7 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp
     if not isinstance(smap, sunpy.map.mapbase.GenericMap):
         raise TypeError("Input must be an instance of a sunpy.map.GenericMap")
 
-    median_filtered = sndi.median_filter(smap.data, size=3)
+    median_filtered = scipy.ndimage.median_filter(smap.data, size=3)
     # Apply initial skimage threshold.
     threshold = get_threshold(median_filtered, skimage_method)
     segmented_image = np.uint8(median_filtered > threshold)
