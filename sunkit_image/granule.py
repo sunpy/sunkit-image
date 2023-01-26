@@ -20,8 +20,6 @@ __all__ = [
     "correlation",
 ]
 
-METHODS = ["li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"]
-
 
 def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=None):
     """
@@ -59,8 +57,6 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp
     """
     if not isinstance(smap, sunpy.map.mapbase.GenericMap):
         raise TypeError("Input must be an instance of a sunpy.map.GenericMap")
-    if skimage_method not in METHODS:
-        raise TypeError("Method must be one of: " + ", ".join(METHODS))
 
     median_filtered = sndi.median_filter(smap.data, size=3)
     # Apply initial skimage threshold.
@@ -93,22 +89,19 @@ def get_threshold(data, method):
     """
     if not isinstance(data, np.ndarray):
         raise ValueError("Input data must be an instance of a np.ndarray")
-    if method == "li":
-        threshold = skimage.filters.threshold_li(data)
-    elif method == "otsu":
-        threshold = skimage.filters.threshold_otsu(data)
-    elif method == "yen":
-        threshold = skimage.filters.threshold_yen(data)
-    elif method == "mean":
-        threshold = skimage.filters.threshold_mean(data)
-    elif method == "minimum":
-        threshold = skimage.filters.threshold_minimum(data)
-    elif method == "triangle":
-        threshold = skimage.filters.threshold_triangle(data)
-    elif method == "isodata":
-        threshold = skimage.filters.threshold_isodata(data)
-    else:
-        raise ValueError("Method must be one of: " + ", ".join(METHODS))
+    method = method.lower()
+    method_funcs = {
+       "li": skimage.filters.threshold_li,
+       "otsu": skimage.filters.threshold_otsu,
+       "yen": skimage.filters.threshold_yen,
+       "mean": skimage.filters.threshold_mean,
+       "minimum": skimage.filters.threshold_minimum,
+       "triangle": skimage.filters.threshold_triangle,
+       "isodata": skimage.filters.threshold_isodata,
+    }
+    if method not in method_funcs:
+        raise ValueError("Method must be one of: " + ", ".join(list(method_funcs.keys())))
+    threshold = method_funcs[method](data)
     return threshold
 
 
