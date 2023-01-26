@@ -173,7 +173,8 @@ def mark_brightpoint(segmented_image, data, resolution):
         The number of granules identified, after re-classifcation of brightpoint.
     """
     bp_size_limit = 0.1  # Approximate max size of a photosphere bright point in square arcsec (see Yanxiao et al., 2018)
-    bp_pix_limit = bp_size_limit / (resolution**2)
+    bp_pix_upper_limit = bp_size_limit / (resolution**2)
+    bp_pix_lower_limit = 4 # Very small bright regions are likley artifacts
     # General flux limit determined by visual inspection.
     stand_devs = 0.5
     bp_brightness_limit = np.mean(data) + stand_devs * np.std(data)
@@ -191,11 +192,13 @@ def mark_brightpoint(segmented_image, data, resolution):
             region_size = len(segmented_image_fixed[mask == 1])
             tot_flux = np.sum(data[mask == 1])
             # check that region is small.
-            if region_size < bp_pix_limit:
-                # Check that avg flux very high.
-                if tot_flux / region_size > bp_brightness_limit:
-                    segmented_image_fixed[mask == 1] = 1.5
-                    bp_count += 1
+            if region_size < bp_pix_upper_limit:
+                # Check that region is not *too* small (likley an artifact)
+                if region_size > bp_pix_lower_limit:
+                    # Check that avg flux very high.
+                    if tot_flux / region_size > bp_brightness_limit:
+                        segmented_image_fixed[mask == 1] = 1.5
+                        bp_count += 1
     gran_count = len(values) - 1 - bp_count  # Subtract 1 for IG region.
     return segmented_image_fixed, bp_count, gran_count
 
