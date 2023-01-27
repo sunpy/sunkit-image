@@ -103,28 +103,28 @@ def test_mark_brightpoint_error(test_granule_map):
         granule._mark_brightpoint(test_granule_map.data, test_granule_map.data, 0.016, bp_min_flux=None)
 
 
-def test_compute_overlap():
-    # Check that compute_overlap is 1 when Maps are equal.
+def test_segments_overlap_fraction():
+    # Check that segments_overlap_fraction is 1 when Maps are equal.
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))
     test_array_1[0, 0] = 0 # add "intergranule region"
     test_array_2[0, 0] = 0
-    assert granule._compute_overlap(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2)) == 1.0
+    assert granule._segments_overlap_fraction(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2)) == 1.0
 
 
-def test_compute_overlap2():
-    # Check that compute_overlap is between 0 and 1 when Maps are not equal. 
+def test_segments_overlap_fraction2():
+    # Check that segments_overlap_fraction is between 0 and 1 when Maps are not equal. 
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))
     test_array_1[0, 0] = 0
     test_array_2[1, 1] = 0
-    assert granule._compute_overlap(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2)) <= 1
-    assert not granule._compute_overlap(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2)) < 0
+    assert granule._segments_overlap_fraction(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2)) <= 1
+    assert not granule._segments_overlap_fraction(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2)) < 0
 
 
-def test_compute_overlap_errors():
+def test_segments_overlap_fraction_errors():
     # Check that error is raised if there are no granules or intergranules in image.
     test_array_1 = np.ones((10, 10))
     test_array_2 = np.ones((10, 10))
     with pytest.raises(Exception, match="clustering failed"):
-        granule._compute_overlap(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2))
+        granule._segments_overlap_fraction(sunpy.map.Map(test_array_1), sunpy.map.Map(test_array_2))

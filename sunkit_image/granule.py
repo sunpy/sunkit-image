@@ -14,7 +14,7 @@ import sunpy.map
 
 __all__ = [
     "segment",
-    "compute_overlap"
+    "segments_overlap_fraction"
 ]
 
 
@@ -210,9 +210,9 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     return segmented_image_fixed, bp_count, gran_count
 
 
-def compute_overlap(segment1, segment2):
+def segments_overlap_fraction(segment1, segment2):
     """
-    Compute the correlation of two segmented SunPy Maps.
+    Compute the fraction of overlap between two segmented SunPy Maps.
 
         Designed for comparing output Map from `segment` with other segmentation methods. 
 
