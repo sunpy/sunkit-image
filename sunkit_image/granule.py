@@ -13,7 +13,8 @@ import sunpy
 import sunpy.map
 
 __all__ = [
-    "segment"
+    "segment",
+    "compute_overlap"
 ]
 
 
@@ -209,66 +210,27 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     return segmented_image_fixed, bp_count, gran_count
 
 
-def _kmeans_segment(data):
+def compute_overlap(segment1, segment2):
     """
-    Uses a k-means clustering algorithm to cluster data, in order to
-    independently verify the scikit-image clustering method.
+    Compute the correlation of two segmented SunPy Maps.
+
+        Designed for comparing output Map from `segment` with other segmentation methods. 
 
     Parameters
     ----------
-    data : `numpy array`
-        Data to be clustered.
+    segment1: `~sunpy.map.GenericMap`
+        Main `~sunpy.map.GenericMap` to compare against. Must have 0 = intergranule, 1 = granule.
+    segment2 :`~sunpy.map.GenericMap`
+        Comparison `~sunpy.map.GenericMap`. Must have 0 = intergranule, 1 = granule.
+        As an example, this could come from a simple segment useing sklearn.cluster.KMeans
 
     Returns
     -------
-    labels : `numpy.ndarray`
-        An array of labels with:
-
-        * 0 are granules
-        * 2 are intergranules
-        * 1 are in-between regions
+    confidence : `float`
+        The numeric confidence metric: 0 = no agreement and 1 = complete agreement.
     """
-    x_size = np.shape(data)[0]
-    y_size = np.shape(data)[1]
-    data_flat = np.reshape(data, (x_size * y_size, 1))
-    labels_flat = KMeans(n_clusters=3, n_init="auto").fit(data_flat).labels_
-    labels = np.reshape(labels_flat, (x_size, y_size))
-    # Make intergranules = 0 and granules = 1.
-    group0_mean = np.mean(data[labels == 0])
-    group1_mean = np.mean(data[labels == 1])
-    group2_mean = np.mean(data[labels == 2])
-    min_index = np.argmin([group0_mean, group1_mean, group2_mean])
-    segmented_map = np.ones(labels.shape)
-    segmented_map[[labels[:, :] == min_index][0]] -= 1
-    return segmented_map
-
-
-def _correlation(segment1, segment2):
-    """
-    Compute the correlation of two segmented arrays.
-
-        -1 if the agreement between two arrays is low, 0 otherwise.
-
-        Designed to be used with `segment` and `segment_kmeans` function.
-
-    Parameters
-    ----------
-    segment1 : `numpy.ndarray`
-        Main array to compare the other input array against.
-    segment2 : `numpy.ndarray`
-        Other array, i.e., data segmented using k-means clustering.
-
-    Returns
-    -------
-    [label, confidence] : `list`
-        label : `int`
-            Summarizes the confidence metric:
-            -1: if agreement is low (below 75%)
-            0: otherwise
-        confidence : `float`
-            The numeric confidence metric:
-            Between 0 and 1 where 0 if there is no agreement and 1 if completely agrees.
-    """
+    segment1 = np.array(segment1.data)
+    segment2 = np.array(segment2.data)
     total_granules = np.count_nonzero(segment1 == 1)
     total_intergranules = np.count_nonzero(segment1 == 0)
     if total_granules == 0:
@@ -284,8 +246,4 @@ def _correlation(segment1, segment2):
     percentage_agreement_granules = granule_agreement_count / total_granules
     percentage_agreement_intergranules = intergranule_agreement_count / total_intergranules
     confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
-    if percentage_agreement_granules < 0.75 or percentage_agreement_intergranules < 0.75:
-        logging.info("Low agreement with K-Means clustering. Saved output has low confidence.")
-        return [-1, confidence]
-    else:
-        return [0, confidence]
+    return confidence 
