@@ -6,7 +6,6 @@ import logging
 import numpy as np
 import scipy
 import skimage
-from sklearn.cluster import KMeans
 import matplotlib
 
 import sunpy
