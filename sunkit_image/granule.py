@@ -7,6 +7,7 @@ import numpy as np
 import scipy
 import skimage
 from sklearn.cluster import KMeans
+import matplotlib
 
 import sunpy
 import sunpy.map
@@ -66,6 +67,9 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     seg_im_markbp, brightpoint_count, granule_count = _mark_brightpoint(seg_im_fixed, smap.data, resolution, bp_min_flux)
     logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
     segmented_map = sunpy.map.Map(seg_im_markbp, smap.meta)
+    # Add colormap to Map, such that 0 (intergranules) = black, 1 (granule) = white, 2 (brightpoints) = yellow, 3 (dim_centers) = blue
+    cmap = matplotlib.colors.ListedColormap(["black", "white", "#ffc406", "blue"])
+    segmented_map.plot_settings['cmap'] = cmap
     return segmented_map
 
 
