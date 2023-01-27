@@ -13,11 +13,11 @@ import sunpy.map
 
 __all__ = [
     "segment",
-    "get_threshold",
-    "trim_intergranules",
-    "mark_brightpoint",
-    "kmeans_segment",
-    "correlation",
+    "_get_threshold",
+    "_trim_intergranules",
+    "_mark_brightpoint",
+    "_kmeans_segment",
+    "_correlation",
 ]
 
 
@@ -60,18 +60,18 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp
 
     median_filtered = scipy.ndimage.median_filter(smap.data, size=3)
     # Apply initial skimage threshold.
-    threshold = get_threshold(median_filtered, skimage_method)
+    threshold = _get_threshold(median_filtered, skimage_method)
     segmented_image = np.uint8(median_filtered > threshold)
     # Fix the extra intergranule material bits in the middle of granules.
-    seg_im_fixed = trim_intergranules(segmented_image, mark=mark_dim_centers)
+    seg_im_fixed = _trim_intergranules(segmented_image, mark=mark_dim_centers)
     # Mark brightpoint and get final granule and brightpoint count.
-    seg_im_markbp, brightpoint_count, granule_count = mark_brightpoint(seg_im_fixed, smap.data, resolution, bp_min_flux)
+    seg_im_markbp, brightpoint_count, granule_count = _mark_brightpoint(seg_im_fixed, smap.data, resolution, bp_min_flux)
     logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
     segmented_map = sunpy.map.Map(seg_im_markbp, smap.meta)
     return segmented_map
 
 
-def get_threshold(data, method):
+def _get_threshold(data, method):
     """
     Get the threshold value using given skimage segmentation type.
 
@@ -105,7 +105,7 @@ def get_threshold(data, method):
     return threshold
 
 
-def trim_intergranules(segmented_image, mark=False):
+def _trim_intergranules(segmented_image, mark=False):
     """
     Remove the erroneous identification of intergranule material in the middle
     of granules that the pure threshold segmentation produces.
@@ -146,7 +146,7 @@ def trim_intergranules(segmented_image, mark=False):
     return segmented_image_fixed
 
 
-def mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
+def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     """
     Mark brightpoints separately from granules - give them a value of 1.5.
 
@@ -205,7 +205,7 @@ def mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     return segmented_image_fixed, bp_count, gran_count
 
 
-def kmeans_segment(data):
+def _kmeans_segment(data):
     """
     Uses a k-means clustering algorithm to cluster data, in order to
     independently verify the scikit-image clustering method.
@@ -239,7 +239,7 @@ def kmeans_segment(data):
     return segmented_map
 
 
-def correlation(segment1, segment2):
+def _correlation(segment1, segment2):
     """
     Compute the correlation of two segmented arrays.
 
@@ -275,12 +275,8 @@ def correlation(segment1, segment2):
     y_size = np.shape(segment1)[1]
     granule_agreement_count = 0
     intergranule_agreement_count = 0
-    for i in range(x_size):
-        for j in range(y_size):
-            if segment1[i, j] == 1 and segment2[i, j] == 1:
-                granule_agreement_count += 1
-            elif segment1[i, j] == 0 and segment2[i, j] == 0:
-                intergranule_agreement_count += 1
+    granule_agreement_count = ((segment1 == 1) * (segment2 == 1)).sum()
+    intergranule_agreement_count = ((segment1 == 0) * (segment2 == 0)).sum()
     percentage_agreement_granules = granule_agreement_count / total_granules
     percentage_agreement_intergranules = intergranule_agreement_count / total_intergranules
     confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
