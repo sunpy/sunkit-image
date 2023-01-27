@@ -27,9 +27,9 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp
 
      * 0 as intergranule
      * 1 as granule
-     * 1.5 as brightpoint 
+     * 2 as brightpoint 
 
-    If mark_dim_centers is set to True, an additional label, 0.5, will be assigned to
+    If mark_dim_centers is set to True, an additional label, 3, will be assigned to
     dim grnanule centers. 
 
     Parameters
@@ -116,7 +116,7 @@ def _trim_intergranules(segmented_image, mark=False):
         The segmented image containing incorrect extra intergranules.
     mark : `bool`
         If `False` (the default), remove erroneous intergranules.
-        If `True`, mark them as 0.5 instead (for later examination).
+        If `True`, mark them as 2 instead (for later examination).
 
     Returns
     -------
@@ -135,20 +135,20 @@ def _trim_intergranules(segmented_image, mark=False):
         if len((labeled_seg[labeled_seg == value])) > size:
             real_IG_value = value
             size = len(labeled_seg[labeled_seg == value])
-    # Set all other 0 regions to mark value (1 or 0.5).
+    # Set all other 0 regions to mark value (2).
     for value in values:
         if np.sum(segmented_image[labeled_seg == value]) == 0:
             if value != real_IG_value:
                 if not mark:
                     segmented_image_fixed[labeled_seg == value] = 1
                 elif mark:
-                    segmented_image_fixed[labeled_seg == value] = 0.5
+                    segmented_image_fixed[labeled_seg == value] = 2
     return segmented_image_fixed
 
 
 def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     """
-    Mark brightpoints separately from granules - give them a value of 1.5.
+    Mark brightpoints separately from granules - give them a value of 3.
 
     Parameters
     ----------
@@ -165,7 +165,7 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     Returns
     -------
     segmented_image_fixed : `numpy.ndrray`
-        The segmented image with brightpoints marked as 1.5.
+        The segmented image with brightpoints marked as 3.
     brightpoint_count: `int`
         The number of brightpoints identified in the image.
     granule_count: `int`
@@ -181,7 +181,7 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     else:
          bp_brightness_limit = bp_min_flux
     if len(np.unique(segmented_image)) > 3:
-        raise ValueError("segmented_image must have only values of 1, 0 and a 0.5 (if dim centers marked)")
+        raise ValueError("segmented_image must have only values of 1, 0 and a 2 (if dim centers marked)")
     segmented_image_fixed = np.copy(segmented_image.astype(float)) # Make type float to enable adding float values
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
@@ -199,7 +199,7 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
                 if region_size > bp_pix_lower_limit:
                     # Check that avg flux very high.
                     if tot_flux / region_size > bp_brightness_limit:
-                        segmented_image_fixed[mask == 1] = 1.5
+                        segmented_image_fixed[mask == 1] = 3
                         bp_count += 1
     gran_count = len(values) - 1 - bp_count  # Subtract 1 for IG region.
     return segmented_image_fixed, bp_count, gran_count

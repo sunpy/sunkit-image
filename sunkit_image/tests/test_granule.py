@@ -65,11 +65,11 @@ def test_trim_intergranules(test_granule_map):
     assert thresholded.shape == granule._trim_intergranules(thresholded).shape
     # Check that erroneous material marked, not removed, when flag is True.
     middles_marked = granule._trim_intergranules(thresholded, mark=True)
-    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 0.5])
+    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 3])
     assert marked_erroneous != 0
-    # Check that removed when flag is False (no 0.5 values).
+    # Check that removed when flag is False (no 3 values).
     middles_marked = granule._trim_intergranules(thresholded, mark=False)
-    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 0.5])
+    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 3])
     assert marked_erroneous == 0
     # Check that the returned array has fewer (or same number) 0-valued pixels as input
     # array (for a data set which we know by eye should have some middle sections removed).
@@ -92,8 +92,8 @@ def test_mark_brightpoint(test_granule_map):
     assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
     assert np.size(brightpoint_marked) > 0
-    # Check that the returned array has some 1.5 values (for a dataset that we know has brightpoints by eye).
-    assert len(np.where(brightpoint_marked == 1.5)[0]) != 0
+    # Check that the returned array has some 2 values (for a dataset that we know has brightpoints by eye).
+    assert len(np.where(brightpoint_marked == 2)[0]) != 0
 
 
 @pytest.mark.remote_data
