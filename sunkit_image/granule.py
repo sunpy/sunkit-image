@@ -69,7 +69,9 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     segmented_map = sunpy.map.Map(seg_im_markbp, smap.meta)
     # Add colormap to Map, such that 0 (intergranules) = black, 1 (granule) = white, 2 (brightpoints) = yellow, 3 (dim_centers) = blue
     cmap = matplotlib.colors.ListedColormap(["black", "white", "#ffc406", "blue"])
+    norm = matplotlib.colors.BoundaryNorm(boundaries=[-.5, .5, 1.5, 2.5, 3.5], ncolors=cmap.N)
     segmented_map.plot_settings['cmap'] = cmap
+    segmented_map.plot_settings['norm'] = norm
     return segmented_map
 
 
