@@ -12,12 +12,7 @@ import sunpy
 import sunpy.map
 
 __all__ = [
-    "segment",
-    "_get_threshold",
-    "_trim_intergranules",
-    "_mark_brightpoint",
-    "_kmeans_segment",
-    "_correlation",
+    "segment"
 ]
 
 
