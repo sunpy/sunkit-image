@@ -11,7 +11,7 @@ import sunkit_image.granule as granule
 
 @pytest.mark.remote_data
 def test_segment(test_granule_map):
-    segmented = granule.segment(test_granule_map, 0.016, skimage_method="li", mark_dim_centers=True)
+    segmented = granule.segment(test_granule_map, skimage_method="li", mark_dim_centers=True)
     assert isinstance(segmented, sunpy.map.mapbase.GenericMap)
     # Check pixels are not empty.
     initial_pix = all_pixel_indices_from_map(test_granule_map).value
@@ -28,9 +28,9 @@ def test_segment(test_granule_map):
 @pytest.mark.remote_data
 def test_segment_errors(test_granule_map):
     with pytest.raises(TypeError, match="Input must be an instance of a sunpy.map.GenericMap"):
-        granule.segment(np.array([[1, 2, 3], [1, 2, 3]]), 0.016)
+        granule.segment(np.array([[1, 2, 3], [1, 2, 3]]))
     with pytest.raises(TypeError, match="Method must be one of: otsu, li, isodata, mean, minimum, yen, triangle"):
-        granule.segment(test_granule_map, 0.016, skimage_method="banana")
+        granule.segment(test_granule_map, skimage_method="banana")
 
 
 def test_get_threshold():

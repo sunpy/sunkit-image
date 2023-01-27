@@ -21,7 +21,7 @@ __all__ = [
 ]
 
 
-def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=None):
+def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=None):
     """
     Segment an optical image of the solar photosphere into tri-value maps with:
 
@@ -35,9 +35,7 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp
     Parameters
     ----------
     smap : `~sunpy.map.GenericMap`
-        `~sunpy.map.GenericMap` containing data to segment.
-    resolution : `float`
-        Spatial resolution (arcsec/pixel) of the data.
+        `~sunpy.map.GenericMap` containing data to segment. Must have square pixels.
     skimage_method : {"li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"}, optional
         scikit-image thresholding method, defaults to "li".
         Depending on input data, one or more of these methods may be
@@ -57,6 +55,11 @@ def segment(smap, resolution, *, skimage_method="li", mark_dim_centers=False, bp
     """
     if not isinstance(smap, sunpy.map.mapbase.GenericMap):
         raise TypeError("Input must be an instance of a sunpy.map.GenericMap")
+
+    if map.scale[0].value == map.scale[1].value:
+        resolution = map.scale[0].value
+    else: 
+        raise Exception('Currently only maps with square pixels are supported.')
 
     median_filtered = scipy.ndimage.median_filter(smap.data, size=3)
     # Apply initial skimage threshold.
