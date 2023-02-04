@@ -97,26 +97,48 @@ def test_granule_map():
 
 
 @pytest.fixture(scope="session")
-def test_granule_minimaps():
+def granule_minimap1():
 
     # array with "intergranule region"
-    arr_1 = np.ones((10, 10))
-    arr_1[0, 0] = 0 
-    # modified array with "intergranule region"
-    arr_2 = np.ones((10, 10))
-    arr_2[1, 1] = 0 
-    # array with no "intergranule region"
-    arr_3 = np.ones((10, 10))
+    arr = np.ones((10, 10))
+    arr[0, 0] = 0 
 
     observer = get_earth()
     frame = Helioprojective(observer=observer, obstime=observer.obstime)
     ref_coord = astropy.coordinates.SkyCoord(0, 0, unit='arcsec', frame=frame)
     
-    header1 = make_fitswcs_header(arr_1, ref_coord,)
-    map1 =  sunpy.map.GenericMap(arr_1, header1)
-    header2 = make_fitswcs_header(arr_2, ref_coord,)
-    map2 =  sunpy.map.GenericMap(arr_2, header2)
-    header3 = make_fitswcs_header(arr_3, ref_coord,)
-    map3 =  sunpy.map.GenericMap(arr_3, header3)
+    header = make_fitswcs_header(arr, ref_coord,)
+    map =  sunpy.map.GenericMap(arr, header)
 
-    return [map1, map2, map3]
+    return map
+
+@pytest.fixture(scope="session")
+def granule_minimap2():
+
+    # modified array with "intergranule region"
+    arr = np.ones((10, 10))
+    arr[1, 1] = 0 
+
+    observer = get_earth()
+    frame = Helioprojective(observer=observer, obstime=observer.obstime)
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit='arcsec', frame=frame)
+    
+    header = make_fitswcs_header(arr, ref_coord,)
+    map =  sunpy.map.GenericMap(arr, header)
+
+    return map
+
+@pytest.fixture(scope="session")
+def granule_minimap3():
+
+    # array with no "intergranule region"
+    arr = np.ones((10, 10))
+
+    observer = get_earth()
+    frame = Helioprojective(observer=observer, obstime=observer.obstime)
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit='arcsec', frame=frame)
+
+    header = make_fitswcs_header(arr, ref_coord,)
+    map =  sunpy.map.GenericMap(arr, header)
+
+    return map

@@ -103,21 +103,22 @@ def test_mark_brightpoint_error(test_granule_map):
         granule._mark_brightpoint(test_granule_map.data, test_granule_map.data, 0.016, bp_min_flux=None)
 
 
-def test_segments_overlap_fraction(test_granule_minimaps):
+def test_segments_overlap_fraction(granule_minimap1):
     # Check that segments_overlap_fraction is 1 when Maps are equal.
-    maps = test_granule_minimaps
-    assert granule._segments_overlap_fraction(maps[0], maps[0]) == 1.0
+    map = granule_minimap1
+    assert granule._segments_overlap_fraction(map, map) == 1.0
 
 
-def test_segments_overlap_fraction2(test_granule_minimaps):
+def test_segments_overlap_fraction2(granule_minimap1, granule_minimap2):
     # Check that segments_overlap_fraction is between 0 and 1 when Maps are not equal. 
-    maps = test_granule_minimaps
-    assert granule._segments_overlap_fraction(maps[0], maps[1]) <= 1
-    assert not granule._segments_overlap_fraction(maps[0], maps[1]) < 0
+    map1 = granule_minimap1
+    map2 = granule_minimap2
+    assert granule._segments_overlap_fraction(map1 map2) <= 1
+    assert not granule._segments_overlap_fraction(map1, map2) < 0
 
 
-def test_segments_overlap_fraction_errors(test_granule_minimaps):
+def test_segments_overlap_fraction_errors(granule_minimap3):
     # Check that error is raised if there are no granules or intergranules in image.
-    maps = test_granule_minimaps
+    map = granule_minimap3
     with pytest.raises(Exception, match="clustering failed"):
-        granule._segments_overlap_fraction(maps[2], maps[2])
+        granule._segments_overlap_fraction(map, map)
