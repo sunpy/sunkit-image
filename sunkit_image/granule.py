@@ -3,18 +3,15 @@ This module contains functions that will segment images for granule detection.
 """
 import logging
 
+import matplotlib
 import numpy as np
 import scipy
 import skimage
-import matplotlib
 
 import sunpy
 import sunpy.map
 
-__all__ = [
-    "segment",
-    "segments_overlap_fraction"
-]
+__all__ = ["segment", "segments_overlap_fraction"]
 
 
 def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=None):
@@ -23,10 +20,10 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
 
      * 0 as intergranule
      * 1 as granule
-     * 2 as brightpoint 
+     * 2 as brightpoint
 
     If mark_dim_centers is set to True, an additional label, 3, will be assigned to
-    dim grnanule centers. 
+    dim grnanule centers.
 
     Parameters
     ----------
@@ -51,12 +48,10 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     """
     if not isinstance(smap, sunpy.map.mapbase.GenericMap):
         raise TypeError("Input must be an instance of a sunpy.map.GenericMap")
-
-    if map.scale[0].value == map.scale[1].value:
-        resolution = map.scale[0].value
-    else: 
-        raise Exception('Currently only maps with square pixels are supported.')
-
+    if smap.scale[0].value == smap.scale[1].value:
+        resolution = smap.scale[0].value
+    else:
+        raise ValueError("Currently only maps with square pixels are supported.")
     median_filtered = scipy.ndimage.median_filter(smap.data, size=3)
     # Apply initial skimage threshold.
     threshold = _get_threshold(median_filtered, skimage_method)
@@ -64,14 +59,16 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     # Fix the extra intergranule material bits in the middle of granules.
     seg_im_fixed = _trim_intergranules(segmented_image, mark=mark_dim_centers)
     # Mark brightpoint and get final granule and brightpoint count.
-    seg_im_markbp, brightpoint_count, granule_count = _mark_brightpoint(seg_im_fixed, smap.data, resolution, bp_min_flux)
+    seg_im_markbp, brightpoint_count, granule_count = _mark_brightpoint(
+        seg_im_fixed, smap.data, resolution, bp_min_flux
+    )
     logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
     # Create output map using input wcs and adding colormap such that 0 (intergranules) = black, 1 (granule) = white, 2 (brightpoints) = yellow, 3 (dim_centers) = blue.
     segmented_map = sunpy.map.Map(seg_im_markbp, smap.wcs)
     cmap = matplotlib.colors.ListedColormap(["black", "white", "#ffc406", "blue"])
-    norm = matplotlib.colors.BoundaryNorm(boundaries=[-.5, .5, 1.5, 2.5, 3.5], ncolors=cmap.N)
-    segmented_map.plot_settings['cmap'] = cmap
-    segmented_map.plot_settings['norm'] = norm
+    norm = matplotlib.colors.BoundaryNorm(boundaries=[-0.5, 0.5, 1.5, 2.5, 3.5], ncolors=cmap.N)
+    segmented_map.plot_settings["cmap"] = cmap
+    segmented_map.plot_settings["norm"] = norm
     return segmented_map
 
 
@@ -95,13 +92,13 @@ def _get_threshold(data, method):
         raise ValueError("Input data must be an instance of a np.ndarray")
     method = method.lower()
     method_funcs = {
-       "li": skimage.filters.threshold_li,
-       "otsu": skimage.filters.threshold_otsu,
-       "yen": skimage.filters.threshold_yen,
-       "mean": skimage.filters.threshold_mean,
-       "minimum": skimage.filters.threshold_minimum,
-       "triangle": skimage.filters.threshold_triangle,
-       "isodata": skimage.filters.threshold_isodata,
+        "li": skimage.filters.threshold_li,
+        "otsu": skimage.filters.threshold_otsu,
+        "yen": skimage.filters.threshold_yen,
+        "mean": skimage.filters.threshold_mean,
+        "minimum": skimage.filters.threshold_minimum,
+        "triangle": skimage.filters.threshold_triangle,
+        "isodata": skimage.filters.threshold_isodata,
     }
     if method not in method_funcs:
         raise ValueError("Method must be one of: " + ", ".join(list(method_funcs.keys())))
@@ -175,18 +172,20 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     granule_count: `int`
         The number of granules identified, after re-classifcation of brightpoint.
     """
-    bp_size_limit = 0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
+    bp_size_limit = (
+        0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
+    )
     bp_pix_upper_limit = bp_size_limit / (resolution**2)
-    bp_pix_lower_limit = 4 # Very small bright regions are likley artifacts
+    bp_pix_lower_limit = 4  # Very small bright regions are likley artifacts
     # General flux limit determined by visual inspection.
     if bp_min_flux is None:
         stand_devs = 0.5
         bp_brightness_limit = np.mean(data) + stand_devs * np.std(data)
     else:
-         bp_brightness_limit = bp_min_flux
+        bp_brightness_limit = bp_min_flux
     if len(np.unique(segmented_image)) > 3:
         raise ValueError("segmented_image must have only values of 1, 0 and a 2 (if dim centers marked)")
-    segmented_image_fixed = np.copy(segmented_image.astype(float)) # Make type float to enable adding float values
+    segmented_image_fixed = np.copy(segmented_image.astype(float))  # Make type float to enable adding float values
     labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
     values = np.unique(labeled_seg)
     bp_count = 0
@@ -213,7 +212,7 @@ def segments_overlap_fraction(segment1, segment2):
     """
     Compute the fraction of overlap between two segmented SunPy Maps.
 
-        Designed for comparing output Map from `segment` with other segmentation methods. 
+        Designed for comparing output Map from `segment` with other segmentation methods.
 
     Parameters
     ----------
@@ -236,8 +235,8 @@ def segments_overlap_fraction(segment1, segment2):
         raise ValueError("No granules in `segment1`. It is possible the clustering failed.")
     if total_intergranules == 0:
         raise ValueError("No intergranules in `segment1`. It is possible the clustering failed.")
-    x_size = np.shape(segment1)[0]
-    y_size = np.shape(segment1)[1]
+    np.shape(segment1)[0]
+    np.shape(segment1)[1]
     granule_agreement_count = 0
     intergranule_agreement_count = 0
     granule_agreement_count = ((segment1 == 1) * (segment2 == 1)).sum()
@@ -245,4 +244,4 @@ def segments_overlap_fraction(segment1, segment2):
     percentage_agreement_granules = granule_agreement_count / total_granules
     percentage_agreement_intergranules = intergranule_agreement_count / total_intergranules
     confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
-    return confidence 
+    return confidence

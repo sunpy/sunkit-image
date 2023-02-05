@@ -2,14 +2,15 @@ import os
 import tempfile
 import importlib
 
+import numpy as np
 import pytest
 
 import astropy
 import astropy.config.paths
 import sunpy.map
+from sunpy.coordinates import Helioprojective, get_earth
+from sunpy.data import manager
 from sunpy.map.header_helper import make_fitswcs_header
-from sunpy.coordinates import get_earth, Helioprojective
-import numpy as np
 
 # Force MPL to use non-gui backends for testing.
 try:
@@ -90,55 +91,59 @@ def pytest_runtest_setup(item):
             pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
 
 
+@pytest.fixture(scope="session")
 @pytest.mark.remote_data
-@pytest.fixture(scope="session")
-def test_granule_map():
-    return sunpy.map.Map("https://github.com/sunpy/data/raw/main/sunkit-image/granule_testdata.fits")
+@manager.require(
+    "granule_fits",
+    "https://github.com/sunpy/data/raw/main/sunkit-image/granule_testdata.fits",
+    "a118b15466dcce88e140e3235a787d99eb564f038761cb166b5f41a94b945ba9",
+)
+def granule_map():
+    return sunpy.map.Map(manager.get("granule_fits"))
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def granule_minimap1():
-
-    # array with "intergranule region"
+    # Array with "intergranule region"
     arr = np.ones((10, 10))
-    arr[0, 0] = 0 
-
+    arr[0, 0] = 0
     observer = get_earth()
     frame = Helioprojective(observer=observer, obstime=observer.obstime)
-    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit='arcsec', frame=frame)
-    
-    header = make_fitswcs_header(arr, ref_coord,)
-    map =  sunpy.map.GenericMap(arr, header)
-
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit="arcsec", frame=frame)
+    header = make_fitswcs_header(
+        arr,
+        ref_coord,
+    )
+    map = sunpy.map.GenericMap(arr, header)
     return map
 
-@pytest.fixture(scope="session")
+
+@pytest.fixture
 def granule_minimap2():
-
-    # modified array with "intergranule region"
+    # Modified array with "intergranule region"
     arr = np.ones((10, 10))
-    arr[1, 1] = 0 
-
+    arr[1, 1] = 0
     observer = get_earth()
     frame = Helioprojective(observer=observer, obstime=observer.obstime)
-    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit='arcsec', frame=frame)
-    
-    header = make_fitswcs_header(arr, ref_coord,)
-    map =  sunpy.map.GenericMap(arr, header)
-
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit="arcsec", frame=frame)
+    header = make_fitswcs_header(
+        arr,
+        ref_coord,
+    )
+    map = sunpy.map.GenericMap(arr, header)
     return map
 
-@pytest.fixture(scope="session")
+
+@pytest.fixture
 def granule_minimap3():
-
-    # array with no "intergranule region"
+    # Array with no "intergranule region"
     arr = np.ones((10, 10))
-
     observer = get_earth()
     frame = Helioprojective(observer=observer, obstime=observer.obstime)
-    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit='arcsec', frame=frame)
-
-    header = make_fitswcs_header(arr, ref_coord,)
-    map =  sunpy.map.GenericMap(arr, header)
-
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit="arcsec", frame=frame)
+    header = make_fitswcs_header(
+        arr,
+        ref_coord,
+    )
+    map = sunpy.map.GenericMap(arr, header)
     return map
