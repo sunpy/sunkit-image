@@ -35,7 +35,7 @@ def test_segment(granule_map):
 def test_segment_errors(granule_map):
     with pytest.raises(TypeError, match="Input must be an instance of a sunpy.map.GenericMap"):
         segment(np.array([[1, 2, 3], [1, 2, 3]]))
-    with pytest.raises(TypeError, match="Method must be one of: otsu, li, isodata, mean, minimum, yen, triangle"):
+    with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
         segment(granule_map, skimage_method="banana")
 
 
@@ -58,7 +58,7 @@ def test_get_threshold_range():
 def test_get_threshold_errors():
     with pytest.raises(ValueError, match="Input data must be an instance of a np.ndarray"):
         _get_threshold([], "li")
-    with pytest.raises(ValueError, match="Method must be one of: "):
+    with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
         _get_threshold(np.array([[1, 2], [1, 2]]), "banana")
 
 
@@ -71,11 +71,11 @@ def test_trim_intergranules(granule_map):
     assert thresholded.shape == _trim_intergranules(thresholded).shape
     # Check that erroneous material marked, not removed, when flag is True.
     middles_marked = _trim_intergranules(thresholded, mark=True)
-    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 3])
+    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 2])
     assert marked_erroneous != 0
     # Check that removed when flag is False (no 3 values).
     middles_marked = _trim_intergranules(thresholded, mark=False)
-    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 3])
+    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 2])
     assert marked_erroneous == 0
     # Check that the returned array has fewer (or same number) 0-valued pixels as input
     # array (for a data set which we know by eye should have some middle sections removed).
@@ -98,8 +98,8 @@ def test_mark_brightpoint(granule_map):
     assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
     assert np.size(brightpoint_marked) > 0
-    # Check that the returned array has some 2 values (for a dataset that we know has brightpoints by eye).
-    assert len(np.where(brightpoint_marked == 2)[0]) != 0
+    # Check that the returned array has some 3 values (for a dataset that we know has brightpoints by eye).
+    assert (brightpoint_marked == 3).sum() == 32768
 
 
 @pytest.mark.remote_data

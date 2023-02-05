@@ -235,8 +235,6 @@ def segments_overlap_fraction(segment1, segment2):
         raise ValueError("No granules in `segment1`. It is possible the clustering failed.")
     if total_intergranules == 0:
         raise ValueError("No intergranules in `segment1`. It is possible the clustering failed.")
-    np.shape(segment1)[0]
-    np.shape(segment1)[1]
     granule_agreement_count = 0
     intergranule_agreement_count = 0
     granule_agreement_count = ((segment1 == 1) * (segment2 == 1)).sum()
