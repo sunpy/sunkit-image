@@ -344,7 +344,6 @@ def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0
         the mean approximation. The second row contains the attenuation coefficients for the Fourier coefficients
         of the standard deviation approximation.
     """
-
     attenuation_coefficients = np.zeros((2, order + 1))
     attenuation_coefficients[0, :] = np.linspace(range_mean[0], range_mean[1], order + 1)
     attenuation_coefficients[1, :] = np.linspace(range_std[0], range_std[1], order + 1)
