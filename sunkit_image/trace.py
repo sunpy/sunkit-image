@@ -112,7 +112,6 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     loops = []
 
     for _ in range(0, nstruc):
-
         # Loop tracing begins at maximum flux position
         zstart = residual.max()
 
@@ -132,7 +131,6 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
         ndir = 2
 
         for idir in range(0, ndir):
-
             # Creating arrays which will store all the loops points coordinates, flux,
             # angle and radius.
             # xl, yl are the x and y coordinates
@@ -157,7 +155,6 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
             # `ip` denotes a point in the traced loop
             for ip in range(0, npmax):
-
                 # The below function call will return the coordinate, flux and angle
                 # of the next point.
                 xl, yl, zl, al = curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
@@ -354,7 +351,6 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
 
     # All the points surrounding the loops are zeroed out
     for point in range(0, len(xloop)):
-
         i0 = min(max(int(xloop[point]), 0), nx - 1)
         xstart = max(int(i0 - width), 0)
         xend = min(int(i0 + width), nx - 1)
