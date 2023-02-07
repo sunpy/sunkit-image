@@ -471,7 +471,6 @@ def fnrgf(
 
     # Iterate over each circular ring
     for i in range(0, nbins):
-
         # Finding the pixels which belong to a certain circular ring
         annulus = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         annulus = np.logical_and(annulus, map_r > application_radius)
@@ -504,7 +503,6 @@ def fnrgf(
 
         # Iterate over each segment in a circular ring
         for j in range(0, number_angular_segments, 1):
-
             # Finding all the pixels whose angle values lie in the segment
             angular_segment = np.logical_and(angles >= segment_angle * j, angles < segment_angle * (j + 1))
 

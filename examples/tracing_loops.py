@@ -64,7 +64,6 @@ trace_map.plot()
 # through the `pixel_to_world` functionality which converts the pixel coordinates to coordinates (in arcsec)
 # on the `trace_map`.
 for loop in loops:
-
     loop = np.array(loop)  # convert to array as easier to index `x` and `y` coordinates
 
     coord_loops = trace_map.pixel_to_world(loop[:, 0] * u.pixel, loop[:, 1] * u.pixel)
