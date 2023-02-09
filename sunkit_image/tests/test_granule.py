@@ -69,18 +69,18 @@ def test_trim_intergranules(granule_map):
     assert np.size(thresholded) > 0
     # Check that the correct dimensions are returned.
     assert thresholded.shape == _trim_intergranules(thresholded).shape
-    # Check that erroneous material marked, not removed, when flag is True.
-    middles_marked = _trim_intergranules(thresholded, mark=True)
-    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 2])
-    assert marked_erroneous != 0
-    # Check that removed when flag is False (no 2 values).
-    middles_marked = _trim_intergranules(thresholded, mark=False)
-    marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 2])
-    assert marked_erroneous == 0
-    # Check that the returned array has fewer (or same number) 0-valued pixels as input
-    # array (for a data set which we know by eye should have some middle sections removed).
+    # Check that erroneous zero values are caught and re-assigned 
+    # e.g. the returned array has fewer (or same number) 0-valued pixels as input
     middles_removed = _trim_intergranules(thresholded)
     assert not np.count_nonzero(middles_removed) < np.count_nonzero(thresholded)
+    # Check that when mark=True, erroneous 0 values are set to 2
+    middles_marked = _trim_intergranules(thresholded, mark=True)
+    marked_as_2 = np.count_nonzero(middles_marked[middles_marked == 2])
+    assert marked_as_2 != 0
+    # Check that when mark=False, erroneous 0 values are "removed" (set to 1), returning NO 2 values
+    middles_marked = _trim_intergranules(thresholded, mark=False)
+    marked_as_2 = np.count_nonzero(middles_marked[middles_marked == 2])
+    assert marked_as_2 == 0
 
 
 def test_trim_intergranules_errors():
