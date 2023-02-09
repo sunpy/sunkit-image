@@ -73,7 +73,7 @@ def test_trim_intergranules(granule_map):
     middles_marked = _trim_intergranules(thresholded, mark=True)
     marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 2])
     assert marked_erroneous != 0
-    # Check that removed when flag is False (no 3 values).
+    # Check that removed when flag is False (no 2 values).
     middles_marked = _trim_intergranules(thresholded, mark=False)
     marked_erroneous = np.count_nonzero(middles_marked[middles_marked == 2])
     assert marked_erroneous == 0
