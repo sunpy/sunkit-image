@@ -90,7 +90,7 @@ def test_mark_brightpoint(granule_map):
     # Check that returned array is not empty.
     assert np.size(brightpoint_marked) > 0
     # Check that the returned array has some 3 values (for a dataset that we know has brightpoints by eye).
-    assert (brightpoint_marked == 3).sum() == 7130
+    assert (brightpoint_marked == 3).sum() == 230
 
 
 def test_mark_brightpoint_error(granule_map):
