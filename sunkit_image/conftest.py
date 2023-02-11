@@ -8,8 +8,8 @@ import pytest
 import astropy
 import astropy.config.paths
 import sunpy.map
+from astropy.utils.data import get_pkg_data_filename
 from sunpy.coordinates import Helioprojective, get_earth
-from sunpy.data import manager
 from sunpy.map.header_helper import make_fitswcs_header
 
 # Force MPL to use non-gui backends for testing.
@@ -91,15 +91,9 @@ def pytest_runtest_setup(item):
             pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
 
 
-@pytest.fixture(scope="session")
-@pytest.mark.remote_data
-@manager.require(
-    "granule_fits",
-    "https://github.com/sunpy/data/raw/main/sunkit-image/granule_testdata.fits",
-    "a118b15466dcce88e140e3235a787d99eb564f038761cb166b5f41a94b945ba9",
-)
+@pytest.fixture()
 def granule_map():
-    return sunpy.map.Map(manager.get("granule_fits"))
+    return sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
 
 
 @pytest.fixture

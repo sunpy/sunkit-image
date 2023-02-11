@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 import pytest
 
@@ -15,7 +13,6 @@ from sunkit_image.granule import (
 )
 
 
-@pytest.mark.remote_data
 def test_segment(granule_map):
     segmented = segment(granule_map, skimage_method="li", mark_dim_centers=True)
     assert isinstance(segmented, sunpy.map.mapbase.GenericMap)
@@ -24,14 +21,10 @@ def test_segment(granule_map):
     seg_pixels = all_pixel_indices_from_map(segmented).value
     assert np.size(seg_pixels) > 0
     assert seg_pixels.shape == initial_pix.shape
-    # Check that the values in the array are changed (pick 10 random indices to check).
-    x = random.sample(list(np.arange(0, granule_map.data.shape[0], 1)), 10)
-    y = random.sample(list(np.arange(0, granule_map.data.shape[1], 1)), 10)
-    for i in range(len(x)):
-        assert granule_map.data[x[i], y[i]] != segmented.data[x[i], y[i]]
+    # Check that the values in the array have changed
+    assert np.any(np.not_equal(granule_map.data, segmented.data))
 
 
-@pytest.mark.remote_data
 def test_segment_errors(granule_map):
     with pytest.raises(TypeError, match="Input must be an instance of a sunpy.map.GenericMap"):
         segment(np.array([[1, 2, 3], [1, 2, 3]]))
@@ -62,14 +55,13 @@ def test_get_threshold_errors():
         _get_threshold(np.array([[1, 2], [1, 2]]), "banana")
 
 
-@pytest.mark.remote_data
 def test_trim_intergranules(granule_map):
     thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map.data))
     # Check that returned array is not empty.
     assert np.size(thresholded) > 0
     # Check that the correct dimensions are returned.
     assert thresholded.shape == _trim_intergranules(thresholded).shape
-    # Check that erroneous zero values are caught and re-assigned 
+    # Check that erroneous zero values are caught and re-assigned
     # e.g. the returned array has fewer (or same number) 0-valued pixels as input
     middles_removed = _trim_intergranules(thresholded)
     assert not np.count_nonzero(middles_removed) < np.count_nonzero(thresholded)
@@ -90,7 +82,6 @@ def test_trim_intergranules_errors():
         _trim_intergranules(data)
 
 
-@pytest.mark.remote_data
 def test_mark_brightpoint(granule_map):
     thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map.data))
     brightpoint_marked, _, _ = _mark_brightpoint(thresholded, granule_map.data, resolution=0.016, bp_min_flux=None)
@@ -99,10 +90,9 @@ def test_mark_brightpoint(granule_map):
     # Check that returned array is not empty.
     assert np.size(brightpoint_marked) > 0
     # Check that the returned array has some 3 values (for a dataset that we know has brightpoints by eye).
-    assert (brightpoint_marked == 3).sum() == 32768
+    assert (brightpoint_marked == 3).sum() == 7130
 
 
-@pytest.mark.remote_data
 def test_mark_brightpoint_error(granule_map):
     # Check that errors are raised for incorrect granule_map.
     with pytest.raises(ValueError, match="segmented_image must have only"):
