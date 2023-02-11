@@ -1,5 +1,5 @@
 """
-This module contains functions that will enhance the entire image.
+This module contains enhancement routines for solar physics data.
 """
 import warnings
 

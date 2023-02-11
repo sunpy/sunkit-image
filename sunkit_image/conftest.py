@@ -2,10 +2,15 @@ import os
 import tempfile
 import importlib
 
+import numpy as np
 import pytest
 
 import astropy
 import astropy.config.paths
+import sunpy.map
+from astropy.utils.data import get_pkg_data_filename
+from sunpy.coordinates import Helioprojective, get_earth
+from sunpy.map.header_helper import make_fitswcs_header
 
 # Force MPL to use non-gui backends for testing.
 try:
@@ -84,3 +89,55 @@ def pytest_runtest_setup(item):
     if isinstance(item, pytest.Function):
         if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
             pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
+
+
+@pytest.fixture()
+def granule_map():
+    return sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
+
+
+@pytest.fixture
+def granule_minimap1():
+    # Array with "intergranule region"
+    arr = np.ones((10, 10))
+    arr[0, 0] = 0
+    observer = get_earth()
+    frame = Helioprojective(observer=observer, obstime=observer.obstime)
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit="arcsec", frame=frame)
+    header = make_fitswcs_header(
+        arr,
+        ref_coord,
+    )
+    map = sunpy.map.GenericMap(arr, header)
+    return map
+
+
+@pytest.fixture
+def granule_minimap2():
+    # Modified array with "intergranule region"
+    arr = np.ones((10, 10))
+    arr[1, 1] = 0
+    observer = get_earth()
+    frame = Helioprojective(observer=observer, obstime=observer.obstime)
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit="arcsec", frame=frame)
+    header = make_fitswcs_header(
+        arr,
+        ref_coord,
+    )
+    map = sunpy.map.GenericMap(arr, header)
+    return map
+
+
+@pytest.fixture
+def granule_minimap3():
+    # Array with no "intergranule region"
+    arr = np.ones((10, 10))
+    observer = get_earth()
+    frame = Helioprojective(observer=observer, obstime=observer.obstime)
+    ref_coord = astropy.coordinates.SkyCoord(0, 0, unit="arcsec", frame=frame)
+    header = make_fitswcs_header(
+        arr,
+        ref_coord,
+    )
+    map = sunpy.map.GenericMap(arr, header)
+    return map
