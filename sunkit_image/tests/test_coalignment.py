@@ -111,7 +111,6 @@ def test_check_for_nonfinite_entries():
 def test_match_template_to_layer(
     aia171_test_map_layer, aia171_test_template, aia171_test_map_layer_shape, aia171_test_template_shape
 ):
-
     result = match_template_to_layer(aia171_test_map_layer, aia171_test_template)
     assert_allclose(
         result.shape[0],
