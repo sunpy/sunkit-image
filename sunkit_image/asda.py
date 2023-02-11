@@ -445,7 +445,6 @@ class Lamb_Oseen(Asda):
             self.y_range = [0 - self.rmax, self.rmax]
 
         if (x is None) or (y is None):
-
             # Check if one of the input parameters is None
             # but the other one is not None
             if (x is None) != (y is None):

@@ -8,12 +8,7 @@ import astropy.units as u
 import sunpy.map
 from sunpy.coordinates import frames
 
-from sunkit_image.utils import (
-    bin_edge_summary,
-    equally_spaced_bins,
-    find_pixel_radii,
-    get_radial_intensity_summary,
-)
+from sunkit_image.utils import bin_edge_summary, equally_spaced_bins, find_pixel_radii, get_radial_intensity_summary
 
 __all__ = [
     "fit_polynomial_to_log_radial_intensity",

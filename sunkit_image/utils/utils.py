@@ -256,7 +256,6 @@ def remove_duplicate(edge):
     `list`
         Same as edge, but with duplicated points removed.
     """
-
     shape = np.shape(edge)
     if shape[1] != 2:
         raise ValueError("Polygon must be defined as a n x 2 array!")
@@ -305,7 +304,6 @@ def calc_gamma(pm, vel, pnorm, N):
       Astrophys. J., 872, 22, 2019.
       (https://doi.org/10.3847/1538-4357/aabd34)
     """
-
     cross = np.cross(pm, vel)
     vel_norm = np.linalg.norm(vel, axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
