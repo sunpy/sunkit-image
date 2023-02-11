@@ -69,7 +69,7 @@ def test_trim_intergranules(granule_map):
     assert np.size(thresholded) > 0
     # Check that the correct dimensions are returned.
     assert thresholded.shape == _trim_intergranules(thresholded).shape
-    # Check that erroneous zero values are caught and re-assigned 
+    # Check that erroneous zero values are caught and re-assigned
     # e.g. the returned array has fewer (or same number) 0-valued pixels as input
     middles_removed = _trim_intergranules(thresholded)
     assert not np.count_nonzero(middles_removed) < np.count_nonzero(thresholded)
