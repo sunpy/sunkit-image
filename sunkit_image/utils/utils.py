@@ -4,15 +4,21 @@ This module contains a collection of functions of general utility.
 import warnings
 
 import numpy as np
+from scipy.interpolate import interp2d
+from skimage import measure
 
 import astropy.units as u
 from sunpy.map import all_coordinates_from_map
 
 __all__ = [
     "bin_edge_summary",
+    "calc_gamma",
     "equally_spaced_bins",
     "find_pixel_radii",
     "get_radial_intensity_summary",
+    "points_in_poly",
+    "reform2d",
+    "remove_duplicate",
 ]
 
 
@@ -167,3 +173,141 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
         return np.asarray(
             [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)]
         )
+
+
+def reform2d(array, factor=1):
+    """
+    Reform a 2d array by a given factor.
+
+    Parameters
+    ----------
+    array : `numpy.ndarray`
+        2d array to be reformed/
+    factor : `int`, optional
+        The array is going to be magnified by the factor. Default is 1.
+
+    Returns
+    -------
+    `numpy.ndarray`
+        Reformed array.
+    """
+    if not isinstance(factor, int):
+        raise ValueError("Parameter 'factor' must be an integer!")
+
+    if len(np.shape(array)) != 2:
+        raise ValueError("Input array must be 2d!")
+
+    if factor > 1:
+        congridx = interp2d(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array.T)
+        array = congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor)).T
+
+    return array
+
+
+def points_in_poly(poly):
+    """
+    Return polygon as grid of points inside polygon. Only works for polygons
+    defined with points which are all integers.
+
+    Parameters
+    ----------
+    poly : `list` or `numpy.ndarray`
+        N x 2 list which defines all points at the edge of a polygon.
+
+    Returns
+    -------
+    `list`
+        N x 2 array, all points within the polygon.
+    """
+    if np.shape(poly)[1] != 2:
+        raise ValueError("Polygon must be defined as a n x 2 array!")
+
+    # convert to integers
+    poly = np.array(poly, dtype=int).tolist()
+
+    xs, ys = zip(*poly)
+    minx, maxx = min(xs), max(xs)
+    miny, maxy = min(ys), max(ys)
+    # New polygon with the staring point as [0, 0]
+    newPoly = [(int(x - minx), int(y - miny)) for (x, y) in poly]
+    mask = measure.grid_points_in_poly((round(maxx - minx) + 1, round(maxy - miny) + 1), newPoly)
+    # all points in polygon
+    points = [[x + minx, y + miny] for x, y in zip(*np.nonzero(mask))]
+
+    # add edge points if missing
+    for p in poly:
+        if p not in points:
+            points.append(p)
+
+    return points
+
+
+def remove_duplicate(edge):
+    """
+    Remove duplicated points in a the edge of a polygon.
+
+    Parameters
+    ----------
+    edge : `list` or `numpy.ndarray`
+        N x 2 list which defines all points at the edge of a polygon.
+
+    Returns
+    -------
+    `list`
+        Same as edge, but with duplicated points removed.
+    """
+
+    shape = np.shape(edge)
+    if shape[1] != 2:
+        raise ValueError("Polygon must be defined as a n x 2 array!")
+
+    new_edge = []
+    for i in range(shape[0]):
+        p = edge[i]
+        if not isinstance(p, list):
+            p = p.tolist()
+        if p not in new_edge:
+            new_edge.append(p)
+
+    return new_edge
+
+
+def calc_gamma(pm, vel, pnorm, N):
+    """
+    Calculate gamma values.
+
+    Parameters
+    ----------
+    pm : `numpy.ndarray`
+        Vector from point "p" to point "m".
+    vel : `numpy.ndarray`
+        Velocity vector.
+    pnorm : `numpy.ndarray`
+        Mode of ``pm``.
+    N : `int`
+        Number of points.
+
+    Returns
+    -------
+    `numpy.ndarray`
+        calculated gamma values for velocity vector vel
+
+    References
+    ----------
+    * Equation (8) in Laurent Graftieaux, Marc Michard and Nathalie Grosjean.
+      Combining PIV, POD and vortex identification algorithms for the
+      study of unsteady turbulent swirling flows.
+      Meas. Sci. Technol. 12, 1422, 2001.
+      (https://doi.org/10.1088/0957-0233/12/9/307)
+    * Equation (1) in Jiajia Liu, Chris Nelson, Robert Erdelyi.
+      Automated Swirl Detection Algorithm (ASDA) and Its Application to
+      Simulation and Observational Data.
+      Astrophys. J., 872, 22, 2019.
+      (https://doi.org/10.3847/1538-4357/aabd34)
+    """
+
+    cross = np.cross(pm, vel)
+    vel_norm = np.linalg.norm(vel, axis=2)
+    sint = cross / (pnorm * vel_norm + 1e-10)
+
+    return np.nansum(sint, axis=1) / N
