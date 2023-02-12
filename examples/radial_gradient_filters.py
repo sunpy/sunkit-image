@@ -47,7 +47,7 @@ out1.plot()
 ###########################################################################
 # We will need to work out  a few parameters for the FNRGF.
 # Order is the number of Fourier coefficients to be used in the approximation.
-# The attentuation coefficient are calculated to be linearly decreasing, you should
+# The attenuation coefficient are calculated to be linearly decreasing, you should
 # choose them according to your requirements.
 order = 20
 attenuation_coefficients = radial.set_attenuation_coefficients(order)

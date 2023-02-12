@@ -43,7 +43,7 @@ trace_map.plot()
 # The maximum number of structures to be examined ``nstruc`` is 1000.
 # The number of extra points in the loop below noise level to terminate a loop tracing ``ngap`` is 0.
 # The base flux and median flux ratio ``qthresh1`` is 0.0.
-# The noise threshold in the image with repect to median flux ``qthresh2`` is 3.0 .
+# The noise threshold in the image with respect to median flux ``qthresh2`` is 3.0 .
 # For the meaning of these parameters please consult the OCCULT2 article.
 loops = trace.occult2(trace_map.data, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 

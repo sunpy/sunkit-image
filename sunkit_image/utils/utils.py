@@ -107,13 +107,13 @@ def find_pixel_radii(smap, scale=None):
         gives the distance in solar radii of the pixel in the corresponding
         entry in the input map data.
     """
-    # Calculate the co-ordinates of every pixel.
+    # Calculate the coordinates of every pixel.
     coords = all_coordinates_from_map(smap)
 
     # TODO: check that the returned coordinates are indeed helioprojective cartesian
 
     # Calculate the radii of every pixel in helioprojective Cartesian
-    # co-ordinate distance units.
+    # coordinate distance units.
     radii = np.sqrt(coords.Tx**2 + coords.Ty**2)
 
     # Re-scale the output to solar radii

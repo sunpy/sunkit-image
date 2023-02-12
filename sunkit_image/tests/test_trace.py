@@ -39,7 +39,7 @@ def test_occult2_remote(image_remote, filepath_IDL):
     # Testing on the same input files as in the IDL tutorial
     loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
-    # Taking all the x and y coordinates in seperate lists
+    # Taking all the x and y coordinates in separate lists
     x = []
     y = []
     for loop in loops:
@@ -89,7 +89,7 @@ def test_occult2_fig(image_remote):
     loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     for loop in loops:
-        # We collect all the ``x`` and ``y`` coordinates in seperate lists for plotting.
+        # We collect all the ``x`` and ``y`` coordinates in separate lists for plotting.
         x = []
         y = []
         for points in loop:
@@ -126,7 +126,7 @@ def test_occult2(test_image, image_test):
     loops = occult2(image_test, nsm1=1, rmin=30, lmin=0, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     for loop in loops:
-        # We collect all the ``x`` and ``y`` coordinates in seperate lists
+        # We collect all the ``x`` and ``y`` coordinates in separate lists
         x = []
         y = []
         for points in loop:

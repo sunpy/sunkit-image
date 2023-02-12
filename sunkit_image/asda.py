@@ -19,16 +19,16 @@ class Asda:
         """
         Parameters
         ----------
-        vx : `list` or `numpy.ndarray`
+        vx : `numpy.ndarray`
             Velocity field in the x direction.
-        vy : `list` or `numpy.ndarray`
+        vy : `numpy.ndarray`
             Velocity field in the y direction.
         r : `int`, optional
-            Maximum distance of neighbour points from target point.
+            Maximum distance of neighbor points from target point.
             Default value is 3.
         factor : `int`, optional
-            (EXPERIMENTAL) Magnify the original data to find sub-grid vortex center and
-            boundary. Default value is 1.
+            Magnify the original data to find sub-grid vortex center and boundary.
+            Default value is 1.
 
         References
         ----------
@@ -43,18 +43,14 @@ class Asda:
           Astrophys. J., 872, 22, 2019.
           (https://doi.org/10.3847/1538-4357/aabd34)
         """
-
-        # Check the dimensions of the velocity fields
         if vx.shape != vy.shape:
             raise ValueError("Shape of velocity field's vx and vy do not match")
-        # Check input parameters
         if not isinstance(r, int):
             raise ValueError("Keyword 'r' must be an integer")
         if not isinstance(factor, int):
             raise ValueError("Keyword 'factor' must be an integer")
-        # Initialise class properties
-        self.vx = np.array(vx, dtype=np.float32)
-        self.vy = np.array(vy, dtype=np.float32)
+        self.vx = vx
+        self.vy = vy
         self.dshape = np.shape(vx)
         self.r = r
         self.factor = factor
@@ -79,7 +75,7 @@ class Asda:
             region with a size of ``(2r+1) x (2r+1)`` centered at ``[i, j]`` from
             the original velocity field ``self.vx`` and ``self.vy``.
             the second dimension is similar as the first dimension, but
-            with the mean velocity field substracted from the original
+            with the mean velocity field subtracted from the original
             velocity field.
         """
 
@@ -192,7 +188,7 @@ class Asda:
             dust = []
             for p in ps:
                 dust.append(self.gamma[..., 0][int(p[1]), int(p[0])])
-            # determin swirl properties
+            # determine swirl properties
             if len(dust) > 1:
                 # effective radius
                 re = np.sqrt(np.array(ps).shape[0] / np.pi) / self.factor
@@ -315,11 +311,11 @@ class Lamb_Oseen(Asda):
             A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
             Defaults to `None`.
         r : `int`, optional
-            Maximum distance of neighbour points from target point.
+            Maximum distance of neighbor points from target point.
             Default value is 3.
         factor : `int`, optional
-            (EXPERIMENTAL) Magnify the original data to find sub-grid vortex center and
-            boundary. Default value is 1.
+            Magnify the original data to find sub-grid vortex center and boundary.
+            Default value is 1.
         """
         # Check input parameters
         if not isinstance(r, int):
