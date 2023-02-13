@@ -114,7 +114,7 @@ def cross_correlation(signal_a, signal_b, lags: u.s):
     fill_value = signal_a.max()
     std_a = signal_a.std(axis=0)
     # Avoid dividing by zero by replacing with some non-zero dummy value. Note that
-    # what this value is does not matter as it will be mulitplied by zero anyway
+    # what this value is does not matter as it will be multiplied by zero anyway
     # since std_dev == 0 any place that signal - signal_mean == 0. We use the max
     # of the signal as the fill_value in order to support Quantities.
     std_a = np.where(std_a == 0, fill_value, std_a)
