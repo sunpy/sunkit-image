@@ -15,6 +15,13 @@ __all__ = ["Asda", "Lamb_Oseen"]
 
 
 class Asda:
+    """
+    Version 2.0 of Automated Swirl Detection Algorithm (ASDA).
+
+    References
+    ----------
+    * `ASDA Source Code <https://github.com/PyDL/ASDA>`__.
+    """
     def __init__(self, vx, vy, r=3, factor=1):
         """
         Parameters
@@ -78,7 +85,6 @@ class Asda:
             with the mean velocity field subtracted from the original
             velocity field.
         """
-
         vel = np.array(
             [
                 [self.vx[i + im, j + jm], self.vy[i + im, j + jm]]
@@ -86,7 +92,6 @@ class Asda:
                 for jm in np.arange(-self.r, self.r + 1)
             ]
         )
-
         return np.array([vel, vel - vel.mean(axis=0)])
 
     def gamma_values(self):
@@ -100,29 +105,22 @@ class Asda:
             finding vortex centers and ``gamma2`` is useful in finding vortex
             edges.
         """
-
-        # this part of the code was written in (x, y) order
-        # but default Python is in (y, x) order
-        # so we need to transpose it
+        # This part of the code was written in (x, y) order
+        # but numpy is in (y, x) order so we need to transpose it
         self.vx = self.vx.T
         self.vy = self.vy.T
-        # reform data is factor is greater than 1
         if self.factor > 1:
             self.vx = reform2d(self.vx, self.factor)
             self.vy = reform2d(self.vy, self.factor)
-        # Initialise Gamma1 and Gamma2
         self.gamma = np.array([np.zeros_like(self.vx), np.zeros_like(self.vy)]).T
-        # pm vectors, see equation (8) in Graftieaux et al. 2001 or Equation
-        # (1) in Liu et al. 2019
+        # pm vectors, see equation (8) in Graftieaux et al. 2001 or Equation (1) in Liu et al. 2019
         pm = np.array(
-            [[i, j] for i in np.arange(-self.r, self.r + 1) for j in np.arange(-self.r, self.r + 1)],
-            dtype=float,
+            [[i, j] for i in np.arange(-self.r, self.r + 1) for j in np.arange(-self.r, self.r + 1)], dtype=float
         )
-        # mode of vector pm
+        # Mode of vector pm
         pnorm = np.linalg.norm(pm, axis=1)
         # Number of points in the concerned region
         N = (2 * self.r + 1) ** 2
-        # Create index array
         index = np.array(
             [
                 [i, j]
@@ -130,11 +128,8 @@ class Asda:
                 for j in np.arange(self.r, self.dshape[1] - self.r)
             ]
         )
-        # Transpose index
         index = index.T
-        # Generate velocity field
         vel = self.gen_vel(index[1], index[0])
-        # Iterate over the array gamma
         for d, (i, j) in enumerate(
             product(np.arange(self.r, self.dshape[0] - self.r, 1), np.arange(self.r, self.dshape[1] - self.r, 1))
         ):
@@ -142,7 +137,6 @@ class Asda:
         # Transpose back vx & vy
         self.vx = self.vx.T
         self.vy = self.vy.T
-
         return self.gamma
 
     def center_edge(self, rmin=4, gamma_min=0.89):
@@ -152,8 +146,7 @@ class Asda:
         Parameters
         ----------
         rmin : `int`, optional
-            Minimum radius of swirls, all swirls with radius less than
-            ``rmin`` will be rejected.
+            Minimum radius of swirls, all swirls with radius less than ``rmin`` will be rejected.
             Defaults to 4.
         gamma_min : `float`, optional
             Minimum value of ``gamma1``, all potential swirls with
@@ -170,8 +163,6 @@ class Asda:
             ``radius`` : Equivalent radius of vortices.
             All results are in pixel coordinates.
         """
-
-        # Initial dictionary setup
         self.edge_prop = {"center": (), "edge": (), "points": (), "peak": (), "radius": ()}
         cs = np.array(measure.find_contours(self.gamma[..., 1].T, -2 / np.pi), dtype=object)
         cs_pos = np.array(measure.find_contours(self.gamma[..., 1].T, 2 / np.pi), dtype=object)
@@ -182,32 +173,25 @@ class Asda:
         for i in range(np.shape(cs)[0]):
             v = np.rint(cs[i].astype(np.float32))
             v = remove_duplicate(v)
-            # find all points in the contour
+            # Find all points in the contour
             ps = points_in_poly(v)
             # gamma1 value of all points in the contour
             dust = []
             for p in ps:
                 dust.append(self.gamma[..., 0][int(p[1]), int(p[0])])
-            # determine swirl properties
+            # Determine swirl properties
             if len(dust) > 1:
-                # effective radius
+                # Effective radius
                 re = np.sqrt(np.array(ps).shape[0] / np.pi) / self.factor
-                # only consider swirls with re >= rmin and maximum gamma1
-                # value greater than gamma_min
+                # Only consider swirls with re >= rmin and maximum gamma1 value greater than gamma_min
                 if np.max(np.fabs(dust)) >= gamma_min and re >= rmin:
                     # Extract the index, only first dimension
                     idx = np.where(np.fabs(dust) == np.max(np.fabs(dust)))[0][0]
-                    # Update dictionary key 'center'
                     self.edge_prop["center"] += (np.array(ps[idx]) / self.factor,)
-                    # Update dictionary key 'edge'
                     self.edge_prop["edge"] += (np.array(v) / self.factor,)
-                    # Update dictionary key 'points'
                     self.edge_prop["points"] += (np.array(ps) / self.factor,)
-                    # Update dictionary key 'peak'
                     self.edge_prop["peak"] += (dust[idx],)
-                    # Update dictionary key 'radius'
                     self.edge_prop["radius"] += (re,)
-
         return self.edge_prop
 
     def vortex_property(self, image=None):
@@ -217,7 +201,7 @@ class Asda:
 
         Parameters
         ----------
-        image : `list` or `numpy.ndarray`
+        image : `numpy.ndarray`
             Has to have the same shape as ``self.vx`` observational image,
             which will be used to calculate the average observational values of all swirls.
 
@@ -232,10 +216,7 @@ class Asda:
                 field strength etc) within the vortices if the parameter
                 image is given.
         """
-
-        # Initialising containers
         ve, vr, vc, ia = (), (), (), ()
-        # Iterate over the swirls
         for i in range(len(self.edge_prop["center"])):
             # Centre and edge of i-th swirl
             cen = self.edge_prop["center"][i]
@@ -251,35 +232,27 @@ class Asda:
             )
             # Calculate average the observational values
             if image is None:
-                # Appening 'ia' with None if no image
                 ia += (None,)
             else:
-                # Calculate ia
                 value = 0
                 for pos in pnt:
                     value += image[pos[1], pos[0]]
-                # Appending 'ia'
                 ia += (value / pnt.shape[0],)
-            # Clearing list ve0 and vr0
             ve0, vr0 = [], []
-            # Iterate over the shapes
             for j in range(edg.shape[0]):
                 # Edge position
                 idx = [edg[j][0], edg[j][1]]
-                # radial vector from swirl center to a point at its edge
+                # Eadial vector from swirl center to a point at its edge
                 pm = [idx[0] - cen[0], idx[1] - cen[1]]
-                # tangential vector
+                # Tangential vector
                 tn = [cen[1] - idx[1], idx[0] - cen[0]]
-                # velocity vector
+                # Velocity vector
                 v = [self.vx[int(idx[1]), int(idx[0])], self.vy[int(idx[1]), int(idx[0])]]
-                # Appending ve0 amd vr0
                 ve0.append(np.dot(v, pm) / np.linalg.norm(pm))
                 vr0.append(np.dot(v, tn) / np.linalg.norm(tn))
-            # Appending ve and vt
             ve += (np.nanmean(ve0),)
             vr += (np.nanmean(vr0),)
-
-        return (ve, vr, vc, ia)
+        return ve, vr, vc, ia
 
 
 class Lamb_Oseen(Asda):
@@ -317,21 +290,16 @@ class Lamb_Oseen(Asda):
             Magnify the original data to find sub-grid vortex center and boundary.
             Default value is 1.
         """
-        # Check input parameters
         if not isinstance(r, int):
             raise ValueError("Keyword 'r' must be an integer")
         if not isinstance(factor, int):
             raise ValueError("Keyword 'factor' must be an integer")
-
-        # alpha of Lamb Oseen vortices
+        # Alpha of Lamb Oseen vortices
         self.alpha = 1.256430
         self.ratio_vradial = ratio_vradial
         if gamma is None or rcore is None:
-            # Check if one of the input parameters is None but the other one
-            # is not None
-            if (gamma is None) != (rcore is None):
-                # Missing input parameter
-                warnings.warn("One of the input parameters is missing," + "setting both to 'None'")
+            if gamma != rcore:
+                warnings.warn("One of the input parameters is missing, setting both to 'None'")
                 gamma, rcore = None, None
             # Radius of the position where v_theta reaches vmax
             self.rmax = rmax
@@ -341,11 +309,11 @@ class Lamb_Oseen(Asda):
             self.rcore = self.rmax / np.sqrt(self.alpha)
             self.gamma = 2 * np.pi * self.vmax * self.rmax * (1 + 1 / (2 * self.alpha))
         else:
-            # radius
+            # Radius
             self.rmax = self.rcore * np.sqrt(self.alpha)
-            # rotating speed
+            # Rotating speed
             self.vmax = self.gamma / (2 * np.pi * self.rmax * (1 + 1 / (2 * self.alpha)))
-            # core radius
+            # Core radius
             self.rcore = rcore
             self.gamma = gamma
         # Calculating core speed
@@ -369,10 +337,8 @@ class Lamb_Oseen(Asda):
         `tuple`
             Contains the meshgrids generated.
         """
-
         self.xx, self.yy = np.meshgrid(np.arange(x_range[0], x_range[1]), np.arange(y_range[0], y_range[1]))
         self.dshape = np.shape(self.xx)
-
         return self.xx, self.yy
 
     def get_vtheta(self, r=0):
@@ -389,7 +355,6 @@ class Lamb_Oseen(Asda):
         `float`
             Rotating speed at radius of ``r``.
         """
-
         r = r + 1e-10
         return self.gamma * (1.0 - np.exp(0 - np.square(r) / np.square(self.rcore))) / (2 * np.pi * r)
 
@@ -407,7 +372,6 @@ class Lamb_Oseen(Asda):
         `float`
             Radial speed at the radius of ``r``.
         """
-
         r = r + 1e-10
         return self.get_vtheta(r) * self.ratio_vradial
 
@@ -431,35 +395,24 @@ class Lamb_Oseen(Asda):
         `tuple`
             The generated velocity field ``(vx, vy)``.
         """
-
-        # Check the dimensions of x_range
         if len(x_range) != 2:
             self.x_range = [0 - self.rmax, self.rmax]
-
-        # Check the dimensions of y_range
         if len(y_range) != 2:
             self.y_range = [0 - self.rmax, self.rmax]
-
-        if (x is None) or (y is None):
-            # Check if one of the input parameters is None
-            # but the other one is not None
-            if (x is None) != (y is None):
-                warnings.warn("One of the input parameters is missing, setting " + " both to 'None'")
+        if x is None or y is None:
+            # Check if one of the input parameters is None but the other one is not None
+            if x != y:
+                warnings.warn("One of the input parameters is missing, setting both to 'None'")
                 x, y = None, None
-
             # Creating mesh grid
             x, y = self.get_grid(x_range=x_range, y_range=y_range)
-
-        # calculate radius
+        # Calculate radius
         r = np.sqrt(np.square(x) + np.square(y)) + 1e-10
-
-        # calculate velocity vector
+        # Calculate velocity vector
         vector = [
             0 - self.get_vtheta(r) * y + self.get_vradial(r) * x,
             self.get_vtheta(r) * x + self.get_vradial(r) * y,
         ]
-
         self.vx = vector[0] / r
         self.vy = vector[1] / r
-
         return self.vx, self.vy

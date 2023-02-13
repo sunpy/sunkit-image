@@ -4,7 +4,7 @@ This module contains a collection of functions of general utility.
 import warnings
 
 import numpy as np
-from scipy.interpolate import interp2d
+from scipy.interpolate import RectBivariateSpline
 from skimage import measure
 
 import astropy.units as u
@@ -43,10 +43,8 @@ def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
     """
     if inner_value >= outer_value:
         raise ValueError("The inner value must be strictly less than the outer value.")
-
     if nbins <= 0:
         raise ValueError("The number of bins must be strictly greater than 0.")
-
     bin_edges = np.zeros((2, nbins))
     bin_edges[0, :] = np.arange(0, nbins)
     bin_edges[1, :] = np.arange(1, nbins + 1)
@@ -74,7 +72,6 @@ def bin_edge_summary(r, binfit):
         raise ValueError("The bin edges must be two-dimensional with shape (2, nbins).")
     if r.shape[0] != 2:
         raise ValueError("The bin edges must be two-dimensional with shape (2, nbins).")
-
     if binfit == "center":
         summary = 0.5 * (r[0, :] + r[1, :])
     elif binfit == "left":
@@ -109,13 +106,10 @@ def find_pixel_radii(smap, scale=None):
     """
     # Calculate the coordinates of every pixel.
     coords = all_coordinates_from_map(smap)
-
     # TODO: check that the returned coordinates are indeed helioprojective cartesian
-
     # Calculate the radii of every pixel in helioprojective Cartesian
     # coordinate distance units.
     radii = np.sqrt(coords.Tx**2 + coords.Ty**2)
-
     # Re-scale the output to solar radii
     if scale is None:
         return u.R_sun * (radii / smap.rsun_obs)
@@ -155,17 +149,13 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
         s = smap.rsun_obs
     else:
         s = scale
-
     # Get the radial distance of every pixel from the center of the Sun.
     map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
-
     # Number of radial bins
     nbins = radial_bin_edges.shape[1]
-
     # Upper and lower edges
     lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
     upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
-
     # Calculate the summary statistic in the radial bins.
     with warnings.catch_warnings():
         # We want to ignore RuntimeWarning: Mean of empty slice
@@ -182,7 +172,7 @@ def reform2d(array, factor=1):
     Parameters
     ----------
     array : `numpy.ndarray`
-        2d array to be reformed/
+        2d array to be reformed.
     factor : `int`, optional
         The array is going to be magnified by the factor. Default is 1.
 
@@ -193,15 +183,12 @@ def reform2d(array, factor=1):
     """
     if not isinstance(factor, int):
         raise ValueError("Parameter 'factor' must be an integer!")
-
     if len(np.shape(array)) != 2:
         raise ValueError("Input array must be 2d!")
-
     if factor > 1:
-        congridx = interp2d(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array.T)
-        array = congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor)).T
-
-    return array
+        congridx = RectBivariateSpline(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1)
+        reformed_array = congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
+    return reformed_array
 
 
 def points_in_poly(poly):
@@ -211,34 +198,30 @@ def points_in_poly(poly):
 
     Parameters
     ----------
-    poly : `list` or `numpy.ndarray`
-        N x 2 list which defines all points at the edge of a polygon.
+    poly : `numpy.ndarray`
+        N x 2 array which defines all points at the edge of a polygon.
 
     Returns
     -------
-    `list`
+    `numpy.ndarray`
         N x 2 array, all points within the polygon.
     """
     if np.shape(poly)[1] != 2:
         raise ValueError("Polygon must be defined as a n x 2 array!")
-
-    # convert to integers
+    # Convert to integers
     poly = np.array(poly, dtype=int).tolist()
-
     xs, ys = zip(*poly)
     minx, maxx = min(xs), max(xs)
     miny, maxy = min(ys), max(ys)
     # New polygon with the staring point as [0, 0]
     newPoly = [(int(x - minx), int(y - miny)) for (x, y) in poly]
     mask = measure.grid_points_in_poly((round(maxx - minx) + 1, round(maxy - miny) + 1), newPoly)
-    # all points in polygon
+    # All points in polygon
     points = [[x + minx, y + miny] for x, y in zip(*np.nonzero(mask))]
-
-    # add edge points if missing
+    # Add edge points if missing
     for p in poly:
         if p not in points:
             points.append(p)
-
     return points
 
 
@@ -248,18 +231,17 @@ def remove_duplicate(edge):
 
     Parameters
     ----------
-    edge : `list` or `numpy.ndarray`
-        N x 2 list which defines all points at the edge of a polygon.
+    edge : `numpy.ndarray`
+        N x 2 array which defines all points at the edge of a polygon.
 
     Returns
     -------
-    `list`
+    `numpy.ndarray`
         Same as edge, but with duplicated points removed.
     """
     shape = np.shape(edge)
     if shape[1] != 2:
         raise ValueError("Polygon must be defined as a n x 2 array!")
-
     new_edge = []
     for i in range(shape[0]):
         p = edge[i]
@@ -267,7 +249,6 @@ def remove_duplicate(edge):
             p = p.tolist()
         if p not in new_edge:
             new_edge.append(p)
-
     return new_edge
 
 
@@ -307,5 +288,4 @@ def calc_gamma(pm, vel, pnorm, N):
     cross = np.cross(pm, vel)
     vel_norm = np.linalg.norm(vel, axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
-
     return np.nansum(sint, axis=1) / N
