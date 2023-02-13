@@ -22,6 +22,7 @@ class Asda:
     ----------
     * `ASDA Source Code <https://github.com/PyDL/ASDA>`__.
     """
+
     def __init__(self, vx, vy, r=3, factor=1):
         """
         Parameters
