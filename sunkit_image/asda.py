@@ -9,7 +9,7 @@ from itertools import product
 import numpy as np
 from skimage import measure
 
-from sunkit_image.utils import calc_gamma, points_in_poly, reform2d, remove_duplicate
+from sunkit_image.utils import calculate_gamma, points_in_poly, reform2d, remove_duplicate
 
 __all__ = ["Asda", "Lamb_Oseen"]
 
@@ -134,7 +134,7 @@ class Asda:
         for d, (i, j) in enumerate(
             product(np.arange(self.r, self.dshape[0] - self.r, 1), np.arange(self.r, self.dshape[1] - self.r, 1))
         ):
-            self.gamma[i, j, 0], self.gamma[i, j, 1] = calc_gamma(pm, vel[..., d], pnorm, N)
+            self.gamma[i, j, 0], self.gamma[i, j, 1] = calculate_gamma(pm, vel[..., d], pnorm, N)
         # Transpose back vx & vy
         self.vx = self.vx.T
         self.vy = self.vy.T
@@ -206,16 +206,15 @@ class Asda:
             Has to have the same shape as ``self.vx`` observational image,
             which will be used to calculate the average observational values of all swirls.
 
-        Outputs
+        Returns
         -------
         `tuple`
-            The returned tuple has four components, each component in order is
-            ``ve``: expanding speed, in the same unit as ``self.vx`` or ``self.vy``.
-            ``vr``: rotational speed, in the same unit as ``self.vx`` or ``self.vy``.
-            ``vc``: velocity of the center, in the form of ``[vx, vy]``.
-            ``ia``: average of the observational values (intensity or magnetic
-                field strength etc) within the vortices if the parameter
-                image is given.
+            The returned tuple has four components, which are:
+
+            ``ve`` : expanding speed, in the same unit as ``self.vx`` or ``self.vy``.
+            ``vr`` : rotational speed, in the same unit as ``self.vx`` or ``self.vy``.
+            ``vc`` : velocity of the center, in the form of ``[vx, vy]``.
+            ``ia`` : average of the observational values within the vortices if the parameter image is given.
         """
         ve, vr, vc, ia = (), (), (), ()
         for i in range(len(self.edge_prop["center"])):

@@ -12,7 +12,7 @@ from sunpy.map import all_coordinates_from_map
 
 __all__ = [
     "bin_edge_summary",
-    "calc_gamma",
+    "calculate_gamma",
     "equally_spaced_bins",
     "find_pixel_radii",
     "get_radial_intensity_summary",
@@ -188,7 +188,9 @@ def reform2d(array, factor=1):
     if factor > 1:
         congridx = RectBivariateSpline(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1)
         reformed_array = congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
-    return reformed_array
+        return reformed_array
+    else:
+        return array
 
 
 def points_in_poly(poly):
@@ -252,7 +254,7 @@ def remove_duplicate(edge):
     return new_edge
 
 
-def calc_gamma(pm, vel, pnorm, N):
+def calculate_gamma(pm, vel, pnorm, n):
     """
     Calculate gamma values.
 
@@ -264,7 +266,7 @@ def calc_gamma(pm, vel, pnorm, N):
         Velocity vector.
     pnorm : `numpy.ndarray`
         Mode of ``pm``.
-    N : `int`
+    n : `int`
         Number of points.
 
     Returns
@@ -288,4 +290,4 @@ def calc_gamma(pm, vel, pnorm, N):
     cross = np.cross(pm, vel)
     vel_norm = np.linalg.norm(vel, axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
-    return np.nansum(sint, axis=1) / N
+    return np.nansum(sint, axis=1) / n

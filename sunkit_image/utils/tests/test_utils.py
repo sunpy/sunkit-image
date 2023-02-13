@@ -139,7 +139,7 @@ def test_calculate_gamma():
     vel_norm = np.linalg.norm(vel[..., 0], axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
     expected = np.nansum(sint, axis=1) / N
-    assert np.allclose(expected, utils.calc_gamma(pm, vel[..., 0], pnorm, N))
+    assert np.allclose(expected, utils.calculate_gamma(pm, vel[..., 0], pnorm, N))
 
 
 def test_remove_duplicate():
