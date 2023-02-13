@@ -8,12 +8,7 @@ import astropy.units as u
 import sunpy.map
 from sunpy.coordinates import frames
 
-from sunkit_image.utils import (
-    bin_edge_summary,
-    equally_spaced_bins,
-    find_pixel_radii,
-    get_radial_intensity_summary,
-)
+from sunkit_image.utils import bin_edge_summary, equally_spaced_bins, find_pixel_radii, get_radial_intensity_summary
 
 __all__ = [
     "fit_polynomial_to_log_radial_intensity",
@@ -311,7 +306,7 @@ def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0
     This function sets the attenuation coefficients in the one of the following two manners:
 
     If ``cutoff`` is ``0``, then it will set the attenuation coefficients as linearly decreasing between
-    the range ``range_mean`` for the attenuation coefficents for mean approximation and ``range_std`` for
+    the range ``range_mean`` for the attenuation coefficients for mean approximation and ``range_std`` for
     the attenuation coefficients for standard deviation approximation.
 
     If ``cutoff`` is not ``0``, then it will set the last ``cutoff`` number of coefficients equal to zero
@@ -321,7 +316,7 @@ def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0
 
         This function only describes some of the ways in which attenuation coefficients can be calculated.
         The optimal coefficients depends on the size and quality of image. There is no generalized formula
-        for choosing them and its upto the user to choose a optimum value.
+        for choosing them and its up to the user to choose a optimum value.
 
     Parameters
     ----------

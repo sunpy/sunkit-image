@@ -176,7 +176,7 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
         0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
     )
     bp_pix_upper_limit = bp_size_limit / (resolution**2)
-    bp_pix_lower_limit = 4  # Very small bright regions are likley artifacts
+    bp_pix_lower_limit = 4  # Very small bright regions are likely artifacts
     # General flux limit determined by visual inspection.
     if bp_min_flux is None:
         stand_devs = 0.5
@@ -198,7 +198,7 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
             tot_flux = np.sum(data[mask == 1])
             # check that region is small.
             if region_size < bp_pix_upper_limit:
-                # Check that region is not *too* small (likley an artifact)
+                # Check that region is not *too* small (likely an artifact)
                 if region_size > bp_pix_lower_limit:
                     # Check that avg flux very high.
                     if tot_flux / region_size > bp_brightness_limit:
@@ -220,7 +220,7 @@ def segments_overlap_fraction(segment1, segment2):
         Main `~sunpy.map.GenericMap` to compare against. Must have 0 = intergranule, 1 = granule.
     segment2 :`~sunpy.map.GenericMap`
         Comparison `~sunpy.map.GenericMap`. Must have 0 = intergranule, 1 = granule.
-        As an example, this could come from a simple segment useing sklearn.cluster.KMeans
+        As an example, this could come from a simple segment using sklearn.cluster.KMeans
 
     Returns
     -------
