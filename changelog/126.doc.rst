@@ -1,0 +1,1 @@
+Added two notes to `sunkit_image.enhance.mgn` detailing prerequisites for using this function.

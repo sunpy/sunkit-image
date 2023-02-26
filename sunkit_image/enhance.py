@@ -35,7 +35,9 @@ def mgn(
         * In practice, the weights and h may be adjusted according to the desired output, and also according
           to the type of input image (e.g. wavelength or channel). For most purposes, the weights can be set
           equal for all scales.
-        * We don't deal with nan (Not A Number) in this implementation.
+        * We don't deal with NaN (Not a Number) in this implementation.
+        * The input data array should be normalized by the exposure time.
+        * The input data array should be dtype `float`.
 
     Parameters
     ----------
