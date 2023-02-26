@@ -36,7 +36,8 @@ def mgn(
           to the type of input image (e.g. wavelength or channel). For most purposes, the weights can be set
           equal for all scales.
         * We don't deal with NaN (Not a Number) in this implementation.
-        * data array passed as the argument should be already normalized by the exposure time
+        * The input data array should be normalized by the exposure time.
+        * The input data array should be dtype `float`.
 
     Parameters
     ----------
