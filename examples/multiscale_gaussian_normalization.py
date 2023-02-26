@@ -5,6 +5,9 @@ Multi-scale Gaussian Normalization
 
 This example applies Multi-scale Gaussian Normalization
 to a SunPy Map using `sunkit_image.enhance.mgn`.
+
+The data array passed as the arguement should be already normalized by the exposure time
+as required by the MGN algorithm of Morgan and Druckmüller 
 """
 # sphinx_gallery_thumbnail_number = 2
 
