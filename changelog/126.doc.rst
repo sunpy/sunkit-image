@@ -1,1 +1,1 @@
- note that the data array should be already normalized by the exposure time in the `sunkit_image.enhance.mgn` function
+Added two notes to `sunkit_image.enhance.mgn` detailing prerequisites for using this function.
