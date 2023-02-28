@@ -1,1 +1,1 @@
-Added a tutorial (:ref:`sphx_glr_generated_gallery_rgb_composite.py`) demonstrates how to create an RGB image with three different maps.
+Added a tutorial (:ref:`sphx_glr_generated_gallery_rgb_composite.py`) demonstrating how to create an RGB image with three different maps.
