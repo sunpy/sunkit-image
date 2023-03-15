@@ -231,7 +231,7 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
 
     Parameters
     ----------
-    image : `numpy.ndarray`
+    image : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image to be filtered.
     nsm1 : `int`
         Low pass filter boxcar smoothing constant.
@@ -244,7 +244,8 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
     Returns
     -------
     `numpy.ndarray`
-        Bandpass filtered image.
+        Bandpass filtered image. If a map is input, a map is returned with new data
+        and the same metadata.
     """
     if nsm1 >= nsm2:
         raise ValueError("nsm1 should be less than nsm2")
@@ -263,7 +264,7 @@ def smooth(image, width, nanopt="replace"):
 
     Parameters
     ----------
-    image : `numpy.ndarray`
+    image : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image to be filtered.
     width : `int`
         Width of the boxcar window. The `width` should always be odd but if even value is given then
@@ -273,8 +274,9 @@ def smooth(image, width, nanopt="replace"):
 
     Returns
     -------
-    `numpy.ndarray`
-        Smoothed image.
+    `numpy.ndarray`, `sunpy.map.GenericMap`
+        Smoothed image. If a map is input, a map is returned with new data
+        and the same metadata.
 
     References
     ----------

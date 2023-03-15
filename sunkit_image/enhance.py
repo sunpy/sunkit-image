@@ -44,7 +44,7 @@ def mgn(
 
     Parameters
     ----------
-    data : `numpy.ndarray`
+    data : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image to be transformed.
     sigma : `list`, optional
         Range of Gaussian widths (i.e. the standard deviation of the Gaussian kernel) to transform over.
@@ -75,8 +75,9 @@ def mgn(
 
     Returns
     -------
-    `numpy.ndarray`
-        Normalized image.
+    `numpy.ndarray`, `sunpy.map.GenericMap`
+        Normalized image. If a map is input, a map is returned with new data
+        and the same metadata.
 
     References
     ----------
