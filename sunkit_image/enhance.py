@@ -6,9 +6,12 @@ import warnings
 import numpy as np
 import scipy.ndimage as ndimage
 
+from sunkit_image.utils.decorators import accept_array_or_map
+
 __all__ = ["mgn"]
 
 
+@accept_array_or_map(arg_name="data")
 def mgn(
     data,
     sigma=[1.25, 2.5, 5, 10, 20, 40],
