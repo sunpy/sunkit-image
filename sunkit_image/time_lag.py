@@ -4,6 +4,8 @@ lag between intensity cubes.
 
 Useful for understanding time variability in EUV light curves.
 """
+from typing import Optional
+
 import numpy as np
 
 import astropy.units as u
@@ -162,7 +164,7 @@ def _dask_check(lags, indices):
 
 
 @u.quantity_input
-def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kwargs):
+def time_lag(signal_a, signal_b, time: u.s, lag_bounds: Optional[u.Quantity[u.s]] = None, **kwargs):
     r"""
     Compute the time lag that maximizes the cross-correlation between
     ``signal_a`` and ``signal_b``.
@@ -236,7 +238,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None, **kw
 
 
 @u.quantity_input
-def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: (u.s, None) = None):
+def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: Optional[u.Quantity[u.s]] = None):
     """
     Compute the maximum value of the cross-correlation between ``signal_a`` and
     ``signal_b``.

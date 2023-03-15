@@ -236,16 +236,6 @@ def test_erase_loop_in_image(image, test_map):
     assert np.allclose(expect, result)
 
 
-@pytest.fixture
-def test_image():
-    # An image containing a loop in a straight line
-    ima = np.zeros((3, 3), dtype=np.float32)
-    ima[0, 1] = 5
-    ima[1, 1] = 3
-    ima[2, 1] = 0
-    return ima
-
-
 def test_initial_direction_finding(test_image):
     # The starting point of the loop i.e. the maximumflux position
     xstart = 0
