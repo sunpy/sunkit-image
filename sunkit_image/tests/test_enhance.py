@@ -8,21 +8,11 @@ import sunkit_image.enhance as enhance
 from sunkit_image.tests.helpers import figure_test
 
 
-@pytest.fixture(params=["array", "map"])
-@pytest.mark.remote_data
-def smap(request):
-    smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
-    if request.param == "map":
-        return smap
-    elif request.param == "array":
-        return smap.data
-
-
 @figure_test
 @pytest.mark.remote_data
-def test_mgn(smap):
-    out = enhance.mgn(smap)
-    assert type(out) == type(smap)
+def test_mgn(aia_171):
+    out = enhance.mgn(aia_171)
+    assert type(out) == type(aia_171)
     if isinstance(out, sunpy.map.GenericMap):
         out.plot()
 

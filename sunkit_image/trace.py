@@ -224,6 +224,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
 
 # The functions below this are subroutines for the OCCULT 2.
+@accept_array_or_map(arg_name="image")
 def bandpass_filter(image, nsm1=1, nsm2=3):
     """
     Applies a band pass filter to the image.

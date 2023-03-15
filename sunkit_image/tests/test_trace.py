@@ -165,16 +165,18 @@ def test_map():
 
 
 @pytest.fixture
-def image():
+def test_map_ones():
     return np.ones((4, 4), dtype=np.float32)
 
 
-def test_bandpass_filter(image, test_map):
+def test_bandpass_filter_ones(test_map_ones):
     expect = np.zeros((4, 4))
-    result = bandpass_filter(image)
+    result = bandpass_filter(test_map_ones)
 
     assert np.allclose(expect, result)
 
+
+def test_bandpass_filter(test_map):
     expect = np.array(
         [
             [0.0, 0.0, 0.0, 0.0],
@@ -185,21 +187,26 @@ def test_bandpass_filter(image, test_map):
     )
 
     result = bandpass_filter(test_map)
-
     assert np.allclose(expect, result)
 
-    with pytest.raises(ValueError) as record:
-        _ = bandpass_filter(image, 5, 1)
 
-    assert str(record.value) == "nsm1 should be less than nsm2"
+def test_bandpass_filter_output(aia_171):
+    # Check that bandpass filter works with both arrays and maps
+    result = bandpass_filter(aia_171)
+    assert type(result) == type(aia_171)
 
 
-def test_smooth(image, test_map):
-    filtered = smooth(image, 1)
-    assert np.allclose(filtered, image)
+def test_bandpass_filter_error(test_map_ones):
+    with pytest.raises(ValueError, match="nsm1 should be less than nsm2"):
+        bandpass_filter(test_map_ones, 5, 1)
 
-    filtered = smooth(image, 4)
-    assert np.allclose(filtered, image)
+
+def test_smooth(test_map_ones, test_map):
+    filtered = smooth(test_map_ones, 1)
+    assert np.allclose(filtered, test_map_ones)
+
+    filtered = smooth(test_map_ones, 4)
+    assert np.allclose(filtered, test_map_ones)
 
     filtered = smooth(test_map, 1)
     assert np.allclose(filtered, test_map)
@@ -217,7 +224,7 @@ def test_smooth(image, test_map):
     assert np.allclose(filtered, expect)
 
 
-def test_erase_loop_in_image(image, test_map):
+def test_erase_loop_in_image(test_map_ones, test_map):
     # The starting point of a dummy loop
     istart = 0
     jstart = 1
@@ -227,7 +234,7 @@ def test_erase_loop_in_image(image, test_map):
     xloop = [1, 2, 3]
     yloop = [1, 1, 1]
 
-    result = erase_loop_in_image(image, istart, jstart, width, xloop, yloop)
+    result = erase_loop_in_image(test_map_ones, istart, jstart, width, xloop, yloop)
 
     expect = np.array([[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]])
 
