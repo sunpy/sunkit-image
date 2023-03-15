@@ -6,6 +6,8 @@ structures in an image.
 import numpy as np
 from scipy import interpolate
 
+from sunkit_image.utils.decorators import accept_array_or_map
+
 __all__ = [
     "occult2",
     "bandpass_filter",
@@ -17,6 +19,7 @@ __all__ = [
 ]
 
 
+@accept_array_or_map(arg_name="image", output_to_map=False)
 def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     """
     Implements the Oriented Coronal CUrved Loop Tracing (OCCULT-2) algorithm
@@ -24,7 +27,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
     Parameters
     ----------
-    image : `numpy.ndarray`
+    image : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image in which loops are to be detected.
     nsm1 : `int`
         Low pass filter boxcar smoothing constant.
@@ -48,7 +51,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     -------
     `list`
         A list of all loop where each element is itself a list of points containing
-        ``x`` and ``y`` coordinates for each point.
+        ``x`` and ``y`` pixel coordinates for each point.
 
     References
     ----------

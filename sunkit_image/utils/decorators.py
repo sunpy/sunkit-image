@@ -6,7 +6,7 @@ import numpy as np
 from sunpy.map import GenericMap, Map
 
 
-def accept_array_or_map(*, arg_name: str) -> Callable[Callable, Callable]:
+def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[Callable, Callable]:
     """
     Decorator that allows a function to accept an array or a
     `sunpy.map.GenericMap` as an argument.
@@ -16,9 +16,14 @@ def accept_array_or_map(*, arg_name: str) -> Callable[Callable, Callable]:
     - Return a single array that has the same pixel coordinates
       as the input array.
 
-    If the decorated function is given a map, this decorator will
-    automatically handle returning a map, with new data and the
-    original metadata.
+    Parameters
+    ----------
+    arg_name : `str`
+        Name of data/map argument in function signature.
+    output_to_map : `bool`
+        If `True` (the default), convert the function return to a map if a map
+        is given as input. For this to work the decorated function must return
+        an array where pixels have the same coordinates as the input map data.
     """
 
     def decorate(f: Callable) -> Callable:
@@ -40,7 +45,7 @@ def accept_array_or_map(*, arg_name: str) -> Callable[Callable, Callable]:
             # Run decorated function
             array_out = f(*sig_bound.args, **sig_bound.kwargs)
 
-            if map_in:
+            if map_in and output_to_map:
                 return Map(array_out, map_arg.meta)
             else:
                 return array_out

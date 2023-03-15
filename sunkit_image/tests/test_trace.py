@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
+import sunpy.map
 from astropy.io import fits
 
 import sunkit_image.data.test as data
@@ -19,13 +20,16 @@ from sunkit_image.trace import (
 )
 
 
-@pytest.fixture
+@pytest.fixture(params=["array", "map"])
 @pytest.mark.remote_data
-def image_remote():
+def image_remote(request):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=fits.verify.VerifyWarning)
-        im = fits.getdata("http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits")
-        return im
+        smap = sunpy.map.Map("http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits")
+        if request.param == "map":
+            return smap
+        elif request.param == "array":
+            return smap.data
 
 
 @pytest.fixture
