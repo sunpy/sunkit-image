@@ -1,7 +1,7 @@
 """
-===============================================
-Compensating for Solar Rotation in MapSequences
-===============================================
+===============================
+Compensating for Solar Rotation
+===============================
 
 Often a set of solar image data consists of fixing the pointing of a field of
 view for some time and observing. Features on the Sun will differentially

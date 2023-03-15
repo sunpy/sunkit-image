@@ -1,7 +1,7 @@
 """
-================================================
-Coalignment of MapSequences by Template Matching
-================================================
+===================================
+Coalignment using Template Matching
+===================================
 
 A common approach to coaligning a time series of images is to take a
 representative template that contains the features you are interested in, and

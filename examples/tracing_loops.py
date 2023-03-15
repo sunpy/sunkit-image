@@ -1,6 +1,6 @@
 """
 =====================
-Coronal Loops Tracing
+Tracing Coronal Loops
 =====================
 
 This example traces out the coronal loops in a FITS image
