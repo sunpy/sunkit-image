@@ -256,6 +256,7 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
         return smooth(image, nsm1, "replace") - smooth(image, nsm2, "replace")
 
 
+@accept_array_or_map(arg_name="image")
 def smooth(image, width, nanopt="replace"):
     """
     Python implementation of the IDL's ``smooth``.

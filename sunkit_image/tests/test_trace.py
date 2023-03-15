@@ -201,13 +201,15 @@ def test_bandpass_filter_error(test_map_ones):
         bandpass_filter(test_map_ones, 5, 1)
 
 
-def test_smooth(test_map_ones, test_map):
+def test_smooth_ones(test_map_ones):
     filtered = smooth(test_map_ones, 1)
     assert np.allclose(filtered, test_map_ones)
 
     filtered = smooth(test_map_ones, 4)
     assert np.allclose(filtered, test_map_ones)
 
+
+def test_smooth(test_map):
     filtered = smooth(test_map, 1)
     assert np.allclose(filtered, test_map)
 
@@ -222,6 +224,12 @@ def test_smooth(test_map_ones, test_map):
     )
 
     assert np.allclose(filtered, expect)
+
+
+def test_smooth_output(aia_171):
+    # Check that smooth works with both arrays and maps
+    result = smooth(aia_171, 1)
+    assert type(result) == type(aia_171)
 
 
 def test_erase_loop_in_image(test_map_ones, test_map):
