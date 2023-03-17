@@ -9,10 +9,6 @@ from scipy import interpolate
 __all__ = [
     "occult2",
     "bandpass_filter",
-    "curvature_radius",
-    "erase_loop_in_image",
-    "initial_direction_finding",
-    "loop_add",
     "smooth",
 ]
 
