@@ -1,4 +1,4 @@
-Removes the functions 
+Removes the functions
 1. curvature_radius
 2. erase_loop_in_image
 3. initial_direction_finding
