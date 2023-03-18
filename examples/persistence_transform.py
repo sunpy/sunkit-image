@@ -12,10 +12,9 @@ This example illustrates how to perform a persistence transform.
    This example requires `mpl_animators` to be installed.
 """
 
-from matplotlib import cm
-from matplotlib import colors
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import cm, colors
 
 import sunpy.map
 from sunpy.data.sample import AIA_193_CUTOUT01_IMAGE, AIA_193_CUTOUT02_IMAGE, AIA_193_CUTOUT03_IMAGE
