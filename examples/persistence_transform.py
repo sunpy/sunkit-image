@@ -23,7 +23,7 @@ from sunpy.data.sample import AIA_193_CUTOUT01_IMAGE, AIA_193_CUTOUT02_IMAGE, AI
 ###############################################################################
 # We will create a `~sunpy.map.MapSequence` using the `sunpy` sample data.
 
-aiamapseq = sunpy.map.Map(AIA_193_CUTOUT01_IMAGE, AIA_193_CUTOUT02_IMAGE, AIA_193_CUTOUT03_IMAGE, cube=True)
+aiamapseq = sunpy.map.Map(AIA_193_CUTOUT01_IMAGE, AIA_193_CUTOUT02_IMAGE, AIA_193_CUTOUT03_IMAGE)
 
 ###############################################################################
 # For a data set consisting of N images with intensity values I(x,y,t),
