@@ -8,7 +8,8 @@ and depiction of gradually evolving structures.
 This example illustrates how to perform a persistence transform.
 
 .. note::
-   This example requires ``mpl_animators`` to be installed.
+
+   This example requires `mpl_animators` to be installed.
 """
 
 import matplotlib.cm as cm
