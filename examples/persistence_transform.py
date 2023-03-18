@@ -5,7 +5,7 @@ Persistence transform for a sequence
 
 Persistence transform is a simple image processing technique that is useful for the visualization
 and depiction of gradually evolving structures.
-This example illustrates persistence transform using the AIA_193_CUTOUT series.
+This example illustrates how to perform a persistence transform.
 
 .. note::
    This example requires ``mpl_animators`` to be installed.
