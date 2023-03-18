@@ -45,7 +45,7 @@ for i in aiamapseq:
     i.peek()
 
 ###############################################################################
-# This plots the final mapsequence after implementing the persistence transform
+# Now we will plot the original sequence and the new sequence side by side so you can see the difference.
 
 result_mapseq = sunpy.map.MapSequence(persistence_maps)
 result_mapseq.peek()
