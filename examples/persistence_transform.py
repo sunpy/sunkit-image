@@ -1,7 +1,7 @@
 """
-========================================
-Persistence Transform in MapSequence
-========================================
+====================================
+Persistence transform for a sequence
+====================================
 Persistence Transform is a simple image processing technique that is useful for the visualization
 and depiction of gradually evolving structures.
 This example illustrates persistence transform using the AIA_193_CUTOUT series.
