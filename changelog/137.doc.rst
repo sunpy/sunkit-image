@@ -1,1 +1,1 @@
-Added an example (:ref:`sphx_glr_generated_gallery_persistence_transform.py`) illustrates persistence transform using the AIA_193_CUTOUT series.
+Added an example (:ref:`sphx_glr_generated_gallery_persistence_transform.py`) illustrates a persistence transform.
