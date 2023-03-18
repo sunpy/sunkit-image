@@ -12,8 +12,8 @@ This example illustrates how to perform a persistence transform.
    This example requires `mpl_animators` to be installed.
 """
 
-import matplotlib.cm as cm
-import matplotlib.colors as colors
+from matplotlib import cm
+from matplotlib import colors
 import matplotlib.pyplot as plt
 import numpy as np
 
