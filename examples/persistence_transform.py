@@ -21,9 +21,7 @@ import sunpy.map
 from sunpy.data.sample import AIA_193_CUTOUT01_IMAGE, AIA_193_CUTOUT02_IMAGE, AIA_193_CUTOUT03_IMAGE
 
 ###############################################################################
-# We create the MapSequence using the AIA_193_CUTOUT sample data.
-# To create a MapSequence, we can call Map directly but add in a
-# keyword to output a MapSequence instead.
+# We will create a `~sunpy.map.MapSequence` using the `sunpy` sample data.
 
 aiamapseq = sunpy.map.Map(AIA_193_CUTOUT01_IMAGE, AIA_193_CUTOUT02_IMAGE, AIA_193_CUTOUT03_IMAGE, cube=True)
 
