@@ -48,4 +48,5 @@ for i in aiamapseq:
 
 result_mapseq = sunpy.map.MapSequence(persistence_maps)
 result_mapseq.peek()
+
 plt.show()
