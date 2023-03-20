@@ -1,6 +1,8 @@
-Removes the functions
-1. curvature_radius
-2. erase_loop_in_image
-3. initial_direction_finding
-4. loop_add
-from the __all__ variable in `sunkit_image.trace` to make them private.
+Made the following functions in `sunkit_image.trace` private:
+
+1. ``curvature_radius`` (renamed to ``_curvature_radius``)
+2. ``erase_loop_in_image`` (renamed to ``_erase_loop_in_image``)
+3. ``initial_direction_finding`` (renamed to ``_initial_direction_finding``)
+4. ``loop_add`` (renamed to ``_loop_add``)
+
+These were never intended to be used by users but for the user-facing functions.
