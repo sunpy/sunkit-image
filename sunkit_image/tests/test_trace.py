@@ -9,11 +9,11 @@ from astropy.io import fits
 import sunkit_image.data.test as data
 from sunkit_image.tests.helpers import figure_test
 from sunkit_image.trace import (
-    bandpass_filter,
     _curvature_radius,
     _erase_loop_in_image,
     _initial_direction_finding,
     _loop_add,
+    bandpass_filter,
     occult2,
     smooth,
 )
