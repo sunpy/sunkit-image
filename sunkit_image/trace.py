@@ -311,7 +311,7 @@ def smooth(image, width, nanopt="replace"):
     return filtered.astype(np.float32)
 
 
-def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
+def _erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     """
     Makes all the points in a loop and its vicinity as zero in the original
     image to prevent them from being traced again.
@@ -358,7 +358,7 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     return image
 
 
-def loop_add(lengths, xloop, yloop, zloop, iloop, loops):
+def _loop_add(lengths, xloop, yloop, zloop, iloop, loops):
     """
     Adds the current loop to the output structures by interpolating the
     coordinates.
@@ -416,7 +416,7 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops):
     return loops, iloop
 
 
-def initial_direction_finding(image, xstart, ystart, nlen):
+def _initial_direction_finding(image, xstart, ystart, nlen):
     """
     Finds the initial angle of the loop at the starting point.
 
@@ -470,7 +470,7 @@ def initial_direction_finding(image, xstart, ystart, nlen):
     return angles[0, np.argmax(flux)]
 
 
-def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
+def _curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     """
     Finds the radius of curvature at the given loop point and then uses it to
     find the next point in the loop.
