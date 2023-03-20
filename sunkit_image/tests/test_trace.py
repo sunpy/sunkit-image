@@ -9,11 +9,11 @@ from astropy.io import fits
 import sunkit_image.data.test as data
 from sunkit_image.tests.helpers import figure_test
 from sunkit_image.trace import (
+    _curvature_radius,
+    _erase_loop_in_image,
+    _initial_direction_finding,
+    _loop_add,
     bandpass_filter,
-    curvature_radius,
-    erase_loop_in_image,
-    initial_direction_finding,
-    loop_add,
     occult2,
     smooth,
 )
@@ -223,13 +223,13 @@ def test_erase_loop_in_image(image, test_map):
     xloop = [1, 2, 3]
     yloop = [1, 1, 1]
 
-    result = erase_loop_in_image(image, istart, jstart, width, xloop, yloop)
+    result = _erase_loop_in_image(image, istart, jstart, width, xloop, yloop)
 
     expect = np.array([[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]])
 
     assert np.allclose(expect, result)
 
-    result = erase_loop_in_image(test_map, istart, jstart, width, xloop, yloop)
+    result = _erase_loop_in_image(test_map, istart, jstart, width, xloop, yloop)
 
     expect = np.array([[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]])
 
@@ -253,7 +253,7 @@ def test_initial_direction_finding(test_image):
     nlen = 30
 
     # The angle returned is with respect to the ``x`` axis.
-    al = initial_direction_finding(test_image, xstart, ystart, nlen)
+    al = _initial_direction_finding(test_image, xstart, ystart, nlen)
 
     # The angle returned is zero because the image has loop in the ``y`` direction but the function
     # assumes the image is transposed so it takes the straight line in the ``x`` direction.
@@ -274,14 +274,14 @@ def test_curvature_radius(test_image):
 
     # Using the similar settings in as in the IDL tutorial.
     # This is forward tracing where the first point is after the starting point is being traced.
-    xl, yl, zl, al = curvature_radius(test_image, 30, xl, yl, zl, al, ir, 0, 30, 0)
+    xl, yl, zl, al = _curvature_radius(test_image, 30, xl, yl, zl, al, ir, 0, 30, 0)
 
     assert np.allclose(np.ceil(xl[1]), 1)
     assert np.allclose(np.ceil(yl[1]), 1)
     assert np.allclose(zl[1], 3)
 
     # This is forward tracing where the second point is after the starting point is being traced.
-    xl, yl, zl, al = curvature_radius(test_image, 30, xl, yl, zl, al, ir, 1, 30, 0)
+    xl, yl, zl, al = _curvature_radius(test_image, 30, xl, yl, zl, al, ir, 1, 30, 0)
 
     assert np.allclose(np.ceil(xl[2]), 2)
     assert np.allclose(np.ceil(yl[2]), 1)
@@ -312,7 +312,7 @@ def parameters_add_loop():
 
 def test_add_loop(parameters_add_loop):
     # We call the add_loop function and the values should be placed in the structures
-    loops, iloop = loop_add(*parameters_add_loop)
+    loops, iloop = _loop_add(*parameters_add_loop)
 
     expect_loops = [[[7.0, 11.0], [7.0, 10.0], [7.0, 9.0], [7.0, 8.0], [7.0, 7.0], [7.0, 6.0], [7.0, 5.0]]]
 
