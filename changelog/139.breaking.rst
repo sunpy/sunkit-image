@@ -1,0 +1,13 @@
+A series of functions were added from `sunkit_image.asda` by declassing the code.
+Previously, if one has to make objects of class ``Asda`` and ``Lamb_Oseen`` to implement asda.
+Now, all the functions are now declassed, now no object creation is required
+to implement any functionality of asda.
+Following functions were declassed:
+    1. ``gen_vel``
+    2. ``gamma_values``
+    3. ``center_edge``
+    4. ``vortex_property``
+    5. ``get_grid``
+    6. ``get_vtheta``
+    7. ``get_vradial``
+    8. ``get_vxvy``
