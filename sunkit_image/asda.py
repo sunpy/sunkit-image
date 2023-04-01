@@ -254,12 +254,13 @@ class Asda:
             vr += (np.nanmean(vr0),)
         return ve, vr, vc, ia
 
+
 # list of functions from class ASDA
-def gen_vel(i, j, vx, vy, r = 3):
+def gen_vel(i, j, vx, vy, r=3):
     """
-    Given a point ``[i, j]``, generate a velocity field which contains a
-    region with a size of ``(2r+1) x (2r+1)`` centered at ``[i, j]`` from
-    the original velocity field ``self.vx`` and ``self.vy``.
+    Given a point ``[i, j]``, generate a velocity field which contains a region
+    with a size of ``(2r+1) x (2r+1)`` centered at ``[i, j]`` from the original
+    velocity field ``self.vx`` and ``self.vy``.
 
     Parameters
     ----------
@@ -274,7 +275,7 @@ def gen_vel(i, j, vx, vy, r = 3):
     r : `int`, optional
         Maximum distance of neighbor points from target point.
         Default value is 3.
-    
+
     Returns
     -------
     `numpy.ndarray`
@@ -290,15 +291,12 @@ def gen_vel(i, j, vx, vy, r = 3):
     if not isinstance(r, int):
         raise ValueError("Keyword 'r' must be an integer")
     vel = np.array(
-        [
-            [vx[i + im, j + jm], vy[i + im, j + jm]]
-            for im in np.arange(-r, r + 1)
-            for jm in np.arange(-r, r + 1)
-        ]
+        [[vx[i + im, j + jm], vy[i + im, j + jm]] for im in np.arange(-r, r + 1) for jm in np.arange(-r, r + 1)]
     )
     return np.array([vel, vel - vel.mean(axis=0)])
 
-def gamma_values(vx, vy, r = 3, factor = 1):
+
+def gamma_values(vx, vy, r=3, factor=1):
     """
     Calculate ``gamma1`` and ``gamma2`` values of velocity field vx and vy.
 
@@ -338,32 +336,23 @@ def gamma_values(vx, vy, r = 3, factor = 1):
         vy = reform2d(vy, factor)
     gamma = np.array([np.zeros_like(vx), np.zeros_like(vy)]).T
     # pm vectors, see equation (8) in Graftieaux et al. 2001 or Equation (1) in Liu et al. 2019
-    pm = np.array(
-        [[i, j] for i in np.arange(-r, r + 1) for j in np.arange(-r, r + 1)], dtype=float
-    )
+    pm = np.array([[i, j] for i in np.arange(-r, r + 1) for j in np.arange(-r, r + 1)], dtype=float)
     # Mode of vector pm
     pnorm = np.linalg.norm(pm, axis=1)
     # Number of points in the concerned region
     N = (2 * r + 1) ** 2
-    index = np.array(
-        [
-            [i, j]
-            for i in np.arange(r, dshape[0] - r)
-            for j in np.arange(r, dshape[1] - r)
-        ]
-    )
+    index = np.array([[i, j] for i in np.arange(r, dshape[0] - r) for j in np.arange(r, dshape[1] - r)])
     index = index.T
-    vel = gen_vel(index[1], index[0],vx, vy,r,factor)
-    for d, (i, j) in enumerate(
-        product(np.arange(r, dshape[0] - r, 1), np.arange(r, dshape[1] - r, 1))
-    ):
+    vel = gen_vel(index[1], index[0], vx, vy, r, factor)
+    for d, (i, j) in enumerate(product(np.arange(r, dshape[0] - r, 1), np.arange(r, dshape[1] - r, 1))):
         gamma[i, j, 0], gamma[i, j, 1] = calculate_gamma(pm, vel[..., d], pnorm, N)
     # Transpose back vx & vy
     vx = vx.T
     vy = vy.T
     return gamma
 
-def center_edge(vx, vy, r = 3, factor = 1, rmin=4, gamma_min=0.89):
+
+def center_edge(vx, vy, r=3, factor=1, rmin=4, gamma_min=0.89):
     """
     Find all swirls from ``gamma1``, and ``gamma2``.
 
@@ -405,7 +394,7 @@ def center_edge(vx, vy, r = 3, factor = 1, rmin=4, gamma_min=0.89):
         raise ValueError("Keyword 'factor' must be an integer")
     if not isinstance(rmin, int):
         raise ValueError("Keyword 'rmin' must be an integer")
-    
+
     edge_prop = {"center": (), "edge": (), "points": (), "peak": (), "radius": ()}
     gamma = gamma_values(vx, vy, r, factor)
     cs = np.array(measure.find_contours(gamma[..., 1].T, -2 / np.pi), dtype=object)
@@ -438,7 +427,8 @@ def center_edge(vx, vy, r = 3, factor = 1, rmin=4, gamma_min=0.89):
                 edge_prop["radius"] += (re,)
     return edge_prop
 
-def vortex_property(vx, vy, image=None, r = 3, factor = 1, rmin = 4, gamma_min=0.89):
+
+def vortex_property(vx, vy, image=None, r=3, factor=1, rmin=4, gamma_min=0.89):
     """
     Calculate expanding, rotational speed, equivalent radius and average
     intensity of given swirls.
@@ -521,6 +511,7 @@ def vortex_property(vx, vy, image=None, r = 3, factor = 1, rmin = 4, gamma_min=0
         ve += (np.nanmean(ve0),)
         vr += (np.nanmean(vr0),)
     return ve, vr, vc, ia
+
 
 class Lamb_Oseen(Asda):
     """
@@ -684,6 +675,7 @@ class Lamb_Oseen(Asda):
         self.vy = vector[1] / r
         return self.vx, self.vy
 
+
 # list of functions from class Lamb_Oseen
 def get_grid(x_range, y_range):
     """
@@ -704,7 +696,8 @@ def get_grid(x_range, y_range):
     xx, yy = np.meshgrid(np.arange(x_range[0], x_range[1]), np.arange(y_range[0], y_range[1]))
     return xx, yy
 
-def get_vtheta(r=0,gamma = None, rcore = None, vmax = 2.0, rmax = 5):
+
+def get_vtheta(r=0, gamma=None, rcore=None, vmax=2.0, rmax=5):
     """
     Calculate rotation speed at radius of ``r``.
 
@@ -733,13 +726,14 @@ def get_vtheta(r=0,gamma = None, rcore = None, vmax = 2.0, rmax = 5):
     # Alpha of Lamb Oseen vortices
     alpha = 1.256430
     if gamma is None or rcore is None:
-            if gamma != rcore:
-                warnings.warn("One of the input parameters is missing, setting both to 'None'")
-                gamma, rcore = None, None
-            rcore = rmax / np.sqrt(alpha)
-            gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
+        if gamma != rcore:
+            warnings.warn("One of the input parameters is missing, setting both to 'None'")
+            gamma, rcore = None, None
+        rcore = rmax / np.sqrt(alpha)
+        gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
     r = r + 1e-10
     return gamma * (1.0 - np.exp(0 - np.square(r) / np.square(rcore))) / (2 * np.pi * r)
+
 
 def get_vradial(r=0, ratio_vradial=0):
     """
@@ -761,10 +755,11 @@ def get_vradial(r=0, ratio_vradial=0):
     r = r + 1e-10
     return get_vtheta(r) * ratio_vradial
 
-def get_vxvy(x_range, y_range, x=None, y=None, rmax=5, rcore = None):
+
+def get_vxvy(x_range, y_range, x=None, y=None, rmax=5, rcore=None):
     """
-    Calculates the velocity field in a meshgrid generated with ``x_range``
-    and ``y_range``.
+    Calculates the velocity field in a meshgrid generated with ``x_range`` and
+    ``y_range``.
 
     Parameters
     ----------
@@ -789,7 +784,7 @@ def get_vxvy(x_range, y_range, x=None, y=None, rmax=5, rcore = None):
     """
     # Alpha of Lamb Oseen vortices
     alpha = 1.256430
-    if(rcore is not None):
+    if rcore is not None:
         rmax = rcore * np.sqrt(alpha)
     if len(x_range) != 2:
         x_range = [0 - rmax, rmax]
