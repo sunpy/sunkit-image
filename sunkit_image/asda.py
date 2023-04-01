@@ -168,8 +168,6 @@ def center_edge(vx, vy, r=3, factor=1, rmin=4, gamma_min=0.89):
         raise ValueError("Keyword 'factor' must be an integer")
     if not isinstance(rmin, int):
         raise ValueError("Keyword 'rmin' must be an integer")
-    if not isinstance(gamma_min, float):
-        raise ValueError("Keyword 'gamma_min' must be a float")
 
     edge_prop = {"center": (), "edge": (), "points": (), "peak": (), "radius": ()}
     gamma = gamma_values(vx, vy, r, factor)
@@ -288,171 +286,6 @@ def vortex_property(vx, vy, image=None, r=3, factor=1, rmin=4, gamma_min=0.89):
         vr += (np.nanmean(vr0),)
     return ve, vr, vc, ia
 
-
-class Lamb_Oseen(Asda):
-    """
-    Creates an Lamb Oseen vortex.
-
-    References
-    ----------
-    * https://en.wikipedia.org/wiki/Lamb%E2%80%93Oseen_vortex
-    """
-
-    def __init__(self, vmax=2.0, rmax=5, ratio_vradial=0, gamma=None, rcore=None, r=3, factor=1):
-        """
-        Parameters
-        ----------
-        vmax : `float`, optional
-            Rotating speed of the vortex, negative value for clockwise vortex.
-            Defaults to 2.0.
-        rmax : `float`, optional
-            Radius of of the vortex.
-            Defaults to 5.
-        ratio_vradial : `float`, optional
-            Ratio between expanding/shrinking speed and rotating speed.
-            Defaults to 0.
-        gamma : `float`, optional
-            A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
-            Defaults to `None`.
-        rcore : `float`, optional
-            A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
-            Defaults to `None`.
-        r : `int`, optional
-            Maximum distance of neighbor points from target point.
-            Default value is 3.
-        factor : `int`, optional
-            Magnify the original data to find sub-grid vortex center and boundary.
-            Default value is 1.
-        """
-        if not isinstance(r, int):
-            raise ValueError("Keyword 'r' must be an integer")
-        if not isinstance(factor, int):
-            raise ValueError("Keyword 'factor' must be an integer")
-        # Alpha of Lamb Oseen vortices
-        self.alpha = 1.256430
-        self.ratio_vradial = ratio_vradial
-        if gamma is None or rcore is None:
-            if gamma != rcore:
-                warnings.warn("One of the input parameters is missing, setting both to 'None'")
-                gamma, rcore = None, None
-            # Radius of the position where v_theta reaches vmax
-            self.rmax = rmax
-            # Maximum value of v_theta
-            self.vmax = vmax
-            # Core radius
-            self.rcore = self.rmax / np.sqrt(self.alpha)
-            self.gamma = 2 * np.pi * self.vmax * self.rmax * (1 + 1 / (2 * self.alpha))
-        else:
-            # Radius
-            self.rmax = self.rcore * np.sqrt(self.alpha)
-            # Rotating speed
-            self.vmax = self.gamma / (2 * np.pi * self.rmax * (1 + 1 / (2 * self.alpha)))
-            # Core radius
-            self.rcore = rcore
-            self.gamma = gamma
-        # Calculating core speed
-        self.vcore = (1 - np.exp(-1.0)) * self.gamma / (2 * np.pi * self.rcore)
-        self.r = r
-        self.factor = factor
-
-    def get_grid(self, x_range, y_range):
-        """
-        Returns a meshgrid of the coordinates of the vortex.
-
-        Parameters
-        ----------
-        x_range : `list`
-            Range of the x coordinates of the meshgrid.
-        y_range : `list`
-            Range of the y coordinates of the meshgrid.
-
-        Return
-        ------
-        `tuple`
-            Contains the meshgrids generated.
-        """
-        self.xx, self.yy = np.meshgrid(np.arange(x_range[0], x_range[1]), np.arange(y_range[0], y_range[1]))
-        self.dshape = np.shape(self.xx)
-        return self.xx, self.yy
-
-    def get_vtheta(self, r=0):
-        """
-        Calculate rotation speed at radius of ``r``.
-
-        Parameters
-        ----------
-        r : `float`, optional
-            Radius which defaults to 0.
-
-        Return
-        ------
-        `float`
-            Rotating speed at radius of ``r``.
-        """
-        r = r + 1e-10
-        return self.gamma * (1.0 - np.exp(0 - np.square(r) / np.square(self.rcore))) / (2 * np.pi * r)
-
-    def get_vradial(self, r=0):
-        """
-        Calculate radial (expanding or shrinking) speed at radius of ``r``.
-
-        Parameters
-        ----------
-        r : `float`, optional
-            Radius which defaults to 0.
-
-        Return
-        ------
-        `float`
-            Radial speed at the radius of ``r``.
-        """
-        r = r + 1e-10
-        return self.get_vtheta(r) * self.ratio_vradial
-
-    def get_vxvy(self, x_range, y_range, x=None, y=None):
-        """
-        Calculates the velocity field in a meshgrid generated with ``x_range``
-        and ``y_range``.
-
-        Parameters
-        ----------
-        x_range : `list`
-            Range of the x coordinates of the meshgrid.
-        y_range : `list`
-            range of the y coordinates of the meshgrid.
-        x, y : `numpy.meshgrid`, optional
-            If both are given, ``x_range`` and ``y_range`` will be ignored.
-            Defaults to None``.
-
-        Return
-        ------
-        `tuple`
-            The generated velocity field ``(vx, vy)``.
-        """
-        if len(x_range) != 2:
-            self.x_range = [0 - self.rmax, self.rmax]
-        if len(y_range) != 2:
-            self.y_range = [0 - self.rmax, self.rmax]
-        if x is None or y is None:
-            # Check if one of the input parameters is None but the other one is not None
-            if x != y:
-                warnings.warn("One of the input parameters is missing, setting both to 'None'")
-                x, y = None, None
-            # Creating mesh grid
-            x, y = self.get_grid(x_range=x_range, y_range=y_range)
-        # Calculate radius
-        r = np.sqrt(np.square(x) + np.square(y)) + 1e-10
-        # Calculate velocity vector
-        vector = [
-            0 - self.get_vtheta(r) * y + self.get_vradial(r) * x,
-            self.get_vtheta(r) * x + self.get_vradial(r) * y,
-        ]
-        self.vx = vector[0] / r
-        self.vy = vector[1] / r
-        return self.vx, self.vy
-
-
-# list of functions from class Lamb_Oseen
 def get_grid(x_range, y_range):
     """
     Returns a meshgrid of the coordinates of the vortex.
@@ -482,8 +315,8 @@ def get_vtheta(r=0, gamma=None, rcore=None, vmax=2.0, rmax=5):
     r : `float`, optional
         Radius which defaults to 0.
     vmax : `float`, optional
-            Rotating speed of the vortex, negative value for clockwise vortex.
-            Defaults to 2.0.
+        Rotating speed of the vortex, negative value for clockwise vortex.
+        Defaults to 2.0.
     rmax : `float`, optional
         Radius of of the vortex.
         Defaults to 5.
@@ -507,9 +340,87 @@ def get_vtheta(r=0, gamma=None, rcore=None, vmax=2.0, rmax=5):
             gamma, rcore = None, None
         rcore = rmax / np.sqrt(alpha)
         gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
+    else:
+            # Radius
+            rmax = rcore * np.sqrt(alpha)
+            # Rotating speed
+            vmax = gamma / (2 * np.pi * rmax * (1 + 1 / (2 * alpha)))
     r = r + 1e-10
     return gamma * (1.0 - np.exp(0 - np.square(r) / np.square(rcore))) / (2 * np.pi * r)
 
+def get_vcore(gamma=None, rcore=None, vmax=2.0, rmax=5):
+    """
+    Calculate core speed.
+
+    Parameters
+    ----------
+    gamma : `float`, optional
+        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        Defaults to `None`.
+    rcore : `float`, optional
+        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        Defaults to `None`.
+
+    Return
+    ------
+    `float`
+        Core speed.
+    """
+    # Alpha of Lamb Oseen vortices
+    alpha = 1.256430
+    if gamma is None or rcore is None:
+        if gamma != rcore:
+            warnings.warn("One of the input parameters is missing, setting both to 'None'")
+            gamma, rcore = None, None
+        rcore = rmax / np.sqrt(alpha)
+        gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
+    return (1 - np.exp(-1.0)) * gamma / (2 * np.pi * rcore)
+
+def get_rmax(rcore):
+    """
+    Calculate Radius of the position where v_theta reaches vmax.
+
+    Parameters
+    ----------
+    rcore : `float`, optional
+        A replacement for ``rmax``.
+        Defaults to `None`.
+
+    Return
+    ------
+    `float`
+        Radius of the position where v_theta reaches vmax.
+    """
+    # Alpha of Lamb Oseen vortices
+    alpha = 1.256430
+    rmax = rcore * np.sqrt(alpha)
+
+    return rmax
+
+def get_vmax(gamma, rcore):
+    """
+    Calculate Maximum value of v_theta.
+
+    Parameters
+    ----------
+    gamma : `float`, optional
+        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        Defaults to `None`.
+    rcore : `float`, optional
+        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        Defaults to `None`.
+
+    Return
+    ------
+    `float`
+        Maximum value of v_theta.
+    """
+    # Alpha of Lamb Oseen vortices
+    alpha = 1.256430
+    rmax = rcore * np.sqrt(alpha)
+    vmax = gamma / (2 * np.pi * rmax * (1 + 1 / (2 * alpha)))
+
+    return vmax
 
 def get_vradial(r=0, ratio_vradial=0):
     """
