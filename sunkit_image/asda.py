@@ -286,6 +286,7 @@ def vortex_property(vx, vy, image=None, r=3, factor=1, rmin=4, gamma_min=0.89):
         vr += (np.nanmean(vr0),)
     return ve, vr, vc, ia
 
+
 def get_grid(x_range, y_range):
     """
     Returns a meshgrid of the coordinates of the vortex.
@@ -341,12 +342,13 @@ def get_vtheta(r=0, gamma=None, rcore=None, vmax=2.0, rmax=5):
         rcore = rmax / np.sqrt(alpha)
         gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
     else:
-            # Radius
-            rmax = rcore * np.sqrt(alpha)
-            # Rotating speed
-            vmax = gamma / (2 * np.pi * rmax * (1 + 1 / (2 * alpha)))
+        # Radius
+        rmax = rcore * np.sqrt(alpha)
+        # Rotating speed
+        vmax = gamma / (2 * np.pi * rmax * (1 + 1 / (2 * alpha)))
     r = r + 1e-10
     return gamma * (1.0 - np.exp(0 - np.square(r) / np.square(rcore))) / (2 * np.pi * r)
+
 
 def get_vcore(gamma=None, rcore=None, vmax=2.0, rmax=5):
     """
@@ -376,6 +378,7 @@ def get_vcore(gamma=None, rcore=None, vmax=2.0, rmax=5):
         gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
     return (1 - np.exp(-1.0)) * gamma / (2 * np.pi * rcore)
 
+
 def get_rmax(rcore):
     """
     Calculate Radius of the position where v_theta reaches vmax.
@@ -396,6 +399,7 @@ def get_rmax(rcore):
     rmax = rcore * np.sqrt(alpha)
 
     return rmax
+
 
 def get_vmax(gamma, rcore):
     """
@@ -421,6 +425,7 @@ def get_vmax(gamma, rcore):
     vmax = gamma / (2 * np.pi * rmax * (1 + 1 / (2 * alpha)))
 
     return vmax
+
 
 def get_vradial(r=0, ratio_vradial=0):
     """
