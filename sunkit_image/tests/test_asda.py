@@ -14,30 +14,25 @@ def test_asda_artificial():
     vmax = 2.0  # rotating speed
     rmax = 50  # radius
     ratio = 0.2  # ratio of expanding speed over rotating speed
-    with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1, r=1.2)
-
-    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
-
-    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
-
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, gamma=0.5, ratio_vradial=ratio, factor=1)
-
-    lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1)
+        vthetha = asda.get_vtheta(r = 0, gamma = 0.5, vmax = vmax, rmax = rmax)
+    with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
+        vcore = asda.get_vcore(r = 0, gamma = 0.5, vmax = vmax, rmax = rmax)
     # Generate vx and vy
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
-        vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200], x=np.meshgrid)
+        vx, vy = asda.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200], x=np.meshgrid)
 
-    vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200])
+    vx, vy = asda.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200],rmax=rmax)
 
+    with pytest.warns(ValueError, match = "Keyword 'r' must be an integer"):
+        gamma = asda.gamma_values(vx,vy,r=1.2)
+    with pytest.warns(ValueError, match = "Keyword 'factor' must be an integer"):
+        gamma = asda.gamma_values(vx,vy,factor=1.2)
     # perform vortex detection
-    lo.gamma_values()
+    gamma = asda.gamma_values(vx,vy, factor=1)
     # properties of the detected vortex
-    center_edge = lo.center_edge()
-    (ve, vr, vc, ia) = lo.vortex_property()
+    center_edge = asda.center_edge(vx, vy, factor=1)
+    (ve, vr, vc, ia) = asda.vortex_property(vx, vy, factor=1)
 
     np.testing.assert_almost_equal(ve[0], 0.39996991917753405)
     np.testing.assert_almost_equal(vr[0], 1.999849595887626)
@@ -88,14 +83,12 @@ def test_real_data():
 
     # Perform swirl detection
     factor = 1
-    # Initialise class
-    lo = asda.Asda(vx, vy, factor=factor)
     # Gamma1 and Gamma2
-    lo.gamma_values()
+    asda.gamma_values(vx, vy, factor=factor)
     # Determine Swirls
-    center_edge = lo.center_edge()
+    center_edge = asda.center_edge(vx, vy, factor=factor)
     # Properties of Swirls
-    ve, vr, vc, ia = lo.vortex_property(image=data)
+    ve, vr, vc, ia = asda.vortex_property(vx,vy,image=data)
     # load correct detect results
     correct = dict(np.load(cor_file, allow_pickle=True))
 
