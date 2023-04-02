@@ -1,6 +1,6 @@
 A series of functions were added from `sunkit_image.asda` by declassing the code.
 Previously, if one has to make objects of class ``Asda`` and ``Lamb_Oseen`` to implement asda.
-Now, all the functions are now declassed, now no object creation is required
+Now, all the functions are now declassed, now one can use ``asda.anyfunction()``
 to implement any functionality of asda.
 Following functions were declassed:
     1. ``gen_vel``
