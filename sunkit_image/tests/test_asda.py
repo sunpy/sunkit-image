@@ -15,21 +15,21 @@ def test_asda_artificial():
     rmax = 50  # radius
     ratio = 0.2  # ratio of expanding speed over rotating speed
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
-        vthetha = asda.get_vtheta(r = 0, gamma = 0.5, vmax = vmax, rmax = rmax)
+        vthetha = asda.get_vtheta(r=0, gamma=0.5, vmax=vmax, rmax=rmax)
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
-        vcore = asda.get_vcore(r = 0, gamma = 0.5, vmax = vmax, rmax = rmax)
+        vcore = asda.get_vcore(r=0, gamma=0.5, vmax=vmax, rmax=rmax)
     # Generate vx and vy
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
         vx, vy = asda.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200], x=np.meshgrid)
 
-    vx, vy = asda.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200],rmax=rmax)
+    vx, vy = asda.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200], rmax=rmax)
 
-    with pytest.warns(ValueError, match = "Keyword 'r' must be an integer"):
-        gamma = asda.gamma_values(vx,vy,r=1.2)
-    with pytest.warns(ValueError, match = "Keyword 'factor' must be an integer"):
-        gamma = asda.gamma_values(vx,vy,factor=1.2)
+    with pytest.warns(ValueError, match="Keyword 'r' must be an integer"):
+        gamma = asda.gamma_values(vx, vy, r=1.2)
+    with pytest.warns(ValueError, match="Keyword 'factor' must be an integer"):
+        gamma = asda.gamma_values(vx, vy, factor=1.2)
     # perform vortex detection
-    gamma = asda.gamma_values(vx,vy, factor=1)
+    gamma = asda.gamma_values(vx, vy, factor=1)
     # properties of the detected vortex
     center_edge = asda.center_edge(vx, vy, factor=1)
     (ve, vr, vc, ia) = asda.vortex_property(vx, vy, factor=1)
@@ -88,7 +88,7 @@ def test_real_data():
     # Determine Swirls
     center_edge = asda.center_edge(vx, vy, factor=factor)
     # Properties of Swirls
-    ve, vr, vc, ia = asda.vortex_property(vx,vy,image=data)
+    ve, vr, vc, ia = asda.vortex_property(vx, vy, image=data)
     # load correct detect results
     correct = dict(np.load(cor_file, allow_pickle=True))
 
