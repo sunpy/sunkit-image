@@ -124,16 +124,15 @@ def test_calculate_gamma():
     vy = vxvy["vy"]
     vxvy["data"]
     factor = 1
-    lo = asda.Asda(vx, vy, factor=factor)
     shape = vx.shape
     r = 3
     index = np.array([[i, j] for i in np.arange(r, shape[0] - r) for j in np.arange(r, shape[1] - r)])
-    vel = lo.gen_vel(index[1], index[0])
+    vel = asda.gen_vel(index[1], index[0], vx, vy)
     pm = np.array(
-        [[i, j] for i in np.arange(-lo.r, lo.r + 1) for j in np.arange(-lo.r, lo.r + 1)],
+        [[i, j] for i in np.arange(-r, r + 1) for j in np.arange(-r, r + 1)],
         dtype=float,
     )
-    N = (2 * lo.r + 1) ** 2
+    N = (2 * r + 1) ** 2
     pnorm = np.linalg.norm(pm, axis=1)
     cross = np.cross(pm, vel[..., 0])
     vel_norm = np.linalg.norm(vel[..., 0], axis=2)
