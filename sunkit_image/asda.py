@@ -27,7 +27,7 @@ from skimage import measure
 
 from sunkit_image.utils import calculate_gamma, points_in_poly, reform2d, remove_duplicate
 
-__all__ = ["Asda", "Lamb_Oseen"]
+__all__ = ['gen_vel','gamma_values','center_edge','vortex_property','get_grid','get_vtheta','get_vcore','get_rmax','get_vmax','get_vradial','get_vxvy']
 
 
 def gen_vel(i, j, vx, vy, r=3):
