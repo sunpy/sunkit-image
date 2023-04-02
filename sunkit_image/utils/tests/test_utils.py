@@ -123,7 +123,6 @@ def test_calculate_gamma():
     vx = vxvy["vx"]
     vy = vxvy["vy"]
     vxvy["data"]
-    factor = 1
     shape = vx.shape
     r = 3
     index = np.array([[i, j] for i in np.arange(r, shape[0] - r) for j in np.arange(r, shape[1] - r)])
