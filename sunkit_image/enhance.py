@@ -5,6 +5,7 @@ import warnings
 
 import numpy as np
 import scipy.ndimage as ndimage
+from watroo import utils
 
 __all__ = ["mgn", "wow"]
 
