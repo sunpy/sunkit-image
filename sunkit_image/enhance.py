@@ -6,7 +6,7 @@ import warnings
 import numpy as np
 import scipy.ndimage as ndimage
 
-__all__ = ["mgn"]
+__all__ = ["mgn", "wow"]
 
 
 def mgn(
