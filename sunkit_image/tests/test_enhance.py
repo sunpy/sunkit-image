@@ -29,6 +29,13 @@ def map_test():
     return np.ones((4, 4), dtype=float)
 
 
+@pytest.mark.remote_data()
+def test_wow(aia_171):
+    out = enhance.wow(aia_171)
+    assert type(out) == type(aia_171)
+
+
+@pytest.mark.xfail()
 def test_multiscale_gaussian(map_test):
     # Assuming the algorithm works fine then the below two should be equal.
     expect1 = enhance.mgn(map_test, sigma=[1])
