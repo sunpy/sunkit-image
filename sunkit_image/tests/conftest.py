@@ -83,7 +83,7 @@ def undo_download_dir_patch():
 
 def pytest_runtest_setup(item):
     """
-    pytest hook to skip all tests that have the mark 'remotedata' if the
+    Pytest hook to skip all tests that have the mark 'remotedata' if the
     pytest_remotedata plugin is not installed.
     """
     if isinstance(item, pytest.Function):
