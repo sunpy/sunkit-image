@@ -1,7 +1,5 @@
 """
-========================
-Removing Cosmic Ray Hits
-========================
+======================== Removing Cosmic Ray Hits ========================
 
 This example illustrates how to remove cosmic ray hits from a LASCO C2 FITS file.
 using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__.

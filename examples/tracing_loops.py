@@ -1,7 +1,5 @@
 """
-=====================
-Tracing Coronal Loops
-=====================
+===================== Tracing Coronal Loops =====================
 
 This example traces out the coronal loops in a FITS image
 using `~sunkit_image.trace.occult2`. In this example we will use the settings
