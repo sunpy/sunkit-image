@@ -1,10 +1,9 @@
 """
-==================================
-Multi-scale Gaussian Normalization
+================================== Multi-scale Gaussian Normalization
 ==================================
 
-This example applies Multi-scale Gaussian Normalization
-to a SunPy Map using `sunkit_image.enhance.mgn`.
+This example applies Multi-scale Gaussian Normalization to a SunPy Map
+using `sunkit_image.enhance.mgn`.
 """
 # sphinx_gallery_thumbnail_number = 2
 

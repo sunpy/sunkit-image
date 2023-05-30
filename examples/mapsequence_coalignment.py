@@ -1,6 +1,5 @@
 """
-===================================
-Coalignment using Template Matching
+=================================== Coalignment using Template Matching
 ===================================
 
 A common approach to coaligning a time series of images is to take a
