@@ -1,6 +1,5 @@
 """
-sunkit-image
-============
+Sunkit-image ============
 
 A image processing toolbox for Solar Physics.
 

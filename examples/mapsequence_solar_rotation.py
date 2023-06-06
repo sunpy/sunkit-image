@@ -1,6 +1,5 @@
 """
-===============================
-Compensating for Solar Rotation
+=============================== Compensating for Solar Rotation
 ===============================
 
 Often a set of solar image data consists of fixing the pointing of a field of

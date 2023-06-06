@@ -1,6 +1,5 @@
 """
-=============================
-Making an RGB composite image
+============================= Making an RGB composite image
 =============================
 
 This example shows the process required to create an RGB composite image
