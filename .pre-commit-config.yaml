@@ -34,7 +34,7 @@ repos:
       - id: check-yaml
       - id: debug-statements
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
+    rev: v2.2.5
     hooks:
       - id: codespell
 ci:
