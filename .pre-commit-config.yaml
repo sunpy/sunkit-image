@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.3
+    rev: v1.7.4
     hooks:
       - id: docformatter
         args: [--in-place, --pre-summary-newline, --make-summary-multi]
@@ -11,7 +11,7 @@ repos:
         args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|__init__.py|docs/conf.py)$"
   -   repo: https://github.com/psf/black
-      rev: 23.3.0
+      rev: 23.7.0
       hooks:
       - id: black
         exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
