@@ -258,11 +258,10 @@ def _get_correlation_shifts(array):
 
 def _parabolic_turning_point(y):
     """
-    Find the location of the turning point for a parabola
-    ``y(x) = ax^2 + bx + c``, given input values ``y(-1), y(0), y(1)``.
-    The maximum is located at ``x0 = -b / 2a``. Assumes
-    that the input array represents an equally spaced sampling at the
-    locations ``y(-1), y(0) and y(1)``.
+    Find the location of the turning point for a parabola ``y(x) = ax^2 + bx +
+    c``, given input values ``y(-1), y(0), y(1)``. The maximum is located at
+    ``x0 = -b / 2a``. Assumes that the input array represents an equally spaced
+    sampling at the locations ``y(-1), y(0) and y(1)``.
 
     Parameters
     ----------
