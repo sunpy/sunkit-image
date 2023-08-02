@@ -159,7 +159,7 @@ def _trim_intergranules(segmented_image, mark=False):
     return segmented_image_fixed
 
 
-def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
+def _mark_brightpoint(segmented_image, data, HE_data, resolution, bp_min_flux=None):
     """
     Mark brightpoints separately from granules - give them a value of 2.
 
@@ -169,6 +169,8 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
         The segmented image containing incorrect middles.
     data : `numpy array`
         The original image.
+    HE_data : `numpy array`
+        Original image with local histogram equalization applied.
     resolution : `float`
         Spatial resolution (arcsec/pixel) of the data.
     bp_min_flux : `float`, optional
@@ -178,44 +180,47 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     Returns
     -------
     segmented_image_fixed : `numpy.ndrray`
-        The segmented image with brightpoints marked as 3.
+        The segmented image with brightpoints marked as 2.
     brightpoint_count: `int`
         The number of brightpoints identified in the image.
     granule_count: `int`
         The number of granules identified, after re-classifcation of brightpoint.
     """
+    # General size limits 
     bp_size_limit = (
         0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
     )
     bp_pix_upper_limit = (bp_size_limit / resolution)**2 # Max area in pixels
     bp_pix_lower_limit = 4  # Very small bright regions are likely artifacts
-    # General flux limit determined by visual inspection.
+    # General flux limit determined by visual inspection (set using equalized map)
     if bp_min_flux is None:
-        stand_devs = 0.5
-        bp_brightness_limit = np.mean(data) + stand_devs * np.std(data)
+        stand_devs = 1.25
+        bp_brightness_limit = np.nanmean(HE_data) + stand_devs*np.nanstd(HE_data)
     else:
         bp_brightness_limit = bp_min_flux
     if len(np.unique(segmented_image)) > 3:
-        raise ValueError("segmented_image must have only values of 1, 0 and a 3 (if dim centers marked)")
+        raise ValueError("segmented_image must have only values of 1, 0 and 3 (if dim centers marked)")
+    # Obtain gradient map and set threshold for gradient on BP edges
+    grad = np.abs(np.gradient(data)[0] + np.gradient(data)[1])
+    bp_min_grad = np.quantile(grad, 0.95)
+    # Label all regions of flux greater than brightness limit (candidate regions)
+    bright_dim_seg = np.zeros_like(data)
+    bright_dim_seg[HE_data > bp_min_flux] = 1
+    labeled_bright_dim_seg = skimage.measure.label(bright_dim_seg + 1, connectivity=2)
+    values = np.unique(labeled_bright_dim_seg)
+    # From candidate regions, select those within pixel limit and gradient limit
     segmented_image_fixed = np.copy(segmented_image.astype(float))  # Make type float to enable adding float values
-    labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
-    values = np.unique(labeled_seg)
     bp_count = 0
     for value in values:
-        mask = np.zeros_like(segmented_image)
-        mask[labeled_seg == value] = 1
-        # Check that is a 1 (white) region.
-        if np.sum(np.multiply(mask, segmented_image)) > 0:
-            region_size = len(segmented_image_fixed[mask == 1])
-            tot_flux = np.sum(data[mask == 1])
-            # check that region is small.
-            if region_size < bp_pix_upper_limit:
-                # Check that region is not *too* small (likely an artifact)
-                if region_size > bp_pix_lower_limit:
-                    # Check that avg flux very high.
-                    if tot_flux / region_size > bp_brightness_limit:
-                        segmented_image_fixed[mask == 1] = 2
-                        bp_count += 1
+        if (bright_dim_seg[labeled_bright_dim_seg==value])[0]==1: # Check region is not the non-bp region
+            # check that region is within pixel limits.
+            region_size = len(labeled_bright_dim_seg[labeled_bright_dim_seg==value])
+            if region_size < bp_pix_upper_limit and region_size > bp_pix_lower_limit:
+                # check that region has high average gradient (maybe try max gradient?)
+                region_mean_grad = np.mean(grad[labeled_bright_dim_seg==value])
+                if region_mean_grad > bp_min_grad:
+                    segmented_image_fixed[labeled_bright_dim_seg==value] = 2
+                    bp_count += 1
     gran_count = len(values) - 1 - bp_count  # Subtract 1 for IG region.
     return segmented_image_fixed, bp_count, gran_count
 
