@@ -52,15 +52,19 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
         resolution = smap.scale[0].value
     else:
         raise ValueError("Currently only maps with square pixels are supported.")
-    median_filtered = scipy.ndimage.median_filter(smap.data, size=3)
+    # Obtain local histogram equalization of map.
+    map = smap.data
+    map_norm = ((map - np.nanmin(map))/(np.nanmax(map) - np.nanmin(map))) * 225 # min-max normalization to [0, 225] 
+    map_HE = skimage.filters.rank.equalize(map_norm.astype(int), footprint=skimage.morphology.disk(radius=100))
     # Apply initial skimage threshold.
+    median_filtered = scipy.ndimage.median_filter(map_HE, size=3)
     threshold = _get_threshold(median_filtered, skimage_method)
     segmented_image = np.uint8(median_filtered > threshold)
     # Fix the extra intergranule material bits in the middle of granules.
     seg_im_fixed = _trim_intergranules(segmented_image, mark=mark_dim_centers)
     # Mark brightpoint and get final granule and brightpoint count.
     seg_im_markbp, brightpoint_count, granule_count = _mark_brightpoint(
-        seg_im_fixed, smap.data, resolution, bp_min_flux
+        seg_im_fixed, map, map_HE, resolution, bp_min_flux
     )
     logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
     # Create output map using input wcs and adding colormap such that 0 (intergranules) = black, 1 (granule) = white, 2 (brightpoints) = yellow, 3 (dim_centers) = blue.
