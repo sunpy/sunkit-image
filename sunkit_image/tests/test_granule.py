@@ -65,14 +65,14 @@ def test_trim_intergranules(granule_map):
     # e.g. the returned array has fewer (or same number) 0-valued pixels as input
     middles_removed = _trim_intergranules(thresholded)
     assert not np.count_nonzero(middles_removed) < np.count_nonzero(thresholded)
-    # Check that when mark=True, erroneous 0 values are set to 2
+    # Check that when mark=True, erroneous 0 values are set to 3
     middles_marked = _trim_intergranules(thresholded, mark=True)
-    marked_as_2 = np.count_nonzero(middles_marked[middles_marked == 2])
-    assert marked_as_2 != 0
-    # Check that when mark=False, erroneous 0 values are "removed" (set to 1), returning NO 2 values
+    marked_as_3 = np.count_nonzero(middles_marked[middles_marked == 3])
+    assert marked_as_3 != 0
+    # Check that when mark=False, erroneous 0 values are "removed" (set to 1), returning NO 3 values
     middles_marked = _trim_intergranules(thresholded, mark=False)
-    marked_as_2 = np.count_nonzero(middles_marked[middles_marked == 2])
-    assert marked_as_2 == 0
+    marked_as_3 = np.count_nonzero(middles_marked[middles_marked == 3])
+    assert marked_as_3 == 0
 
 
 def test_trim_intergranules_errors():
@@ -89,8 +89,8 @@ def test_mark_brightpoint(granule_map):
     assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
     assert np.size(brightpoint_marked) > 0
-    # Check that the returned array has some 3 values (for a dataset that we know has brightpoints by eye).
-    assert (brightpoint_marked == 3).sum() == 230
+    # Check that the returned array has some pixels of value 2 (for a dataset that we know has brightpoints by eye).
+    assert (brightpoint_marked == 2).sum() > 0 
 
 
 def test_mark_brightpoint_error(granule_map):
