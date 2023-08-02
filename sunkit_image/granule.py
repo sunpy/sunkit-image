@@ -134,12 +134,18 @@ def _trim_intergranules(segmented_image, mark=False):
         raise ValueError("segmented_image must only have values of 1 and 0.")
     # Float conversion for correct region labeling.
     segmented_image_fixed = np.copy(segmented_image).astype(float)
-    labeled_seg = skimage.measure.label(segmented_image + 1, connectivity=2)
+    # Add padding of intergranule around edges. Aviods the case where all edge pixels are granule, which will result in all dim centers as intergranules.
+    pad = int(np.shape(segmented_image)[0]/200)
+    segmented_image_fixed[:,0:pad] = 0 
+    segmented_image_fixed[0:pad,:] = 0 
+    segmented_image_fixed[:,-pad:] = 0 
+    segmented_image_fixed[-pad:,:] = 0 
+    labeled_seg = skimage.measure.label(segmented_image_fixed + 1, connectivity=2)
     values = np.unique(labeled_seg)
     # Find value of the large continuous 0-valued region.
     size = 0
     for value in values:
-        if len((labeled_seg[labeled_seg == value])) > size:
+        if len((labeled_seg[labeled_seg == value])) > size and sum(segmented_image[labeled_seg == value] == 0):
             real_IG_value = value
             size = len(labeled_seg[labeled_seg == value])
     # Set all other 0 regions to mark value (3).
