@@ -94,6 +94,8 @@ def _get_threshold(data, method):
     """
     if not isinstance(data, np.ndarray):
         raise ValueError("Input data must be an instance of a np.ndarray")
+    if len(data.flatten()) > 500**2:
+        data = np.random.choice(data.flatten(), (500, 500)) # Computing threshold based on random sample works well and saves significant computatonal time
     method = method.lower()
     method_funcs = {
         "li": skimage.filters.threshold_li,
