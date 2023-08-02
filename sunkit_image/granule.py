@@ -205,7 +205,7 @@ def _mark_brightpoint(segmented_image, data, HE_data, resolution, bp_min_flux=No
     bp_min_grad = np.quantile(grad, 0.95)
     # Label all regions of flux greater than brightness limit (candidate regions)
     bright_dim_seg = np.zeros_like(data)
-    bright_dim_seg[HE_data > bp_min_flux] = 1
+    bright_dim_seg[HE_data > bp_brightness_limit] = 1
     labeled_bright_dim_seg = skimage.measure.label(bright_dim_seg + 1, connectivity=2)
     values = np.unique(labeled_bright_dim_seg)
     # From candidate regions, select those within pixel limit and gradient limit
