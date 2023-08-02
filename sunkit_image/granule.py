@@ -187,7 +187,7 @@ def _mark_brightpoint(segmented_image, data, resolution, bp_min_flux=None):
     bp_size_limit = (
         0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
     )
-    bp_pix_upper_limit = bp_size_limit / (resolution**2)
+    bp_pix_upper_limit = (bp_size_limit / resolution)**2 # Max area in pixels
     bp_pix_lower_limit = 4  # Very small bright regions are likely artifacts
     # General flux limit determined by visual inspection.
     if bp_min_flux is None:
