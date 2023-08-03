@@ -55,16 +55,16 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     # Obtain local histogram equalization of map.
     map = smap.data
     map_norm = ((map - np.nanmin(map))/(np.nanmax(map) - np.nanmin(map))) * 225 # min-max normalization to [0, 225] 
-    map_HE = skimage.filters.rank.equalize(map_norm.astype(int), footprint=skimage.morphology.disk(radius=100))
+    map_he = skimage.filters.rank.equalize(map_norm.astype(int), footprint=skimage.morphology.disk(radius=100))
     # Apply initial skimage threshold.
-    median_filtered = scipy.ndimage.median_filter(map_HE, size=3)
+    median_filtered = scipy.ndimage.median_filter(map_he, size=3)
     threshold = _get_threshold(median_filtered, skimage_method)
     segmented_image = np.uint8(median_filtered > threshold)
     # Fix the extra intergranule material bits in the middle of granules.
     seg_im_fixed = _trim_intergranules(segmented_image, mark=mark_dim_centers)
     # Mark brightpoint and get final granule and brightpoint count.
     seg_im_markbp, brightpoint_count, granule_count = _mark_brightpoint(
-        seg_im_fixed, map, map_HE, resolution, bp_min_flux
+        seg_im_fixed, map, map_he, resolution, bp_min_flux
     )
     logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
     # Create output map using input wcs and adding colormap such that 0 (intergranules) = black, 1 (granule) = white, 2 (brightpoints) = yellow, 3 (dim_centers) = blue.
@@ -160,7 +160,7 @@ def _trim_intergranules(segmented_image, mark=False):
     return segmented_image_fixed
 
 
-def _mark_brightpoint(segmented_image, data, HE_data, resolution, bp_min_flux=None):
+def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=None):
     """
     Mark brightpoints separately from granules - give them a value of 2.
 
@@ -170,7 +170,7 @@ def _mark_brightpoint(segmented_image, data, HE_data, resolution, bp_min_flux=No
         The segmented image containing incorrect middles.
     data : `numpy array`
         The original image.
-    HE_data : `numpy array`
+    he_data : `numpy array`
         Original image with local histogram equalization applied.
     resolution : `float`
         Spatial resolution (arcsec/pixel) of the data.
@@ -196,7 +196,7 @@ def _mark_brightpoint(segmented_image, data, HE_data, resolution, bp_min_flux=No
     # General flux limit determined by visual inspection (set using equalized map)
     if bp_min_flux is None:
         stand_devs = 1.25
-        bp_brightness_limit = np.nanmean(HE_data) + stand_devs*np.nanstd(HE_data)
+        bp_brightness_limit = np.nanmean(he_data) + stand_devs*np.nanstd(he_data)
     else:
         bp_brightness_limit = bp_min_flux
     if len(np.unique(segmented_image)) > 3:
@@ -206,7 +206,7 @@ def _mark_brightpoint(segmented_image, data, HE_data, resolution, bp_min_flux=No
     bp_min_grad = np.quantile(grad, 0.95)
     # Label all regions of flux greater than brightness limit (candidate regions)
     bright_dim_seg = np.zeros_like(data)
-    bright_dim_seg[HE_data > bp_brightness_limit] = 1
+    bright_dim_seg[he_data > bp_brightness_limit] = 1
     labeled_bright_dim_seg = skimage.measure.label(bright_dim_seg + 1, connectivity=2)
     values = np.unique(labeled_bright_dim_seg)
     # From candidate regions, select those within pixel limit and gradient limit
