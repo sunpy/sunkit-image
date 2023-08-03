@@ -82,9 +82,9 @@ def test_trim_intergranules_errors():
         _trim_intergranules(data)
 
 
-def test_mark_brightpoint(granule_map):
-    thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map.data))
-    brightpoint_marked, _, _ = _mark_brightpoint(thresholded, granule_map.data, resolution=0.016, bp_min_flux=None)
+def test_mark_brightpoint(granule_map, granule_map_he):
+    thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map_he))
+    brightpoint_marked, _, _ = _mark_brightpoint(thresholded, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None)
     # Check that the correct dimensions are returned.
     assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
@@ -93,10 +93,10 @@ def test_mark_brightpoint(granule_map):
     assert (brightpoint_marked == 2).sum() > 0 
 
 
-def test_mark_brightpoint_error(granule_map):
+def test_mark_brightpoint_error(granule_map, granule_map_he):
     # Check that errors are raised for incorrect granule_map.
     with pytest.raises(ValueError, match="segmented_image must have only"):
-        _mark_brightpoint(granule_map.data, granule_map.data, 0.016, bp_min_flux=None)
+        _mark_brightpoint(granule_map.data, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None)
 
 
 def test_segments_overlap_fraction(granule_minimap1):
