@@ -55,7 +55,7 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     # Obtain local histogram equalization of map.
     map = smap.data
     map_norm = ((map - np.nanmin(map))/(np.nanmax(map) - np.nanmin(map))) * 225 # min-max normalization to [0, 225] 
-    map_he = skimage.filters.rank.equalize(map_norm.astype(int), footprint=skimage.morphology.disk(radius=100))
+    map_he = skimage.filters.rank.equalize(skimage.util.img_as_ubyte(map_norm.astype(int)), footprint=skimage.morphology.disk(radius=100))
     # Apply initial skimage threshold.
     median_filtered = scipy.ndimage.median_filter(map_he, size=3)
     threshold = _get_threshold(median_filtered, skimage_method)
