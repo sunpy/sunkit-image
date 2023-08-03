@@ -94,7 +94,7 @@ def _get_threshold(data, method):
     if not isinstance(data, np.ndarray):
         raise ValueError("Input data must be an instance of a np.ndarray")
     if len(data.flatten()) > 500**2:
-        logging.info("Image is large, so threshold computation will be based on a random 500x500 sample of pixels")
+        logging.info("Input image is large (> 500**2), so threshold computation will be based on a random 500x500 sample of pixels")
         data = np.random.choice(data.flatten(), (500, 500)) # Computing threshold based on random sample works well and saves significant computatonal time
     method = method.lower()
     method_funcs = {
