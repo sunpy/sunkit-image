@@ -195,7 +195,7 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
     bp_pix_lower_limit = 4  # Very small bright regions are likely artifacts
     # General flux limit determined by visual inspection (set using equalized map)
     if bp_min_flux is None:
-        stand_devs = 1.25
+        stand_devs = 1.25 # General flux limit determined by visual inspection (set using equalized map)
         bp_brightness_limit = np.nanmean(he_data) + stand_devs*np.nanstd(he_data)
     else:
         bp_brightness_limit = bp_min_flux
