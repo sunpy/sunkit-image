@@ -100,8 +100,8 @@ def granule_map():
 def granule_map_he():
     granule_map = sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
     map = granule_map.data
-    map_norm = ((map - np.nanmin(map))/(np.nanmax(map) - np.nanmin(map))) * 225 # min-max normalization to [0, 225] 
-    map_he = skimage.filters.rank.equalize(skimage.util.img_as_ubyte(map_norm.astype(int)), footprint=skimage.morphology.disk(radius=100))
+    map_norm = ((map - np.nanmin(map))/(np.nanmax(map) - np.nanmin(map))) # min-max normalization to [0, 1] 
+    map_he = skimage.filters.rank.equalize(skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100))
     return map_he
 
 @pytest.fixture
