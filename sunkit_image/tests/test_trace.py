@@ -25,11 +25,15 @@ from sunkit_image.trace import (
 def image_remote(request):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=fits.verify.VerifyWarning)
-        smap = sunpy.map.Map("http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits")
+        data, header = fits.getdata(
+            "http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits", header=True
+        )
         if request.param == "map":
-            return smap
+            return sunpy.map.Map((data, header))
         elif request.param == "array":
-            return smap.data
+            return data
+        else:
+            raise ValueError(f"Invalid request parameter {request.param}")
 
 
 @pytest.fixture
@@ -190,6 +194,7 @@ def test_bandpass_filter(test_map):
     assert np.allclose(expect, result)
 
 
+@pytest.mark.remote_data
 def test_bandpass_filter_output(aia_171):
     # Check that bandpass filter works with both arrays and maps
     result = bandpass_filter(aia_171)
@@ -226,6 +231,7 @@ def test_smooth(test_map):
     assert np.allclose(filtered, expect)
 
 
+@pytest.mark.remote_data
 def test_smooth_output(aia_171):
     # Check that smooth works with both arrays and maps
     result = smooth(aia_171, 1)
@@ -242,7 +248,7 @@ def test_erase_loop_in_image(test_map_ones, test_map):
     xloop = [1, 2, 3]
     yloop = [1, 1, 1]
 
-    result = _erase_loop_in_image(image, istart, jstart, width, xloop, yloop)
+    result = _erase_loop_in_image(test_map_ones, istart, jstart, width, xloop, yloop)
 
     expect = np.array([[0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 1.0]])
 
