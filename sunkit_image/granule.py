@@ -53,8 +53,11 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     else:
         raise ValueError("Currently only maps with square pixels are supported.")
     # Obtain local histogram equalization of map.
-    map_norm = ((smap.data - np.nanmin(smap.data))/(np.nanmax(smap.data) - np.nanmin(smap.data))) # min-max normalization to [0, 1] 
-    map_he = skimage.filters.rank.equalize(skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100))
+    # min-max normalization to [0, 1]
+    map_norm = (smap.data - np.nanmin(smap.data)) / (np.nanmax(smap.data) - np.nanmin(smap.data))
+    map_he = skimage.filters.rank.equalize(
+        skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100)
+    )
     # Apply initial skimage threshold.
     median_filtered = scipy.ndimage.median_filter(map_he, size=3)
     threshold = _get_threshold(median_filtered, skimage_method)
@@ -94,8 +97,12 @@ def _get_threshold(data, method):
     if not isinstance(data, np.ndarray):
         raise ValueError("Input data must be an instance of a np.ndarray")
     if len(data.flatten()) > 500**2:
-        logging.info("Input image is large (> 500**2), so threshold computation will be based on a random 500x500 sample of pixels")
-        data = np.random.choice(data.flatten(), (500, 500)) # Computing threshold based on random sample works well and saves significant computatonal time
+        logging.info(
+            "Input image is large (> 500**2), so threshold computation will be based on a random 500x500 sample of pixels"
+        )
+        data = np.random.choice(
+            data.flatten(), (500, 500)
+        )  # Computing threshold based on random sample works well and saves significant computatonal time
     method = method.lower()
     method_funcs = {
         "li": skimage.filters.threshold_li,
@@ -134,12 +141,14 @@ def _trim_intergranules(segmented_image, mark=False):
         raise ValueError("segmented_image must only have values of 1 and 0.")
     # Float conversion for correct region labeling.
     segmented_image_fixed = np.copy(segmented_image).astype(float)
-    # Add padding of intergranule around edges. Aviods the case where all edge pixels are granule, which will result in all dim centers as intergranules.
-    pad = int(np.shape(segmented_image)[0]/200)
-    segmented_image_fixed[:,0:pad] = 0 
-    segmented_image_fixed[0:pad,:] = 0 
-    segmented_image_fixed[:,-pad:] = 0 
-    segmented_image_fixed[-pad:,:] = 0 
+    # Add padding of intergranule around edges.
+    # Avoids the case where all edge pixels are granule,
+    # which will result in all dim centers as intergranules.
+    pad = int(np.shape(segmented_image)[0] / 200)
+    segmented_image_fixed[:, 0:pad] = 0
+    segmented_image_fixed[0:pad, :] = 0
+    segmented_image_fixed[:, -pad:] = 0
+    segmented_image_fixed[-pad:, :] = 0
     labeled_seg = skimage.measure.label(segmented_image_fixed + 1, connectivity=2)
     values = np.unique(labeled_seg)
     # Find value of the large continuous 0-valued region.
@@ -186,16 +195,16 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
     granule_count: `int`
         The number of granules identified, after re-classifcation of brightpoint.
     """
-    # General size limits 
+    # General size limits
     bp_size_limit = (
         0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
     )
-    bp_pix_upper_limit = (bp_size_limit / resolution)**2 # Max area in pixels
+    bp_pix_upper_limit = (bp_size_limit / resolution) ** 2  # Max area in pixels
     bp_pix_lower_limit = 4  # Very small bright regions are likely artifacts
     # General flux limit determined by visual inspection (set using equalized map)
     if bp_min_flux is None:
-        stand_devs = 1.25 # General flux limit determined by visual inspection (set using equalized map)
-        bp_brightness_limit = np.nanmean(he_data) + stand_devs*np.nanstd(he_data)
+        stand_devs = 1.25  # General flux limit determined by visual inspection (set using equalized map)
+        bp_brightness_limit = np.nanmean(he_data) + stand_devs * np.nanstd(he_data)
     else:
         bp_brightness_limit = bp_min_flux
     if len(np.unique(segmented_image)) > 3:
@@ -212,14 +221,14 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
     segmented_image_fixed = np.copy(segmented_image.astype(float))  # Make type float to enable adding float values
     bp_count = 0
     for value in values:
-        if (bright_dim_seg[labeled_bright_dim_seg==value])[0]==1: # Check region is not the non-bp region
+        if (bright_dim_seg[labeled_bright_dim_seg == value])[0] == 1:  # Check region is not the non-bp region
             # check that region is within pixel limits.
-            region_size = len(labeled_bright_dim_seg[labeled_bright_dim_seg==value])
+            region_size = len(labeled_bright_dim_seg[labeled_bright_dim_seg == value])
             if region_size < bp_pix_upper_limit and region_size > bp_pix_lower_limit:
                 # check that region has high average gradient (maybe try max gradient?)
-                region_mean_grad = np.mean(grad[labeled_bright_dim_seg==value])
+                region_mean_grad = np.mean(grad[labeled_bright_dim_seg == value])
                 if region_mean_grad > bp_min_grad:
-                    segmented_image_fixed[labeled_bright_dim_seg==value] = 2
+                    segmented_image_fixed[labeled_bright_dim_seg == value] = 2
                     bp_count += 1
     gran_count = len(values) - 1 - bp_count  # Subtract 1 for IG region.
     return segmented_image_fixed, bp_count, gran_count

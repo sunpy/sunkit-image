@@ -64,7 +64,7 @@ def test_trim_intergranules(granule_map):
     # Check that erroneous zero values are caught and re-assigned
     # e.g. inside of pad region, returned array has fewer 0-valued pixels then input
     middles_removed = _trim_intergranules(thresholded)
-    pad = int(np.shape(thresholded)[0]/200)
+    pad = int(np.shape(thresholded)[0] / 200)
     assert not np.count_nonzero(middles_removed[pad:-pad, pad:-pad]) < np.count_nonzero(thresholded[pad:-pad, pad:-pad])
     # Check that when mark=True, erroneous 0 values are set to 3
     middles_marked = _trim_intergranules(thresholded, mark=True)
@@ -85,13 +85,15 @@ def test_trim_intergranules_errors():
 
 def test_mark_brightpoint(granule_map, granule_map_he):
     thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map_he))
-    brightpoint_marked, _, _ = _mark_brightpoint(thresholded, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None)
+    brightpoint_marked, _, _ = _mark_brightpoint(
+        thresholded, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None
+    )
     # Check that the correct dimensions are returned.
     assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
     assert np.size(brightpoint_marked) > 0
     # Check that the returned array has some pixels of value 2 (for a dataset that we know has brightpoints by eye).
-    assert (brightpoint_marked == 2).sum() > 0 
+    assert (brightpoint_marked == 2).sum() > 0
 
 
 def test_mark_brightpoint_error(granule_map, granule_map_he):

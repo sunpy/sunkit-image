@@ -4,10 +4,10 @@ import importlib
 
 import numpy as np
 import pytest
+import skimage
 
 import astropy
 import astropy.config.paths
-import skimage
 import sunpy.map
 from astropy.utils.data import get_pkg_data_filename
 from sunpy.coordinates import Helioprojective, get_earth
@@ -96,12 +96,19 @@ def pytest_runtest_setup(item):
 def granule_map():
     return sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
 
+
 @pytest.fixture()
 def granule_map_he():
     granule_map = sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
-    map_norm = ((granule_map.data - np.nanmin(granule_map.data))/(np.nanmax(granule_map.data) - np.nanmin(granule_map.data))) # min-max normalization to [0, 1] 
-    map_he = skimage.filters.rank.equalize(skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100))
+    # min-max normalization to [0, 1]
+    map_norm = (granule_map.data - np.nanmin(granule_map.data)) / (
+        np.nanmax(granule_map.data) - np.nanmin(granule_map.data)
+    )
+    map_he = skimage.filters.rank.equalize(
+        skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100)
+    )
     return map_he
+
 
 @pytest.fixture
 def granule_minimap1():
