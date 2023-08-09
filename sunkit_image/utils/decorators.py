@@ -6,12 +6,13 @@ import numpy as np
 from sunpy.map import GenericMap, Map
 
 
-def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[Callable, Callable]:
+def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Callable], Callable]:
     """
     Decorator that allows a function to accept an array or a
     `sunpy.map.GenericMap` as an argument.
 
     This can be applied to functions that:
+
     - Take a single array or map as input
     - Return a single array that has the same pixel coordinates
       as the input array.
