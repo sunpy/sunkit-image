@@ -37,7 +37,6 @@ mc = Map(
 # result.
 plt.figure()
 anim = mc.plot()
-plt.show()
 
 ###############################################################################
 # The :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation`
@@ -60,7 +59,6 @@ derotated = coalignment.mapsequence_coalign_by_rotation(mc)
 # shifted MapSequence to compare with the original plot above.
 plt.figure()
 anim_derotate = derotated.plot()
-plt.show()
 
 ###############################################################################
 # The de-rotation shifts used in the above function can be calculated without
@@ -71,3 +69,9 @@ shifts = coalignment.calculate_solar_rotate_shift(mc)
 ###############################################################################
 # The calculated shifts can be passed as an argument to
 # :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation`.
+derotate = coalignment.mapsequence_coalign_by_match_template(mc, shift=shifts)
+
+plt.figure()
+anim_derotate = derotate.plot()
+
+plt.show()

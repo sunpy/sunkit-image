@@ -41,7 +41,6 @@ mc = Map(
 # the coaligned MapSequence.
 plt.figure()
 anim = mc.plot()
-plt.show()
 
 ###############################################################################
 # To coalign the `~sunpy.map.MapSequence`, apply the
@@ -61,7 +60,6 @@ coaligned = coalignment.mapsequence_coalign_by_match_template(mc)
 # the original.
 plt.figure()
 anim_coalign = coaligned.plot()
-plt.show()
 
 ###############################################################################
 # If you just want to calculate the shifts required to compensate for solar
@@ -76,3 +74,8 @@ shifts = coalignment.calculate_match_template_shift(mc)
 # The shifts calculated here can be passed directly to the coalignment
 # function.
 coaligned = coalignment.mapsequence_coalign_by_match_template(mc, shift=shifts)
+
+plt.figure()
+anim_coalign = coaligned.plot()
+
+plt.show()
