@@ -62,17 +62,18 @@ def test_trim_intergranules(granule_map):
     # Check that the correct dimensions are returned.
     assert thresholded.shape == _trim_intergranules(thresholded).shape
     # Check that erroneous zero values are caught and re-assigned
-    # e.g. the returned array has fewer (or same number) 0-valued pixels as input
+    # e.g. inside of pad region, returned array has fewer 0-valued pixels then input
     middles_removed = _trim_intergranules(thresholded)
-    assert not np.count_nonzero(middles_removed) < np.count_nonzero(thresholded)
-    # Check that when mark=True, erroneous 0 values are set to 2
+    pad = int(np.shape(thresholded)[0] / 200)
+    assert not np.count_nonzero(middles_removed[pad:-pad, pad:-pad]) < np.count_nonzero(thresholded[pad:-pad, pad:-pad])
+    # Check that when mark=True, erroneous 0 values are set to 3
     middles_marked = _trim_intergranules(thresholded, mark=True)
-    marked_as_2 = np.count_nonzero(middles_marked[middles_marked == 2])
-    assert marked_as_2 != 0
-    # Check that when mark=False, erroneous 0 values are "removed" (set to 1), returning NO 2 values
+    marked_as_3 = np.count_nonzero(middles_marked[middles_marked == 3])
+    assert marked_as_3 != 0
+    # Check that when mark=False, erroneous 0 values are "removed" (set to 1), returning NO 3 values
     middles_marked = _trim_intergranules(thresholded, mark=False)
-    marked_as_2 = np.count_nonzero(middles_marked[middles_marked == 2])
-    assert marked_as_2 == 0
+    marked_as_3 = np.count_nonzero(middles_marked[middles_marked == 3])
+    assert marked_as_3 == 0
 
 
 def test_trim_intergranules_errors():
@@ -82,21 +83,23 @@ def test_trim_intergranules_errors():
         _trim_intergranules(data)
 
 
-def test_mark_brightpoint(granule_map):
-    thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map.data))
-    brightpoint_marked, _, _ = _mark_brightpoint(thresholded, granule_map.data, resolution=0.016, bp_min_flux=None)
+def test_mark_brightpoint(granule_map, granule_map_he):
+    thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map_he))
+    brightpoint_marked, _, _ = _mark_brightpoint(
+        thresholded, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None
+    )
     # Check that the correct dimensions are returned.
     assert thresholded.shape == brightpoint_marked.shape
     # Check that returned array is not empty.
     assert np.size(brightpoint_marked) > 0
-    # Check that the returned array has some 3 values (for a dataset that we know has brightpoints by eye).
-    assert (brightpoint_marked == 3).sum() == 230
+    # Check that the returned array has some pixels of value 2 (for a dataset that we know has brightpoints by eye).
+    assert (brightpoint_marked == 2).sum() > 0
 
 
-def test_mark_brightpoint_error(granule_map):
+def test_mark_brightpoint_error(granule_map, granule_map_he):
     # Check that errors are raised for incorrect granule_map.
     with pytest.raises(ValueError, match="segmented_image must have only"):
-        _mark_brightpoint(granule_map.data, granule_map.data, 0.016, bp_min_flux=None)
+        _mark_brightpoint(granule_map.data, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None)
 
 
 def test_segments_overlap_fraction(granule_minimap1):

@@ -63,7 +63,7 @@ def test_asda_artificial():
 
 def test_real_data():
     """
-    run the test on real data and compare with the correct answer.
+    Run the test on real data and compare with the correct answer.
 
     Notes:
         Input velocity field and image (if there is any) are all stored in

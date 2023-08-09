@@ -1,9 +1,10 @@
 import os
 import tempfile
-import importlib
+import importlib.util
 
 import numpy as np
 import pytest
+import skimage
 
 import astropy
 import astropy.config.paths
@@ -84,7 +85,7 @@ def undo_download_dir_patch():
 
 def pytest_runtest_setup(item):
     """
-    pytest hook to skip all tests that have the mark 'remotedata' if the
+    Pytest hook to skip all tests that have the mark 'remotedata' if the
     pytest_remotedata plugin is not installed.
     """
     if isinstance(item, pytest.Function):
@@ -95,6 +96,19 @@ def pytest_runtest_setup(item):
 @pytest.fixture()
 def granule_map():
     return sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
+
+
+@pytest.fixture()
+def granule_map_he():
+    granule_map = sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
+    # min-max normalization to [0, 1]
+    map_norm = (granule_map.data - np.nanmin(granule_map.data)) / (
+        np.nanmax(granule_map.data) - np.nanmin(granule_map.data)
+    )
+    map_he = skimage.filters.rank.equalize(
+        skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100)
+    )
+    return map_he
 
 
 @pytest.fixture

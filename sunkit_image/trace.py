@@ -11,10 +11,6 @@ from sunkit_image.utils.decorators import accept_array_or_map
 __all__ = [
     "occult2",
     "bandpass_filter",
-    "curvature_radius",
-    "erase_loop_in_image",
-    "initial_direction_finding",
-    "loop_add",
     "smooth",
 ]
 
@@ -154,13 +150,13 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
             # This will return the angle at the first point of the loop during every
             # forward or backward pass
-            al[0] = initial_direction_finding(residual, xl[0], yl[0], nlen)
+            al[0] = _initial_direction_finding(residual, xl[0], yl[0], nlen)
 
             # `ip` denotes a point in the traced loop
             for ip in range(0, npmax):
                 # The below function call will return the coordinate, flux and angle
                 # of the next point.
-                xl, yl, zl, al = curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
+                xl, yl, zl, al = _curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
 
                 # This decides when to stop tracing the loop; when then last `ngap` pixels traced
                 # are below zero, the tracing will stop.
@@ -214,10 +210,10 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
         # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum
         # specified
         if looplen >= lmin:
-            loops, iloop = loop_add(s, xloop, yloop, zloop, iloop, loops)
+            loops, iloop = _loop_add(s, xloop, yloop, zloop, iloop, loops)
 
         # ERASE LOOP IN RESIDUAL IMAGE
-        residual = erase_loop_in_image(residual, istart, jstart, wid, xloop, yloop)
+        residual = _erase_loop_in_image(residual, istart, jstart, wid, xloop, yloop)
 
     # END_TRACE
     return loops
@@ -322,7 +318,7 @@ def smooth(image, width, nanopt="replace"):
     return filtered.astype(np.float32)
 
 
-def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
+def _erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     """
     Makes all the points in a loop and its vicinity as zero in the original
     image to prevent them from being traced again.
@@ -369,7 +365,7 @@ def erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     return image
 
 
-def loop_add(lengths, xloop, yloop, zloop, iloop, loops):
+def _loop_add(lengths, xloop, yloop, zloop, iloop, loops):
     """
     Adds the current loop to the output structures by interpolating the
     coordinates.
@@ -427,7 +423,7 @@ def loop_add(lengths, xloop, yloop, zloop, iloop, loops):
     return loops, iloop
 
 
-def initial_direction_finding(image, xstart, ystart, nlen):
+def _initial_direction_finding(image, xstart, ystart, nlen):
     """
     Finds the initial angle of the loop at the starting point.
 
@@ -481,7 +477,7 @@ def initial_direction_finding(image, xstart, ystart, nlen):
     return angles[0, np.argmax(flux)]
 
 
-def curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
+def _curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     """
     Finds the radius of curvature at the given loop point and then uses it to
     find the next point in the loop.
