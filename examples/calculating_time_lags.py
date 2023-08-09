@@ -13,6 +13,7 @@ The specific implementation in this package is described in detail
 in Appendix C of `Barnes et al. (2019) <https://doi.org/10.3847/1538-4357/ab290c>`__.
 """
 # sphinx_gallery_thumbnail_number = 4
+
 import dask.array
 import matplotlib.pyplot as plt
 import numpy as np
@@ -58,7 +59,6 @@ cc = cross_correlation(s_a, s_b, lags)
 plt.plot(lags, cc)
 plt.xlabel("Lag [s]")
 plt.ylabel("Cross-correlation, AB")
-plt.show()
 
 ###################################################################
 # Additionally, we can also easily calculate the maximum value of the
@@ -70,7 +70,6 @@ plt.plot(lags, cc)
 plt.plot(tl, max_cc, marker="o", ls="", markersize=4)
 plt.xlabel("Lag [s]")
 plt.ylabel("Cross-correlation, AB")
-plt.show()
 
 ###################################################################
 # As expected from the first intensity plot, we find that the lag
@@ -94,7 +93,6 @@ print("Time lag, B -> A =", time_lag(s_b, s_a, time))
 #
 # As an example, we'll create a fake data cube by repeating Gaussian
 # pulses with varying means and then add some noise to them
-
 
 means_a = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
 means_b = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
@@ -120,7 +118,6 @@ cax = make_axes_locatable(ax).append_axes("right", size="5%", pad="1%")
 cb = fig.colorbar(im, cax=cax)
 cb.set_label(r"Max cross-correlation")
 plt.tight_layout()
-plt.show()
 
 ###################################################################
 # In practice, these data cubes are often very large, sometimes many
@@ -143,3 +140,5 @@ print(tl_map)
 # large data cubes as these operations are likely to exceed the
 # memory limits of most desktop machines and are easily accelerated through
 # parallelism.
+
+plt.show()

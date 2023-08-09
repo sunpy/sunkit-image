@@ -21,6 +21,7 @@ from sunkit_image import coalignment
 
 ###############################################################################
 # First, create a `~sunpy.map.MapSequence` with sample data.
+
 mc = Map(
     [
         sunpy.data.sample.AIA_193_CUTOUT01_IMAGE,
@@ -35,12 +36,14 @@ mc = Map(
 ###############################################################################
 # Let's plot the MapSequence so we can later compare it with the shifted
 # result.
+
 plt.figure()
 anim = mc.plot()
 
 ###############################################################################
 # The :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation`
 # function can be applied to the Map Sequence
+
 derotated = coalignment.mapsequence_coalign_by_rotation(mc)
 
 ###############################################################################
@@ -57,6 +60,7 @@ derotated = coalignment.mapsequence_coalign_by_rotation(mc)
 #
 # To check that the applied shifts were reasonable, plot an animation of the
 # shifted MapSequence to compare with the original plot above.
+
 plt.figure()
 anim_derotate = derotated.plot()
 
@@ -64,14 +68,15 @@ anim_derotate = derotated.plot()
 # The de-rotation shifts used in the above function can be calculated without
 # applying them using the
 # :func:`~sunkit_image.coalignment.calculate_solar_rotate_shift` function.
+
 shifts = coalignment.calculate_solar_rotate_shift(mc)
 
 ###############################################################################
 # The calculated shifts can be passed as an argument to
 # :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation`.
-derotate = coalignment.mapsequence_coalign_by_match_template(mc, shift=shifts)
+derotate_shifts = coalignment.mapsequence_coalign_by_match_template(mc, shift=shifts)
 
 plt.figure()
-anim_derotate = derotate.plot()
+anim_derotate_shifts = derotate_shifts.plot()
 
 plt.show()

@@ -7,7 +7,6 @@ This example illustrates how to remove cosmic ray hits from a LASCO C2 FITS file
 using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__.
 Astroscrappy is a separate Python package and can be installed separately using ``pip`` or ``conda``.
 """
-
 import astroscrappy
 import matplotlib.pyplot as plt
 
@@ -20,7 +19,6 @@ from sunpy.net import attrs as a
 # For more details on how to download and plot LASCO FITS file see
 # SunPy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
 # To make this example work you need to have SunPy with all the "net" dependencies installed.
-
 
 ###############################################################################
 # In order to download the required FITS file, we use
@@ -59,15 +57,15 @@ lasco_map.plot()
 # We also modify the ``readnoise`` parameter to obtain better results.
 
 mask, clean_data = astroscrappy.detect_cosmics(lasco_map.data, sigclip=2, objlim=2, readnoise=4, verbose=True)
+
+###############################################################################
 # This returns two variables - mask is a boolean array depicting whether there is
 # a cosmic ray hit at that pixel, clean_data is the cleaned image after removing those
 # hits.
-
-###############################################################################
-# We can now plot the cleaned image.
+#
+# Now we can now plot the cleaned image.
 
 clean_map1 = Map(clean_data, lasco_map.meta)
-
 fig2 = plt.figure()
 clean_map1.plot()
 
