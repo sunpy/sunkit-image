@@ -1,3 +1,5 @@
+# mypy: disable-error-code="no-redef"
+
 # NOTE: First try _dev.scm_version if it exists and setuptools_scm is installed
 # This file is not included in sunkit-image wheels/tarballs, so otherwise it will
 # fall back on the generated _version module.

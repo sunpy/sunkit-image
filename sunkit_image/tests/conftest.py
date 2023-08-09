@@ -1,6 +1,6 @@
 import os
 import tempfile
-import importlib
+import importlib.util
 
 import numpy as np
 import pytest

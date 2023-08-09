@@ -21,7 +21,7 @@ for requirement in doc_requires:
     try:
         get_distribution(requirement)
     except Exception as e:
-        missing_requirements.append(requirement.name)
+        missing_requirements.append(requirement.project_name)
 if missing_requirements:
     print(
         f"The {' '.join(missing_requirements)} package(s) could not be found and "
