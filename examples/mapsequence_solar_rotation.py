@@ -13,7 +13,6 @@ to account for the differential rotation of the Sun is demonstrated using the
 :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation` function.
 """
 import matplotlib.pyplot as plt
-
 import sunpy.data.sample
 from sunpy.map import Map
 

@@ -3,11 +3,10 @@ This module contains a collection of functions of general utility.
 """
 import warnings
 
+import astropy.units as u
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 from skimage import measure
-
-import astropy.units as u
 from sunpy.map import all_coordinates_from_map
 
 __all__ = [
@@ -161,7 +160,7 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
         # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
         return np.asarray(
-            [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)]
+            [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)],
         )
 
 
@@ -187,8 +186,7 @@ def reform2d(array, factor=1):
         raise ValueError("Input array must be 2d!")
     if factor > 1:
         congridx = RectBivariateSpline(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1)
-        reformed_array = congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
-        return reformed_array
+        return congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
     else:
         return array
 

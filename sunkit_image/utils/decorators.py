@@ -2,7 +2,6 @@ import inspect
 from typing import Union, Callable
 
 import numpy as np
-
 from sunpy.map import GenericMap, Map
 
 

@@ -1,9 +1,8 @@
 import warnings
 
+import astropy.units as u
 import numpy as np
 import pytest
-
-import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 import sunkit_image.utils as utils
@@ -11,8 +10,8 @@ from sunkit_image import asda
 from sunkit_image.data.test import get_test_filepath
 
 
-@pytest.fixture
-@pytest.mark.remote_data
+@pytest.fixture()
+@pytest.mark.remote_data()
 def smap():
     import sunpy.data.sample
     from sunpy.data.sample import AIA_171_IMAGE
@@ -83,7 +82,7 @@ def test_bin_edge_summary():
         utils.bin_edge_summary(np.zeros((3, 4)), "center")
 
 
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_find_pixel_radii(smap):
     # The known maximum radius
     known_maximum_pixel_radius = 1.84183121
@@ -101,7 +100,7 @@ def test_find_pixel_radii(smap):
     assert_quantity_allclose(np.max(pixel_radii).value, known_maximum_pixel_radius / 2)
 
 
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_get_radial_intensity_summary(smap):
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins(inner_value=1, outer_value=1.5)) * u.R_sun
     summary = np.mean
@@ -173,6 +172,6 @@ def test_reform_2d():
             [2.0, 2.5, 3.0, 3.0],
             [3.0, 3.5, 4.0, 4.0],
             [3.0, 3.5, 4.0, 4.0],
-        ]
+        ],
     )
     assert np.allclose(utils.reform2d(test_data, 2), expected)

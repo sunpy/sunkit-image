@@ -1,13 +1,15 @@
+import astropy.units as u
 import dask.array
 import numpy as np
 import pytest
 
-import astropy.units as u
-
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
 
-@pytest.mark.parametrize("shape_in,shape_out", [((20, 5, 5), (39, 5, 5)), ((100, 10), (199, 10)), ((1000,), (1999,))])
+@pytest.mark.parametrize(
+    ("shape_in", "shape_out"),
+    [((20, 5, 5), (39, 5, 5)), ((100, 10), (199, 10)), ((1000,), (1999,))],
+)
 def test_cross_correlation_array_shapes(shape_in, shape_out):
     s_a = np.random.rand(*shape_in)
     s_b = np.random.rand(*shape_in)
@@ -112,7 +114,7 @@ def test_quantity_numpy_consistent(shape_in):
 
 
 @pytest.mark.parametrize(
-    "shape_a,shape_b,lags,exception",
+    ("shape_a", "shape_b", "lags", "exception"),
     [
         ((10, 1), (10, 1), np.array([-1, -0.5, 0.1, 1]) * u.s, "Lags must be evenly sampled"),
         ((10, 2, 3), (10, 2, 4), np.linspace(-1, 1, 19) * u.s, "Signals must have same shape."),
@@ -133,7 +135,7 @@ def test_exceptions(shape_a, shape_b, lags, exception):
 
 def test_bounds():
     time = np.linspace(0, 1, 10) * u.s
-    shape = time.shape + (5, 5)
+    shape = (*time.shape, 5, 5)
     s_a = np.random.rand(*shape)
     s_b = np.random.rand(*shape)
     bounds = (-0.5, 0.5) * u.s

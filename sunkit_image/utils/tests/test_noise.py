@@ -5,10 +5,9 @@ from skimage import data
 import sunkit_image.utils.noise as nf
 
 
-@pytest.fixture
+@pytest.fixture()
 def img():
-    image = data.camera()
-    return image
+    return data.camera()
 
 
 def test_conv2d_matrix_size(img):

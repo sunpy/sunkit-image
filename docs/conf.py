@@ -20,12 +20,12 @@ missing_requirements = []
 for requirement in doc_requires:
     try:
         get_distribution(requirement)
-    except Exception as e:
+    except Exception:
         missing_requirements.append(requirement.project_name)
 if missing_requirements:
     print(
         f"The {' '.join(missing_requirements)} package(s) could not be found and "
-        "is needed to build the documentation, please install the 'docs' requirements."
+        "is needed to build the documentation, please install the 'docs' requirements.",
     )
     sys.exit(1)
 
@@ -41,12 +41,12 @@ if on_rtd:
     os.environ["HIDE_PARFIVE_PROGESS"] = "True"
 
 # -- Non stdlib imports --------------------------------------------------------
-from sunkit_image import __version__  # NOQA
+from sunkit_image import __version__
 
 # -- Project information -------------------------------------------------------
 project = "sunkit_image"
 author = "The SunPy Community"
-copyright = "{}, {}".format(datetime.datetime.now().year, author)
+copyright = f"{datetime.datetime.now().year}, {author}"
 
 # The full version, including alpha/beta/rc tags
 release = __version__
@@ -101,7 +101,6 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-# templates_path = ['_templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -172,7 +171,6 @@ from sunpy_sphinx_theme.conf import *  # NOQA
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
 
 # Render inheritance diagrams in SVG
 graphviz_output_format = "svg"

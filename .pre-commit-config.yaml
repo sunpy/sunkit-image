@@ -1,15 +1,20 @@
 repos:
-  - repo: https://github.com/PyCQA/docformatter
+  - repo: https://github.com/myint/docformatter
     rev: v1.7.5
     hooks:
       - id: docformatter
         args: [--in-place, --pre-summary-newline, --make-summary-multi]
-  - repo: https://github.com/PyCQA/autoflake
+  - repo: https://github.com/myint/autoflake
     rev: v2.2.0
     hooks:
       - id: autoflake
         args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
-        exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|__init__.py|docs/conf.py)$"
+        exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|docs/conf.py)$"
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.284'
+    hooks:
+      - id: ruff
+        args: ['--fix']
   -   repo: https://github.com/psf/black
       rev: 23.7.0
       hooks:
@@ -37,9 +42,10 @@ repos:
     rev: v2.2.5
     hooks:
       - id: codespell
-
+        additional_dependencies:
+          - tomli
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v1.4.1'  # Use the sha / tag you want to point at
+    rev: 'v1.4.1'
     hooks:
       - id: mypy
         additional_dependencies: ['types-setuptools']

@@ -2,15 +2,14 @@ import os
 import warnings
 from copy import deepcopy
 
+import astropy.units as u
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose, assert_array_almost_equal
-from scipy.ndimage import shift as sp_shift
-
-import astropy.units as u
 import sunpy.data.test
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
+from numpy.testing import assert_allclose, assert_array_almost_equal
+from scipy.ndimage import shift as sp_shift
 from sunpy.map import Map, MapSequence
 from sunpy.util import SunpyUserWarning
 
@@ -33,33 +32,33 @@ from sunkit_image.coalignment import (
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_clipping():
     return np.asarray([0.2, -0.3, -1.0001])
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_map():
     testpath = sunpy.data.test.rootdir
     return sunpy.map.Map(os.path.join(testpath, "aia_171_level1.fits"))
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_shift():
     return np.array([3, 5])
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_map_layer(aia171_test_map):
     return aia171_test_map.data.astype("float32")  # SciPy 1.4 requires at least 16-bit floats
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_map_layer_shape(aia171_test_map_layer):
     return aia171_test_map_layer.shape
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_template(aia171_test_shift, aia171_test_map_layer, aia171_test_map_layer_shape):
     # Test template
     a1 = aia171_test_shift[0] + aia171_test_map_layer_shape[0] // 4
@@ -69,7 +68,7 @@ def aia171_test_template(aia171_test_shift, aia171_test_map_layer, aia171_test_m
     return aia171_test_map_layer[a1:a2, b1:b2]
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_template_shape(aia171_test_template):
     return aia171_test_template.shape
 
@@ -109,7 +108,10 @@ def test_check_for_nonfinite_entries():
 
 
 def test_match_template_to_layer(
-    aia171_test_map_layer, aia171_test_template, aia171_test_map_layer_shape, aia171_test_template_shape
+    aia171_test_map_layer,
+    aia171_test_template,
+    aia171_test_map_layer_shape,
+    aia171_test_template_shape,
 ):
     result = match_template_to_layer(aia171_test_map_layer, aia171_test_template)
     assert_allclose(
@@ -198,12 +200,12 @@ def test__default_fmap_function():
 # Pixel displacements have the y-displacement as the first entry
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_mc_pixel_displacements():
     return np.asarray([1.6, 10.1])
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_mc_arcsec_displacements(aia171_test_mc_pixel_displacements, aia171_test_map):
     return {
         "x": np.asarray([0.0, aia171_test_mc_pixel_displacements[1] * aia171_test_map.scale[0].value]) * u.arcsec,
@@ -211,7 +213,7 @@ def aia171_mc_arcsec_displacements(aia171_test_mc_pixel_displacements, aia171_te
     }
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_mc(aia171_test_map, aia171_test_map_layer, aia171_test_mc_pixel_displacements):
     # Create a map that has been shifted a known amount.
     d1 = sp_shift(aia171_test_map_layer, aia171_test_mc_pixel_displacements)
@@ -377,18 +379,23 @@ def test_apply_shifts(aia171_test_map):
     # Test for a combination of keywords, and that changing the interpolation
     # order and how the edges are treated changes the results.
     test_mc1 = apply_shifts(
-        mc, astropy_displacements["y"], astropy_displacements["x"], clip=False, order=2, mode="reflect"
+        mc,
+        astropy_displacements["y"],
+        astropy_displacements["x"],
+        clip=False,
+        order=2,
+        mode="reflect",
     )
     test_mc2 = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"], clip=False)
     assert np.all(test_mc1[1].data[:, -1] != test_mc2[1].data[:, -1])
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_submap(aia171_test_map):
     return aia171_test_map.submap(SkyCoord(((0, 0), (400, 500)) * u.arcsec, frame=aia171_test_map.coordinate_frame))
 
 
-@pytest.fixture
+@pytest.fixture()
 def aia171_test_mapsequence(aia171_test_submap):
     m2header = deepcopy(aia171_test_submap.meta)
     m2header["date-obs"] = "2011-02-15T01:00:00.34"
@@ -399,20 +406,22 @@ def aia171_test_mapsequence(aia171_test_submap):
     return sunpy.map.Map([aia171_test_submap, m2, m3], sequence=True)
 
 
-@pytest.fixture
+@pytest.fixture()
 def known_displacements_layer_index0():
     # Known displacements for these mapsequence layers when the layer index is set to 0
     return {"x": np.asarray([0.0, -9.827465, -19.676442]), "y": np.asarray([0.0, 0.251137, 0.490014])}
 
 
-@pytest.fixture
+@pytest.fixture()
 def known_displacements_layer_index1():
     # Known displacements for these mapsequence layers when the layer index is set to 1
     return {"x": np.asarray([9.804878, 0.0, -9.827465]), "y": np.asarray([-0.263369, 0.0, 0.251137])}
 
 
 def test_calculate_solar_rotate_shift(
-    aia171_test_mapsequence, known_displacements_layer_index0, known_displacements_layer_index1
+    aia171_test_mapsequence,
+    known_displacements_layer_index0,
+    known_displacements_layer_index1,
 ):
     # Test that the default works
     test_output = calculate_solar_rotate_shift(aia171_test_mapsequence)
@@ -450,7 +459,7 @@ def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap)
     derotated = mapsequence_coalign_by_rotation(aia171_test_mapsequence, clip=True, layer_index=layer_index)
     tshift = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=layer_index)
     derotated_reference_pixel_at_layer_index = derotated[layer_index].reference_pixel
-    for i, m_derotated in enumerate(derotated):
+    for i, _m_derotated in enumerate(derotated):
         for i_s, s in enumerate(["x", "y"]):
             diff_in_rotated_reference_pixel = (
                 derotated[i].reference_pixel[i_s] - derotated_reference_pixel_at_layer_index[i_s]

@@ -2,9 +2,8 @@
 This module contains functions that can be used to enhance the regions above a
 radius.
 """
-import numpy as np
-
 import astropy.units as u
+import numpy as np
 import sunpy.map
 from sunpy.coordinates import frames
 
@@ -95,7 +94,8 @@ def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
         intensity value normalized to its value at the normalization radius.
     """
     return calculate_fit_radial_intensity(radii, polynomial) / calculate_fit_radial_intensity(
-        normalization_radius, polynomial
+        normalization_radius,
+        polynomial,
     )
 
 
@@ -108,7 +108,7 @@ def intensity_enhance(
     degree=1,
     normalization_radius=1 * u.R_sun,
     fit_range=[1, 1.5] * u.R_sun,
-    **summary_kwargs
+    **summary_kwargs,
 ):
     """
     Returns a SunPy Map with the intensity enhanced above a given radius.
@@ -171,7 +171,11 @@ def intensity_enhance(
 
     # Get the radial intensity distribution
     radial_intensity = get_radial_intensity_summary(
-        smap, radial_bin_edges, scale=scale, summary=summary, **summary_kwargs
+        smap,
+        radial_bin_edges,
+        scale=scale,
+        summary=summary,
+        **summary_kwargs,
     )
 
     # Summarize the radial bins
@@ -189,7 +193,9 @@ def intensity_enhance(
     # Fits a polynomial function to the natural logarithm of an estimate of
     # the intensity as a function of radius.
     polynomial = fit_polynomial_to_log_radial_intensity(
-        radial_bin_summary[fit_here], radial_intensity[fit_here], degree
+        radial_bin_summary[fit_here],
+        radial_intensity[fit_here],
+        degree,
     )
 
     # Calculate the enhancement
@@ -271,17 +277,27 @@ def nrgf(
     # To make sure bins are in the map.
     if radial_bin_edges[1, -1] > np.max(map_r):
         radial_bin_edges = equally_spaced_bins(
-            inner_value=radial_bin_edges[0, 0], outer_value=np.max(map_r), nbins=radial_bin_edges.shape[1]
+            inner_value=radial_bin_edges[0, 0],
+            outer_value=np.max(map_r),
+            nbins=radial_bin_edges.shape[1],
         )
 
     # Radial intensity
     radial_intensity = get_radial_intensity_summary(
-        smap, radial_bin_edges, scale=scale, summary=intensity_summary, **intensity_summary_kwargs
+        smap,
+        radial_bin_edges,
+        scale=scale,
+        summary=intensity_summary,
+        **intensity_summary_kwargs,
     )
 
     # An estimate of the width of the intensity distribution in each radial bin.
     radial_intensity_distribution_summary = get_radial_intensity_summary(
-        smap, radial_bin_edges, scale=scale, summary=width_function, **width_function_kwargs
+        smap,
+        radial_bin_edges,
+        scale=scale,
+        summary=width_function,
+        **width_function_kwargs,
     )
 
     # Storage for the filtered data
@@ -445,7 +461,9 @@ def fnrgf(
     # To make sure bins are in the map.
     if radial_bin_edges[1, -1] > np.max(map_r):
         radial_bin_edges = equally_spaced_bins(
-            inner_value=radial_bin_edges[0, 0], outer_value=np.max(map_r), nbins=radial_bin_edges.shape[1]
+            inner_value=radial_bin_edges[0, 0],
+            outer_value=np.max(map_r),
+            nbins=radial_bin_edges.shape[1],
         )
 
     # Get the Helioprojective coordinates of each pixel
@@ -484,16 +502,16 @@ def fnrgf(
                 [
                     [(2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments for j in range(order)]
                     for i in range(number_angular_segments)
-                ]
-            )
+                ],
+            ),
         )
         sin_matrix = np.sin(
             np.array(
                 [
                     [(2 * np.pi * (j + 1) * (i + 0.5)) / number_angular_segments for j in range(order)]
                     for i in range(number_angular_segments)
-                ]
-            )
+                ],
+            ),
         )
 
         # Iterate over each segment in a circular ring

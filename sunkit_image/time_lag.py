@@ -6,9 +6,8 @@ Useful for understanding time variability in EUV light curves.
 """
 from typing import Optional
 
-import numpy as np
-
 import astropy.units as u
+import numpy as np
 
 DASK_INSTALLED = False
 try:

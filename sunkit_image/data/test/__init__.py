@@ -51,7 +51,7 @@ def test_data_filenames():
     excludes = ["*.pyc", "*" + os.path.sep + "__*__", "*.py"]
     excludes = r"|".join([fnmatch.translate(x) for x in excludes]) or r"$."
 
-    for root, dirs, files in os.walk(rootdir):
+    for root, _dirs, files in os.walk(rootdir):
         files = [os.path.join(root, f) for f in files]
         files = [f for f in files if not re.match(excludes, f)]
         files = [file.replace(rootdir + os.path.sep, "") for file in files]

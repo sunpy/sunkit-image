@@ -11,11 +11,9 @@ the ``OCCULT2`` algorithm, which can be found
 The aim of this example is to demonstrate that `~sunkit_image.trace.occult2` provides similar
 results compared to the IDL version.
 """
-# sphinx_gallery_thumbnail_number = 2
 
 import matplotlib.pyplot as plt
 import numpy as np
-
 import sunpy.map
 from astropy import units as u
 from astropy.io import fits

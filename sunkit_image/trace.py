@@ -94,7 +94,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     if (not np.count_nonzero(image2)) is True:
         raise RuntimeError(
             "The filter size is very large compared to the size of the image."
-            + " The entire image zeros out while smoothing the image edges after filtering."
+            + " The entire image zeros out while smoothing the image edges after filtering.",
         )
 
     # NOISE THRESHOLD
@@ -251,6 +251,7 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
 
     if nsm1 >= 3:
         return smooth(image, nsm1, "replace") - smooth(image, nsm2, "replace")
+    return None
 
 
 @accept_array_or_map(arg_name="image")
@@ -539,7 +540,7 @@ def _curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
 
     # See Eqn. 6 in the paper. Getting the values of all the valid radii
     rad_i = rmin / (-1.0 + 2.0 * np.arange(ib1, ib2 + 1, dtype=np.float32) / np.float32(rad_segments - 1)).reshape(
-        (1, -1)
+        (1, -1),
     )
 
     # See Eqn 16.

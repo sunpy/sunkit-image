@@ -2,12 +2,11 @@ import os
 import tempfile
 import importlib.util
 
+import astropy
+import astropy.config.paths
 import numpy as np
 import pytest
 import skimage
-
-import astropy
-import astropy.config.paths
 import sunpy.data.sample
 import sunpy.map
 from astropy.utils.data import get_pkg_data_filename
@@ -105,13 +104,13 @@ def granule_map_he():
     map_norm = (granule_map.data - np.nanmin(granule_map.data)) / (
         np.nanmax(granule_map.data) - np.nanmin(granule_map.data)
     )
-    map_he = skimage.filters.rank.equalize(
-        skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100)
+    return skimage.filters.rank.equalize(
+        skimage.util.img_as_ubyte(map_norm),
+        footprint=skimage.morphology.disk(radius=100),
     )
-    return map_he
 
 
-@pytest.fixture
+@pytest.fixture()
 def granule_minimap1():
     # Array with "intergranule region"
     arr = np.ones((10, 10))
@@ -123,11 +122,10 @@ def granule_minimap1():
         arr,
         ref_coord,
     )
-    map = sunpy.map.GenericMap(arr, header)
-    return map
+    return sunpy.map.GenericMap(arr, header)
 
 
-@pytest.fixture
+@pytest.fixture()
 def granule_minimap2():
     # Modified array with "intergranule region"
     arr = np.ones((10, 10))
@@ -139,11 +137,10 @@ def granule_minimap2():
         arr,
         ref_coord,
     )
-    map = sunpy.map.GenericMap(arr, header)
-    return map
+    return sunpy.map.GenericMap(arr, header)
 
 
-@pytest.fixture
+@pytest.fixture()
 def granule_minimap3():
     # Array with no "intergranule region"
     arr = np.ones((10, 10))
@@ -154,15 +151,15 @@ def granule_minimap3():
         arr,
         ref_coord,
     )
-    map = sunpy.map.GenericMap(arr, header)
-    return map
+    return sunpy.map.GenericMap(arr, header)
 
 
 @pytest.fixture(params=["array", "map"])
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":
         return smap
     elif request.param == "array":
         return smap.data
+    return None

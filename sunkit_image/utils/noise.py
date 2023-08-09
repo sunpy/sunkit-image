@@ -172,12 +172,16 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
         Xh = Xh.reshape(
-            int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xh.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xv = view_as_windows(imgv[:, :, cha], (patchsize - 2, patchsize))
         Xv = Xv.reshape(
-            int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xv.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
@@ -303,12 +307,16 @@ def weak_texture_mask(img, patchsize, thresh):
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
         Xh = Xh.reshape(
-            int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xh.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xv = view_as_windows(imgv[:, :, cha], (patchsize - 2, patchsize))
         Xv = Xv.reshape(
-            int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xv.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
