@@ -50,6 +50,7 @@ class Asda:
           Simulation and Observational Data.
           Astrophys. J., 872, 22, 2019.
           (https://doi.org/10.3847/1538-4357/aabd34)
+
         """
         if vx.shape != vy.shape:
             raise ValueError("Shape of velocity field's vx and vy do not match")

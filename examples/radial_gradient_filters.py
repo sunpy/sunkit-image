@@ -19,6 +19,7 @@ from sunkit_image.utils import equally_spaced_bins
 
 ###########################################################################
 # Sunpy's sample data contain a number of suitable FITS files for this purpose.
+
 aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 # The original image is plotted to showcase the difference.
@@ -31,6 +32,7 @@ aia_map.plot()
 # Here we create those segments radial segments. Each segment created will be of
 # equal dimensions radially. The distance between 1 solar radii and 2 solar radii
 # is divided into 100 equal parts by the following two lines.
+
 radial_bin_edges = equally_spaced_bins()
 radial_bin_edges *= u.R_sun
 
@@ -49,6 +51,7 @@ out1.plot()
 # Order is the number of Fourier coefficients to be used in the approximation.
 # The attenuation coefficient are calculated to be linearly decreasing, you should
 # choose them according to your requirements.
+
 order = 20
 attenuation_coefficients = radial.set_attenuation_coefficients(order)
 
@@ -60,5 +63,4 @@ fig = plt.figure()
 ax = plt.subplot(projection=out2)
 out2.plot()
 
-# All the figures are plotted.
 plt.show()

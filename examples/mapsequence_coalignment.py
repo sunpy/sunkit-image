@@ -25,6 +25,7 @@ from sunkit_image import coalignment
 
 ###############################################################################
 # Create a `~sunpy.map.MapSequence` using sample data.
+
 mc = Map(
     [
         sunpy.data.sample.AIA_193_CUTOUT01_IMAGE,
@@ -39,14 +40,15 @@ mc = Map(
 ###############################################################################
 # Plot an animation of the `~sunpy.map.MapSequence` that we can compare with
 # the coaligned MapSequence.
+
 plt.figure()
 anim = mc.plot()
-plt.show()
 
 ###############################################################################
 # To coalign the `~sunpy.map.MapSequence`, apply the
 # :func:`~sunkit_image.coalignment.mapsequence_coalign_by_match_template`
 # function.
+
 coaligned = coalignment.mapsequence_coalign_by_match_template(mc)
 
 ###############################################################################
@@ -59,15 +61,16 @@ coaligned = coalignment.mapsequence_coalign_by_match_template(mc)
 #
 # Now, let's plot an animation of the coaligned MapSequence to compare with
 # the original.
+
 plt.figure()
 anim_coalign = coaligned.plot()
-plt.show()
 
 ###############################################################################
 # If you just want to calculate the shifts required to compensate for solar
 # rotation relative to the first map in the `~sunpy.map.MapSequence` without
 # applying the shifts, use
 # :func:`~sunkit_image.coalignment.calculate_match_template_shift`:
+
 shifts = coalignment.calculate_match_template_shift(mc)
 
 ###############################################################################
@@ -75,4 +78,10 @@ shifts = coalignment.calculate_match_template_shift(mc)
 # :func:`~sunkit_image.coalignment.mapsequence_coalign_by_match_template`.
 # The shifts calculated here can be passed directly to the coalignment
 # function.
-coaligned = coalignment.mapsequence_coalign_by_match_template(mc, shift=shifts)
+
+coaligned_shifts = coalignment.mapsequence_coalign_by_match_template(mc, shift=shifts)
+
+plt.figure()
+anim_coaligned_shifts = coaligned_shifts.plot()
+
+plt.show()

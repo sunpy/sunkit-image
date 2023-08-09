@@ -24,8 +24,8 @@ def test_noiselevel(img):
     for n in range(noise_levels.size):
         noise = img + np.random.standard_normal(img.shape) * noise_levels[n]
         output = nf.noise_estimation(noise, patchsize=11, iterations=5)
-        n_levels[n] = output["nlevel"]
-        n_patches[n] = output["num"]
+        n_levels[n] = output["nlevel"][0]
+        n_patches[n] = output["num"][0]
 
     assert np.abs(1 - n_levels.all() / noise_levels.all()) < 0.1
     assert all(n_patches > 10000.0)

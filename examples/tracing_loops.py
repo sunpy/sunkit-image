@@ -25,12 +25,11 @@ import sunkit_image.trace as trace
 ###########################################################################
 # We will be using `astropy.io.fits.open` to read the FITS file from the tutorial website
 # and read in the header and data information.
-hdu = fits.open("http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits")[0]
 
+hdu = fits.open("http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits")[0]
 # We can now make this into a `sunpy.map.GenericMap`. There is currently not an instrument specific
 # class for the TRACE instrument.
 trace_map = sunpy.map.Map(hdu.data, hdu.header)
-
 # We can now plot the map, of which we can see coronal loops.
 trace_map.plot()
 
@@ -55,19 +54,14 @@ loops = trace.occult2(trace_map.data, nsm1=3, rmin=30, lmin=25, nstruc=1000, nga
 # to world coordinates to be plotted on the map.
 
 fig = plt.figure()
-
 ax = plt.subplot(projection=trace_map)
-
 trace_map.plot()
-
 # We can now plot each loop in the list of loops. We plot these in world coordinates, converting them
 # through the `pixel_to_world` functionality which converts the pixel coordinates to coordinates (in arcsec)
 # on the `trace_map`.
 for loop in loops:
     loop = np.array(loop)  # convert to array as easier to index `x` and `y` coordinates
-
     coord_loops = trace_map.pixel_to_world(loop[:, 0] * u.pixel, loop[:, 1] * u.pixel)
-
     ax.plot_coord(coord_loops, color="b")
 
 plt.show()
