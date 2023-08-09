@@ -3,4 +3,4 @@ Modifications to the `sunkit_image.granule` module.
 1. Increase in speed for large images achieved by computing the initial thresholding on a random subset of pixels.
 2. Increase accuracy on images with spatially varying background flux levels achieved by applying a local histogram equalization before computing the initial thresholding.
 3. Prevention of errors in finding "dim centers" in images that have all-granule edges achieved by adding a "padding" of zero pixels around the edges.
-5. Correction of the assignment of the values 2 and 3 to brightpoints and dim centers.
+4. Correction of the assignment of the values 2 and 3 to brightpoints and dim centers.

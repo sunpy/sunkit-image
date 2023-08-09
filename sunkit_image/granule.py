@@ -18,12 +18,12 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     """
     Segment an optical image of the solar photosphere into tri-value maps with:
 
-     * 0 as intergranule
-     * 1 as granule
-     * 2 as brightpoint
+    * 0 as intergranule
+    * 1 as granule
+    * 2 as brightpoint
 
     If mark_dim_centers is set to True, an additional label, 3, will be assigned to
-    dim grnanule centers.
+    dim granule centers.
 
     Parameters
     ----------
@@ -236,9 +236,10 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
 
 def segments_overlap_fraction(segment1, segment2):
     """
-    Compute the fraction of overlap between two segmented SunPy Maps.
+    Compute the fraction of overlap between two segmented
+    `~sunpy.map.GenericMap`.
 
-        Designed for comparing output Map from `segment` with other segmentation methods.
+    Designed for comparing output Map from `segment` with other segmentation methods.
 
     Parameters
     ----------
