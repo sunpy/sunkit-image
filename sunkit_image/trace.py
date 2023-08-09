@@ -6,6 +6,8 @@ structures in an image.
 import numpy as np
 from scipy import interpolate
 
+from sunkit_image.utils.decorators import accept_array_or_map
+
 __all__ = [
     "occult2",
     "bandpass_filter",
@@ -13,6 +15,7 @@ __all__ = [
 ]
 
 
+@accept_array_or_map(arg_name="image", output_to_map=False)
 def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     """
     Implements the Oriented Coronal CUrved Loop Tracing (OCCULT-2) algorithm
@@ -20,7 +23,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
     Parameters
     ----------
-    image : `numpy.ndarray`
+    image : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image in which loops are to be detected.
     nsm1 : `int`
         Low pass filter boxcar smoothing constant.
@@ -44,7 +47,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     -------
     `list`
         A list of all loop where each element is itself a list of points containing
-        ``x`` and ``y`` coordinates for each point.
+        ``x`` and ``y`` pixel coordinates for each point.
 
     References
     ----------
@@ -217,13 +220,14 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
 
 # The functions below this are subroutines for the OCCULT 2.
+@accept_array_or_map(arg_name="image")
 def bandpass_filter(image, nsm1=1, nsm2=3):
     """
     Applies a band pass filter to the image.
 
     Parameters
     ----------
-    image : `numpy.ndarray`
+    image : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image to be filtered.
     nsm1 : `int`
         Low pass filter boxcar smoothing constant.
@@ -236,7 +240,8 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
     Returns
     -------
     `numpy.ndarray`
-        Bandpass filtered image.
+        Bandpass filtered image. If a map is input, a map is returned with new data
+        and the same metadata.
     """
     if nsm1 >= nsm2:
         raise ValueError("nsm1 should be less than nsm2")
@@ -248,13 +253,14 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
         return smooth(image, nsm1, "replace") - smooth(image, nsm2, "replace")
 
 
+@accept_array_or_map(arg_name="image")
 def smooth(image, width, nanopt="replace"):
     """
     Python implementation of the IDL's ``smooth``.
 
     Parameters
     ----------
-    image : `numpy.ndarray`
+    image : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image to be filtered.
     width : `int`
         Width of the boxcar window. The `width` should always be odd but if even value is given then
@@ -264,8 +270,9 @@ def smooth(image, width, nanopt="replace"):
 
     Returns
     -------
-    `numpy.ndarray`
-        Smoothed image.
+    `numpy.ndarray`, `sunpy.map.GenericMap`
+        Smoothed image. If a map is input, a map is returned with new data
+        and the same metadata.
 
     References
     ----------

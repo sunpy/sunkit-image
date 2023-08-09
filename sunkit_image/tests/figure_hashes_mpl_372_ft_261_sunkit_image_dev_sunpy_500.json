@@ -1,6 +1,8 @@
 {
-    "sunkit_image.tests.test_enhance.test_mgn": "4ef8a14c6b3290280b6fc9bc0748c8aa170760b2d43a5bbd67bb4d46ffd5408e",
-    "sunkit_image.tests.test_radial.test_fig_nrgf": "52b448fa9d845841066d71a1fc6e7bfc471a658d726af1cf16403ddb858fcfc0",
-    "sunkit_image.tests.test_radial.test_fig_fnrgf": "62621426ff8c3ee03cb1de004f9e08f63c4869dbd8b55d440adc73c74bfc5bcc",
-    "sunkit_image.tests.test_trace.test_occult2_fig": "c5ff1416cb51dc51ad1705174e5b13f8cb02486dc3c58fd79dc1b80534f6caf5"
-  }
+  "sunkit_image.tests.test_enhance.test_mgn[array]": "67b17ac7c343a1d568d9dfa2bb12e0041e2fc53e8ca1c0e1c2c7693eda2bd0d8",
+  "sunkit_image.tests.test_enhance.test_mgn[map]": "4ef8a14c6b3290280b6fc9bc0748c8aa170760b2d43a5bbd67bb4d46ffd5408e",
+  "sunkit_image.tests.test_radial.test_fig_nrgf": "52b448fa9d845841066d71a1fc6e7bfc471a658d726af1cf16403ddb858fcfc0",
+  "sunkit_image.tests.test_radial.test_fig_fnrgf": "62621426ff8c3ee03cb1de004f9e08f63c4869dbd8b55d440adc73c74bfc5bcc",
+  "sunkit_image.tests.test_trace.test_occult2_fig[array]": "c5ff1416cb51dc51ad1705174e5b13f8cb02486dc3c58fd79dc1b80534f6caf5",
+  "sunkit_image.tests.test_trace.test_occult2_fig[map]": "c5ff1416cb51dc51ad1705174e5b13f8cb02486dc3c58fd79dc1b80534f6caf5"
+}

@@ -8,6 +8,7 @@ import skimage
 
 import astropy
 import astropy.config.paths
+import sunpy.data.sample
 import sunpy.map
 from astropy.utils.data import get_pkg_data_filename
 from sunpy.coordinates import Helioprojective, get_earth
@@ -155,3 +156,13 @@ def granule_minimap3():
     )
     map = sunpy.map.GenericMap(arr, header)
     return map
+
+
+@pytest.fixture(params=["array", "map"])
+@pytest.mark.remote_data
+def aia_171(request):
+    smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
+    if request.param == "map":
+        return smap
+    elif request.param == "array":
+        return smap.data
