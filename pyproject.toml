@@ -87,6 +87,7 @@ extend-ignore = [
 [tool.ruff.per-file-ignores]
 "examples/*.py" = [
     "T201", # We need print in our examples
+    "PGH004", # Sometimes we need to use NOQA in examples
 ]
 
 [tool.ruff.pydocstyle]
