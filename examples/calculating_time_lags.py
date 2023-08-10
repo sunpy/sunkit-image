@@ -92,9 +92,10 @@ print("Time lag, B -> A =", time_lag(s_b, s_a, time))
 # As an example, we'll create a fake data cube by repeating Gaussian
 # pulses with varying means and then add some noise to them
 
-means_a = np.tile(np.random.rand(10, 10), (*time.shape, 1, 1)) * u.s
-means_b = np.tile(np.random.rand(10, 10), (*time.shape, 1, 1)) * u.s
-noise = 0.2 * (-0.5 + np.random.rand(*means_a.shape))
+rng = np.random.default_rng()
+means_a = np.tile(rng.standard_normal((10, 10)), (*time.shape, 1, 1)) * u.s
+means_b = np.tile(rng.standard_normal((10, 10)), (*time.shape, 1, 1)) * u.s
+noise = 0.2 * (-0.5 + rng.random(means_a.shape))
 s_a = gaussian_pulse(np.tile(time, means_a.shape[1:] + (1,)).T, means_a, 0.02 * u.s) + noise
 s_b = gaussian_pulse(np.tile(time, means_b.shape[1:] + (1,)).T, means_b, 0.02 * u.s) + noise
 

@@ -112,8 +112,7 @@ def find_pixel_radii(smap, scale=None):
     # Re-scale the output to solar radii
     if scale is None:
         return u.R_sun * (radii / smap.rsun_obs)
-    else:
-        return u.R_sun * (radii / scale)
+    return u.R_sun * (radii / scale)
 
 
 def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.mean, **summary_kwargs):
@@ -187,8 +186,7 @@ def reform2d(array, factor=1):
     if factor > 1:
         congridx = RectBivariateSpline(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1)
         return congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
-    else:
-        return array
+    return array
 
 
 def points_in_poly(poly):

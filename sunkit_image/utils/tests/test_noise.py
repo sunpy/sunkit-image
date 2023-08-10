@@ -20,8 +20,9 @@ def test_noiselevel(img):
     n_levels = np.zeros_like(noise_levels)
     n_patches = np.zeros_like(noise_levels)
 
+    rng = np.random.default_rng()
     for n in range(noise_levels.size):
-        noise = img + np.random.standard_normal(img.shape) * noise_levels[n]
+        noise = img + rng.standard_normal(img.shape) * noise_levels[n]
         output = nf.noise_estimation(noise, patchsize=11, iterations=5)
         n_levels[n] = output["nlevel"][0]
         n_patches[n] = output["num"][0]
@@ -32,7 +33,8 @@ def test_noiselevel(img):
 
 def test_weak_texture_mask(img):
     noise_levels = 5
-    noise = img + np.random.standard_normal(img.shape) * noise_levels
+    rng = np.random.default_rng()
+    noise = img + rng.standard_normal(img.shape) * noise_levels
     output = nf.noise_estimation(noise, patchsize=11, iterations=5)
 
     assert np.sum(output["mask"]) / output["mask"].size < 1.0

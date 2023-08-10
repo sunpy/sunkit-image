@@ -1,16 +1,13 @@
-import os
-import re
-import glob
-import fnmatch
+from pathlib import Path
 
 from astropy.utils.data import get_pkg_data_filename
 
 import sunkit_image
 
-__all__ = ["rootdir", "file_list", "get_test_filepath", "test_data_filenames"]
+__all__ = ["rootdir", "file_list", "get_test_filepath"]
 
-rootdir = os.path.join(os.path.dirname(sunkit_image.__file__), "data")
-file_list = glob.glob(os.path.join(rootdir, "*.[!p]*"))
+rootdir = Path(sunkit_image.__file__).parent / "data" / "test"
+file_list = Path(rootdir).glob("/*.[!p]*")
 
 
 def get_test_filepath(filename, **kwargs):
@@ -34,27 +31,3 @@ def get_test_filepath(filename, **kwargs):
     sets the ``package`` kwarg to be ``sunkit_image.data.test``.
     """
     return get_pkg_data_filename(filename, package="sunkit_image.data.test", **kwargs)
-
-
-def test_data_filenames():
-    """
-    Return a list of all test files in ``data`` directory.
-
-    This ignores any ``py``, ``pyc`` and ``__*__`` files in these directories.
-
-    Return
-    ------
-    get_all_test_filepath : `list`
-        The name of all test files in ``data/test`` directory.
-    """
-    test_data_filenames_list = []
-    excludes = ["*.pyc", "*" + os.path.sep + "__*__", "*.py"]
-    excludes = r"|".join([fnmatch.translate(x) for x in excludes]) or r"$."
-
-    for root, _dirs, files in os.walk(rootdir):
-        files = [os.path.join(root, f) for f in files]
-        files = [f for f in files if not re.match(excludes, f)]
-        files = [file.replace(rootdir + os.path.sep, "") for file in files]
-        test_data_filenames_list.extend(files)
-
-    return test_data_filenames_list

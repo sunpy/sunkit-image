@@ -76,8 +76,9 @@ def test_trim_intergranules(granule_map):
 
 
 def test_trim_intergranules_errors():
+    rng = np.random.default_rng()
     # Check that raises error if passed array is not binary.
-    data = np.random.randint(0, 10, size=(10, 10))
+    data = rng.integers(low=0, high=10, size=(10, 10))
     with pytest.raises(ValueError, match="segmented_image must only have values of 1 and 0."):
         _trim_intergranules(data)
 

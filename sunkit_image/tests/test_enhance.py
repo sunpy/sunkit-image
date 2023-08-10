@@ -50,4 +50,4 @@ def test_multiscale_gaussian(map_test):
 def test_nans_raise_warning(map_test):
     map_test[0, 0] = np.nan
     with pytest.warns(UserWarning, match="One or more entries in the input data are NaN."):
-        _ = enhance.mgn(map_test)
+        enhance.mgn(map_test)

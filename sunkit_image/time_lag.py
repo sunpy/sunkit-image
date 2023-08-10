@@ -158,8 +158,7 @@ def _dask_check(lags, indices):
         lags_lazy = dask.array.from_array(lags.value, chunks=lags.shape)
         lags_unit = lags.unit
         return lags_lazy[indices.flatten()].reshape(indices.shape) * lags_unit
-    else:
-        return lags[indices]
+    return lags[indices]
 
 
 @u.quantity_input

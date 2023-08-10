@@ -298,6 +298,7 @@ def _check_for_nonfinite_entries(layer_image, template_image):
             "Not a Number values. For instance, replacing them with a "
             "local mean.",
             SunpyUserWarning,
+            stacklevel=3,
         )
 
     if not np.all(np.isfinite(template_image)):
@@ -308,6 +309,7 @@ def _check_for_nonfinite_entries(layer_image, template_image):
             "Not a Number values. For instance, replacing them with a "
             "local mean.",
             SunpyUserWarning,
+            stacklevel=3,
         )
 
 

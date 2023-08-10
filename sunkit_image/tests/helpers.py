@@ -5,9 +5,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pytest
 import sunpy
-from sunpy.tests.helpers import skip_windows  # NOQA
+from sunpy.tests.helpers import skip_windows
 
 import sunkit_image
+
+__all__ = ["get_hash_library_name", "figure_test", "skip_windows"]
 
 
 def get_hash_library_name():

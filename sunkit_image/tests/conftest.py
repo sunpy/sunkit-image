@@ -31,7 +31,7 @@ collect_ignore = ["data/sample.py"]
 
 
 @pytest.fixture(scope="session", autouse=True)
-def tmp_config_dir(request):
+def _tmp_config_dir(request):
     """
     Globally set the default config for all tests.
     """
@@ -50,7 +50,7 @@ def tmp_config_dir(request):
 
 
 @pytest.fixture()
-def undo_config_dir_patch():
+def _undo_config_dir_patch():
     """
     Provide a way for certain tests to not have the config dir.
     """
@@ -72,7 +72,7 @@ def tmp_dl_dir(request):
 
 
 @pytest.fixture()
-def undo_download_dir_patch():
+def _undo_download_dir_patch():
     """
     Provide a way for certain tests to not have tmp download dir.
     """
@@ -160,6 +160,6 @@ def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":
         return smap
-    elif request.param == "array":
+    if request.param == "array":
         return smap.data
     return None

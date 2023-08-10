@@ -104,10 +104,12 @@ def _get_threshold(data, method):
         logging.info(
             "Input image is large (> 500**2), so threshold computation will be based on a random 500x500 sample of pixels",
         )
-        data = np.random.choice(
+        rng = np.random.default_rng()
+        # Computing threshold based on random sample works well and saves significant computational time
+        data = rng.choice(
             data.flatten(),
             (500, 500),
-        )  # Computing threshold based on random sample works well and saves significant computatonal time
+        )
     method = method.lower()
     method_funcs = {
         "li": skimage.filters.threshold_li,

@@ -301,7 +301,7 @@ class Lamb_Oseen(Asda):
         self.ratio_vradial = ratio_vradial
         if gamma is None or rcore is None:
             if gamma != rcore:
-                warnings.warn("One of the input parameters is missing, setting both to 'None'")
+                warnings.warn("One of the input parameters is missing, setting both to 'None'", stacklevel=3)
                 gamma, rcore = None, None
             # Radius of the position where v_theta reaches vmax
             self.rmax = rmax
@@ -404,7 +404,7 @@ class Lamb_Oseen(Asda):
         if x is None or y is None:
             # Check if one of the input parameters is None but the other one is not None
             if x != y:
-                warnings.warn("One of the input parameters is missing, setting both to 'None'")
+                warnings.warn("One of the input parameters is missing, setting both to 'None'", stacklevel=3)
                 x, y = None, None
             # Creating mesh grid
             x, y = self.get_grid(x_range=x_range, y_range=y_range)

@@ -30,10 +30,9 @@ def image_remote(request):
         )
         if request.param == "map":
             return sunpy.map.Map((data, header))
-        elif request.param == "array":
+        if request.param == "array":
             return data
-        else:
-            raise ValueError(f"Invalid request parameter {request.param}")
+        raise ValueError(f"Invalid request parameter {request.param}")
 
 
 @pytest.fixture()
@@ -151,7 +150,7 @@ def test_occult2(test_image, image_test):
 
     # This check is used to verify whether the RuntimeError is triggered
     with pytest.raises(RuntimeError) as record:
-        _ = occult2(test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
+        occult2(test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     assert (
         str(record.value)

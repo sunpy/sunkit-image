@@ -49,12 +49,12 @@ def test_equally_spaced_bins():
     assert esb2[0, 999] == 1.999
     assert esb2[1, 999] == 2.000
     # The radii have the correct relative sizes
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The inner value must be strictly less than the outer value."):
         utils.equally_spaced_bins(inner_value=1.0, outer_value=1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The inner value must be strictly less than the outer value."):
         utils.equally_spaced_bins(inner_value=1.5, outer_value=1.0)
     # The number of bins is strictly greater than 0
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The number of bins must be strictly greater than 0."):
         utils.equally_spaced_bins(nbins=0)
 
 
@@ -73,12 +73,12 @@ def test_bin_edge_summary():
     assert right[0] == 1.01
     assert right[99] == 2.0
     # Correct selection of summary type
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Keyword "binfit" must have value "center", "left" or "right"'):
         utils.bin_edge_summary(esb, "should raise the error")
     # The correct shape of bin edges are passed in
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The bin edges must be two-dimensional with shape \\(2, nbins\\)"):
         utils.bin_edge_summary(np.arange(0, 10), "center")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The bin edges must be two-dimensional with shape \\(2, nbins\\)"):
         utils.bin_edge_summary(np.zeros((3, 4)), "center")
 
 
@@ -142,7 +142,8 @@ def test_calculate_gamma():
 
 
 def test_remove_duplicate():
-    test_data = np.random.rand(5, 2)
+    rng = np.random.default_rng()
+    test_data = rng.random(size=(5, 2))
     data_ = np.append(test_data, [test_data[0]], axis=0)
     expected = np.delete(data_, -1, 0)
     with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):

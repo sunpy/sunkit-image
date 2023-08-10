@@ -41,14 +41,11 @@ def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Calla
                 map_in = False
             else:
                 raise ValueError(f"'{arg_name}' argument must be a sunpy map or numpy array (got type {type(map_arg)})")
-
             # Run decorated function
             array_out = f(*sig_bound.args, **sig_bound.kwargs)
-
             if map_in and output_to_map:
                 return Map(array_out, map_arg.meta)
-            else:
-                return array_out
+            return array_out
 
         return inner
 

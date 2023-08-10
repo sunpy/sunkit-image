@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup  # isort:skip
-import os
+from pathlib import Path
 from itertools import chain
 
 from extension_helpers import get_extensions
@@ -28,6 +28,6 @@ extras["all"] = list(chain.from_iterable(ex_extras.values()))
 
 setup(
     extras_require=extras,
-    use_scm_version={"write_to": os.path.join("sunkit_image", "_version.py")},
+    use_scm_version={"write_to": Path("sunkit_image") / "_version.py"},
     ext_modules=get_extensions(),
 )

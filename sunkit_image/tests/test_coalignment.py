@@ -1,6 +1,6 @@
-import os
 import warnings
 from copy import deepcopy
+from pathlib import Path
 
 import astropy.units as u
 import numpy as np
@@ -40,7 +40,7 @@ def aia171_test_clipping():
 @pytest.fixture()
 def aia171_test_map():
     testpath = sunpy.data.test.rootdir
-    return sunpy.map.Map(os.path.join(testpath, "aia_171_level1.fits"))
+    return sunpy.map.Map(Path(testpath) / "aia_171_level1.fits")
 
 
 @pytest.fixture()
@@ -147,11 +147,11 @@ def test_get_correlation_shifts():
 
     # Input array is too big in either direction
     test_array = np.zeros((4, 3))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
         _get_correlation_shifts(test_array)
 
     test_array = np.zeros((3, 4))
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
         _get_correlation_shifts(test_array)
 
 
@@ -251,8 +251,8 @@ def test_calculate_match_template_shift(
     assert_allclose(test_displacements["y"], aia171_mc_arcsec_displacements["y"], rtol=5e-2, atol=0)
 
     # Test setting the template as something other than a ndarray and a
-    # GenericMap.  This should throw a ValueError.
-    with pytest.raises(ValueError):
+    # GenericMap. This should throw a ValueError.
+    with pytest.raises(ValueError, match="Invalid template."):
         calculate_match_template_shift(aia171_test_mc, template="broken")
 
 
@@ -430,8 +430,6 @@ def test_calculate_solar_rotate_shift(
 
     # Test that the rotation relative to a nonzero layer_index works
     test_output = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=1)
-    print(test_output["x"].to("arcsec").value)
-    print(test_output["y"].to("arcsec").value)
     assert_allclose(test_output["x"].to("arcsec").value, known_displacements_layer_index1["x"], rtol=5e-2, atol=1e-5)
     assert_allclose(test_output["y"].to("arcsec").value, known_displacements_layer_index1["y"], rtol=5e-2, atol=1e-5)
 

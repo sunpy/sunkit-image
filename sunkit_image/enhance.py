@@ -91,6 +91,7 @@ def mgn(
             "One or more entries in the input data are NaN. This implementation does not account "
             "for the presence of NaNs in the input data. As such, this may result in undefined "
             "behavior.",
+            stacklevel=3,
         )
 
     if weights is None:

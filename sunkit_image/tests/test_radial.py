@@ -155,8 +155,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
     order = 0
 
-    with pytest.raises(ValueError) as record:
-        _ = rad.fnrgf(
+    with pytest.raises(ValueError, match="Minimum value of order is 1"):
+        rad.fnrgf(
             map_test2,
             radial_bin_edges,
             order,
@@ -164,8 +164,6 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
             application_radius=0.001 * u.R_sun,
             number_angular_segments=4,
         )
-
-    assert str(record.value) == "Minimum value of order is 1"
 
 
 @pytest.fixture()
@@ -217,10 +215,8 @@ def test_set_attenuation_coefficients():
     result3 = rad.set_attenuation_coefficients(order, cutoff=2)
     assert np.allclose(expect3, result3)
 
-    with pytest.raises(ValueError) as record:
-        _ = rad.set_attenuation_coefficients(order, cutoff=5)
-
-    assert str(record.value) == "Cutoff cannot be greater than order + 1."
+    with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
+        rad.set_attenuation_coefficients(order, cutoff=5)
 
 
 def test_fit_polynomial_to_log_radial_intensity():
