@@ -1,3 +1,69 @@
+0.5.0 (2023-08-10)
+==================
+
+Backwards Incompatible Changes
+------------------------------
+
+- The following helper functions in `sunkit_image.colaginment` have been removed, with no replacement.
+  This is because they are designed to be internal helper functions.
+  If you need to use them in your own code create a copy of the functions from the ``sunkit-image`` source code.
+
+  - ``parabolic_turning_point``
+  - ``calculate_clipping``
+  - ``check_for_nonfinite_entries``
+  - ``get_correlation_shifts``
+  - ``clip_edges``
+  - ``find_best_match_location``
+  - ``calculate_shift`` (`#100 <https://github.com/sunpy/sunkit-image/pull/100>`__)
+
+- Made the following functions in `sunkit_image.trace` private:
+
+  1. ``curvature_radius`` (renamed to ``_curvature_radius``)
+  2. ``erase_loop_in_image`` (renamed to ``_erase_loop_in_image``)
+  3. ``initial_direction_finding`` (renamed to ``_initial_direction_finding``)
+  4. ``loop_add`` (renamed to ``_loop_add``)
+
+  These were never intended to be used by users but for the user-facing functions. (`#136 <https://github.com/sunpy/sunkit-image/pull/136>`__)
+
+- Dropped support for Python 3.8 by increasing minimum required Python version to 3.9.
+  Dropped support for sunpy 4.0 and 4.1 by increasing minimum required sunpy version to 5.0.
+  Dropped support for scikit-image 0.18 by increasing minimum required scikit-image version to 0.19. (`#155 <https://github.com/sunpy/sunkit-image/pull/155>`__)
+
+
+Features
+--------
+
+- Add two examples demonstrating the usage of :func:`~sunkit_image.coalignment.mapsequence_coalign_by_match_template` and :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation`. (`#90 <https://github.com/sunpy/sunkit-image/pull/90>`__)
+- Added the `sunkit_image.granule` module which provides functions to segment granulation in images of the solar photosphere.
+  The key functionality is contained in the `~sunkit_image.granule.segment` function, which
+  segments an image into intergranule, granule, faculae, and, optionally, dim granule. (`#114 <https://github.com/sunpy/sunkit-image/pull/114>`__)
+- ``mypy`` type checking has been enabled on the repository.
+  Types have not yet been extensively added, but running ``mypy`` does not raise any errors. (`#133 <https://github.com/sunpy/sunkit-image/pull/133>`__)
+- Several functions have been updated to accept either numpy array or sunpy map inputs.
+  The following functions now accept either a numpy array or sunpy map, and return the same data type:
+
+  - `sunkit_image.enhance.mgn`
+  - `sunkit_image.trace.bandpass_filter`
+  - `sunkit_image.trace.smooth`
+
+  The following functions now accept either a numpy array or sunpy map, and their return type is unchanged:
+
+  - `sunkit_image.trace.occult2` (`#135 <https://github.com/sunpy/sunkit-image/pull/135>`__)
+- Modifications to the `sunkit_image.granule` module.
+
+  1. Increase in speed for large images achieved by computing the initial thresholding on a random subset of pixels.
+  2. Increase accuracy on images with spatially varying background flux levels achieved by applying a local histogram equalization before computing the initial thresholding.
+  3. Prevention of errors in finding "dim centers" in images that have all-granule edges achieved by adding a "padding" of zero pixels around the edges.
+  4. Correction of the assignment of the values 2 and 3 to brightpoints and dim centers. (`#154 <https://github.com/sunpy/sunkit-image/pull/154>`__)
+
+
+Improved Documentation
+----------------------
+
+- Added two notes to `sunkit_image.enhance.mgn` detailing prerequisites for using this function. (`#126 <https://github.com/sunpy/sunkit-image/pull/126>`__)
+- Added a tutorial (:ref:`sphx_glr_generated_gallery_rgb_composite.py`) demonstrating how to create an RGB image with three different maps. (`#128 <https://github.com/sunpy/sunkit-image/pull/128>`__)
+
+
 0.4.2 (2022-05-24)
 ==================
 

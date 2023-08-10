@@ -1,3 +1,0 @@
-Dropped support for Python 3.8 by increasing minimum required Python version to 3.9.
-Dropped support for sunpy 4.0 and 4.1 by increasing minimum required sunpy version to 5.0.
-Dropped support for scikit-image 0.18 by increasing minimum required scikit-image version to 0.19.

@@ -1,2 +1,0 @@
-``mypy`` type checking has been enabled on the repository.
-Types have not yet been extensively added, but running ``mypy`` does not raise any errors.
