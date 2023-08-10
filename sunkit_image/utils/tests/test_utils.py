@@ -1,9 +1,8 @@
 import warnings
 
+import astropy.units as u
 import numpy as np
 import pytest
-
-import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 import sunkit_image.utils as utils
@@ -11,8 +10,8 @@ from sunkit_image import asda
 from sunkit_image.data.test import get_test_filepath
 
 
-@pytest.fixture
-@pytest.mark.remote_data
+@pytest.fixture()
+@pytest.mark.remote_data()
 def smap():
     import sunpy.data.sample
     from sunpy.data.sample import AIA_171_IMAGE
@@ -50,12 +49,12 @@ def test_equally_spaced_bins():
     assert esb2[0, 999] == 1.999
     assert esb2[1, 999] == 2.000
     # The radii have the correct relative sizes
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The inner value must be strictly less than the outer value."):
         utils.equally_spaced_bins(inner_value=1.0, outer_value=1.0)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The inner value must be strictly less than the outer value."):
         utils.equally_spaced_bins(inner_value=1.5, outer_value=1.0)
     # The number of bins is strictly greater than 0
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The number of bins must be strictly greater than 0."):
         utils.equally_spaced_bins(nbins=0)
 
 
@@ -74,16 +73,16 @@ def test_bin_edge_summary():
     assert right[0] == 1.01
     assert right[99] == 2.0
     # Correct selection of summary type
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Keyword "binfit" must have value "center", "left" or "right"'):
         utils.bin_edge_summary(esb, "should raise the error")
     # The correct shape of bin edges are passed in
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The bin edges must be two-dimensional with shape \\(2, nbins\\)"):
         utils.bin_edge_summary(np.arange(0, 10), "center")
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="The bin edges must be two-dimensional with shape \\(2, nbins\\)"):
         utils.bin_edge_summary(np.zeros((3, 4)), "center")
 
 
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_find_pixel_radii(smap):
     # The known maximum radius
     known_maximum_pixel_radius = 1.84183121
@@ -101,7 +100,7 @@ def test_find_pixel_radii(smap):
     assert_quantity_allclose(np.max(pixel_radii).value, known_maximum_pixel_radius / 2)
 
 
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_get_radial_intensity_summary(smap):
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins(inner_value=1, outer_value=1.5)) * u.R_sun
     summary = np.mean
@@ -143,7 +142,8 @@ def test_calculate_gamma():
 
 
 def test_remove_duplicate():
-    test_data = np.random.rand(5, 2)
+    rng = np.random.default_rng()
+    test_data = rng.random(size=(5, 2))
     data_ = np.append(test_data, [test_data[0]], axis=0)
     expected = np.delete(data_, -1, 0)
     with pytest.raises(ValueError, match="Polygon must be defined as a n x 2 array!"):
@@ -173,6 +173,6 @@ def test_reform_2d():
             [2.0, 2.5, 3.0, 3.0],
             [3.0, 3.5, 4.0, 4.0],
             [3.0, 3.5, 4.0, 4.0],
-        ]
+        ],
     )
     assert np.allclose(utils.reform2d(test_data, 2), expected)

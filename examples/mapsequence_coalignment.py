@@ -17,7 +17,6 @@ of the image processing library
 `scikit-image <https://scikit-image.org/docs/stable/install.html>`__.
 """
 import matplotlib.pyplot as plt
-
 import sunpy.data.sample
 from sunpy.map import Map
 

@@ -6,12 +6,11 @@ corrections due to solar rotation.
 import warnings
 from copy import deepcopy
 
+import astropy.units as u
 import numpy as np
+import sunpy.map
 from scipy.ndimage import shift
 from skimage.feature import match_template
-
-import astropy.units as u
-import sunpy.map
 from sunpy.map.mapbase import GenericMap
 from sunpy.physics.differential_rotation import solar_rotate_coordinate
 from sunpy.util.exceptions import SunpyUserWarning
@@ -299,6 +298,7 @@ def _check_for_nonfinite_entries(layer_image, template_image):
             "Not a Number values. For instance, replacing them with a "
             "local mean.",
             SunpyUserWarning,
+            stacklevel=3,
         )
 
     if not np.all(np.isfinite(template_image)):
@@ -309,6 +309,7 @@ def _check_for_nonfinite_entries(layer_image, template_image):
             "Not a Number values. For instance, replacing them with a "
             "local mean.",
             SunpyUserWarning,
+            stacklevel=3,
         )
 
 
@@ -460,7 +461,13 @@ def calculate_match_template_shift(mc, template=None, layer_index=0, func=_defau
 
 
 def mapsequence_coalign_by_match_template(
-    mc, template=None, layer_index=0, func=_default_fmap_function, clip=True, shift=None, **kwargs
+    mc,
+    template=None,
+    layer_index=0,
+    func=_default_fmap_function,
+    clip=True,
+    shift=None,
+    **kwargs,
 ):
     """
     Co-register the layers in a `~sunpy.map.MapSequence` according to a

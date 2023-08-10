@@ -6,11 +6,9 @@ Radial Gradient Filters
 This example applies both the normalizing radial gradient (`sunkit_image.radial.nrgf`) filter and Fourier
 normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
 """
-# sphinx_gallery_thumbnail_number = 3
-
-import matplotlib.pyplot as plt
 
 import astropy.units as u
+import matplotlib.pyplot as plt
 import sunpy.data.sample
 import sunpy.map
 

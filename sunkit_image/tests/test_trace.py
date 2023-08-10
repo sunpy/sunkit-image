@@ -3,7 +3,6 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-
 import sunpy.map
 from astropy.io import fits
 
@@ -21,28 +20,27 @@ from sunkit_image.trace import (
 
 
 @pytest.fixture(params=["array", "map"])
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def image_remote(request):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=fits.verify.VerifyWarning)
         data, header = fits.getdata(
-            "http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits", header=True
+            "http://data.sunpy.org/sunkit-image/trace_1998-05-19T22:21:43.000_171_1024.fits",
+            header=True,
         )
         if request.param == "map":
             return sunpy.map.Map((data, header))
-        elif request.param == "array":
+        if request.param == "array":
             return data
-        else:
-            raise ValueError(f"Invalid request parameter {request.param}")
+        raise ValueError(f"Invalid request parameter {request.param}")
 
 
-@pytest.fixture
+@pytest.fixture()
 def filepath_IDL():
-    filepath = data.get_test_filepath("IDL.txt")
-    return filepath
+    return data.get_test_filepath("IDL.txt")
 
 
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_occult2_remote(image_remote, filepath_IDL):
     # Testing on the same input files as in the IDL tutorial
     loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
@@ -91,7 +89,7 @@ def test_occult2_remote(image_remote, filepath_IDL):
 
 
 @figure_test
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_occult2_fig(image_remote):
     # A figure test for occult2, the plot is same as the one in the IDL tutorial
     loops = occult2(image_remote, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
@@ -107,7 +105,7 @@ def test_occult2_fig(image_remote):
         plt.plot(x, y, "b")
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_image():
     # An image containing a loop in a straight line
     ima = np.zeros((3, 3), dtype=np.float32)
@@ -117,7 +115,7 @@ def test_image():
     return ima
 
 
-@pytest.fixture
+@pytest.fixture()
 def image_test():
     # An image containing a loop in a straight line
     ima = np.zeros((15, 15), dtype=np.float32)
@@ -152,7 +150,7 @@ def test_occult2(test_image, image_test):
 
     # This check is used to verify whether the RuntimeError is triggered
     with pytest.raises(RuntimeError) as record:
-        _ = occult2(test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
+        occult2(test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
     assert (
         str(record.value)
@@ -161,14 +159,14 @@ def test_occult2(test_image, image_test):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_map():
     map_test = [[1.0, 1.0, 1.0, 1.0], [1.0, 5.0, 5.0, 1.0], [1.0, 5.0, 5.0, 1.0], [1.0, 1.0, 1.0, 1.0]]
 
     return np.array(map_test)
 
 
-@pytest.fixture
+@pytest.fixture()
 def test_map_ones():
     return np.ones((4, 4), dtype=np.float32)
 
@@ -187,14 +185,14 @@ def test_bandpass_filter(test_map):
             [0.0, 2.22222222, 2.22222222, 0.0],
             [0.0, 2.22222222, 2.22222222, 0.0],
             [0.0, 0.0, 0.0, 0.0],
-        ]
+        ],
     )
 
     result = bandpass_filter(test_map)
     assert np.allclose(expect, result)
 
 
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_bandpass_filter_output(aia_171):
     # Check that bandpass filter works with both arrays and maps
     result = bandpass_filter(aia_171)
@@ -225,13 +223,13 @@ def test_smooth(test_map):
             [1.0, 2.77777777, 2.77777777, 1.0],
             [1.0, 2.77777777, 2.77777777, 1.0],
             [1.0, 1.0, 1.0, 1.0],
-        ]
+        ],
     )
 
     assert np.allclose(filtered, expect)
 
 
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_smooth_output(aia_171):
     # Check that smooth works with both arrays and maps
     result = smooth(aia_171, 1)
@@ -303,7 +301,7 @@ def test_curvature_radius(test_image):
     assert np.allclose(zl[2], 0)
 
 
-@pytest.fixture
+@pytest.fixture()
 def parameters_add_loop():
     # Here we are creating dummy coordinates and flux for a loop
     xloop = np.ones(8, dtype=np.float32) * 7

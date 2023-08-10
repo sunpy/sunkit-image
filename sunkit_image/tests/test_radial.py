@@ -1,7 +1,6 @@
+import astropy.units as u
 import numpy as np
 import pytest
-
-import astropy.units as u
 import sunpy
 import sunpy.data.sample
 import sunpy.map
@@ -11,7 +10,7 @@ import sunkit_image.utils as utils
 from sunkit_image.tests.helpers import figure_test, skip_windows
 
 
-@pytest.fixture
+@pytest.fixture()
 def map_test1():
     x = np.linspace(-2, 2, 5)
     grid = np.meshgrid(x, x.T)
@@ -20,11 +19,10 @@ def map_test1():
     test_data1 = 28 - test_data1
     test_data1 = np.round(test_data1)
     header = {"cunit1": "arcsec", "cunit2": "arcsec", "CTYPE1": "HPLN-TAN", "CTYPE2": "HPLT-TAN"}
-    test_map1 = sunpy.map.Map((test_data1, header))
-    return test_map1
+    return sunpy.map.Map((test_data1, header))
 
 
-@pytest.fixture
+@pytest.fixture()
 def map_test2():
     x = np.linspace(-2, 2, 5)
     grid = np.meshgrid(x, x.T)
@@ -35,15 +33,13 @@ def map_test2():
     header = {"cunit1": "arcsec", "cunit2": "arcsec", "CTYPE1": "HPLN-TAN", "CTYPE2": "HPLT-TAN"}
     test_data2 = np.where(test_data1[:, 0:2] == 6, 8, test_data1[:, 0:2])
     test_data2 = np.concatenate((test_data2, test_data1[:, 2:]), axis=1)
-    test_map2 = sunpy.map.Map((test_data2, header))
-    return test_map2
+    return sunpy.map.Map((test_data2, header))
 
 
-@pytest.fixture
+@pytest.fixture()
 def radial_bin_edges():
     radial_bins = utils.equally_spaced_bins(inner_value=0.001, outer_value=0.003, nbins=5)
-    radial_bins = radial_bins * u.R_sun
-    return radial_bins
+    return radial_bins * u.R_sun
 
 
 def test_nrgf(map_test1, map_test2, radial_bin_edges):
@@ -159,8 +155,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
     order = 0
 
-    with pytest.raises(ValueError) as record:
-        _ = rad.fnrgf(
+    with pytest.raises(ValueError, match="Minimum value of order is 1"):
+        rad.fnrgf(
             map_test2,
             radial_bin_edges,
             order,
@@ -169,17 +165,15 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
             number_angular_segments=4,
         )
 
-    assert str(record.value) == "Minimum value of order is 1"
 
-
-@pytest.fixture
-@pytest.mark.remote_data
+@pytest.fixture()
+@pytest.mark.remote_data()
 def smap():
     return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 
 @figure_test
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_fig_nrgf(smap):
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
@@ -189,7 +183,7 @@ def test_fig_nrgf(smap):
 
 
 @figure_test
-@pytest.mark.remote_data
+@pytest.mark.remote_data()
 def test_fig_fnrgf(smap):
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
@@ -221,10 +215,8 @@ def test_set_attenuation_coefficients():
     result3 = rad.set_attenuation_coefficients(order, cutoff=2)
     assert np.allclose(expect3, result3)
 
-    with pytest.raises(ValueError) as record:
-        _ = rad.set_attenuation_coefficients(order, cutoff=5)
-
-    assert str(record.value) == "Cutoff cannot be greater than order + 1."
+    with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
+        rad.set_attenuation_coefficients(order, cutoff=5)
 
 
 def test_fit_polynomial_to_log_radial_intensity():
@@ -249,7 +241,8 @@ def test_normalize_fit_radial_intensity():
     radii = (0.001, 0.002) * u.R_sun
     normalization_radii = (0.003, 0.004) * u.R_sun
     expected = rad.calculate_fit_radial_intensity(radii, polynomial) / rad.calculate_fit_radial_intensity(
-        normalization_radii, polynomial
+        normalization_radii,
+        polynomial,
     )
 
     assert np.allclose(rad.normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)
@@ -276,7 +269,9 @@ def test_intensity_enhance(map_test1):
     )
 
     polynomial = rad.fit_polynomial_to_log_radial_intensity(
-        radial_bin_summary[fit_here], radial_intensity[fit_here], degree
+        radial_bin_summary[fit_here],
+        radial_intensity[fit_here],
+        degree,
     )
 
     enhancement = 1 / rad.normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)

@@ -9,10 +9,9 @@ algorithm used in this example, see this
 `Astropy tutorial <https://docs.astropy.org/en/stable/visualization/rgb.html>`__.
 """
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
-
 import sunpy.data.sample
 from astropy.visualization import make_lupton_rgb
+from matplotlib.lines import Line2D
 from sunpy.map import Map
 
 from sunkit_image.enhance import mgn

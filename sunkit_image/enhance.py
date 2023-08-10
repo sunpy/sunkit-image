@@ -90,7 +90,8 @@ def mgn(
         warnings.warn(
             "One or more entries in the input data are NaN. This implementation does not account "
             "for the presence of NaNs in the input data. As such, this may result in undefined "
-            "behavior."
+            "behavior.",
+            stacklevel=3,
         )
 
     if weights is None:
@@ -111,7 +112,7 @@ def mgn(
 
         # 4. Calculate difference between image and the local mean image,
         # square the difference, and convolve with kernel. Square-root the
-        # resulting image to give ‘local standard deviation’ image sigmaw
+        # resulting image to give `local standard deviation` image sigmaw
         # Refer to equation (2) in the paper
         conv = data - conv
         ndimage.filters.gaussian_filter(conv**2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw)

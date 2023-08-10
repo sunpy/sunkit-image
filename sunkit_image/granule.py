@@ -7,7 +7,6 @@ import matplotlib
 import numpy as np
 import scipy
 import skimage
-
 import sunpy
 import sunpy.map
 
@@ -56,7 +55,8 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     # min-max normalization to [0, 1]
     map_norm = (smap.data - np.nanmin(smap.data)) / (np.nanmax(smap.data) - np.nanmin(smap.data))
     map_he = skimage.filters.rank.equalize(
-        skimage.util.img_as_ubyte(map_norm), footprint=skimage.morphology.disk(radius=100)
+        skimage.util.img_as_ubyte(map_norm),
+        footprint=skimage.morphology.disk(radius=100),
     )
     # Apply initial skimage threshold.
     median_filtered = scipy.ndimage.median_filter(map_he, size=3)
@@ -66,7 +66,11 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     seg_im_fixed = _trim_intergranules(segmented_image, mark=mark_dim_centers)
     # Mark brightpoint and get final granule and brightpoint count.
     seg_im_markbp, brightpoint_count, granule_count = _mark_brightpoint(
-        seg_im_fixed, smap.data, map_he, resolution, bp_min_flux
+        seg_im_fixed,
+        smap.data,
+        map_he,
+        resolution,
+        bp_min_flux,
     )
     logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
     # Create output map using input wcs and adding colormap such that 0 (intergranules) = black, 1 (granule) = white, 2 (brightpoints) = yellow, 3 (dim_centers) = blue.
@@ -98,11 +102,14 @@ def _get_threshold(data, method):
         raise ValueError("Input data must be an instance of a np.ndarray")
     if len(data.flatten()) > 500**2:
         logging.info(
-            "Input image is large (> 500**2), so threshold computation will be based on a random 500x500 sample of pixels"
+            "Input image is large (> 500**2), so threshold computation will be based on a random 500x500 sample of pixels",
         )
-        data = np.random.choice(
-            data.flatten(), (500, 500)
-        )  # Computing threshold based on random sample works well and saves significant computatonal time
+        rng = np.random.default_rng()
+        # Computing threshold based on random sample works well and saves significant computational time
+        data = rng.choice(
+            data.flatten(),
+            (500, 500),
+        )
     method = method.lower()
     method_funcs = {
         "li": skimage.filters.threshold_li,
@@ -115,8 +122,7 @@ def _get_threshold(data, method):
     }
     if method not in method_funcs:
         raise ValueError("Method must be one of: " + ", ".join(list(method_funcs.keys())))
-    threshold = method_funcs[method](data)
-    return threshold
+    return method_funcs[method](data)
 
 
 def _trim_intergranules(segmented_image, mark=False):
@@ -154,7 +160,7 @@ def _trim_intergranules(segmented_image, mark=False):
     # Find value of the large continuous 0-valued region.
     size = 0
     for value in values:
-        if len((labeled_seg[labeled_seg == value])) > size and sum(segmented_image[labeled_seg == value] == 0):
+        if len(labeled_seg[labeled_seg == value]) > size and sum(segmented_image[labeled_seg == value] == 0):
             real_IG_value = value
             size = len(labeled_seg[labeled_seg == value])
     # Set all other 0 regions to mark value (3).
@@ -268,5 +274,4 @@ def segments_overlap_fraction(segment1, segment2):
     intergranule_agreement_count = ((segment1 == 0) * (segment2 == 0)).sum()
     percentage_agreement_granules = granule_agreement_count / total_granules
     percentage_agreement_intergranules = intergranule_agreement_count / total_intergranules
-    confidence = np.mean([percentage_agreement_granules, percentage_agreement_intergranules])
-    return confidence
+    return np.mean([percentage_agreement_granules, percentage_agreement_intergranules])

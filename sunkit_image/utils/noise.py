@@ -43,8 +43,8 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
     Examples
     --------
     >>> import numpy as np
-    >>> np.random.seed(0)
-    >>> noisy_image_array = np.random.randn(100, 100)
+    >>> rng = np.random.default_rng(0)
+    >>> noisy_image_array = rng.standard_normal((100, 100))
     >>> estimate = noise_estimation(noisy_image_array, patchsize=11, iterations=10)
     >>> estimate['mask'] # Prints mask
     array([[1., 1., 1., ..., 1., 1., 0.],
@@ -55,9 +55,9 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
         [1., 1., 1., ..., 1., 1., 0.],
         [0., 0., 0., ..., 0., 0., 0.]])
     >>> estimate['nlevel'] # Prints nlevel
-    array([1.0014616])
+    array([0.97398633])
     >>> estimate['thresh'] # Prints thresh
-    array([173.61530607])
+    array([164.21965135])
     >>> estimate['num'] # Prints num
      array([8100.])
 
@@ -75,31 +75,31 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
     """
     try:
         img = np.array(img)
-    except:
-        raise TypeError("Input image should be a NumPy ndarray")
+    except ValueError as e:
+        raise TypeError("Input image should be a numpy ndarray, or ndarray-compatible") from e
 
     try:
         patchsize = int(patchsize)
-    except ValueError:
-        raise TypeError("patchsize must be an integer, or int-compatible, variable")
+    except ValueError as e:
+        raise TypeError("patchsize must be an integer, or int-compatible") from e
 
     try:
         decim = int(decim)
-    except ValueError:
-        raise TypeError("decim must be an integer, or int-compatible, variable")
+    except ValueError as e:
+        raise TypeError("decim must be an integer, or int-compatible") from e
 
     try:
         confidence = float(confidence)
-    except ValueError:
-        raise TypeError("confidence must be a float, or float-compatible, value between 0 and 1")
+    except ValueError as e:
+        raise TypeError("confidence must be a float, or float-compatible, value between 0 and 1") from e
 
     if not (confidence >= 0 and confidence <= 1):
         raise ValueError("confidence must be defined in the interval 0 <= confidence <= 1")
 
     try:
         iterations = int(iterations)
-    except ValueError:
-        raise TypeError("iterations must be an integer, or int-compatible, variable")
+    except ValueError as e:
+        raise TypeError("iterations must be an integer, or int-compatible.") from e
 
     output = {}
     nlevel, thresh, num = noiselevel(img, patchsize, decim, confidence, iterations)
@@ -172,12 +172,16 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
         Xh = Xh.reshape(
-            int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xh.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xv = view_as_windows(imgv[:, :, cha], (patchsize - 2, patchsize))
         Xv = Xv.reshape(
-            int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xv.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)
@@ -303,12 +307,16 @@ def weak_texture_mask(img, patchsize, thresh):
 
         Xh = view_as_windows(imgh[:, :, cha], (patchsize, patchsize - 2))
         Xh = Xh.reshape(
-            int(Xh.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xh.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xv = view_as_windows(imgv[:, :, cha], (patchsize - 2, patchsize))
         Xv = Xv.reshape(
-            int(Xv.size / ((patchsize - 2) * patchsize)), ((patchsize - 2) * patchsize), order="F"
+            int(Xv.size / ((patchsize - 2) * patchsize)),
+            ((patchsize - 2) * patchsize),
+            order="F",
         ).transpose()
 
         Xtr = np.expand_dims(np.sum(np.concatenate((Xh, Xv), axis=0), axis=0), 0)

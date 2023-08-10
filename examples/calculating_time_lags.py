@@ -12,14 +12,11 @@ by `Viall and Klimchuk (2012) <https://doi.org/10.1088/0004-637X/753/1/35>`__.
 The specific implementation in this package is described in detail
 in Appendix C of `Barnes et al. (2019) <https://doi.org/10.3847/1538-4357/ab290c>`__.
 """
-# sphinx_gallery_thumbnail_number = 4
-
+import astropy.units as u
 import dask.array
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
-
-import astropy.units as u
 
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
@@ -94,9 +91,10 @@ print("Time lag, B -> A =", time_lag(s_b, s_a, time))
 # As an example, we'll create a fake data cube by repeating Gaussian
 # pulses with varying means and then add some noise to them
 
-means_a = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
-means_b = np.tile(np.random.rand(10, 10), time.shape + (1, 1)) * u.s
-noise = 0.2 * (-0.5 + np.random.rand(*means_a.shape))
+rng = np.random.default_rng()
+means_a = np.tile(rng.standard_normal((10, 10)), (*time.shape, 1, 1)) * u.s
+means_b = np.tile(rng.standard_normal((10, 10)), (*time.shape, 1, 1)) * u.s
+noise = 0.2 * (-0.5 + rng.random(means_a.shape))
 s_a = gaussian_pulse(np.tile(time, means_a.shape[1:] + (1,)).T, means_a, 0.02 * u.s) + noise
 s_b = gaussian_pulse(np.tile(time, means_b.shape[1:] + (1,)).T, means_b, 0.02 * u.s) + noise
 
@@ -142,3 +140,5 @@ print(tl_map)
 # parallelism.
 
 plt.show()
+
+# sphinx_gallery_thumbnail_number = 4 # NOQA

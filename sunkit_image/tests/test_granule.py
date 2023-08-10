@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-
 import sunpy
 from sunpy.map import all_pixel_indices_from_map
 
@@ -77,8 +76,9 @@ def test_trim_intergranules(granule_map):
 
 
 def test_trim_intergranules_errors():
+    rng = np.random.default_rng()
     # Check that raises error if passed array is not binary.
-    data = np.random.randint(0, 10, size=(10, 10))
+    data = rng.integers(low=0, high=10, size=(10, 10))
     with pytest.raises(ValueError, match="segmented_image must only have values of 1 and 0."):
         _trim_intergranules(data)
 
@@ -86,7 +86,11 @@ def test_trim_intergranules_errors():
 def test_mark_brightpoint(granule_map, granule_map_he):
     thresholded = np.uint8(granule_map.data > np.nanmedian(granule_map_he))
     brightpoint_marked, _, _ = _mark_brightpoint(
-        thresholded, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None
+        thresholded,
+        granule_map.data,
+        granule_map_he,
+        resolution=0.016,
+        bp_min_flux=None,
     )
     # Check that the correct dimensions are returned.
     assert thresholded.shape == brightpoint_marked.shape

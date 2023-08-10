@@ -4,11 +4,12 @@ from functools import wraps
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pytest
-
 import sunpy
-from sunpy.tests.helpers import skip_windows  # NOQA
+from sunpy.tests.helpers import skip_windows
 
 import sunkit_image
+
+__all__ = ["get_hash_library_name", "figure_test", "skip_windows"]
 
 
 def get_hash_library_name():
@@ -39,9 +40,11 @@ def figure_test(test_function):
     hash_library_name = get_hash_library_name()
     hash_library_file = Path(__file__).parent / hash_library_name
 
-    @pytest.mark.remote_data
+    @pytest.mark.remote_data()
     @pytest.mark.mpl_image_compare(
-        hash_library=hash_library_file, savefig_kwargs={"metadata": {"Software": None}}, style="default"
+        hash_library=hash_library_file,
+        savefig_kwargs={"metadata": {"Software": None}},
+        style="default",
     )
     @wraps(test_function)
     def test_wrapper(*args, **kwargs):

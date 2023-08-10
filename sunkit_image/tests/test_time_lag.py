@@ -1,16 +1,19 @@
+import astropy.units as u
 import dask.array
 import numpy as np
 import pytest
 
-import astropy.units as u
-
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
 
-@pytest.mark.parametrize("shape_in,shape_out", [((20, 5, 5), (39, 5, 5)), ((100, 10), (199, 10)), ((1000,), (1999,))])
+@pytest.mark.parametrize(
+    ("shape_in", "shape_out"),
+    [((20, 5, 5), (39, 5, 5)), ((100, 10), (199, 10)), ((1000,), (1999,))],
+)
 def test_cross_correlation_array_shapes(shape_in, shape_out):
-    s_a = np.random.rand(*shape_in)
-    s_b = np.random.rand(*shape_in)
+    rng = np.random.default_rng()
+    s_a = rng.random(shape_in)
+    s_b = rng.random(shape_in)
     time = np.linspace(0, 1, shape_in[0]) * u.s
     lags = get_lags(time)
     cc = cross_correlation(s_a, s_b, lags)
@@ -21,8 +24,9 @@ def test_cross_correlation_array_shapes(shape_in, shape_out):
 def test_max_cc_time_lag_array_shapes(shape):
     time = np.linspace(0, 1, 10) * u.s
     shape_in = time.shape + shape
-    s_a = np.random.rand(*shape_in)
-    s_b = np.random.rand(*shape_in)
+    rng = np.random.default_rng()
+    s_a = rng.random(shape_in)
+    s_b = rng.random(shape_in)
     max_cc = max_cross_correlation(s_a, s_b, time)
     tl = time_lag(s_a, s_b, time)
     assert max_cc.shape == shape
@@ -52,8 +56,9 @@ def test_time_lag_calculation(shape):
     ],
 )
 def test_preserve_array_types(shape_in):
-    s_a = np.random.rand(*shape_in)
-    s_b = np.random.rand(*shape_in)
+    rng = np.random.default_rng()
+    s_a = rng.random(shape_in)
+    s_b = rng.random(shape_in)
     time = np.linspace(0, 1, shape_in[0]) * u.s
     # Numpy arrays
     max_cc = max_cross_correlation(s_a, s_b, time)
@@ -78,8 +83,9 @@ def test_preserve_array_types(shape_in):
     ],
 )
 def test_dask_numpy_consistent(shape_in):
-    s_a = np.random.rand(*shape_in)
-    s_b = np.random.rand(*shape_in)
+    rng = np.random.default_rng()
+    s_a = rng.random(shape_in)
+    s_b = rng.random(shape_in)
     time = np.linspace(0, 1, shape_in[0]) * u.s
     max_cc = max_cross_correlation(s_a, s_b, time)
     tl = time_lag(s_a, s_b, time)
@@ -102,8 +108,9 @@ def test_dask_numpy_consistent(shape_in):
 def test_quantity_numpy_consistent(shape_in):
     # Test that Quantities can be used as inputs for the signals and that
     # it gives equivalent results to using bare numpy arrays
-    s_a = np.random.rand(*shape_in) * u.ct / u.s
-    s_b = np.random.rand(*shape_in) * u.ct / u.s
+    rng = np.random.default_rng()
+    s_a = rng.random(shape_in) * u.ct / u.s
+    s_b = rng.random(shape_in) * u.ct / u.s
     time = np.linspace(0, 1, shape_in[0]) * u.s
     for func in [time_lag, max_cross_correlation]:
         result_numpy = func(s_a.value, s_b.value, time)
@@ -112,7 +119,7 @@ def test_quantity_numpy_consistent(shape_in):
 
 
 @pytest.mark.parametrize(
-    "shape_a,shape_b,lags,exception",
+    ("shape_a", "shape_b", "lags", "exception"),
     [
         ((10, 1), (10, 1), np.array([-1, -0.5, 0.1, 1]) * u.s, "Lags must be evenly sampled"),
         ((10, 2, 3), (10, 2, 4), np.linspace(-1, 1, 19) * u.s, "Signals must have same shape."),
@@ -125,17 +132,19 @@ def test_quantity_numpy_consistent(shape_in):
     ],
 )
 def test_exceptions(shape_a, shape_b, lags, exception):
-    s_a = np.random.rand(*shape_a)
-    s_b = np.random.rand(*shape_b)
+    rng = np.random.default_rng()
+    s_a = rng.random(shape_a)
+    s_b = rng.random(shape_b)
     with pytest.raises(ValueError, match=exception):
-        _ = cross_correlation(s_a, s_b, lags)
+        cross_correlation(s_a, s_b, lags)
 
 
 def test_bounds():
     time = np.linspace(0, 1, 10) * u.s
-    shape = time.shape + (5, 5)
-    s_a = np.random.rand(*shape)
-    s_b = np.random.rand(*shape)
+    shape = (*time.shape, 5, 5)
+    rng = np.random.default_rng()
+    s_a = rng.random(shape)
+    s_b = rng.random(shape)
     bounds = (-0.5, 0.5) * u.s
     max_cc = max_cross_correlation(s_a, s_b, time, lag_bounds=bounds)
     tl = time_lag(s_a, s_b, time, lag_bounds=bounds)

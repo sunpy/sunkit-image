@@ -92,7 +92,7 @@ class Asda:
                 [self.vx[i + im, j + jm], self.vy[i + im, j + jm]]
                 for im in np.arange(-self.r, self.r + 1)
                 for jm in np.arange(-self.r, self.r + 1)
-            ]
+            ],
         )
         return np.array([vel, vel - vel.mean(axis=0)])
 
@@ -117,7 +117,8 @@ class Asda:
         self.gamma = np.array([np.zeros_like(self.vx), np.zeros_like(self.vy)]).T
         # pm vectors, see equation (8) in Graftieaux et al. 2001 or Equation (1) in Liu et al. 2019
         pm = np.array(
-            [[i, j] for i in np.arange(-self.r, self.r + 1) for j in np.arange(-self.r, self.r + 1)], dtype=float
+            [[i, j] for i in np.arange(-self.r, self.r + 1) for j in np.arange(-self.r, self.r + 1)],
+            dtype=float,
         )
         # Mode of vector pm
         pnorm = np.linalg.norm(pm, axis=1)
@@ -128,12 +129,12 @@ class Asda:
                 [i, j]
                 for i in np.arange(self.r, self.dshape[0] - self.r)
                 for j in np.arange(self.r, self.dshape[1] - self.r)
-            ]
+            ],
         )
         index = index.T
         vel = self.gen_vel(index[1], index[0])
         for d, (i, j) in enumerate(
-            product(np.arange(self.r, self.dshape[0] - self.r, 1), np.arange(self.r, self.dshape[1] - self.r, 1))
+            product(np.arange(self.r, self.dshape[0] - self.r, 1), np.arange(self.r, self.dshape[1] - self.r, 1)),
         ):
             self.gamma[i, j, 0], self.gamma[i, j, 1] = calculate_gamma(pm, vel[..., d], pnorm, N)
         # Transpose back vx & vy
@@ -300,7 +301,7 @@ class Lamb_Oseen(Asda):
         self.ratio_vradial = ratio_vradial
         if gamma is None or rcore is None:
             if gamma != rcore:
-                warnings.warn("One of the input parameters is missing, setting both to 'None'")
+                warnings.warn("One of the input parameters is missing, setting both to 'None'", stacklevel=3)
                 gamma, rcore = None, None
             # Radius of the position where v_theta reaches vmax
             self.rmax = rmax
@@ -403,7 +404,7 @@ class Lamb_Oseen(Asda):
         if x is None or y is None:
             # Check if one of the input parameters is None but the other one is not None
             if x != y:
-                warnings.warn("One of the input parameters is missing, setting both to 'None'")
+                warnings.warn("One of the input parameters is missing, setting both to 'None'", stacklevel=3)
                 x, y = None, None
             # Creating mesh grid
             x, y = self.get_grid(x_range=x_range, y_range=y_range)
