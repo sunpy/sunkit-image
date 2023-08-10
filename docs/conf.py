@@ -36,7 +36,6 @@ if on_rtd:
     os.environ["LC_ALL"] = "C"
     os.environ["HIDE_PARFIVE_PROGESS"] = "True"
 
-
 project = "sunkit_image"
 author = "The SunPy Community"
 copyright = f"{datetime.datetime.now().year}, {author}"  # NOQA: A001

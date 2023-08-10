@@ -15,8 +15,6 @@ from sunpy.map.mapbase import GenericMap
 from sunpy.physics.differential_rotation import solar_rotate_coordinate
 from sunpy.util.exceptions import SunpyUserWarning
 
-__author__ = "J. Ireland"
-
 __all__ = [
     "match_template_to_layer",
     "apply_shifts",
