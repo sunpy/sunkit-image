@@ -16,6 +16,14 @@ Backwards Incompatible Changes
   - ``find_best_match_location``
   - ``calculate_shift`` (`#100 <https://github.com/sunpy/sunkit-image/pull/100>`__)
 
+- The following helper functions in `sunkit_image.radial` have been removed, with no replacement.
+  This is because they are designed to be internal helper functions.
+  If you need to use them in your own code create a copy of the functions from the ``sunkit-image`` source code.
+
+  - ``fit_polynomial_to_log_radial_intensity``
+  - ``calculate_fit_radial_intensity``
+  - ``normalize_fit_radial_intensity``
+
 - Made the following functions in `sunkit_image.trace` private:
 
   1. ``curvature_radius`` (renamed to ``_curvature_radius``)

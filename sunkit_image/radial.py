@@ -10,17 +10,14 @@ from sunpy.coordinates import frames
 from sunkit_image.utils import bin_edge_summary, equally_spaced_bins, find_pixel_radii, get_radial_intensity_summary
 
 __all__ = [
-    "fit_polynomial_to_log_radial_intensity",
-    "calculate_fit_radial_intensity",
-    "normalize_fit_radial_intensity",
-    "intensity_enhance",
-    "nrgf",
-    "set_attenuation_coefficients",
     "fnrgf",
+    "intensity_enhance",
+    "set_attenuation_coefficients",
+    "nrgf",
 ]
 
 
-def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
+def _fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
     """
     Fits a polynomial of  a given degree to the log of the radial intensity.
 
@@ -43,7 +40,7 @@ def fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
     return np.polyfit(radii.to(u.R_sun).value, np.log(intensity), degree)
 
 
-def calculate_fit_radial_intensity(radii, polynomial):
+def _calculate_fit_radial_intensity(radii, polynomial):
     """
     Calculates the fit value of the radial intensity at the values ``radii``.
 
@@ -68,7 +65,7 @@ def calculate_fit_radial_intensity(radii, polynomial):
     return np.exp(np.poly1d(polynomial)(radii.to(u.R_sun).value))
 
 
-def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
+def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     """
     Normalizes the fitted radial intensity to the value at the normalization
     radius.
@@ -93,7 +90,7 @@ def normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
         An array with the same shape as radii which expresses the fitted
         intensity value normalized to its value at the normalization radius.
     """
-    return calculate_fit_radial_intensity(radii, polynomial) / calculate_fit_radial_intensity(
+    return _calculate_fit_radial_intensity(radii, polynomial) / _calculate_fit_radial_intensity(
         normalization_radius,
         polynomial,
     )
@@ -192,14 +189,14 @@ def intensity_enhance(
 
     # Fits a polynomial function to the natural logarithm of an estimate of
     # the intensity as a function of radius.
-    polynomial = fit_polynomial_to_log_radial_intensity(
+    polynomial = _fit_polynomial_to_log_radial_intensity(
         radial_bin_summary[fit_here],
         radial_intensity[fit_here],
         degree,
     )
 
     # Calculate the enhancement
-    enhancement = 1 / normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
+    enhancement = 1 / _normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
     enhancement[map_r < normalization_radius] = 1
 
     # Return a map with the intensity enhanced above the normalization radius
@@ -374,11 +371,8 @@ def fnrgf(
     order,
     attenuation_coefficients,
     ratio_mix=[15, 1],
-    scale=None,
     intensity_summary=np.nanmean,
-    intensity_summary_kwargs={},
     width_function=np.std,
-    width_function_kwargs={},
     application_radius=1 * u.R_sun,
     number_angular_segments=130,
 ):
@@ -417,20 +411,12 @@ def fnrgf(
         A one dimensional array of shape ``[2, 1]`` with values equal to ``[K1, K2]``.
         The ratio in which the original image and filtered image are mixed.
         Defaults to ``[15, 1]``.
-    scale : `None` or `astropy.units.Quantity`, optional
-        The radius of the Sun expressed in map units. For example, in typical
-        helioprojective Cartesian maps the solar radius is expressed in units
-        of arcseconds. If `None` (the default), then the map scale is used.
     intensity_summary :`function`, optional
         A function that returns a summary statistic of the radial intensity.
         Default is `numpy.nanmean`.
-    intensity_summary_kwargs : `None`, `~dict`
-        Keywords applicable to the summary function.
     width_function : `function`
         A function that returns a summary statistic of the distribution of intensity, at a given radius.
         Defaults to `numpy.std`.
-    width_function_kwargs : `function`
-        Keywords applicable to the width function.
     application_radius : `astropy.units.Quantity`
         The FNRGF is applied to emission at radii above the application_radius.
         Defaults to 1 solar radii.
@@ -558,17 +544,17 @@ def fnrgf(
         phi_matrix = angles[annulus].reshape((1, angles[annulus].shape[0]))
         angles_of_pixel = K_matrix * phi_matrix
 
-        # Get the approxiamted value of mean
+        # Get the approximated value of mean
         mean_approximated = np.matmul(fourier_coefficients_a_k, np.cos(angles_of_pixel))
         mean_approximated += np.matmul(fourier_coefficients_b_k, np.sin(angles_of_pixel))
         mean_approximated += fourier_coefficient_a_0 / 2
 
-        # Get the approxiamted value of standard deviation
+        # Get the approximated value of standard deviation
         std_approximated = np.matmul(fourier_coefficients_c_k, np.cos(angles_of_pixel))
         std_approximated += np.matmul(fourier_coefficients_d_k, np.sin(angles_of_pixel))
         std_approximated += fourier_coefficient_c_0 / 2
 
-        # Normailize the data
+        # Normalize the data
         # Refer equation (7) in the paper
         std_approximated = np.where(std_approximated == 0.00, 1, std_approximated)
         data[annulus] = np.ravel((smap.data[annulus] - mean_approximated) / std_approximated)

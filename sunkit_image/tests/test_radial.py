@@ -225,7 +225,7 @@ def test_fit_polynomial_to_log_radial_intensity():
     degree = 1
     expected = np.polyfit(radii.to(u.R_sun).value, np.log(intensity), degree)
 
-    assert np.allclose(rad.fit_polynomial_to_log_radial_intensity(radii, intensity, degree), expected)
+    assert np.allclose(rad._fit_polynomial_to_log_radial_intensity(radii, intensity, degree), expected)
 
 
 def test_calculate_fit_radial_intensity():
@@ -233,19 +233,19 @@ def test_calculate_fit_radial_intensity():
     radii = (0.001, 0.002) * u.R_sun
     expected = np.exp(np.poly1d(polynomial)(radii.to(u.R_sun).value))
 
-    assert np.allclose(rad.calculate_fit_radial_intensity(radii, polynomial), expected)
+    assert np.allclose(rad._calculate_fit_radial_intensity(radii, polynomial), expected)
 
 
 def test_normalize_fit_radial_intensity():
     polynomial = np.asarray([1, 2, 3])
     radii = (0.001, 0.002) * u.R_sun
     normalization_radii = (0.003, 0.004) * u.R_sun
-    expected = rad.calculate_fit_radial_intensity(radii, polynomial) / rad.calculate_fit_radial_intensity(
+    expected = rad._calculate_fit_radial_intensity(radii, polynomial) / rad._calculate_fit_radial_intensity(
         normalization_radii,
         polynomial,
     )
 
-    assert np.allclose(rad.normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)
+    assert np.allclose(rad._normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)
 
 
 @skip_windows
@@ -268,13 +268,13 @@ def test_intensity_enhance(map_test1):
         radial_bin_summary.to(u.R_sun).value <= fit_range[1].to(u.R_sun).value,
     )
 
-    polynomial = rad.fit_polynomial_to_log_radial_intensity(
+    polynomial = rad._fit_polynomial_to_log_radial_intensity(
         radial_bin_summary[fit_here],
         radial_intensity[fit_here],
         degree,
     )
 
-    enhancement = 1 / rad.normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
+    enhancement = 1 / rad._normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
     enhancement[map_r < normalization_radius] = 1
 
     with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
