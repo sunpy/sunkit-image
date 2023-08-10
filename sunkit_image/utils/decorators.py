@@ -1,5 +1,6 @@
 import inspect
 from typing import Union, Callable
+from functools import wraps
 
 import numpy as np
 from sunpy.map import GenericMap, Map
@@ -31,6 +32,7 @@ def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Calla
         if arg_name not in sig.parameters:
             raise RuntimeError(f"Could not find '{arg_name}' in function signature")
 
+        @wraps(f)
         def inner(*args, **kwargs) -> Union[np.ndarray, GenericMap]:
             sig_bound = sig.bind(*args, **kwargs)
             map_arg = sig_bound.arguments[arg_name]
