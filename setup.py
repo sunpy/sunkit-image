@@ -3,8 +3,6 @@ from setuptools import setup  # isort:skip
 from pathlib import Path
 from itertools import chain
 
-from extension_helpers import get_extensions
-
 try:
     # Recommended for setuptools 61.0.0+
     # (though may disappear in the future)
@@ -29,5 +27,4 @@ extras["all"] = list(chain.from_iterable(ex_extras.values()))
 setup(
     extras_require=extras,
     use_scm_version={"write_to": Path("sunkit_image") / "_version.py"},
-    ext_modules=get_extensions(),
 )
