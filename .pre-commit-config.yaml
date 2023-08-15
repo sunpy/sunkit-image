@@ -10,7 +10,7 @@ repos:
       - id: autoflake
         args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md)$"
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: 'v0.0.284'
     hooks:
       - id: ruff
@@ -45,7 +45,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v1.4.1'
+    rev: 'v1.5.0'
     hooks:
       - id: mypy
         additional_dependencies: ['types-setuptools']
