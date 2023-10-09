@@ -128,7 +128,7 @@ def intensity_enhance(
     Parameters
     ----------
     smap : `sunpy.map.Map`
-        The SunPy map to enchance.
+        The sunpy map to enhance.
     radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is
         the number of bins.
@@ -233,7 +233,7 @@ def nrgf(
     Parameters
     ----------
     smap : `sunpy.map.Map`
-        The SunPy map to enchance.
+        The sunpy map to enhance.
     radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is
         the number of bins.
@@ -387,7 +387,7 @@ def fnrgf(
     radius and in the radial bins into various small angular segments. Then for each of these angular
     segments, the intensity summary and width is calculated. The intensity summary and the width of each
     angular segments are then used to find a Fourier approximation of the intensity summary and width for
-    the entire radial bin, this Fourier approximated value is then used to noramlize the intensity in the
+    the entire radial bin, this Fourier approximated value is then used to normalize the intensity in the
     radial bin.
 
     .. note::
