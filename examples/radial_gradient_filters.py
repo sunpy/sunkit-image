@@ -23,7 +23,7 @@ aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 # The original image is plotted to showcase the difference.
 fig = plt.figure()
 ax = plt.subplot(projection=aia_map)
-aia_map.plot()
+aia_map.plot(clip_interval=(1, 99.99) * u.percent)
 
 ###########################################################################
 # Both the NRGF and FNRGF work on radial segments above their application radius.
