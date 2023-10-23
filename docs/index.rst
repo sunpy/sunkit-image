@@ -49,7 +49,7 @@ Once you have that virtual environment, you will want to fork the repo and then 
     $ cd sunkit-image
     $ pip install -e ".[dev]"
 
-.. _installation guide: https://docs.sunpy.org/en/stable/guide/installation/index.html
+.. _installation guide: https://docs.sunpy.org/en/stable/tutorial/installation.html
 .. _`#sunpy:matrix.org`: https://app.element.io/#/room/#sunpy:openastronomy.org
 .. _issues page: https://github.com/sunpy/sunkit-image/issues
 .. _contributing guide: https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html
