@@ -11,7 +11,7 @@ repos:
         args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md)$"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.1.3'
+    rev: 'v0.1.4'
     hooks:
       - id: ruff
         args: ['--fix']
