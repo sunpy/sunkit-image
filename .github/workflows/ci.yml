@@ -47,6 +47,7 @@ jobs:
     needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
+      default_python: '3.9'
       submodules: false
       pytest: false
       toxdeps: tox-pypi-filter
@@ -102,6 +103,7 @@ jobs:
     needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
     with:
+      python-version: "3.11"
       test_extras: 'dev'
       test_command: 'pytest -p no:warnings --doctest-rst -m "not mpl_image_compare" --pyargs sunkit_image'
       submodules: false
