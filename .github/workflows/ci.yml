@@ -47,6 +47,7 @@ jobs:
     needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
+      default_python: '3.9'
       submodules: false
       pytest: false
       toxdeps: tox-pypi-filter
@@ -69,12 +70,8 @@ jobs:
       envs: |
         - linux: py311-online
 
-  cron:
-    if: |
-      github.event_name == 'workflow_dispatch' || (
-        github.event_name == 'pull_request' &&
-        contains(github.event.pull_request.labels.*.name, 'Run cron CI')
-      )
+  devdeps:
+    needs: [online]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
       submodules: false
@@ -87,8 +84,35 @@ jobs:
           - libhdf5-dev
       envs: |
         - linux: py311-devdeps
-        - linux: py39-conda
-          libraries: ''
+
+  conda:
+    needs: [online]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          installer-url: https://github.com/conda-forge/miniforge/releases/download/4.8.3-2/Miniforge-pypy3-4.8.3-2-Linux-x86_64.sh
+          python-version: 3.11
+          activate-environment: sunkit_image_test
+          environment-file: sunkit-dev-env.yml
+      - name: Install sunkit_image
+        shell: bash -el {0}
+        run: |
+          pip install --no-deps --no-build-isolation .
+      - name: Run tests
+        shell: bash -el {0}
+        run: |
+          conda list
+          cd /tmp
+          pytest -vvv -r a --pyargs sunkit_image --cov-report=xml --cov=sunkit_image --cov-config=$GITHUB_WORKSPACE/setup.cfg $GITHUB_WORKSPACE/docs -n auto
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
 
   publish:
     # Build wheels when pushing to any branch except main
@@ -106,6 +130,7 @@ jobs:
     needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
     with:
+      python-version: "3.11"
       test_extras: 'dev'
       test_command: 'pytest -p no:warnings --doctest-rst -m "not mpl_image_compare" --pyargs sunkit_image'
       submodules: false
