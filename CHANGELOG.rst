@@ -1,3 +1,11 @@
+0.5.1 (2023-11-17)
+==================
+
+Trivial/Internal Changes
+------------------------
+
+- Added the explicitly imported packages to the install requirements. (`#160 <https://github.com/sunpy/sunkit-image/pull/160>`__)
+
 0.5.0 (2023-08-10)
 ==================
 
