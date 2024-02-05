@@ -9,7 +9,7 @@ Astroscrappy is a separate Python package and can be installed separately using 
 """
 import astroscrappy
 import matplotlib.pyplot as plt
-from sunpy.io.file_tools import read_file
+from astropy.io import fits
 from sunpy.map import Map
 from sunpy.net import Fido
 from sunpy.net import attrs as a
@@ -30,7 +30,7 @@ detector = a.Detector("C2")
 result = Fido.search(time_range, instrument)
 
 downloaded_files = Fido.fetch(result[0])
-data, header = read_file(downloaded_files[0])[0]
+data, header = fits.open(downloaded_files[0])[0].data, fits.open(downloaded_files[0])[0].header
 
 # Add the missing meta information to the header
 header["CUNIT1"] = "arcsec"
