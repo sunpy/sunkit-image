@@ -167,7 +167,6 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
 
 
 @pytest.fixture()
-@pytest.mark.remote_data()
 def smap():
     return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
