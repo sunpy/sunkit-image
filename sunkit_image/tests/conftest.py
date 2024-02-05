@@ -155,7 +155,6 @@ def granule_minimap3():
 
 
 @pytest.fixture(params=["array", "map"])
-@pytest.mark.remote_data()
 def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":

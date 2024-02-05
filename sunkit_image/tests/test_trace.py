@@ -20,7 +20,6 @@ from sunkit_image.trace import (
 
 
 @pytest.fixture(params=["array", "map"])
-@pytest.mark.remote_data()
 def image_remote(request):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=fits.verify.VerifyWarning)

@@ -11,7 +11,6 @@ from sunkit_image.data.test import get_test_filepath
 
 
 @pytest.fixture()
-@pytest.mark.remote_data()
 def smap():
     import sunpy.data.sample
     from sunpy.data.sample import AIA_171_IMAGE
