@@ -98,17 +98,12 @@ jobs:
           installer-url: https://github.com/conda-forge/miniforge/releases/download/4.8.3-2/Miniforge-pypy3-4.8.3-2-Linux-x86_64.sh
           python-version: "3.11"
           activate-environment: sunkit_image_test
-          environment-file: sunkit-dev-env.yml
-      - name: Install sunkit_image
-        shell: bash -el {0}
-        run: |
-          pip install --no-deps --no-build-isolation .
+          environment-file: sunkit-test-env.yml
       - name: Run tests
         shell: bash -el {0}
         run: |
           conda list
-          cd /tmp
-          pytest -vvv -r a --pyargs sunkit_image --cov-report=xml --cov=sunkit_image --cov-config=$GITHUB_WORKSPACE/setup.cfg $GITHUB_WORKSPACE/docs -n auto
+          tox -e py311
       - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
