@@ -18,7 +18,6 @@ dependencies:
   - pytest-astropy
   - pytest-mpl
   - tox
-  - tox-conda
 
   # Documentation
   - graphviz
