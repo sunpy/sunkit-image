@@ -287,7 +287,6 @@ def get_grid(x_range, y_range):
         Contains the meshgrids generated.
     """
     xx, yy = np.meshgrid(np.arange(x_range[0], x_range[1]), np.arange(y_range[0], y_range[1]))
-    # dshape = np.shape(xx)
     return xx, yy
 
 
