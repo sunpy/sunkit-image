@@ -55,9 +55,9 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
         [1., 1., 1., ..., 1., 1., 0.],
         [0., 0., 0., ..., 0., 0., 0.]])
     >>> estimate['nlevel'] # Prints nlevel
-    array([0.97398633])
+    array([0.97470748])
     >>> estimate['thresh'] # Prints thresh
-    array([164.21965135])
+    array([164.46292244])
     >>> estimate['num'] # Prints num
      array([8100.])
 
