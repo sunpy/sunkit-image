@@ -30,7 +30,11 @@ def test_asda_artificial():
         )
 
     vx, vy = asda.get_vxvy(
-        gamma=gamma, rcore=rcore, ratio_vradial=ratio, x_range=[-100, 100, 200], y_range=[-100, 100, 200]
+        gamma=gamma,
+        rcore=rcore,
+        ratio_vradial=ratio,
+        x_range=[-100, 100, 200],
+        y_range=[-100, 100, 200],
     )
 
     # perform vortex detection
