@@ -124,7 +124,7 @@ def test_calculate_gamma():
     shape = vx.shape
     r = 3
     index = np.array([[i, j] for i in np.arange(r, shape[0] - r) for j in np.arange(r, shape[1] - r)])
-    vel = asda.gen_vel(vx, vy, index[1], index[0], r)
+    vel = asda.generate_velocity_field(vx, vy, index[1], index[0], r)
     pm = np.array(
         [[i, j] for i in np.arange(-r, r + 1) for j in np.arange(-r, r + 1)],
         dtype=float,

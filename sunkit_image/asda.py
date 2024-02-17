@@ -12,10 +12,10 @@ from skimage import measure
 from sunkit_image.utils import calculate_gamma, points_in_poly, reform2d, remove_duplicate
 
 __all__ = [
-    "gen_vel",
-    "gamma_values",
+    "generate_velocity_field",
+    "calculate_gamma_values",
     "center_edge",
-    "vortex_property",
+    "get_vortex_properties",
     "get_grid",
     "get_vtheta",
     "get_vradial",
@@ -63,7 +63,7 @@ def generate_velocity_field(vx, vy, i, j, r=3):
     return np.array([vel, vel - vel.mean(axis=0)])
 
 
-def calculate_gamma(vx, vy, factor=1, r=3):
+def calculate_gamma_values(vx, vy, factor=1, r=3):
     """
     Calculate ``gamma1`` and ``gamma2`` values of velocity field vx and vy.
 
@@ -118,7 +118,7 @@ def calculate_gamma(vx, vy, factor=1, r=3):
         [[i, j] for i in np.arange(r, dshape[0] - r) for j in np.arange(r, dshape[1] - r)],
     )
     index = index.T
-    vel = gen_vel(vx, vy, index[1], index[0], r)
+    vel = generate_velocity_field(vx, vy, index[1], index[0], r)
     for d, (i, j) in enumerate(
         product(np.arange(r, dshape[0] - r, 1), np.arange(r, dshape[1] - r, 1)),
     ):

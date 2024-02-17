@@ -1,1 +1,9 @@
 The ``Asda`` and ``Lamb_Oseen`` classes have been removed and replaced with functions that replicate the original process.
+
+The following function were renamed:
+- gen_vel -> generate_velocity_field
+- gamma_values -> calculate_gamma_values
+- vortex_property -> get_vortex_properties
+
+Now to use, the properties that were previously stored whithin the class should now be passed through the arguments of the methods in case the method used these arguments.
+Ex: lo.gen_vel(index[1], index[0]) -> asda.generate_velocity_field(vx, vy, index[1], index[0], r)
