@@ -1,2 +1,1 @@
-Asda and Lamb_Oseen classes were both declassed.
-Now instead of initiating the classes the methods that were previously provided within the class can be used directly with the same exact functionality.
+The ``Asda`` and ``Lamb_Oseen`` classes have been removed and replaced with functions that replicate the original process.
