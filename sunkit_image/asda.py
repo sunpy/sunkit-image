@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 
-def gen_vel(vx, vy, i, j, r=3):
+def generate_velocity_field(vx, vy, i, j, r=3):
     """
     Given a point ``[i, j]``, generate a velocity field which contains a region
     with a size of ``(2r+1) x (2r+1)`` centered at ``[i, j]`` from the original
