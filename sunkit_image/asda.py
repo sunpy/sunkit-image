@@ -63,7 +63,7 @@ def gen_vel(vx, vy, i, j, r=3):
     return np.array([vel, vel - vel.mean(axis=0)])
 
 
-def gamma_values(vx, vy, factor=1, r=3):
+def calculate_gamma(vx, vy, factor=1, r=3):
     """
     Calculate ``gamma1`` and ``gamma2`` values of velocity field vx and vy.
 
