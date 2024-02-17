@@ -195,7 +195,7 @@ def center_edge(gamma, rmin=4, gamma_min=0.89, factor=1):
     return edge_prop
 
 
-def vortex_property(vx, vy, edge_prop, image=None):
+def get_vortex_properties(vx, vy, edge_prop, image=None):
     """
     Calculate expanding, rotational speed, equivalent radius and average
     intensity of given swirls.
