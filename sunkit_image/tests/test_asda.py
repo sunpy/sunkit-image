@@ -18,19 +18,19 @@ def test_asda_artificial():
     rcore = rmax / np.sqrt(alpha)
     gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
     with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
-        asda.generate_velocity_field(np.zeros((1,2)),np.zeros((2,1)),0,0)
+        asda.generate_velocity_field(np.zeros((1, 2)), np.zeros((2, 1)), 0, 0)
     with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
-        asda.generate_velocity_field(np.zeros((1,2)),np.zeros((1,2)),0,0,0.8)
+        asda.generate_velocity_field(np.zeros((1, 2)), np.zeros((1, 2)), 0, 0, 0.8)
     with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
-        asda.calculate_gamma_values(np.zeros((1,2)),np.zeros((2,1)),0,0)
+        asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((2, 1)), 0, 0)
     with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
-        asda.calculate_gamma_values(np.zeros((1,2)),np.zeros((1,2)),1,0.8)
+        asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((1, 2)), 1, 0.8)
     with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
-        asda.calculate_gamma_values(np.zeros((1,2)),np.zeros((1,2)),0.8,3)
+        asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((1, 2)), 0.8, 3)
     with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
-        asda.center_edge(gamma=np.zeros((1,2)),factor=0.8)
+        asda.center_edge(gamma=np.zeros((1, 2)), factor=0.8)
     with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
-        asda.get_vortex_properties(np.zeros((1,2)),np.zeros((2,1)),0)
+        asda.get_vortex_properties(np.zeros((1, 2)), np.zeros((2, 1)), 0)
 
     # Generate vx and vy
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
@@ -93,7 +93,7 @@ def test_real_data():
         edge = [[x1, y1], [x2, y2],...], points = [[x1, y1], [x2, y2],...]
         in units of pixel
     """
-    
+
     # file which stores the velocity field data
     vel_file = get_test_filepath("asda_vxvy.npz")
     # file that stores the correct detection result
