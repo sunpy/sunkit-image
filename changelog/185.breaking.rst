@@ -5,5 +5,5 @@ The following function were renamed:
 - gamma_values -> calculate_gamma_values
 - vortex_property -> get_vortex_properties
 
-Now to use, the properties that were previously stored whithin the class should now be passed through the arguments of the methods in case the method used these arguments.
+Now to use, the properties that were previously stored within the class should now be passed through the arguments of the methods in case the method used these arguments.
 Ex: lo.gen_vel(index[1], index[0]) -> asda.generate_velocity_field(vx, vy, index[1], index[0], r)
