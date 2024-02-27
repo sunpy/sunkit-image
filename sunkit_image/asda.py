@@ -27,7 +27,7 @@ def generate_velocity_field(vx, vy, i, j, r=3):
     """
     Given a point ``[i, j]``, generate a velocity field which contains a region
     with a size of ``(2r+1) x (2r+1)`` centered at ``[i, j]`` from the original
-    velocity field ``self.vx`` and ``self.vy``.
+    velocity field ``vx`` and ``vy``.
 
     Parameters
     ----------
@@ -48,7 +48,7 @@ def generate_velocity_field(vx, vy, i, j, r=3):
     `numpy.ndarray`
         The first dimension is a velocity field which contains a
         region with a size of ``(2r+1) x (2r+1)`` centered at ``[i, j]`` from
-        the original velocity field ``self.vx`` and ``self.vy``.
+        the original velocity field ``vx`` and ``vy``.
         the second dimension is similar as the first dimension, but
         with the mean velocity field subtracted from the original
         velocity field.
@@ -215,7 +215,7 @@ def get_vortex_properties(vx, vy, edge_prop, image=None):
         ``radius`` : Equivalent radius of vortices.
         All results are in pixel coordinates.
     image : `numpy.ndarray`
-        Has to have the same shape as ``self.vx`` observational image,
+        Has to have the same shape as ``vx`` observational image,
         which will be used to calculate the average observational values of all swirls.
 
     Returns
@@ -223,8 +223,8 @@ def get_vortex_properties(vx, vy, edge_prop, image=None):
     `tuple`
         The returned tuple has four components, which are:
 
-        ``ve`` : expanding speed, in the same unit as ``self.vx`` or ``self.vy``.
-        ``vr`` : rotational speed, in the same unit as ``self.vx`` or ``self.vy``.
+        ``ve`` : expanding speed, in the same unit as ``vx`` or ``vy``.
+        ``vr`` : rotational speed, in the same unit as ``vx`` or ``vy``.
         ``vc`` : velocity of the center, in the form of ``[vx, vy]``.
         ``ia`` : average of the observational values within the vortices if the parameter image is given.
     """
