@@ -297,10 +297,10 @@ def get_vtheta(gamma, rcore, r=0):
     Parameters
     ----------
     gamma : `float`, optional
-        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore`` are not `None`.
         Defaults to `None`.
     rcore : `float`, optional
-        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore`` are not `None`.
         Defaults to `None`.
     r : `float`, optional
         Radius which defaults to 0.
@@ -321,10 +321,10 @@ def get_vradial(gamma, rcore, ratio_vradial, r=0):
     Parameters
     ----------
     gamma : `float`, optional
-        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore`` are not `None`.
         Defaults to `None`.
     rcore : `float`, optional
-        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore`` are not `None`.
         Defaults to `None`.
     ratio_vradial : `float`, optional
         Ratio between expanding/shrinking speed and rotating speed.
@@ -349,10 +349,10 @@ def get_vxvy(gamma, rcore, ratio_vradial, x_range, y_range, x=None, y=None):
     Parameters
     ----------
     gamma : `float`, optional
-        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        A replacement for ``vmax`` and only used if both ``gamma`` and ``rcore`` are not `None`.
         Defaults to `None`.
     rcore : `float`, optional
-        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore``are not `None`.
+        A replacement for ``rmax`` and only used if both ``gamma`` and ``rcore`` are not `None`.
         Defaults to `None`.
     ratio_vradial : `float`, optional
         Ratio between expanding/shrinking speed and rotating speed.
