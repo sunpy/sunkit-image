@@ -5,9 +5,15 @@ import warnings
 
 import numpy as np
 import scipy.ndimage as ndimage
-from watroo import utils
+try:
+    from watroo import utils
+    WATROO = True
+except ImportError:
+    WATROO = False
 
-__all__ = ["mgn", "wow"]
+__all__ = ["mgn"]
+if WATROO:
+    __all__.append("wow")
 
 
 def mgn(
@@ -29,7 +35,7 @@ def mgn(
     works by normalizing the image by calculating local mean and standard deviation over many
     spatial scales by convolving with Gaussian kernels of different standard deviations. All the
     normalized images are then arctan transformed (similar to a gamma transform). Then all the
-    images are combined by adding all of them after multiplying with suitable weights. This method
+    images are combined by adding all of them after multiplying with suitable we ights. This method
     can be used to reveal information and structures at various spatial scales.
 
     .. note::
@@ -236,5 +242,9 @@ def wow(*args, **kwargs):
         "Image Enhancement with Wavelets Optimized Whitening.", Astronomy & Astrophysics, 670, id.A66
         doi:10.1051/0004-6361/202245345
     """
-    wow_image, _ = utils.wow(*args, **kwargs)
-    return wow_image
+    if WATROO:
+        wow_image, _ = utils.wow(*args, **kwargs)
+        return wow_image
+    else:
+        print('Watroo package not found')
+        return
