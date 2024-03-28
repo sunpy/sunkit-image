@@ -614,20 +614,25 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
     nt = len(mc.maps)
     xshift_arcseconds = np.zeros(nt) * u.arcsec
     yshift_arcseconds = np.zeros_like(xshift_arcseconds)
-    rotate_to_this_layer = mc.maps[layer_index]
+    observer_coordinate_ref_layer = mc.maps[layer_index].observer_coordinate
 
     for i, m in enumerate(mc):
-        # The shift of the reference layer is always zero by definition.
-        if i == layer_index:
-            continue
-
+        
         # Calculate the rotation of the center of the map 'm' at its
         # observation time to the observation time of the reference layer
         # indicated by "layer_index".
-        new_coordinate = solar_rotate_coordinate(m.center, observer=rotate_to_this_layer.observer_coordinate, **kwargs)
+        new_coordinate = solar_rotate_coordinate(m.center, observer=observer_coordinate_ref_layer, **kwargs)
 
-        xshift_arcseconds[i] = new_coordinate.Tx - rotate_to_this_layer.center.Tx
-        yshift_arcseconds[i] = new_coordinate.Ty - rotate_to_this_layer.center.Ty
+        xshift_arcseconds[i] = new_coordinate.Tx - m.center.Tx
+        yshift_arcseconds[i] = new_coordinate.Ty - m.center.Ty
+
+    # Set the shifts relative to the reference layer
+    # The shift of the reference layer is always zero by definition.
+    xshift_ref=xshift_arcseconds[layer_index]
+    yshift_ref=yshift_arcseconds[layer_index]
+    xshift_arcseconds=[x-xshift_ref for x in xshift_arcseconds]
+    yshift_arcseconds=[y-yshift_ref for y in yshift_arcseconds]
+            
 
     return {"x": xshift_arcseconds, "y": yshift_arcseconds}
 
