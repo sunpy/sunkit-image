@@ -630,8 +630,9 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
     # The shift of the reference layer is always zero by definition.
     xshift_ref=xshift_arcseconds[layer_index]
     yshift_ref=yshift_arcseconds[layer_index]
-    xshift_arcseconds=[x-xshift_ref for x in xshift_arcseconds]
-    yshift_arcseconds=[y-yshift_ref for y in yshift_arcseconds]
+    
+    xshift_arcseconds=xshift_arcseconds-xshift_ref
+    yshift_arcseconds=yshift_arcseconds-yshift_ref
             
 
     return {"x": xshift_arcseconds, "y": yshift_arcseconds}
