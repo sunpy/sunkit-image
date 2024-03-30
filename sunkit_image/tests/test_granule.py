@@ -48,7 +48,7 @@ def test_get_threshold_range():
 
 
 def test_get_threshold_errors():
-    with pytest.raises(ValueError, match="Input data must be an instance of a np.ndarray"):
+    with pytest.raises(TypeError, match="Input data must be an instance of a np.ndarray"):
         _get_threshold([], "li")
     with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
         _get_threshold(np.array([[1, 2], [1, 2]]), "banana")

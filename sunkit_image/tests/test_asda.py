@@ -14,13 +14,13 @@ def test_asda_artificial():
     vmax = 2.0  # rotating speed
     rmax = 50  # radius
     ratio = 0.2  # ratio of expanding speed over rotating speed
-    with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
+    with pytest.raises(TypeError, match="Keyword 'r' must be an integer"):
         lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1, r=1.2)
 
-    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
+    with pytest.raises(TypeError, match="Keyword 'factor' must be an integer"):
         lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
 
-    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
+    with pytest.raises(TypeError, match="Keyword 'factor' must be an integer"):
         lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
 
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):

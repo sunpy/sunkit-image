@@ -160,7 +160,7 @@ def test_points_in_poly():
 
 def test_reform_2d():
     test_data = np.asarray([[0, 0], [1, 2], [3, 4]])
-    with pytest.raises(ValueError, match="Parameter 'factor' must be an integer!"):
+    with pytest.raises(TypeError, match="Parameter 'factor' must be an integer!"):
         utils.reform2d(test_data, 2.2)
     with pytest.raises(ValueError, match="Input array must be 2d!"):
         utils.reform2d(test_data[0], 2)

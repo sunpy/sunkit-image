@@ -368,7 +368,7 @@ def _erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     return image
 
 
-def _loop_add(lengths, xloop, yloop, iloop, loops):
+def _loop_add(lengths, xloop, yloop, zloop, iloop, loops):  # NOQA: ARG001
     """
     Adds the current loop to the output structures by interpolating the
     coordinates.
@@ -381,6 +381,9 @@ def _loop_add(lengths, xloop, yloop, iloop, loops):
         The ``x`` coordinates of all the points of the loop.
     yloop : `numpy.ndarray`
         The ``y`` coordinates of all the points of the loop.
+    zloop : `numpy.ndarray`
+        The flux intensity at every point of the loop.
+        TODO: Unuzed variable. Determine if it is needed.
     iloop : `int`
         The current loop number.
     loops : `list`

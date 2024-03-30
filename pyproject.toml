@@ -37,29 +37,29 @@ dependencies = [
   'matplotlib>=3.5.0',
   'scipy>=1.8.0,!=1.10.0',
   'scikit-image>=0.19.0',
-  'sunpy>=5.0.0',
+  'sunpy[map]>=5.0.0',
 ]
 
 [project.urls]
-changelog = "https://irispy-lmsal.readthedocs.io/en/stable/changelog"
-documentation = "https://irispy-lmsal.readthedocs.io/en/stable/"
-homepage = "https://iris.lmsal.com/"
-issue_tracker = "https://github.com/LM-SAL/irispy-lmsal/issues"
-repository = "https://github.com/LM-SAL/irispy-lmsal"
+changelog = "https://docs.sunpy.org/projects/sunkit-image/en/latest/changelog.html"
+documentation = "https://docs.sunpy.org/projects/sunkit-image/"
+homepage = "https://sunpy.org/"
+issue_tracker = "https://github.com/sunpy/sunkit-image/issues"
+repository = "https://github.com/sunpy/sunkit-image/"
 
 [project.optional-dependencies]
 all = ["sunkit_image"]
 tests = [
   "sunkit_image[all]",
+  'dask',
   'pytest-astropy',
   'pytest-mpl',
 ]
 docs = [
-  "irispy-lmsal[all]",
+  "sunkit_image[all]",
   'astroscrappy',
   'beautifulsoup4',
   'dask',
-  'drms',
   'matplotlib',
   'sphinx-automodapi',
   'sphinx-changelog',
@@ -67,6 +67,7 @@ docs = [
   'sphinx-gallery',
   'sphinx',
   'sunpy-sphinx-theme',
+  'sunpy[net]>=5.0.0',
   'zeep',
 ]
 dev = ["sunkit_image[tests,docs]"]
