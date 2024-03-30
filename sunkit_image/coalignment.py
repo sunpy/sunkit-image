@@ -3,6 +3,7 @@ This module provides routines for the co-alignment of images and
 `~sunpy.map.mapsequence.MapSequence` objects through both template matching and
 corrections due to solar rotation.
 """
+
 import warnings
 from copy import deepcopy
 
@@ -231,7 +232,8 @@ def _get_correlation_shifts(array):
     ny = array.shape[0]
     nx = array.shape[1]
     if nx > 3 or ny > 3:
-        raise ValueError("Input array dimension should not be greater than 3 in any dimension.")
+        msg = "Input array dimension should not be greater than 3 in any dimension."
+        raise ValueError(msg)
 
     # Find where the maximum of the input array is
     ij = np.unravel_index(np.argmax(array), array.shape)
@@ -240,15 +242,9 @@ def _get_correlation_shifts(array):
     # Estimate the location of the parabolic peak if there is enough data.
     # Otherwise, just return the location of the maximum in a particular
     # direction.
-    if ny == 3:
-        y_location = _parabolic_turning_point(array[:, x_max_location])
-    else:
-        y_location = 1.0 * y_max_location
+    y_location = _parabolic_turning_point(array[:, x_max_location]) if ny == 3 else 1.0 * y_max_location
 
-    if nx == 3:
-        x_location = _parabolic_turning_point(array[y_max_location, :])
-    else:
-        x_location = 1.0 * x_max_location
+    x_location = _parabolic_turning_point(array[y_max_location, :]) if nx == 3 else 1.0 * x_max_location
 
     return y_location * u.pix, x_location * u.pix
 
@@ -312,7 +308,7 @@ def _check_for_nonfinite_entries(layer_image, template_image):
 
 
 @u.quantity_input
-def apply_shifts(mc, yshift: u.pix, xshift: u.pix, clip=True, **kwargs):
+def apply_shifts(mc, yshift: u.pix, xshift: u.pix, *, clip=True, **kwargs):
     """
     Apply a set of pixel shifts to a `~sunpy.map.MapSequence`, and return a new
     `~sunpy.map.MapSequence`.
@@ -420,7 +416,8 @@ def calculate_match_template_shift(mc, template=None, layer_index=0, func=_defau
     elif isinstance(template, np.ndarray):
         tplate = template
     else:
-        raise ValueError("Invalid template.")
+        msg = "Invalid template."
+        raise ValueError(msg)
 
     # Apply the function to the template
     tplate = func(tplate)
@@ -460,6 +457,7 @@ def calculate_match_template_shift(mc, template=None, layer_index=0, func=_defau
 
 def mapsequence_coalign_by_match_template(
     mc,
+    *,
     template=None,
     layer_index=0,
     func=_default_fmap_function,
@@ -535,12 +533,12 @@ def mapsequence_coalign_by_match_template(
     Examples
     --------
     >>> from sunkit_image.coalignment import mapsequence_coalign_by_match_template as mc_coalign
-    >>> coaligned_mc = mc_coalign(mc)   # doctest: +SKIP
-    >>> coaligned_mc = mc_coalign(mc, layer_index=-1)   # doctest: +SKIP
-    >>> coaligned_mc = mc_coalign(mc, clip=False)   # doctest: +SKIP
-    >>> coaligned_mc = mc_coalign(mc, template=sunpy_map)   # doctest: +SKIP
-    >>> coaligned_mc = mc_coalign(mc, template=two_dimensional_ndarray)   # doctest: +SKIP
-    >>> coaligned_mc = mc_coalign(mc, func=np.log)   # doctest: +SKIP
+    >>> coaligned_mc = mc_coalign(mc)  # doctest: +SKIP
+    >>> coaligned_mc = mc_coalign(mc, layer_index=-1)  # doctest: +SKIP
+    >>> coaligned_mc = mc_coalign(mc, clip=False)  # doctest: +SKIP
+    >>> coaligned_mc = mc_coalign(mc, template=sunpy_map)  # doctest: +SKIP
+    >>> coaligned_mc = mc_coalign(mc, template=two_dimensional_ndarray)  # doctest: +SKIP
+    >>> coaligned_mc = mc_coalign(mc, func=np.log)  # doctest: +SKIP
 
     References
     ----------
@@ -632,7 +630,7 @@ def calculate_solar_rotate_shift(mc, layer_index=0, **kwargs):
     return {"x": xshift_arcseconds, "y": yshift_arcseconds}
 
 
-def mapsequence_coalign_by_rotation(mc, layer_index=0, clip=True, shift=None, **kwargs):
+def mapsequence_coalign_by_rotation(mc, *, layer_index=0, clip=True, shift=None, **kwargs):
     """
     Move the layers in a mapsequence according to the input shifts.
 

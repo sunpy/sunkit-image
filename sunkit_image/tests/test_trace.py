@@ -31,7 +31,8 @@ def image_remote(request):
             return sunpy.map.Map((data, header))
         if request.param == "array":
             return data
-        raise ValueError(f"Invalid request parameter {request.param}")
+        msg = f"Invalid request parameter {request.param}"
+        raise ValueError(msg)
 
 
 @pytest.fixture()
@@ -151,10 +152,9 @@ def test_occult2(test_image, image_test):
     with pytest.raises(RuntimeError) as record:
         occult2(test_image, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, qthresh1=0.0, qthresh2=3.0)
 
-    assert (
-        str(record.value)
-        == "The filter size is very large compared to the size of the image."
-        + " The entire image zeros out while smoothing the image edges after filtering."
+    assert str(record.value) == (
+        "The filter size is very large compared to the size of the image."
+        " The entire image zeros out while smoothing the image edges after filtering."
     )
 
 

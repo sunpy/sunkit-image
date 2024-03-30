@@ -1,5 +1,5 @@
 import inspect
-from typing import Union, Callable
+from collections.abc import Callable
 from functools import wraps
 
 import numpy as np
@@ -30,10 +30,11 @@ def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Calla
     def decorate(f: Callable) -> Callable:
         sig = inspect.signature(f)
         if arg_name not in sig.parameters:
-            raise RuntimeError(f"Could not find '{arg_name}' in function signature")
+            msg = f"Could not find '{arg_name}' in function signature"
+            raise RuntimeError(msg)
 
         @wraps(f)
-        def inner(*args, **kwargs) -> Union[np.ndarray, GenericMap]:
+        def inner(*args, **kwargs) -> np.ndarray | GenericMap:
             sig_bound = sig.bind(*args, **kwargs)
             map_arg = sig_bound.arguments[arg_name]
             if isinstance(map_arg, GenericMap):
@@ -42,7 +43,8 @@ def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Calla
             elif isinstance(map_arg, np.ndarray):
                 map_in = False
             else:
-                raise ValueError(f"'{arg_name}' argument must be a sunpy map or numpy array (got type {type(map_arg)})")
+                msg = f"'{arg_name}' argument must be a sunpy map or numpy array (got type {type(map_arg)})"
+                raise TypeError(msg)
             # Run decorated function
             array_out = f(*sig_bound.args, **sig_bound.kwargs)
             if map_in and output_to_map:

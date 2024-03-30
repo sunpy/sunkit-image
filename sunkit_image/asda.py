@@ -53,11 +53,14 @@ class Asda:
 
         """
         if vx.shape != vy.shape:
-            raise ValueError("Shape of velocity field's vx and vy do not match")
+            msg = "Shape of velocity field's vx and vy do not match"
+            raise ValueError(msg)
         if not isinstance(r, int):
-            raise ValueError("Keyword 'r' must be an integer")
+            msg = "Keyword 'r' must be an integer"
+            raise TypeError(msg)
         if not isinstance(factor, int):
-            raise ValueError("Keyword 'factor' must be an integer")
+            msg = "Keyword 'factor' must be an integer"
+            raise TypeError(msg)
         self.vx = vx
         self.vy = vy
         self.dshape = np.shape(vx)
@@ -178,10 +181,7 @@ class Asda:
             v = remove_duplicate(v)
             # Find all points in the contour
             ps = points_in_poly(v)
-            # gamma1 value of all points in the contour
-            dust = []
-            for p in ps:
-                dust.append(self.gamma[..., 0][int(p[1]), int(p[0])])
+            dust = [self.gamma[..., 0][int(p[1]), int(p[0])] for p in ps]
             # Determine swirl properties
             if len(dust) > 1:
                 # Effective radius
@@ -293,9 +293,11 @@ class Lamb_Oseen(Asda):
             Default value is 1.
         """
         if not isinstance(r, int):
-            raise ValueError("Keyword 'r' must be an integer")
+            msg = "Keyword 'r' must be an integer"
+            raise TypeError(msg)
         if not isinstance(factor, int):
-            raise ValueError("Keyword 'factor' must be an integer")
+            msg = "Keyword 'factor' must be an integer"
+            raise TypeError(msg)
         # Alpha of Lamb Oseen vortices
         self.alpha = 1.256430
         self.ratio_vradial = ratio_vradial
