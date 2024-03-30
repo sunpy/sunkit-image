@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import sunpy.data.sample
@@ -13,7 +14,14 @@ def test_mgn(aia_171):
     out = enhance.mgn(aia_171)
     assert type(out) == type(aia_171)
     if isinstance(out, sunpy.map.GenericMap):
-        out.plot()
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection=out)
+        out.plot(axes=ax)
+        return fig
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.imshow(out, origin="lower", interpolation="nearest", cmap="sdoaia171")
+    return fig
 
 
 @pytest.fixture()

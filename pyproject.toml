@@ -54,6 +54,7 @@ tests = [
   'dask',
   'pytest-astropy',
   'pytest-mpl',
+  "sunpy[data]>=5.0.0",
 ]
 docs = [
   "sunkit_image[all]",
@@ -67,7 +68,7 @@ docs = [
   'sphinx-gallery',
   'sphinx',
   'sunpy-sphinx-theme',
-  'sunpy[net]>=5.0.0',
+  'sunpy[data,net]>=5.0.0',
   'zeep',
 ]
 dev = ["sunkit_image[tests,docs]"]
