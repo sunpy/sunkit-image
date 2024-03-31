@@ -1,8 +1,8 @@
-from functools import partial
-
+"""
+This module contains functions for tracking and plotting of the sunspots.
+"""
 import astropy.time as Time
 import astropy.units as u
-import matplotlib.pyplot as plt
 import numpy as np
 import sunpy.map
 from astropy.table import QTable
@@ -11,7 +11,7 @@ from skimage.measure import label, regionprops_table
 from skimage.morphology import disk, square, white_tophat
 from skimage.util import invert
 
-__all__ = ["stara", "get_regions", "plot_sunspots", "get_segs"]
+__all__ = ["stara", "get_regions"]
 
 
 @u.quantity_input
@@ -30,24 +30,28 @@ def stara(
     ----------
     smap : `sunpy.map.GenericMap`
         The map to apply the algorithm to.
-
     circle_radius : `astropy.units.Quantity`, optional
         The angular size of the structuring element used in the
         `skimage.morphology.white_tophat`. This is the maximum radius of
-        detected features.
-
+        detected features. By default, this is set to 100 arcseconds.
     median_box : `astropy.units.Quantity`, optional
         The size of the structuring element for the median filter, features
-        smaller than this will be averaged out.
-
+        smaller than this will be averaged out. The default value is 10 arcseconds.
     threshold : `int`, optional
         The threshold used for detection, this will be subject to detector
-        degradation. The default is a reasonable value for HMI continuum images.
-
+        degradation. The default value of 6000, is a reasonable value for HMI continuum
+        images.
     limb_filter : `astropy.units.Quantity`, optional
         If set, ignore features close to the limb within a percentage of the
         radius of the disk. A value of 10% generally filters out false
         detections around the limb with HMI continuum images.
+
+    References
+    ----------
+    * Fraser Watson and Fletcher Lyndsay.
+      “Automated sunspot detection and the evolution of sunspot magnetic fields during solar cycle 23”
+      arXiv preprint arXiv:1009.5884  (2010).
+      Ref: Proceedings of the International Astronomical Union, vol. 6, no. S273, pp. 51-55, 2010. doi:10.1017/S1743921311014992
     """
     data = invert(smap.data)
 
@@ -80,7 +84,6 @@ def get_regions(segmentation, smap):
     ----------
     segmentation : `numpy.ndarray`
         A 2D array representing the segmented image, where different regions are marked with different integer labels.
-
     smap : `sunpy.map.GenericMap`
         The original SunPy map from which the segmented image was derived. This is used to convert pixel coordinates to world coordinates.
 
@@ -102,53 +105,3 @@ def get_regions(segmentation, smap):
     ).heliographic_stonyhurst
 
     return QTable(regions)
-
-
-def plot_sunspots(segs, maps):
-    """
-    Plots sunspots detected in solar maps.
-
-    Parameters
-    ----------
-    seg : list of `numpy.ndarray`
-        A list of 2D arrays representing the segmented images, where different regions are marked with different integer labels.
-
-    maps : list of `sunpy.map.GenericMap`
-        A list of the original SunPy maps from which the segmented images were derived. These are used to plot the original solar images and to provide the projection for the plots.
-
-    Notes
-    -----
-    This function creates a new figure and subplot for each map and segmented image pair in the input lists, plots the original solar image, overlays the detected sunspots as contours, and then displays the plots.
-    """
-    for smap, seg in zip(maps, segs):
-        plt.figure()
-        ax = plt.subplot(projection=smap)
-        smap.plot()
-        ax.contour(seg, levels=0)
-
-    plt.show()
-
-
-def get_segs(maps, limb_filter_value):
-    """
-    Applies the stara function to each map in the input list with a specified
-    limb filter value.
-
-    Parameters
-    ----------
-    maps : list of `sunpy.map.GenericMap`
-        A list of SunPy maps to which the stara function will be applied.
-
-    limb_filter_value : `astropy.units.Quantity`
-        The limb filter value to be used in the stara function. This value specifies the percentage of the radius of the disk to ignore features close to the limb.
-
-    Returns
-    -------
-    segs : list of `numpy.ndarray`
-        A list of 2D arrays representing the segmented images resulting from the application of the stara function to each map in the input list. Each segmented image has different regions marked with different integer labels, representing detected sunspots.
-
-    Notes
-    -----
-    This function uses the functools.partial function to create a new function that behaves like the stara function, but with the limb_filter argument set to limb_filter_value. This new function is then applied to each map in the input list.
-    """
-    return list(map(partial(stara, limb_filter=limb_filter_value), maps))
