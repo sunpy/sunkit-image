@@ -21,7 +21,6 @@ def map_test():
     return np.ones((4, 4), dtype=float)
 
 
-@pytest.mark.xfail()
 def test_multiscale_gaussian(map_test):
     # Assuming the algorithm works fine then the below two should be equal.
     expect1 = enhance.mgn(map_test, [1])
