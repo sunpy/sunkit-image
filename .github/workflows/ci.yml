@@ -29,6 +29,8 @@ jobs:
       posargs: -n auto
       envs: |
         - linux: py312
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   test:
     needs: [core]
@@ -42,6 +44,8 @@ jobs:
         - macos: py310
         - windows: py311
         - linux: py310-oldestdeps
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
     needs: [test]
@@ -69,6 +73,8 @@ jobs:
       posargs: -n auto --dist loadgroup
       envs: |
         - linux: py312-online
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   devdeps:
     needs: [online]
@@ -80,6 +86,8 @@ jobs:
       posargs: -n auto
       envs: |
         - linux: py312-devdeps
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   conda:
     needs: [online]
