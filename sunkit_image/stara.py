@@ -1,11 +1,11 @@
 """
 This module contains functions for tracking and plotting of the sunspots.
 """
-import astropy.time as Time
 import astropy.units as u
 import numpy as np
 import sunpy.map
 from astropy.table import QTable
+from astropy.time import Time
 from skimage.filters import median
 from skimage.measure import label, regionprops_table
 from skimage.morphology import disk, square, white_tophat
