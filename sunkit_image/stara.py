@@ -1,6 +1,6 @@
 """
 This module contains python implementation of Sunspot Tracking And Recognition
-(STARA) Algorithm (STARA) .
+Algorithm (STARA) .
 """
 import astropy.units as u
 import numpy as np
