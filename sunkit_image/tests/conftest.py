@@ -162,3 +162,22 @@ def aia_171(request):
     if request.param == "array":
         return smap.data
     return None
+
+@pytest.fixture()
+def mock_hmi_map():
+    data = np.random.default_rng(42).random((100, 100))
+    header = {
+        "date-obs": "2022-01-01T00:00:00.000",
+        "crpix1": 50,
+        "crpix2": 50,
+        "cdelt1": 1,
+        "cdelt2": 1,
+        "crval1": 0,
+        "crval2": 0,
+        "cunit1": "arcsec",
+        "cunit2": "arcsec",
+        "ctype1": "HPLN-TAN",
+        "ctype2": "HPLT-TAN",
+        "rsun_obs": 1000,
+    }
+    return sunpy.map.GenericMap(data, header)

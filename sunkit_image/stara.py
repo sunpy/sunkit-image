@@ -1,5 +1,5 @@
 """
-This module contains functions for tracking and plotting of the sunspots.
+This module contains python implementation of Sunspot Tracking And Recognition Algorithm (STARA) .
 """
 import astropy.units as u
 import numpy as np
@@ -46,6 +46,13 @@ def stara(
         radius of the disk. A value of 10% generally filters out false
         detections around the limb with HMI continuum images.
 
+    Returns
+    -------
+    `numpy.ndarray`
+        A 2D boolean array of the same shape as the input solar map. Each element in the array
+        represents a pixel in the solar map, and its value is `True` if the corresponding pixel
+        is identified as part of a sunspot (based on the specified threshold), and `False` otherwise.
+
     References
     ----------
     * Fraser Watson and Fletcher Lyndsay
@@ -72,35 +79,3 @@ def stara(
     finite[np.isnan(finite)] = 0  # Filter out nans
 
     return finite > threshold
-
-
-def get_regions(segmentation, smap):
-    """
-    Extracts regions from a segmented image and returns a table with their
-    properties.
-
-    Parameters
-    ----------
-    segmentation : `numpy.ndarray`
-        A 2D array representing the segmented image, where different regions are marked with different integer labels.
-    smap : `sunpy.map.GenericMap`
-        The original SunPy map from which the segmented image was derived. This is used to convert pixel coordinates to world coordinates.
-
-    Returns
-    -------
-    regions : `astropy.table.QTable`
-        A table containing the properties of each detected region. The properties include the label, centroid, area, and minimum intensity of each region, as well as the observation time and the heliographic Stonyhurst coordinates of the region center. If no regions are detected, an empty table is returned.
-    """
-    labelled = label(segmentation)
-    if labelled.max() == 0:
-        return QTable()
-
-    regions = regionprops_table(labelled, smap.data, properties=["label", "centroid", "area", "min_intensity"])
-
-    regions["obstime"] = Time([smap.date] * regions["label"].size)
-    regions["center_coord"] = smap.pixel_to_world(
-        regions["centroid-0"] * u.pix,
-        regions["centroid-1"] * u.pix,
-    ).heliographic_stonyhurst
-
-    return QTable(regions)
