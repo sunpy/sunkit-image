@@ -39,9 +39,7 @@ def test_stara(mock_map):
 def test_get_regions(mock_map):
     segmentation = np.zeros((100, 100))
     segmentation[40:60, 40:60] = 1
-    print(segmentation)
     result = get_regions(segmentation, mock_map)
-    print(result)
     assert isinstance(result, QTable)
     assert len(result) == 1
     assert result["label"][0] == 1
