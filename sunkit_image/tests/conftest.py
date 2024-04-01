@@ -163,6 +163,7 @@ def aia_171(request):
         return smap.data
     return None
 
+
 @pytest.fixture()
 def mock_hmi_map():
     data = np.random.default_rng(42).random((100, 100))
