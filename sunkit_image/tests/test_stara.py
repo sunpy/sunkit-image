@@ -11,8 +11,8 @@ from sunkit_image.tests.helpers import figure_test
 
 @pytest.fixture()
 def mock_map():
-    np.random.seed(42)
-    data = np.random.rand(100, 100)
+    rng = np.random.default_rng(0)
+    data = rng.random(100, 100)
     header = {
         "date-obs": "2022-01-01T00:00:00.000",
         "crpix1": 50,
