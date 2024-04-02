@@ -4,6 +4,7 @@ lag between intensity cubes.
 
 Useful for understanding time variability in EUV light curves.
 """
+
 from typing import Optional
 
 import astropy.units as u

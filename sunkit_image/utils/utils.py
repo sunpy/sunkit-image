@@ -1,6 +1,7 @@
 """
 This module contains a collection of functions of general utility.
 """
+
 import warnings
 
 import astropy.units as u

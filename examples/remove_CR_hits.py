@@ -7,6 +7,7 @@ This example illustrates how to remove cosmic ray hits from a LASCO C2 FITS file
 using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__.
 Astroscrappy is a separate Python package and can be installed separately using ``pip`` or ``conda``.
 """
+
 import astroscrappy
 import matplotlib.pyplot as plt
 from astropy.io import fits

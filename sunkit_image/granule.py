@@ -1,6 +1,7 @@
 """
 This module contains functions that will segment images for granule detection.
 """
+
 import logging
 
 import matplotlib

@@ -3,6 +3,7 @@ This module provides routines for the co-alignment of images and
 `~sunpy.map.mapsequence.MapSequence` objects through both template matching and
 corrections due to solar rotation.
 """
+
 import warnings
 from copy import deepcopy
 
