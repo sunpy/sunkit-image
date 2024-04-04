@@ -14,9 +14,9 @@ from sunkit_image.utils import calculate_gamma, points_in_poly, reform2d, remove
 __all__ = [
     "generate_velocity_field",
     "calculate_gamma_values",
-    "center_edge",
+    "get_vortex_edges",
     "get_vortex_properties",
-    "get_grid",
+    "get_vortex_meshgrid",
     "get_vtheta",
     "get_vradial",
     "get_vxvy",
@@ -129,7 +129,7 @@ def calculate_gamma_values(vx, vy, factor=1, r=3):
     return gamma
 
 
-def center_edge(gamma, rmin=4, gamma_min=0.89, factor=1):
+def get_vortex_edges(gamma, rmin=4, gamma_min=0.89, factor=1):
     """
     Find all swirls from ``gamma1``, and ``gamma2``.
 
@@ -270,7 +270,7 @@ def get_vortex_properties(vx, vy, edge_prop, image=None):
     return ve, vr, vc, ia
 
 
-def get_grid(x_range, y_range):
+def get_vortex_meshgrid(x_range, y_range):
     """
     Returns a meshgrid of the coordinates of the vortex.
 
@@ -376,7 +376,7 @@ def get_vxvy(gamma, rcore, ratio_vradial, x_range, y_range, x=None, y=None):
             warnings.warn("One of the input parameters is missing, setting both to 'None'", stacklevel=3)
             x, y = None, None
         # Creating mesh grid
-        x, y = get_grid(x_range=x_range, y_range=y_range)
+        x, y = get_vortex_meshgrid(x_range=x_range, y_range=y_range)
     # Calculate radius
     r = np.sqrt(np.square(x) + np.square(y)) + 1e-10
     # Calculate velocity vector

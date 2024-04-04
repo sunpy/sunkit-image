@@ -4,6 +4,8 @@ The following function were renamed:
 - ``gen_vel`` -> ``generate_velocity_field``
 - ``gamma_values`` -> ``calculate_gamma_values``
 - ``vortex_property`` -> ``get_vortex_properties``
+- ``get_grid`` -> ``get_vortex_meshgrid``
+- ``center_edge`` -> ``get_vortex_edges``
 
 Now to use, the properties that were previously stored within the class should now be passed through the arguments of the methods in case the method used these arguments.
 

@@ -28,7 +28,7 @@ def test_asda_artificial():
     with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
         asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((1, 2)), 0.8, 3)
     with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
-        asda.center_edge(gamma=np.zeros((1, 2)), factor=0.8)
+        asda.get_vortex_edges(gamma=np.zeros((1, 2)), factor=0.8)
     with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
         asda.get_vortex_properties(np.zeros((1, 2)), np.zeros((2, 1)), 0)
 
@@ -54,7 +54,7 @@ def test_asda_artificial():
     # perform vortex detection
     gamma = asda.calculate_gamma_values(vx, vy)
     # properties of the detected vortex
-    center_edge = asda.center_edge(gamma)
+    center_edge = asda.get_vortex_edges(gamma)
     (ve, vr, vc, ia) = asda.get_vortex_properties(vx, vy, center_edge)
     np.testing.assert_almost_equal(ve[0], 0.39996991917753405)
     np.testing.assert_almost_equal(vr[0], 1.999849595887626)
@@ -110,7 +110,7 @@ def test_real_data():
     # Gamma1 and Gamma2
     gamma = asda.calculate_gamma_values(vx, vy, factor, r)
     # Determine Swirls
-    center_edge = asda.center_edge(gamma)
+    center_edge = asda.get_vortex_edges(gamma)
     # Properties of Swirls
     ve, vr, vc, ia = asda.get_vortex_properties(vx, vy, center_edge, data)
     # load correct detect results
