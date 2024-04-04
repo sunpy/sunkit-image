@@ -305,7 +305,6 @@ def parameters_add_loop():
     # Here we are creating dummy coordinates and flux for a loop
     xloop = np.ones(8, dtype=np.float32) * 7
     yloop = np.arange(11, 3, -1, dtype=np.float32)
-    zloop = np.array([1, 2, 4, 3, 4, 12, 6, 3], dtype=np.float32)
 
     iloop = 0
     np1 = len(xloop)
@@ -319,7 +318,7 @@ def parameters_add_loop():
     # The empty structures in which the first loop is stored
     loops = []
 
-    return (lengths, xloop, yloop, zloop, iloop, loops)
+    return (lengths, xloop, yloop, iloop, loops)
 
 
 def test_add_loop(parameters_add_loop):
@@ -333,11 +332,10 @@ def test_add_loop(parameters_add_loop):
 
 
 def test_parameters_add_loop(parameters_add_loop):
-    lengths, xloop, yloop, zloop, iloop, loops = parameters_add_loop
+    lengths, xloop, yloop, iloop, loops = parameters_add_loop
 
     assert np.allclose(lengths, np.arange(0, 8))
     assert np.allclose(xloop, np.ones(8) * 7)
     assert np.allclose(yloop, np.arange(11, 3, -1))
-    assert np.allclose(zloop, np.array([1, 2, 4, 3, 4, 12, 6, 3]))
     assert np.allclose(iloop, 0)
     assert not loops

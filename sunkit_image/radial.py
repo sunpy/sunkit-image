@@ -2,6 +2,7 @@
 This module contains functions that can be used to enhance the regions above a
 radius.
 """
+
 import astropy.units as u
 import numpy as np
 import sunpy.map
