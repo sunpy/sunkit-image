@@ -1,6 +1,7 @@
 """
 This module contains enhancement routines for solar physics data.
 """
+
 import warnings
 
 import numpy as np
