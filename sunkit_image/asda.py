@@ -17,9 +17,9 @@ __all__ = [
     "get_vortex_edges",
     "get_vortex_properties",
     "get_vortex_meshgrid",
-    "get_vtheta",
-    "get_vradial",
-    "get_vxvy",
+    "get_rotational_velocity",
+    "get_radial_velocity",
+    "get_velocity_field",
 ]
 
 
@@ -290,7 +290,7 @@ def get_vortex_meshgrid(x_range, y_range):
     return xx, yy
 
 
-def get_vtheta(gamma, rcore, r=0):
+def get_rotational_velocity(gamma, rcore, r=0):
     """
     Calculate rotation speed at radius of ``r``.
 
@@ -314,7 +314,7 @@ def get_vtheta(gamma, rcore, r=0):
     return gamma * (1.0 - np.exp(0 - np.square(r) / np.square(rcore))) / (2 * np.pi * r)
 
 
-def get_vradial(gamma, rcore, ratio_vradial, r=0):
+def get_radial_velocity(gamma, rcore, ratio_vradial, r=0):
     """
     Calculate radial (expanding or shrinking) speed at radius of ``r``.
 
@@ -338,10 +338,10 @@ def get_vradial(gamma, rcore, ratio_vradial, r=0):
         Radial speed at the radius of ``r``.
     """
     r = r + 1e-10
-    return get_vtheta(gamma, rcore, r) * ratio_vradial
+    return get_rotational_velocity(gamma, rcore, r) * ratio_vradial
 
 
-def get_vxvy(gamma, rcore, ratio_vradial, x_range, y_range, x=None, y=None):
+def get_velocity_field(gamma, rcore, ratio_vradial, x_range, y_range, x=None, y=None):
     """
     Calculates the velocity field in a meshgrid generated with ``x_range`` and
     ``y_range``.
@@ -381,8 +381,8 @@ def get_vxvy(gamma, rcore, ratio_vradial, x_range, y_range, x=None, y=None):
     r = np.sqrt(np.square(x) + np.square(y)) + 1e-10
     # Calculate velocity vector
     vector = [
-        0 - get_vtheta(gamma, rcore, r) * y + get_vradial(gamma, rcore, ratio_vradial, r) * x,
-        get_vtheta(gamma, rcore, r) * x + get_vradial(gamma, rcore, ratio_vradial, r) * y,
+        0 - get_rotational_velocity(gamma, rcore, r) * y + get_radial_velocity(gamma, rcore, ratio_vradial, r) * x,
+        get_rotational_velocity(gamma, rcore, r) * x + get_radial_velocity(gamma, rcore, ratio_vradial, r) * y,
     ]
     vx = vector[0] / r
     vy = vector[1] / r

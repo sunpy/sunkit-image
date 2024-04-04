@@ -6,6 +6,9 @@ The following function were renamed:
 - ``vortex_property`` -> ``get_vortex_properties``
 - ``get_grid`` -> ``get_vortex_meshgrid``
 - ``center_edge`` -> ``get_vortex_edges``
+- ``get_vtheta`` -> ``get_rotational_velocity``
+- ``get_vradial`` -> ``get_radial_velocity``
+- ``get_vxvy`` -> ``get_velocity_field``
 
 Now to use, the properties that were previously stored within the class should now be passed through the arguments of the methods in case the method used these arguments.
 

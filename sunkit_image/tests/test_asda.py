@@ -34,7 +34,7 @@ def test_asda_artificial():
 
     # Generate vx and vy
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
-        vx, vy = asda.get_vxvy(
+        vx, vy = asda.get_velocity_field(
             gamma=gamma,
             rcore=rcore,
             ratio_vradial=ratio,
@@ -43,7 +43,7 @@ def test_asda_artificial():
             x=np.meshgrid,
         )
 
-    vx, vy = asda.get_vxvy(
+    vx, vy = asda.get_velocity_field(
         gamma=gamma,
         rcore=rcore,
         ratio_vradial=ratio,
