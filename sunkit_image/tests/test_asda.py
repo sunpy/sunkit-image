@@ -14,31 +14,48 @@ def test_asda_artificial():
     vmax = 2.0  # rotating speed
     rmax = 50  # radius
     ratio = 0.2  # ratio of expanding speed over rotating speed
+    alpha = 1.256430
+    rcore = rmax / np.sqrt(alpha)
+    gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
+    with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
+        asda.generate_velocity_field(np.zeros((1, 2)), np.zeros((2, 1)), 0, 0)
     with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1, r=1.2)
-
+        asda.generate_velocity_field(np.zeros((1, 2)), np.zeros((1, 2)), 0, 0, 0.8)
+    with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
+        asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((2, 1)), 0, 0)
+    with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
+        asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((1, 2)), 1, 0.8)
     with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
-
+        asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((1, 2)), 0.8, 3)
     with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1.2, r=1)
+        asda.get_vortex_edges(gamma=np.zeros((1, 2)), factor=0.8)
+    with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
+        asda.get_vortex_properties(np.zeros((1, 2)), np.zeros((2, 1)), 0)
 
-    with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
-        lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, gamma=0.5, ratio_vradial=ratio, factor=1)
-
-    lo = asda.Lamb_Oseen(vmax=vmax, rmax=rmax, ratio_vradial=ratio, factor=1)
     # Generate vx and vy
     with pytest.warns(UserWarning, match="One of the input parameters is missing, setting both to 'None'"):
-        vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200], x=np.meshgrid)
+        vx, vy = asda.get_velocity_field(
+            gamma=gamma,
+            rcore=rcore,
+            ratio_vradial=ratio,
+            x_range=[-100, 100, 200],
+            y_range=[-100, 100, 200],
+            x=np.meshgrid,
+        )
 
-    vx, vy = lo.get_vxvy(x_range=[-100, 100, 200], y_range=[-100, 100, 200])
+    vx, vy = asda.get_velocity_field(
+        gamma=gamma,
+        rcore=rcore,
+        ratio_vradial=ratio,
+        x_range=[-100, 100, 200],
+        y_range=[-100, 100, 200],
+    )
 
     # perform vortex detection
-    lo.gamma_values()
+    gamma = asda.calculate_gamma_values(vx, vy)
     # properties of the detected vortex
-    center_edge = lo.center_edge()
-    (ve, vr, vc, ia) = lo.vortex_property()
-
+    center_edge = asda.get_vortex_edges(gamma)
+    (ve, vr, vc, ia) = asda.get_vortex_properties(vx, vy, center_edge)
     np.testing.assert_almost_equal(ve[0], 0.39996991917753405)
     np.testing.assert_almost_equal(vr[0], 1.999849595887626)
     assert vc == ([0.0, 0.0],)
@@ -76,6 +93,7 @@ def test_real_data():
         edge = [[x1, y1], [x2, y2],...], points = [[x1, y1], [x2, y2],...]
         in units of pixel
     """
+
     # file which stores the velocity field data
     vel_file = get_test_filepath("asda_vxvy.npz")
     # file that stores the correct detection result
@@ -88,14 +106,13 @@ def test_real_data():
 
     # Perform swirl detection
     factor = 1
-    # Initialise class
-    lo = asda.Asda(vx, vy, factor=factor)
+    r = 3
     # Gamma1 and Gamma2
-    lo.gamma_values()
+    gamma = asda.calculate_gamma_values(vx, vy, factor, r)
     # Determine Swirls
-    center_edge = lo.center_edge()
+    center_edge = asda.get_vortex_edges(gamma)
     # Properties of Swirls
-    ve, vr, vc, ia = lo.vortex_property(image=data)
+    ve, vr, vc, ia = asda.get_vortex_properties(vx, vy, center_edge, data)
     # load correct detect results
     correct = dict(np.load(cor_file, allow_pickle=True))
 
