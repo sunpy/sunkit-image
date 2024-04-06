@@ -174,13 +174,11 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             if idir == 0:
                 xloop = np.flip(xl[0 : ip + 1])
                 yloop = np.flip(yl[0 : ip + 1])
-                zloop = np.flip(zl[0 : ip + 1])
                 continue
             # After the backward pass the forward and backward traces are concatenated
             if idir == 1 and ip >= 1:
                 xloop = np.concatenate([xloop, xl[1 : ip + 1]])
                 yloop = np.concatenate([yloop, yl[1 : ip + 1]])
-                zloop = np.concatenate([zloop, zl[1 : ip + 1]])
             else:
                 break
 
@@ -192,7 +190,6 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             # skip_struct
             xloop = xloop[ind]
             yloop = yloop[ind]
-            zloop = zloop[ind]
 
             # If number of traced loop is greater than maximum stop tracing
             if iloop >= nloopmax:
@@ -211,7 +208,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
         # SKIP STRUCT: Only those loops are returned whose length is greater than the minimum
         # specified
         if looplen >= lmin:
-            loops, iloop = _loop_add(s, xloop, yloop, zloop, iloop, loops)
+            loops, iloop = _loop_add(s, xloop, yloop, iloop, loops)
 
         # ERASE LOOP IN RESIDUAL IMAGE
         residual = _erase_loop_in_image(residual, istart, jstart, wid, xloop, yloop)
@@ -368,7 +365,7 @@ def _erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     return image
 
 
-def _loop_add(lengths, xloop, yloop, zloop, iloop, loops):  # NOQA: ARG001
+def _loop_add(lengths, xloop, yloop, iloop, loops):
     """
     Adds the current loop to the output structures by interpolating the
     coordinates.
@@ -381,9 +378,6 @@ def _loop_add(lengths, xloop, yloop, zloop, iloop, loops):  # NOQA: ARG001
         The ``x`` coordinates of all the points of the loop.
     yloop : `numpy.ndarray`
         The ``y`` coordinates of all the points of the loop.
-    zloop : `numpy.ndarray`
-        The flux intensity at every point of the loop.
-        TODO: Unuzed variable. Determine if it is needed.
     iloop : `int`
         The current loop number.
     loops : `list`
