@@ -515,7 +515,7 @@ def fnrgf(
         )
 
         # Iterate over each segment in a circular ring
-        for j in range(0, number_angular_segments, 1):
+        for j in range(number_angular_segments):
             # Finding all the pixels whose angle values lie in the segment
             angular_segment = np.logical_and(angles >= segment_angle * j, angles < segment_angle * (j + 1))
 

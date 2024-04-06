@@ -58,7 +58,7 @@ def generate_velocity_field(vx, vy, i, j, r=3):
         raise ValueError(msg)
     if not isinstance(r, int):
         msg = "Keyword 'r' must be an integer"
-        raise ValueError(msg)
+        raise TypeError(msg)
     vel = np.array(
         [[vx[i + im, j + jm], vy[i + im, j + jm]] for im in np.arange(-r, r + 1) for jm in np.arange(-r, r + 1)],
     )
@@ -95,10 +95,10 @@ def calculate_gamma_values(vx, vy, factor=1, r=3):
         raise ValueError(msg)
     if not isinstance(r, int):
         msg = "Keyword 'r' must be an integer"
-        raise ValueError(msg)
+        raise TypeError(msg)
     if not isinstance(factor, int):
         msg = "Keyword 'factor' must be an integer"
-        raise ValueError(msg)
+        raise TypeError(msg)
 
     # This part of the code was written in (x, y) order
     # but numpy is in (y, x) order so we need to transpose it
@@ -167,7 +167,7 @@ def get_vortex_edges(gamma, rmin=4, gamma_min=0.89, factor=1):
     """
     if not isinstance(factor, int):
         msg = "Keyword 'factor' must be an integer"
-        raise ValueError(msg)
+        raise TypeError(msg)
 
     edge_prop = {"center": (), "edge": (), "points": (), "peak": (), "radius": ()}
     cs = np.array(measure.find_contours(gamma[..., 1].T, -2 / np.pi), dtype=object)
@@ -181,10 +181,7 @@ def get_vortex_edges(gamma, rmin=4, gamma_min=0.89, factor=1):
         v = remove_duplicate(v)
         # Find all points in the contour
         ps = points_in_poly(v)
-        # gamma1 value of all points in the contour
-        dust = []
-        for p in ps:
-            dust.append(gamma[..., 0][int(p[1]), int(p[0])])
+        dust = [gamma[..., 0][int(p[1]), int(p[0])] for p in ps]
         # Determine swirl properties
         if len(dust) > 1:
             # Effective radius
@@ -256,9 +253,7 @@ def get_vortex_properties(vx, vy, edge_prop, image=None):
         if image is None:
             ia += (None,)
         else:
-            value = 0
-            for pos in pnt:
-                value += image[pos[1], pos[0]]
+            value = sum(image[pos[1], pos[0]] for pos in pnt)
             ia += (value / pnt.shape[0],)
         ve0, vr0 = [], []
         for j in range(edg.shape[0]):

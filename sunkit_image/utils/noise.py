@@ -97,7 +97,7 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
         msg = "confidence must be a float, or float-compatible, value between 0 and 1"
         raise TypeError(msg) from e
 
-    if not (confidence >= 0 and confidence <= 1):
+    if confidence < 0 or confidence > 1:
         msg = "confidence must be defined in the interval 0 <= confidence <= 1"
         raise ValueError(msg)
 
@@ -107,16 +107,10 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
         msg = "iterations must be an integer, or int-compatible."
         raise TypeError(msg) from e
 
-    output = {}
     nlevel, thresh, num = noiselevel(img, patchsize, decim, confidence, iterations)
     mask = weak_texture_mask(img, patchsize, thresh)
 
-    output["nlevel"] = nlevel
-    output["thresh"] = thresh
-    output["num"] = num
-    output["mask"] = mask
-
-    return output
+    return {"nlevel": nlevel, "thresh": thresh, "num": num, "mask": mask}
 
 
 def noiselevel(img, patchsize, decim, confidence, iterations):

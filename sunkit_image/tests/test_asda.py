@@ -19,15 +19,15 @@ def test_asda_artificial():
     gamma = 2 * np.pi * vmax * rmax * (1 + 1 / (2 * alpha))
     with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
         asda.generate_velocity_field(np.zeros((1, 2)), np.zeros((2, 1)), 0, 0)
-    with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
+    with pytest.raises(TypeError, match="Keyword 'r' must be an integer"):
         asda.generate_velocity_field(np.zeros((1, 2)), np.zeros((1, 2)), 0, 0, 0.8)
     with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
         asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((2, 1)), 0, 0)
-    with pytest.raises(ValueError, match="Keyword 'r' must be an integer"):
+    with pytest.raises(TypeError, match="Keyword 'r' must be an integer"):
         asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((1, 2)), 1, 0.8)
-    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
+    with pytest.raises(TypeError, match="Keyword 'factor' must be an integer"):
         asda.calculate_gamma_values(np.zeros((1, 2)), np.zeros((1, 2)), 0.8, 3)
-    with pytest.raises(ValueError, match="Keyword 'factor' must be an integer"):
+    with pytest.raises(TypeError, match="Keyword 'factor' must be an integer"):
         asda.get_vortex_edges(gamma=np.zeros((1, 2)), factor=0.8)
     with pytest.raises(ValueError, match="Shape of velocity field's vx and vy do not match"):
         asda.get_vortex_properties(np.zeros((1, 2)), np.zeros((2, 1)), 0)
@@ -128,7 +128,7 @@ def test_real_data():
     for cen in center_edge["center"]:
         cen = [int(cen[0]), int(cen[1])]
         idx = np.where(correct["center"] == cen)
-        assert not np.size(idx[0]) < 2
+        assert np.size(idx[0]) >= 2
         pos.append(np.bincount(idx[0]).argmax())
 
     # perform comparison

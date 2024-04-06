@@ -171,10 +171,7 @@ def _trim_intergranules(segmented_image, *, mark=False):
     # Set all other 0 regions to mark value (3).
     for value in values:
         if np.sum(segmented_image[labeled_seg == value]) == 0 and value != real_IG_value:
-            if not mark:
-                segmented_image_fixed[labeled_seg == value] = 1
-            elif mark:
-                segmented_image_fixed[labeled_seg == value] = 3
+            segmented_image_fixed[labeled_seg == value] = 3 if mark else 1
     return segmented_image_fixed
 
 

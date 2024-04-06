@@ -47,9 +47,7 @@ def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Calla
                 raise TypeError(msg)
             # Run decorated function
             array_out = f(*sig_bound.args, **sig_bound.kwargs)
-            if map_in and output_to_map:
-                return Map(array_out, map_arg.meta)
-            return array_out
+            return Map(array_out, map_arg.meta) if map_in and output_to_map else array_out
 
         return inner
 

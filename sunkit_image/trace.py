@@ -172,16 +172,14 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             # After the forward pass the loop points are flipped as the backward pass starts
             # from the maximum flux point
             if idir == 0:
-                xloop = np.flip(xl[0 : ip + 1])
-                yloop = np.flip(yl[0 : ip + 1])
+                xloop = np.flip(xl[: ip + 1])
+                yloop = np.flip(yl[: ip + 1])
                 continue
-            # After the backward pass the forward and backward traces are concatenated
-            if idir == 1 and ip >= 1:
-                xloop = np.concatenate([xloop, xl[1 : ip + 1]])
-                yloop = np.concatenate([yloop, yl[1 : ip + 1]])
-            else:
+            if idir != 1 or ip < 1:
                 break
 
+            xloop = np.concatenate([xloop, xl[1 : ip + 1]])
+            yloop = np.concatenate([yloop, yl[1 : ip + 1]])
         # Selecting only those loop points where both the coordinates are non-zero
         ind = np.logical_and(xloop != 0, yloop != 0)
         nind = np.sum(ind)
@@ -518,9 +516,8 @@ def _curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     # This denotes loop tracing in forward direction
     if idir == 0:
         sign_dir = +1
-
     # This denotes loop tracing in backward direction
-    if idir == 1:
+    elif idir == 1:
         sign_dir = -1
 
     # `ib1` and `ib2` decide the range of radius in which the next point is to be searched

@@ -114,7 +114,7 @@ def test_segments_overlap_fraction(granule_minimap1):
 def test_segments_overlap_fraction2(granule_minimap1, granule_minimap2):
     # Check that segments_overlap_fraction is between 0 and 1 when Maps are not equal.
     assert segments_overlap_fraction(granule_minimap1, granule_minimap2) <= 1
-    assert not segments_overlap_fraction(granule_minimap1, granule_minimap2) < 0
+    assert segments_overlap_fraction(granule_minimap1, granule_minimap2) >= 0
 
 
 def test_segments_overlap_fraction_errors(granule_minimap3):
