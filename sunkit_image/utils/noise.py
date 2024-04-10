@@ -46,7 +46,7 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
     >>> rng = np.random.default_rng(0)
     >>> noisy_image_array = rng.standard_normal((100, 100))
     >>> estimate = noise_estimation(noisy_image_array, patchsize=11, iterations=10)
-    >>> estimate['mask'] # Prints mask
+    >>> estimate["mask"]  # Prints mask
     array([[1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
@@ -54,11 +54,11 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
         [1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
         [0., 0., 0., ..., 0., 0., 0.]])
-    >>> estimate['nlevel'] # Prints nlevel
+    >>> estimate["nlevel"]  # Prints nlevel
     array([0.97398633])
-    >>> estimate['thresh'] # Prints thresh
+    >>> estimate["thresh"]  # Prints thresh
     array([164.21965135])
-    >>> estimate['num'] # Prints num
+    >>> estimate["num"]  # Prints num
      array([8100.])
 
     References
@@ -76,41 +76,41 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
     try:
         img = np.array(img)
     except ValueError as e:
-        raise TypeError("Input image should be a numpy ndarray, or ndarray-compatible") from e
+        msg = "Input image should be a numpy ndarray, or ndarray-compatible"
+        raise TypeError(msg) from e
 
     try:
         patchsize = int(patchsize)
     except ValueError as e:
-        raise TypeError("patchsize must be an integer, or int-compatible") from e
+        msg = "patchsize must be an integer, or int-compatible"
+        raise TypeError(msg) from e
 
     try:
         decim = int(decim)
     except ValueError as e:
-        raise TypeError("decim must be an integer, or int-compatible") from e
+        msg = "decim must be an integer, or int-compatible"
+        raise TypeError(msg) from e
 
     try:
         confidence = float(confidence)
     except ValueError as e:
-        raise TypeError("confidence must be a float, or float-compatible, value between 0 and 1") from e
+        msg = "confidence must be a float, or float-compatible, value between 0 and 1"
+        raise TypeError(msg) from e
 
-    if not (confidence >= 0 and confidence <= 1):
-        raise ValueError("confidence must be defined in the interval 0 <= confidence <= 1")
+    if confidence < 0 or confidence > 1:
+        msg = "confidence must be defined in the interval 0 <= confidence <= 1"
+        raise ValueError(msg)
 
     try:
         iterations = int(iterations)
     except ValueError as e:
-        raise TypeError("iterations must be an integer, or int-compatible.") from e
+        msg = "iterations must be an integer, or int-compatible."
+        raise TypeError(msg) from e
 
-    output = {}
     nlevel, thresh, num = noiselevel(img, patchsize, decim, confidence, iterations)
     mask = weak_texture_mask(img, patchsize, thresh)
 
-    output["nlevel"] = nlevel
-    output["thresh"] = thresh
-    output["num"] = num
-    output["mask"] = mask
-
-    return output
+    return {"nlevel": nlevel, "thresh": thresh, "num": num, "mask": mask}
 
 
 def noiselevel(img, patchsize, decim, confidence, iterations):
@@ -324,8 +324,8 @@ def weak_texture_mask(img, patchsize, thresh):
         p = Xtr < thresh[cha]
         ind = 0
 
-        for col in range(0, s[1] - patchsize + 1):
-            for row in range(0, s[0] - patchsize + 1):
+        for col in range(s[1] - patchsize + 1):
+            for row in range(s[0] - patchsize + 1):
                 if p[:, ind]:
                     msk[row : row + patchsize - 1, col : col + patchsize - 1, cha] = 1
                 ind = ind + 1

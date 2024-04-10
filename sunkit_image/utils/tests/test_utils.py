@@ -105,12 +105,12 @@ def test_get_radial_intensity_summary(smap):
     summary = np.mean
     map_r = utils.find_pixel_radii(smap, scale=smap.rsun_obs).to(u.R_sun)
     nbins = radial_bin_edges.shape[1]
-    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
-    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
+    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(nbins)]
+    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(nbins)]
     with warnings.catch_warnings():
         # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
-        expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(0, nbins)])
+        expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(nbins)])
     assert np.allclose(utils.get_radial_intensity_summary(smap=smap, radial_bin_edges=radial_bin_edges), expected)
 
 
@@ -158,7 +158,7 @@ def test_points_in_poly():
 
 def test_reform_2d():
     test_data = np.asarray([[0, 0], [1, 2], [3, 4]])
-    with pytest.raises(ValueError, match="Parameter 'factor' must be an integer!"):
+    with pytest.raises(TypeError, match="Parameter 'factor' must be an integer!"):
         utils.reform2d(test_data, 2.2)
     with pytest.raises(ValueError, match="Input array must be 2d!"):
         utils.reform2d(test_data[0], 2)

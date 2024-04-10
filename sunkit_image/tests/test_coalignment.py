@@ -85,7 +85,7 @@ def test_check_for_nonfinite_entries():
 
     assert len(warning_list) == 0
 
-    for i in range(0, 9):
+    for i in range(9):
         for non_number in [np.nan, np.inf]:
             a = np.ones(9)
             a[i] = non_number
@@ -357,7 +357,7 @@ def test_apply_shifts(aia171_test_map):
     # Test returning with clipping.  Output layers should be smaller than the
     # original layer by a known amount.
     test_mc = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"], clip=True)
-    for i in range(0, len(test_mc.maps)):
+    for i in range(len(test_mc.maps)):
         clipped = _calculate_clipping(astropy_displacements["y"], astropy_displacements["x"])
         assert test_mc[i].data.shape[0] == mc[i].data.shape[0] - np.max(clipped[0].value)
         assert test_mc[i].data.shape[1] == mc[i].data.shape[1] - np.max(clipped[1].value)
@@ -366,7 +366,7 @@ def test_apply_shifts(aia171_test_map):
     # true, that is the mapsequence is clipped.  Output layers should be smaller
     # than the original layer by a known amount.
     test_mc = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"])
-    for i in range(0, len(test_mc.maps)):
+    for i in range(len(test_mc.maps)):
         clipped = _calculate_clipping(astropy_displacements["y"], astropy_displacements["x"])
         assert test_mc[i].data.shape[0] == mc[i].data.shape[0] - np.max(clipped[0].value)
         assert test_mc[i].data.shape[1] == mc[i].data.shape[1] - np.max(clipped[1].value)

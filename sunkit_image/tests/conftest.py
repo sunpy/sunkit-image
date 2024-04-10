@@ -1,6 +1,6 @@
+import importlib.util
 import os
 import tempfile
-import importlib.util
 
 import astropy
 import astropy.config.paths
@@ -15,11 +15,11 @@ from sunpy.map.header_helper import make_fitswcs_header
 
 # Force MPL to use non-gui backends for testing.
 try:
-    import matplotlib
+    import matplotlib as mpl
 except ImportError:
     pass
 else:
-    matplotlib.use("Agg")
+    mpl.use("Agg")
 
 # Don't actually import pytest_remotedata because that can do things to the
 # entrypoints code in pytest.
@@ -31,22 +31,22 @@ collect_ignore = ["data/sample.py"]
 
 
 @pytest.fixture(scope="session", autouse=True)
-def _tmp_config_dir(request):
+def _tmp_config_dir(request):  # NOQA: ARG001
     """
     Globally set the default config for all tests.
     """
     tmpdir = tempfile.TemporaryDirectory()
 
     os.environ["SUNPY_CONFIGDIR"] = str(tmpdir.name)
-    astropy.config.paths.set_temp_config._temp_path = str(tmpdir.name)
-    astropy.config.paths.set_temp_cache._temp_path = str(tmpdir.name)
+    astropy.config.paths.set_temp_config._temp_path = str(tmpdir.name)  # NOQA: SLF001
+    astropy.config.paths.set_temp_cache._temp_path = str(tmpdir.name)  # NOQA: SLF001
 
     yield
 
     del os.environ["SUNPY_CONFIGDIR"]
     tmpdir.cleanup()
-    astropy.config.paths.set_temp_config._temp_path = None
-    astropy.config.paths.set_temp_cache._temp_path = None
+    astropy.config.paths.set_temp_config._temp_path = None  # NOQA: SLF001
+    astropy.config.paths.set_temp_cache._temp_path = None  # NOQA: SLF001
 
 
 @pytest.fixture()
@@ -61,7 +61,7 @@ def _undo_config_dir_patch():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def tmp_dl_dir(request):
+def tmp_dl_dir(request):  # NOQA: ARG001
     """
     Globally set the default download directory for the test run to a tmp dir.
     """
@@ -87,9 +87,8 @@ def pytest_runtest_setup(item):
     Pytest hook to skip all tests that have the mark 'remotedata' if the
     pytest_remotedata plugin is not installed.
     """
-    if isinstance(item, pytest.Function):
-        if "remote_data" in item.keywords and not HAVE_REMOTEDATA:
-            pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
+    if isinstance(item, pytest.Function) and "remote_data" in item.keywords and not HAVE_REMOTEDATA:
+        pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
 
 
 @pytest.fixture()
@@ -159,6 +158,4 @@ def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":
         return smap
-    if request.param == "array":
-        return smap.data
-    return None
+    return smap.data if request.param == "array" else None

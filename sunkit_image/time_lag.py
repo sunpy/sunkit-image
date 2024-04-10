@@ -5,8 +5,6 @@ lag between intensity cubes.
 Useful for understanding time variability in EUV light curves.
 """
 
-from typing import Optional
-
 import astropy.units as u
 import numpy as np
 
@@ -34,7 +32,8 @@ def get_lags(time: u.s):
     """
     delta_t = np.diff(time)
     if not np.allclose(delta_t, delta_t[0]):
-        raise ValueError("Times must be evenly sampled")
+        msg = "Times must be evenly sampled"
+        raise ValueError(msg)
     delta_t = delta_t.cumsum(axis=0)
     return np.hstack([-delta_t[::-1], np.array([0]), delta_t])
 
@@ -104,12 +103,15 @@ def cross_correlation(signal_a, signal_b, lags: u.s):
     # interpolated and chunked (if using Dask)
     delta_lags = np.diff(lags)
     if not u.allclose(delta_lags, delta_lags[0]):
-        raise ValueError("Lags must be evenly sampled")
+        msg = "Lags must be evenly sampled"
+        raise ValueError(msg)
     n_time = (lags.shape[0] + 1) // 2
     if signal_a.shape != signal_b.shape:
-        raise ValueError("Signals must have same shape.")
+        msg = "Signals must have same shape."
+        raise ValueError(msg)
     if signal_a.shape[0] != n_time:
-        raise ValueError("First dimension of signal must be equal in length to time array.")
+        msg = "First dimension of signal must be equal in length to time array."
+        raise ValueError(msg)
     # Reverse the first timeseries
     signal_a = signal_a[::-1]
     # Normalize by mean and standard deviation
@@ -163,7 +165,7 @@ def _dask_check(lags, indices):
 
 
 @u.quantity_input
-def time_lag(signal_a, signal_b, time: u.s, lag_bounds: Optional[u.Quantity[u.s]] = None, **kwargs):
+def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.s = None, **kwargs):
     r"""
     Compute the time lag that maximizes the cross-correlation between
     ``signal_a`` and ``signal_b``.
@@ -237,7 +239,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: Optional[u.Quantity[u.s]
 
 
 @u.quantity_input
-def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: Optional[u.Quantity[u.s]] = None):
+def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: u.s = None):
     """
     Compute the maximum value of the cross-correlation between ``signal_a`` and
     ``signal_b``.
@@ -256,7 +258,7 @@ def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: Optional[u.
     time : array-like
         Time array corresponding to the intensity time series
         ``signal_a`` and ``signal_b``.
-    lag_bounds : `tuple`, optional
+    lag_bounds : `~astropy.units.Quantity`, optional
         Minimum and maximum lag to consider when finding the time
         lag that maximizes the cross-correlation. This is useful
         for minimizing boundary effects.

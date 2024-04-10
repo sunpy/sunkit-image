@@ -15,7 +15,8 @@ __all__ = ["mgn"]
 @accept_array_or_map(arg_name="data")
 def mgn(
     data,
-    sigma=[1.25, 2.5, 5, 10, 20, 40],
+    *,
+    sigma=None,
     k=0.7,
     gamma=3.2,
     h=0.7,
@@ -87,6 +88,8 @@ def mgn(
       arXiv preprint arXiv:1403.6613 (2014).
       Ref: Sol Phys (2014) 289: 2945. doi:10.1007/s11207-014-0523-9
     """
+    if sigma is None:
+        sigma = [1.25, 2.5, 5, 10, 20, 40]
     if np.isnan(data).any():
         warnings.warn(
             "One or more entries in the input data are NaN. This implementation does not account "
@@ -106,7 +109,7 @@ def mgn(
     conv = np.zeros_like(data)
     sigmaw = np.zeros_like(data)
 
-    for s, weight in zip(sigma, weights):
+    for s, weight in zip(sigma, weights, strict=True):
         # 2 & 3 Create kernel and convolve with image
         # Refer to equation (1) in the paper
         ndimage.gaussian_filter(data, sigma=s, truncate=truncate, mode="nearest", output=conv)

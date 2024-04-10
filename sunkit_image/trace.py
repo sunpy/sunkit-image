@@ -91,11 +91,12 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     image2[0:nsm2, :] = 0.0
     image2[nx - nsm2 :, :] = 0.0
 
-    if (not np.count_nonzero(image2)) is True:
-        raise RuntimeError(
+    if not np.count_nonzero(image2):
+        msg = (
             "The filter size is very large compared to the size of the image."
-            + " The entire image zeros out while smoothing the image edges after filtering.",
+            " The entire image zeros out while smoothing the image edges after filtering."
         )
+        raise RuntimeError(msg)
 
     # NOISE THRESHOLD
     zmed = np.median(image2[image2 > 0])
@@ -110,7 +111,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
     # Creating the structure in which the loops will be finally stored
     loops = []
 
-    for _ in range(0, nstruc):
+    for _ in range(nstruc):
         # Loop tracing begins at maximum flux position
         zstart = residual.max()
 
@@ -129,7 +130,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
         # The two directions in bidirectional tracing of loops
         ndir = 2
 
-        for idir in range(0, ndir):
+        for idir in range(ndir):
             # Creating arrays which will store all the loops points coordinates, flux,
             # angle and radius.
             # xl, yl are the x and y coordinates
@@ -153,7 +154,7 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             al[0] = _initial_direction_finding(residual, xl[0], yl[0], nlen)
 
             # `ip` denotes a point in the traced loop
-            for ip in range(0, npmax):
+            for ip in range(npmax):
                 # The below function call will return the coordinate, flux and angle
                 # of the next point.
                 xl, yl, zl, al = _curvature_radius(residual, rmin, xl, yl, zl, al, ir, ip, nlen, idir)
@@ -171,16 +172,14 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
             # After the forward pass the loop points are flipped as the backward pass starts
             # from the maximum flux point
             if idir == 0:
-                xloop = np.flip(xl[0 : ip + 1])
-                yloop = np.flip(yl[0 : ip + 1])
+                xloop = np.flip(xl[: ip + 1])
+                yloop = np.flip(yl[: ip + 1])
                 continue
-            # After the backward pass the forward and backward traces are concatenated
-            if idir == 1 and ip >= 1:
-                xloop = np.concatenate([xloop, xl[1 : ip + 1]])
-                yloop = np.concatenate([yloop, yl[1 : ip + 1]])
-            else:
+            if idir != 1 or ip < 1:
                 break
 
+            xloop = np.concatenate([xloop, xl[1 : ip + 1]])
+            yloop = np.concatenate([yloop, yl[1 : ip + 1]])
         # Selecting only those loop points where both the coordinates are non-zero
         ind = np.logical_and(xloop != 0, yloop != 0)
         nind = np.sum(ind)
@@ -241,7 +240,8 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
         and the same metadata.
     """
     if nsm1 >= nsm2:
-        raise ValueError("nsm1 should be less than nsm2")
+        msg = "nsm1 should be less than nsm2"
+        raise ValueError(msg)
 
     if nsm1 <= 2:
         return image - smooth(image, nsm2, "replace")
@@ -351,7 +351,7 @@ def _erase_loop_in_image(image, istart, jstart, width, xloop, yloop):
     image[xstart : xend + 1, ystart : yend + 1] = 0.0
 
     # All the points surrounding the loops are zeroed out
-    for point in range(0, len(xloop)):
+    for point in range(len(xloop)):
         i0 = min(max(int(xloop[point]), 0), nx - 1)
         xstart = max(int(i0 - width), 0)
         xend = min(int(i0 + width), nx - 1)
@@ -409,11 +409,7 @@ def _loop_add(lengths, xloop, yloop, iloop, loops):
 
     iloop += 1
 
-    # The current loop which will contain its points
-    current = []
-    for i in range(0, len(x_interp)):
-        current.append([x_interp[i], y_interp[i]])
-
+    current = [[x_interp[i], y_interp[i]] for i in range(len(x_interp))]
     loops.append(current)
 
     return loops, iloop
@@ -520,9 +516,8 @@ def _curvature_radius(image, rmin, xl, yl, zl, al, ir, ip, nlen, idir):
     # This denotes loop tracing in forward direction
     if idir == 0:
         sign_dir = +1
-
     # This denotes loop tracing in backward direction
-    if idir == 1:
+    elif idir == 1:
         sign_dir = -1
 
     # `ib1` and `ib2` decide the range of radius in which the next point is to be searched

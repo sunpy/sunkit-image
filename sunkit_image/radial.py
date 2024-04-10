@@ -181,7 +181,8 @@ def intensity_enhance(
 
     # Fit range
     if fit_range[0] >= fit_range[1]:
-        raise ValueError("The fit range must be strictly increasing.")
+        msg = "The fit range must be strictly increasing."
+        raise ValueError(msg)
 
     fit_here = np.logical_and(
         fit_range[0].to(u.R_sun).value <= radial_bin_summary.to(u.R_sun).value,
@@ -210,9 +211,9 @@ def nrgf(
     radial_bin_edges,
     scale=None,
     intensity_summary=np.nanmean,
-    intensity_summary_kwargs={},
+    intensity_summary_kwargs=None,
     width_function=np.std,
-    width_function_kwargs={},
+    width_function_kwargs=None,
     application_radius=1 * u.R_sun,
 ):
     """
@@ -270,6 +271,10 @@ def nrgf(
     """
 
     # Get the radii for every pixel
+    if width_function_kwargs is None:
+        width_function_kwargs = {}
+    if intensity_summary_kwargs is None:
+        intensity_summary_kwargs = {}
     map_r = find_pixel_radii(smap).to(u.R_sun)
 
     # To make sure bins are in the map.
@@ -302,7 +307,7 @@ def nrgf(
     data = np.zeros_like(smap.data)
 
     # Calculate the filter value for each radial bin.
-    for i in range(0, radial_bin_edges.shape[1]):
+    for i in range(radial_bin_edges.shape[1]):
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         here = np.logical_and(here, map_r > application_radius)
         data[here] = smap.data[here] - radial_intensity[i]
@@ -312,7 +317,7 @@ def nrgf(
     return sunpy.map.Map(data, smap.meta)
 
 
-def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0.0], cutoff=0):
+def set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=0):
     """
     This is a helper function to Fourier Normalizing Radial Gradient Filter
     (`sunkit_image.radial.fnrgf`).
@@ -353,12 +358,17 @@ def set_attenuation_coefficients(order, range_mean=[1.0, 0.0], range_std=[1.0, 0
         the mean approximation. The second row contains the attenuation coefficients for the Fourier coefficients
         of the standard deviation approximation.
     """
+    if range_std is None:
+        range_std = [1.0, 0.0]
+    if range_mean is None:
+        range_mean = [1.0, 0.0]
     attenuation_coefficients = np.zeros((2, order + 1))
     attenuation_coefficients[0, :] = np.linspace(range_mean[0], range_mean[1], order + 1)
     attenuation_coefficients[1, :] = np.linspace(range_std[0], range_std[1], order + 1)
 
     if cutoff > (order + 1):
-        raise ValueError("Cutoff cannot be greater than order + 1.")
+        msg = "Cutoff cannot be greater than order + 1."
+        raise ValueError(msg)
 
     if cutoff != 0:
         attenuation_coefficients[:, (-1 * cutoff) :] = 0
@@ -371,7 +381,7 @@ def fnrgf(
     radial_bin_edges,
     order,
     attenuation_coefficients,
-    ratio_mix=[15, 1],
+    ratio_mix=None,
     intensity_summary=np.nanmean,
     width_function=np.std,
     application_radius=1 * u.R_sun,
@@ -439,8 +449,11 @@ def fnrgf(
       https://dspace.vutbr.cz/bitstream/handle/11012/34520/DoctoralThesis.pdf.
     """
 
+    if ratio_mix is None:
+        ratio_mix = [15, 1]
     if order < 1:
-        raise ValueError("Minimum value of order is 1")
+        msg = "Minimum value of order is 1"
+        raise ValueError(msg)
 
     # Get the radii for every pixel
     map_r = find_pixel_radii(smap).to(u.R_sun)
@@ -470,7 +483,7 @@ def fnrgf(
     data = np.zeros_like(smap.data)
 
     # Iterate over each circular ring
-    for i in range(0, nbins):
+    for i in range(nbins):
         # Finding the pixels which belong to a certain circular ring
         annulus = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         annulus = np.logical_and(annulus, map_r > application_radius)
@@ -502,7 +515,7 @@ def fnrgf(
         )
 
         # Iterate over each segment in a circular ring
-        for j in range(0, number_angular_segments, 1):
+        for j in range(number_angular_segments):
             # Finding all the pixels whose angle values lie in the segment
             angular_segment = np.logical_and(angles >= segment_angle * j, angles < segment_angle * (j + 1))
 

@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import sunpy.data.sample
@@ -13,7 +14,14 @@ def test_mgn(aia_171):
     out = enhance.mgn(aia_171)
     assert type(out) == type(aia_171)
     if isinstance(out, sunpy.map.GenericMap):
-        out.plot()
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection=out)
+        out.plot(axes=ax)
+        return fig
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.imshow(out, origin="lower", interpolation="nearest", cmap="sdoaia171")
+    return fig
 
 
 @pytest.fixture()
@@ -23,12 +31,12 @@ def map_test():
 
 def test_multiscale_gaussian(map_test):
     # Assuming the algorithm works fine then the below two should be equal.
-    expect1 = enhance.mgn(map_test, [1])
-    expect2 = enhance.mgn(map_test, [1, 1])
+    expect1 = enhance.mgn(map_test, sigma=[1])
+    expect2 = enhance.mgn(map_test, sigma=[1, 1])
     assert np.allclose(expect1, expect2)
 
     result1 = np.zeros((4, 4), dtype=float)
-    expect3 = enhance.mgn(map_test, [1])
+    expect3 = enhance.mgn(map_test, sigma=[1])
     assert np.allclose(result1, expect3)
 
     # This is a dummy test.
