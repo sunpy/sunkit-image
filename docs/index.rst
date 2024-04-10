@@ -23,6 +23,15 @@ sunkit-image
           generated/gallery/index
           changelog
 
+Mission Statement
+=================
+
+The goal of the ``sunkit-image`` library is to provide access to image processing routines that are focused around solar physics data that are readable via sunpy Maps or ndcube NDCube.
+
+As there are an infinite number of ways to process images, the goal is to provide a set of tools that are based around published methods in the solar physics literature.
+This means that the package will contain only a subset of available image processing routines that have been demonstrated to work for solar physics data.
+This is not a replacement for scikit-image or planned to be a general purpose image processing library.
+
 Installation
 ============
 
