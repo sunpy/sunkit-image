@@ -165,7 +165,7 @@ def _dask_check(lags, indices):
 
 
 @u.quantity_input
-def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.s=None, **kwargs):
+def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.s = None, **kwargs):
     r"""
     Compute the time lag that maximizes the cross-correlation between
     ``signal_a`` and ``signal_b``.
@@ -239,7 +239,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.s=None, **kwargs):
 
 
 @u.quantity_input
-def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: u.s=None):
+def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: u.s = None):
     """
     Compute the maximum value of the cross-correlation between ``signal_a`` and
     ``signal_b``.
@@ -258,7 +258,7 @@ def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: u.s=None):
     time : array-like
         Time array corresponding to the intensity time series
         ``signal_a`` and ``signal_b``.
-    lag_bounds : `tuple`, optional
+    lag_bounds : `~astropy.units.Quantity`, optional
         Minimum and maximum lag to consider when finding the time
         lag that maximizes the cross-correlation. This is useful
         for minimizing boundary effects.
