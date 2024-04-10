@@ -165,7 +165,7 @@ def _dask_check(lags, indices):
 
 
 @u.quantity_input
-def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.Quantity[u.s] | None = None, **kwargs):
+def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.s=None, **kwargs):
     r"""
     Compute the time lag that maximizes the cross-correlation between
     ``signal_a`` and ``signal_b``.
