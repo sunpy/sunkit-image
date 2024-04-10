@@ -14,7 +14,7 @@
 
 ``sunkit-image`` is a a open-source toolbox for solar physics image processing.
 Currently it is an experimental library for solar physics specific image processing routines.
-Ideally it will only contain routines that have been published in literature.
+Ideally it will only contain routines that have been published in the literature.
 
 See `sunkit-image Documentation`_ for instructions on how to install and contribute.
 
