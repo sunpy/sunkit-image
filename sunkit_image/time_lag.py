@@ -239,7 +239,7 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.Quantity[u.s] | None =
 
 
 @u.quantity_input
-def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: u.Quantity[u.s] | None = None):
+def max_cross_correlation(signal_a, signal_b, time: u.s, lag_bounds: u.s=None):
     """
     Compute the maximum value of the cross-correlation between ``signal_a`` and
     ``signal_b``.
