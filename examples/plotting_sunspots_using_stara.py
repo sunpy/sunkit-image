@@ -85,8 +85,8 @@ plt.show()
 # the coordinates of the rectangle to zoom in on.
 # For example, let's zoom in on a rectangle from (x0, y0) to (x1, y1)
 
-x0, y0 = 100, 200
-x1, y1 = 500, 500
+x0, y0 = 240, 350
+x1, y1 = 310, 410
 
 fig = plt.figure()
 ax = plt.subplot(projection=cont_rotated_resample)
