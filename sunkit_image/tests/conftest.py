@@ -158,9 +158,7 @@ def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":
         return smap
-    if request.param == "array":
-        return smap.data
-    return None
+    return smap.data if request.param == "array" else None
 
 
 @pytest.fixture()
