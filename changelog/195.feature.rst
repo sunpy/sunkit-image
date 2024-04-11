@@ -1,1 +1,2 @@
 Added the `sunkit_image.stara` module which is an implementation of Sunspot Tracking And Recognition (STARA).
+Added an example of plotting sunspots using the stara.
