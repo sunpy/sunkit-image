@@ -1,9 +1,10 @@
 """
 This module contains functions that will segment images for granule detection.
 """
+
 import logging
 
-import matplotlib
+import matplotlib as mpl
 import numpy as np
 import scipy
 import skimage
@@ -46,11 +47,13 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
         `~sunpy.map.GenericMap` containing a segmented image (with the original header).
     """
     if not isinstance(smap, sunpy.map.mapbase.GenericMap):
-        raise TypeError("Input must be an instance of a sunpy.map.GenericMap")
+        msg = "Input must be an instance of a sunpy.map.GenericMap"
+        raise TypeError(msg)
     if smap.scale[0].value == smap.scale[1].value:
         resolution = smap.scale[0].value
     else:
-        raise ValueError("Currently only maps with square pixels are supported.")
+        msg = "Currently only maps with square pixels are supported."
+        raise ValueError(msg)
     # Obtain local histogram equalization of map.
     # min-max normalization to [0, 1]
     map_norm = (smap.data - np.nanmin(smap.data)) / (np.nanmax(smap.data) - np.nanmin(smap.data))
@@ -72,11 +75,11 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
         resolution,
         bp_min_flux,
     )
-    logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")
+    logging.info(f"Segmentation has identified {granule_count} granules and {brightpoint_count} brightpoint")  # NOQA: G004
     # Create output map using input wcs and adding colormap such that 0 (intergranules) = black, 1 (granule) = white, 2 (brightpoints) = yellow, 3 (dim_centers) = blue.
     segmented_map = sunpy.map.Map(seg_im_markbp, smap.wcs)
-    cmap = matplotlib.colors.ListedColormap(["black", "white", "#ffc406", "blue"])
-    norm = matplotlib.colors.BoundaryNorm(boundaries=[-0.5, 0.5, 1.5, 2.5, 3.5], ncolors=cmap.N)
+    cmap = mpl.colors.ListedColormap(["black", "white", "#ffc406", "blue"])
+    norm = mpl.colors.BoundaryNorm(boundaries=[-0.5, 0.5, 1.5, 2.5, 3.5], ncolors=cmap.N)
     segmented_map.plot_settings["cmap"] = cmap
     segmented_map.plot_settings["norm"] = norm
     return segmented_map
@@ -99,7 +102,8 @@ def _get_threshold(data, method):
         Threshold value.
     """
     if not isinstance(data, np.ndarray):
-        raise ValueError("Input data must be an instance of a np.ndarray")
+        msg = "Input data must be an instance of a np.ndarray"
+        raise TypeError(msg)
     if len(data.flatten()) > 500**2:
         logging.info(
             "Input image is large (> 500**2), so threshold computation will be based on a random 500x500 sample of pixels",
@@ -125,7 +129,7 @@ def _get_threshold(data, method):
     return method_funcs[method](data)
 
 
-def _trim_intergranules(segmented_image, mark=False):
+def _trim_intergranules(segmented_image, *, mark=False):
     """
     Remove the erroneous identification of intergranule material in the middle
     of granules that the pure threshold segmentation produces.
@@ -144,7 +148,8 @@ def _trim_intergranules(segmented_image, mark=False):
         The segmented image without incorrect extra intergranules.
     """
     if len(np.unique(segmented_image)) > 2:
-        raise ValueError("segmented_image must only have values of 1 and 0.")
+        msg = "segmented_image must only have values of 1 and 0."
+        raise ValueError(msg)
     # Float conversion for correct region labeling.
     segmented_image_fixed = np.copy(segmented_image).astype(float)
     # Add padding of intergranule around edges.
@@ -165,12 +170,8 @@ def _trim_intergranules(segmented_image, mark=False):
             size = len(labeled_seg[labeled_seg == value])
     # Set all other 0 regions to mark value (3).
     for value in values:
-        if np.sum(segmented_image[labeled_seg == value]) == 0:
-            if value != real_IG_value:
-                if not mark:
-                    segmented_image_fixed[labeled_seg == value] = 1
-                elif mark:
-                    segmented_image_fixed[labeled_seg == value] = 3
+        if np.sum(segmented_image[labeled_seg == value]) == 0 and value != real_IG_value:
+            segmented_image_fixed[labeled_seg == value] = 3 if mark else 1
     return segmented_image_fixed
 
 
@@ -214,7 +215,8 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
     else:
         bp_brightness_limit = bp_min_flux
     if len(np.unique(segmented_image)) > 3:
-        raise ValueError("segmented_image must have only values of 1, 0 and 3 (if dim centers marked)")
+        msg = "segmented_image must have only values of 1, 0 and 3 (if dim centers marked)"
+        raise ValueError(msg)
     # Obtain gradient map and set threshold for gradient on BP edges
     grad = np.abs(np.gradient(data)[0] + np.gradient(data)[1])
     bp_min_grad = np.quantile(grad, 0.95)
@@ -265,9 +267,11 @@ def segments_overlap_fraction(segment1, segment2):
     total_granules = np.count_nonzero(segment1 == 1)
     total_intergranules = np.count_nonzero(segment1 == 0)
     if total_granules == 0:
-        raise ValueError("No granules in `segment1`. It is possible the clustering failed.")
+        msg = "No granules in `segment1`. It is possible the clustering failed."
+        raise ValueError(msg)
     if total_intergranules == 0:
-        raise ValueError("No intergranules in `segment1`. It is possible the clustering failed.")
+        msg = "No intergranules in `segment1`. It is possible the clustering failed."
+        raise ValueError(msg)
     granule_agreement_count = 0
     intergranule_agreement_count = 0
     granule_agreement_count = ((segment1 == 1) * (segment2 == 1)).sum()

@@ -105,12 +105,12 @@ def test_get_radial_intensity_summary(smap):
     summary = np.mean
     map_r = utils.find_pixel_radii(smap, scale=smap.rsun_obs).to(u.R_sun)
     nbins = radial_bin_edges.shape[1]
-    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
-    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
+    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(nbins)]
+    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(nbins)]
     with warnings.catch_warnings():
         # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
-        expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(0, nbins)])
+        expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(nbins)])
     assert np.allclose(utils.get_radial_intensity_summary(smap=smap, radial_bin_edges=radial_bin_edges), expected)
 
 
@@ -121,17 +121,15 @@ def test_calculate_gamma():
     vx = vxvy["vx"]
     vy = vxvy["vy"]
     vxvy["data"]
-    factor = 1
-    lo = asda.Asda(vx, vy, factor=factor)
     shape = vx.shape
     r = 3
     index = np.array([[i, j] for i in np.arange(r, shape[0] - r) for j in np.arange(r, shape[1] - r)])
-    vel = lo.gen_vel(index[1], index[0])
+    vel = asda.generate_velocity_field(vx, vy, index[1], index[0], r)
     pm = np.array(
-        [[i, j] for i in np.arange(-lo.r, lo.r + 1) for j in np.arange(-lo.r, lo.r + 1)],
+        [[i, j] for i in np.arange(-r, r + 1) for j in np.arange(-r, r + 1)],
         dtype=float,
     )
-    N = (2 * lo.r + 1) ** 2
+    N = (2 * r + 1) ** 2
     pnorm = np.linalg.norm(pm, axis=1)
     cross = np.cross(pm, vel[..., 0])
     vel_norm = np.linalg.norm(vel[..., 0], axis=2)
@@ -160,7 +158,7 @@ def test_points_in_poly():
 
 def test_reform_2d():
     test_data = np.asarray([[0, 0], [1, 2], [3, 4]])
-    with pytest.raises(ValueError, match="Parameter 'factor' must be an integer!"):
+    with pytest.raises(TypeError, match="Parameter 'factor' must be an integer!"):
         utils.reform2d(test_data, 2.2)
     with pytest.raises(ValueError, match="Input array must be 2d!"):
         utils.reform2d(test_data[0], 2)

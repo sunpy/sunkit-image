@@ -48,7 +48,7 @@ def test_get_threshold_range():
 
 
 def test_get_threshold_errors():
-    with pytest.raises(ValueError, match="Input data must be an instance of a np.ndarray"):
+    with pytest.raises(TypeError, match="Input data must be an instance of a np.ndarray"):
         _get_threshold([], "li")
     with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
         _get_threshold(np.array([[1, 2], [1, 2]]), "banana")
@@ -114,7 +114,7 @@ def test_segments_overlap_fraction(granule_minimap1):
 def test_segments_overlap_fraction2(granule_minimap1, granule_minimap2):
     # Check that segments_overlap_fraction is between 0 and 1 when Maps are not equal.
     assert segments_overlap_fraction(granule_minimap1, granule_minimap2) <= 1
-    assert not segments_overlap_fraction(granule_minimap1, granule_minimap2) < 0
+    assert segments_overlap_fraction(granule_minimap1, granule_minimap2) >= 0
 
 
 def test_segments_overlap_fraction_errors(granule_minimap3):

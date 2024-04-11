@@ -13,13 +13,14 @@
    :target: http://numfocus.org
 
 ``sunkit-image`` is a a open-source toolbox for solar physics image processing.
-Currently it is an experimental library for various solar physics specific image processing routines.
+Currently it is an experimental library for solar physics specific image processing routines.
+Ideally it will only contain routines that have been published in the literature.
 
 See `sunkit-image Documentation`_ for instructions on how to install and contribute.
 
 Code of Conduct
 ---------------
 
-When you are interacting with the SunPy community you are asked to follow our `Code of Conduct`_.
+When you are interacting with the SunPy community you are asked to follow our `code of conduct <https://sunpy.org/coc>`__.
 
 .. _sunkit-image Documentation: https://docs.sunpy.org/projects/sunkit-image/en/stable/

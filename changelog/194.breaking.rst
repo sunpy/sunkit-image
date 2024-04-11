@@ -1,0 +1,2 @@
+Increased the minimum version of Python to 3.10.
+This comes along with an increase in the dependencies versions.

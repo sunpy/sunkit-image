@@ -8,6 +8,7 @@ of three AIA images at different wavelengths. To read more about the
 algorithm used in this example, see this
 `Astropy tutorial <https://docs.astropy.org/en/stable/visualization/rgb.html>`__.
 """
+
 import matplotlib.pyplot as plt
 import sunpy.data.sample
 from astropy.visualization import make_lupton_rgb

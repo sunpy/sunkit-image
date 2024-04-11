@@ -1,31 +1,15 @@
 """
 Configuration file for the Sphinx documentation builder.
 """
-import os
-import sys
-import logging
-import pathlib
+
 import datetime
+import os
+import pathlib
 
 from packaging.version import Version
-from pkg_resources import get_distribution
 from sunpy_sphinx_theme.conf import *  # NOQA: F403
 
 from sunkit_image import __version__
-
-doc_requires = get_distribution("sunkit_image").requires(extras=("docs",))
-missing_requirements = []
-for requirement in doc_requires:
-    try:
-        get_distribution(requirement)
-    except Exception:  # NOQA: BLE001
-        missing_requirements.append(requirement.project_name)
-if missing_requirements:
-    logging.warning(
-        f"The {' '.join(missing_requirements)} package(s) could not be found and "
-        "is needed to build the documentation, please install the 'docs' requirements.",
-    )
-    sys.exit(1)
 
 # -- Read the Docs Specific Configuration --------------------------------------
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
@@ -38,7 +22,7 @@ if on_rtd:
 
 project = "sunkit_image"
 author = "The SunPy Community"
-copyright = f"{datetime.datetime.now().year}, {author}"  # NOQA: A001
+copyright = f"{datetime.datetime.now(datetime.UTC).year}, {author}"  # NOQA: A001
 
 release = __version__
 sunkit_image_version = Version(__version__)

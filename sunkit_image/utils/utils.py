@@ -1,6 +1,7 @@
 """
 This module contains a collection of functions of general utility.
 """
+
 import warnings
 
 import astropy.units as u
@@ -41,9 +42,11 @@ def equally_spaced_bins(inner_value=1, outer_value=2, nbins=100):
         An array of shape ``(2, nbins)`` containing the bin edges.
     """
     if inner_value >= outer_value:
-        raise ValueError("The inner value must be strictly less than the outer value.")
+        msg = "The inner value must be strictly less than the outer value."
+        raise ValueError(msg)
     if nbins <= 0:
-        raise ValueError("The number of bins must be strictly greater than 0.")
+        msg = "The number of bins must be strictly greater than 0."
+        raise ValueError(msg)
     bin_edges = np.zeros((2, nbins))
     bin_edges[0, :] = np.arange(0, nbins)
     bin_edges[1, :] = np.arange(1, nbins + 1)
@@ -68,9 +71,11 @@ def bin_edge_summary(r, binfit):
         A one dimensional array of values that summarize the location of the bins.
     """
     if r.ndim != 2:
-        raise ValueError("The bin edges must be two-dimensional with shape (2, nbins).")
+        msg = "The bin edges must be two-dimensional with shape (2, nbins)."
+        raise ValueError(msg)
     if r.shape[0] != 2:
-        raise ValueError("The bin edges must be two-dimensional with shape (2, nbins).")
+        msg = "The bin edges must be two-dimensional with shape (2, nbins)."
+        raise ValueError(msg)
     if binfit == "center":
         summary = 0.5 * (r[0, :] + r[1, :])
     elif binfit == "left":
@@ -78,7 +83,8 @@ def bin_edge_summary(r, binfit):
     elif binfit == "right":
         summary = r[1, :]
     else:
-        raise ValueError('Keyword "binfit" must have value "center", "left" or "right"')
+        msg = 'Keyword "binfit" must have value "center", "left" or "right"'
+        raise ValueError(msg)
     return summary
 
 
@@ -143,23 +149,20 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
         A summary statistic of the radial intensity in the bins defined by the
         bin edges.
     """
-    if scale is None:
-        s = smap.rsun_obs
-    else:
-        s = scale
+    s = smap.rsun_obs if scale is None else scale
     # Get the radial distance of every pixel from the center of the Sun.
     map_r = find_pixel_radii(smap, scale=s).to(u.R_sun)
     # Number of radial bins
     nbins = radial_bin_edges.shape[1]
     # Upper and lower edges
-    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(0, nbins)]
-    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(0, nbins)]
+    lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(nbins)]
+    upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(nbins)]
     # Calculate the summary statistic in the radial bins.
     with warnings.catch_warnings():
         # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
         return np.asarray(
-            [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(0, nbins)],
+            [summary(smap.data[lower_edge[i] * upper_edge[i]], **summary_kwargs) for i in range(nbins)],
         )
 
 
@@ -180,9 +183,11 @@ def reform2d(array, factor=1):
         Reformed array.
     """
     if not isinstance(factor, int):
-        raise ValueError("Parameter 'factor' must be an integer!")
+        msg = "Parameter 'factor' must be an integer!"
+        raise TypeError(msg)
     if len(np.shape(array)) != 2:
-        raise ValueError("Input array must be 2d!")
+        msg = "Input array must be 2d!"
+        raise ValueError(msg)
     if factor > 1:
         congridx = RectBivariateSpline(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1)
         return congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
@@ -205,17 +210,18 @@ def points_in_poly(poly):
         N x 2 array, all points within the polygon.
     """
     if np.shape(poly)[1] != 2:
-        raise ValueError("Polygon must be defined as a n x 2 array!")
+        msg = "Polygon must be defined as a n x 2 array!"
+        raise ValueError(msg)
     # Convert to integers
     poly = np.array(poly, dtype=int).tolist()
-    xs, ys = zip(*poly)
+    xs, ys = zip(*poly, strict=True)
     minx, maxx = min(xs), max(xs)
     miny, maxy = min(ys), max(ys)
     # New polygon with the staring point as [0, 0]
     newPoly = [(int(x - minx), int(y - miny)) for (x, y) in poly]
     mask = measure.grid_points_in_poly((round(maxx - minx) + 1, round(maxy - miny) + 1), newPoly)
     # All points in polygon
-    points = [[x + minx, y + miny] for x, y in zip(*np.nonzero(mask))]
+    points = [[x + minx, y + miny] for x, y in zip(*np.nonzero(mask), strict=True)]
     # Add edge points if missing
     for p in poly:
         if p not in points:
@@ -239,7 +245,8 @@ def remove_duplicate(edge):
     """
     shape = np.shape(edge)
     if shape[1] != 2:
-        raise ValueError("Polygon must be defined as a n x 2 array!")
+        msg = "Polygon must be defined as a n x 2 array!"
+        raise ValueError(msg)
     new_edge = []
     for i in range(shape[0]):
         p = edge[i]
