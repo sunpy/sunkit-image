@@ -16,6 +16,6 @@ def test_stara_plot(mock_hmi_map):
 
     segmentation = stara(mock_hmi_map)
     fig = plt.figure()
-    ax = plt.subplot(projection=mock_hmi_map.wcs)
+    ax = plt.subplot(projection=mock_hmi_map)
     ax.contour(segmentation, levels=[0.5])
     return fig
