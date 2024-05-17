@@ -208,7 +208,7 @@ def wow(
     ----------
     data : `numpy.ndarray` or `sunpy.map.GenericMap`
         Image to be transformed.
-    scaling_function : {``Triangle`` | ``B3spline``}, optional
+    scaling_function : {``Triangle`` , ``B3spline``}, optional
         The wavelet scaling function, comes from the ``watroo`` package.
         Defaults to ``B3spline``.
     n_scales : `int`, optional
@@ -247,7 +247,7 @@ def wow(
     preserve_variance: `bool`, optional
         Experimental, do not use.
         Defaults to `False`.
-    gamma: `float, optional
+    gamma: `float`, optional
         The value used to calculate the global gamma-transformed image.
         Defaults to 3.2.
     gamma_min : `float` or `None`, optional

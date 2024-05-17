@@ -29,7 +29,7 @@ def segment(smap, *, skimage_method="li", mark_dim_centers=False, bp_min_flux=No
     ----------
     smap : `~sunpy.map.GenericMap`
         `~sunpy.map.GenericMap` containing data to segment. Must have square pixels.
-    skimage_method : {"li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"}, optional
+    skimage_method : { "li", "otsu", "isodata", "mean", "minimum", "yen", "triangle" }, optional
         scikit-image thresholding method, defaults to "li".
         Depending on input data, one or more of these methods may be
         significantly better or worse than the others. Typically, 'li', 'otsu',
@@ -93,7 +93,7 @@ def _get_threshold(data, method):
     ----------
     data : `numpy.ndarray`
         Data to threshold.
-    method : {"li", "otsu", "isodata", "mean", "minimum", "yen", "triangle"}
+    method : { "li", "otsu", "isodata", "mean", "minimum", "yen", "triangle" }
         scikit-image thresholding method.
 
     Returns
