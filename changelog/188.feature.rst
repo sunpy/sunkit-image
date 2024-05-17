@@ -1,0 +1,1 @@
+Added the ability to call a Wavelets Optimized Whitening (WOW) algorithm from the `watroo <https://pypi.org/project/watroo/>`__ package.
