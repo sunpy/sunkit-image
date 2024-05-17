@@ -200,7 +200,7 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
     brightpoint_count: `int`
         The number of brightpoints identified in the image.
     granule_count: `int`
-        The number of granules identified, after re-classifcation of brightpoint.
+        The number of granules identified, after re-classification of brightpoint.
     """
     # General size limits
     bp_size_limit = (

@@ -29,13 +29,6 @@ def map_test():
     return np.ones((4, 4), dtype=float)
 
 
-@pytest.mark.remote_data()
-def test_wow(aia_171):
-    out = enhance.wow(aia_171)
-    assert type(out) == type(aia_171)
-
-
-@pytest.mark.xfail()
 def test_multiscale_gaussian(map_test):
     # Assuming the algorithm works fine then the below two should be equal.
     expect1 = enhance.mgn(map_test, sigma=[1])
@@ -65,3 +58,19 @@ def test_nans_raise_warning(map_test):
     map_test[0, 0] = np.nan
     with pytest.warns(UserWarning, match="One or more entries in the input data are NaN."):
         enhance.mgn(map_test)
+
+
+@figure_test
+@pytest.mark.remote_data()
+def test_wow(aia_171):
+    out = enhance.wow(aia_171)
+    assert type(out) == type(aia_171)
+    if isinstance(out, sunpy.map.GenericMap):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection=out)
+        out.plot(axes=ax)
+        return fig
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.imshow(out, origin="lower", interpolation="nearest", cmap="sdoaia171")
+    return fig
