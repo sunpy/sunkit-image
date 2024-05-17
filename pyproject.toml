@@ -48,14 +48,15 @@ issue_tracker = "https://github.com/sunpy/sunkit-image/issues"
 repository = "https://github.com/sunpy/sunkit-image/"
 
 [project.optional-dependencies]
-all = ["sunkit_image"]
+core = ["sunkit_image"]
+all = ["sunkit_image[watroo]"]
+watroo = ["watroo"]
 tests = [
   "sunkit_image[all]",
   'dask',
   'pytest-astropy',
   'pytest-mpl',
   "sunpy[data]>=5.0.0",
-  "watroo",
 ]
 docs = [
   "sunkit_image[all]",
@@ -72,7 +73,7 @@ docs = [
   'sunpy[data,net]>=5.0.0',
   'zeep',
 ]
-dev = ["sunkit_image[tests,docs]"]
+dev = ["sunkit_image[all,tests,docs]"]
 
 [tool.setuptools_scm]
 write_to = "sunkit_image/_version.py"
