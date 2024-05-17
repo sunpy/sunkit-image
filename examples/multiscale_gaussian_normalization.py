@@ -5,6 +5,7 @@ Multi-scale Gaussian Normalization
 
 This example applies Multi-scale Gaussian Normalization to a `sunpy.map.Map` using `sunkit_image.enhance.mgn`.
 """
+# sphinx_gallery_thumbnail_number = 2  # NOQA: ERA001
 
 import matplotlib.pyplot as plt
 import sunpy.data.sample

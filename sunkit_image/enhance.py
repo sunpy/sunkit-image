@@ -41,7 +41,7 @@ def mgn(
         * In practice, the weights and h may be adjusted according to the desired output, and also according
           to the type of input image (e.g. wavelength or channel). For most purposes, the weights can be set
           equal for all scales.
-        * We don't deal with NaN (Not a Number) in this implementation.
+        * We do not deal with NaN (Not a Number) in this implementation.
         * The input data array should be normalized by the exposure time.
         * The input data array should be dtype `float`.
 
@@ -89,8 +89,8 @@ def mgn(
     ----------
     * Huw Morgan and Miloslav Druckmüller.
       "Multi-scale Gaussian normalization for solar image processing."
-      arXiv preprint arXiv:1403.6613 (2014).
-      Ref: Sol Phys (2014) 289: 2945. doi:10.1007/s11207-014-0523-9
+      Sol Phys 289, 2945-2955, 2014
+      `doi:10.1007/s11207-014-0523-9 <https://doi.org/10.1007/s11207-014-0523-9>`__
     """
     if sigma is None:
         sigma = [1.25, 2.5, 5, 10, 20, 40]
@@ -187,7 +187,7 @@ def wow(
     Processes an image with the Wavelets Optimized Whitening (WOW) algorithm.
 
     This function manipulates the wavelet spectrum of the input image so that the power in the output image
-    is equal at all locations and all spatial scales, thus 'whitening' the wavelet spectrum. By doing so, the
+    is equal at all locations and all spatial scales, thus "whitening" the wavelet spectrum. By doing so, the
     large scale structures are attenuated and the small scale structures are reinforced, with the objective
     criterion that the variance at all scales must be equal. The algorithm has the added advantage to allow
     attenuation of the noise at the same time, thus avoiding the usual explosion of noise usually inherent to
@@ -202,7 +202,7 @@ def wow(
           image. The weight of the gamma scaled image can be adjusted using
           the parameter ``h``, to the type of input image (e.g., wavelength or channel).
           For most purposes, the weights can be set to be equal for all scales.
-        * We don't deal with NaN (Not a Number) in this implementation.
+        * We do not deal with NaN (Not a Number) in this implementation.
 
     Parameters
     ----------
@@ -220,9 +220,9 @@ def wow(
         By default, the weights are all set to 1.
         If the weights are not 1, the spectrum of the output is not white.
         Defaults to ``[]``.
-    whitening : 'bool'
+    whitening : `bool`
         If True (default), the spectrum is whitened, i.e., normalized to the local power at each scale.
-        Defaults to 'True'.
+        Defaults to `True`.
     denoise_coefficients : `list` of `float`, optional
         Noise threshold, in units of the noise standard deviation, used at each scale to denoise the wavelet
         coefficients.
@@ -236,15 +236,15 @@ def wow(
         The bilateral transform avoids the formation of glows near strong gradients.
         The recommended "natural" value is 1.
         Defaults to `None`.
-    bilateral_scaling : 'bool', optional
+    bilateral_scaling : `bool`, optional
         Experimental, do not use.
-        Defaults to 'False'
-    soft_threshold: 'bool', optional
+        Defaults to `False`
+    soft_threshold: `bool`, optional
         Used only if denoise_coefficients is not ``[]``.
         If `True`, soft thresholding is used for denoising, otherwise, hard thresholding is used.
         Soft thresholding tends to create less artifacts.
         Defaults to `True`.
-    preserve_variance: 'bool', optional
+    preserve_variance: `bool`, optional
         Experimental, do not use.
         Defaults to `False`.
     gamma: `float, optional
@@ -269,13 +269,13 @@ def wow(
     References
     ----------
     * Frédéric Auchère, Elie Soubrié, Gabriel Pelouze, Eric Buchlin, 2023,
-      "Image Enhancement with Wavelets Optimized Whitening.", Astronomy & Astrophysics, 670, id.A66
-      doi:10.1051/0004-6361/202245345
+      "Image Enhancement with Wavelets Optimized Whitening.", Astronomy & Astrophysics, 670, A66
+      `doi:10.1051/0004-6361/202245345 <https://doi.org/10.1051/0004-6361/202245345>`__
     """
     try:
         from watroo import B3spline, utils
     except ImportError as e:
-        msg = "The 'watroo' package is required to use the 'wow' function. Please install it first."
+        msg = "The `watroo` package is required to use the `wow` function. Please install it first."
         raise ImportError(msg) from e
 
     if denoise_coefficients is None:

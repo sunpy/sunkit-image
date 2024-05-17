@@ -76,23 +76,11 @@ default_role = "obj"
 napoleon_use_rtype = False
 napoleon_google_docstring = False
 intersphinx_mapping = {
-    "python": (
-        "https://docs.python.org/3/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/python3.inv"),
-    ),
-    "numpy": (
-        "https://numpy.org/doc/stable/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
-    ),
-    "scipy": (
-        "https://docs.scipy.org/doc/scipy/reference/",
-        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
-    ),
+    "python": ("https://docs.python.org/3/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
-    "sunpy": (
-        "https://sunpy.org/",
-        (None, "https://docs.sunpy.org/en/stable/"),
-    ),
+    "sunpy": ("https://docs.sunpy.org/en/stable/", None),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "sqlalchemy": ("https://docs.sqlalchemy.org/en/latest/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),

@@ -5,12 +5,12 @@ Wavelets Optimized Whitening (WOW)
 
 This example applies Wavelets Optimized Whitening to a `sunpy.map.Map` using `sunkit_image.enhance.wow`.
 """
+# sphinx_gallery_thumbnail_number = 2  # NOQA: ERA001
 
 import matplotlib.pyplot as plt
 import sunpy.data.sample
 import sunpy.map
 from astropy import units as u
-from matplotlib import colors
 
 import sunkit_image.enhance as enhance
 
@@ -38,6 +38,6 @@ wow_map = enhance.wow(aia_map, bilateral=1, denoise_coefficients=[5, 2, 1])
 
 fig = plt.figure()
 ax = plt.subplot(projection=wow_map)
-wow_map.plot(norm=colors.Normalize())
+wow_map.plot(clip_interval=(1, 99.99) * u.percent)
 
 plt.show()
