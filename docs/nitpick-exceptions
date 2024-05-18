@@ -1,0 +1,33 @@
+# Prevents sphinx nitpicky mode picking up on optional
+# (see https://github.com/sphinx-doc/sphinx/issues/6861)
+# Even if it was "fixed", still broken
+py:class optional
+# See https://github.com/numpy/numpy/issues/10039
+py:obj numpy.datetime64
+# There's no specific file or function classes to link to
+py:class any type
+py:class array-like
+py:class file object
+py:class function
+py:class path-like
+py:class str-like
+py:class time-like
+# Specific units
+py:class Unit('s')
+py:class Unit('pix')
+# It hates the numpy docstring
+py:class { "li"
+py:class "otsu"
+py:class "isodata"
+py:class "mean"
+py:class "minimum"
+py:class "yen"
+py:class "triangle" }
+py:class {"propagate"
+py:class "replace"}
+py:class {'center'
+py:class 'left'
+py:class 'right'}
+py:class {'center'
+py:class {'center'
+py:class {'center'

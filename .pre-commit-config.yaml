@@ -1,3 +1,4 @@
+exclude: ".*(.csv|.fits|.fts|.fit|.header|.txt|tca.*|.json|.asdf)$"
 repos:
   - repo: https://github.com/PyCQA/docformatter
     rev: v1.7.5
@@ -16,7 +17,7 @@ repos:
           ]
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|docs/conf.py)$"
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.3.5"
+    rev: "v0.4.4"
     hooks:
       - id: ruff
         args: ["--fix", "--unsafe-fixes"]
@@ -27,21 +28,16 @@ repos:
       - id: check-ast
       - id: check-case-conflict
       - id: trailing-whitespace
-        exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
       - id: mixed-line-ending
-        exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
       - id: end-of-file-fixer
-        exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
       - id: check-yaml
       - id: debug-statements
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.21.0
     hooks:
-      - id: codespell
-        additional_dependencies:
-          - tomli
+      - id: typos
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.9.0"
+    rev: "v1.10.0"
     hooks:
       - id: mypy
         additional_dependencies: ["types-setuptools"]

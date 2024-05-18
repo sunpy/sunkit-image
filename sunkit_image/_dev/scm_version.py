@@ -9,6 +9,6 @@ try:
 except ImportError as e:
     msg = "setuptools_scm not installed"
     raise ImportError(msg) from e
-except Exception as e:  # NOQA: BLE001
+except Exception as e:
     msg = f"setuptools_scm broken with {e}"
     raise ValueError(msg) from e
