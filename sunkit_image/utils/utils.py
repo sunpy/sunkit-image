@@ -62,7 +62,7 @@ def bin_edge_summary(r, binfit):
     r : `numpy.ndarray`
         An array of bin edges of shape (2, nbins) where nbins is the number of
         bins.
-    binfit : {'center' | 'left' | 'right'}
+    binfit : {'center', 'left', 'right'}
         How to summarize the bin edges.
 
     Returns
@@ -97,7 +97,7 @@ def find_pixel_radii(smap, scale=None):
     ----------
     smap :`sunpy.map.Map`
         A SunPy map.
-    scale : {`None` | `astropy.units.Quantity`}, optional
+    scale : {`None` , `astropy.units.Quantity`}, optional
         The radius of the Sun expressed in map units. For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds. If None then the map is queried for the scale.
@@ -132,7 +132,7 @@ def get_radial_intensity_summary(smap, radial_bin_edges, scale=None, summary=np.
     radial_bin_edges : `astropy.units.Quantity`
         A two-dimensional array of bin edges of shape ``(2, nbins)`` where "nbins" is
         the number of bins.
-    scale : {``None`` | `astropy.units.Quantity`}, optional
+    scale : { `None`, `astropy.units.Quantity` }, optional
         A length scale against which radial distances are measured, expressed
         in the map spatial units. For example, in AIA helioprojective
         Cartesian maps a useful length scale is the solar radius and is

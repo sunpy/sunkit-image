@@ -12,7 +12,7 @@ Trivial/Internal Changes
 Backwards Incompatible Changes
 ------------------------------
 
-- The following helper functions in `sunkit_image.colaginment` have been removed, with no replacement.
+- The following helper functions in `sunkit_image.coalignment` have been removed, with no replacement.
   This is because they are designed to be internal helper functions.
   If you need to use them in your own code create a copy of the functions from the ``sunkit-image`` source code.
 
@@ -95,7 +95,7 @@ Features
 --------
 
 - Add `~sunkit_image.coalignment.calculate_solar_rotate_shift` and
-  `~sunkit_image.coalignment.mapsequence_solar_derotate` to
+  `~sunkit_image.coalignment.mapsequence_coalign_by_rotation` to
   the `sunkit_image.coalignment` module. (`#81 <https://github.com/sunpy/sunkit-image/pull/81>`__)
 
 
@@ -105,7 +105,7 @@ Features
 Features
 --------
 
-- Add the `~sunkit_image.coalignment` module ported from `~sunpy.image.coalignment`. (`#78 <https://github.com/sunpy/sunkit-image/pull/78>`__)
+- Add the `~sunkit_image.coalignment` module ported from `sunpy`. (`#78 <https://github.com/sunpy/sunkit-image/pull/78>`__)
 
 
 0.3.2 (2022-03-08)
@@ -121,10 +121,10 @@ Trivial/Internal Changes
 
 - Fixed a bug where a `~astropy.units.UnitConversionError` was thrown if a non-dimensionless
   `~astropy.units.Quantity` object was input for the signal in `~sunkit_image.time_lag.cross_correlation`. (`#72 <https://github.com/sunpy/sunkit-image/pull/72>`__)
-- Fixed a bug where the way we dealt with `~astropy.unit.Quantity` objects was inconsistent with
-  `~dask.array.Array` objects in newer versions of `~numpy`. The `pre_check_hook` option keyword
-  argument has also been removed from `~sunkit_image.time_lag.time_lag` and `post_check_hook`
-  has been renamed to `array_check` and now accepts two arguments. (`#72 <https://github.com/sunpy/sunkit-image/pull/72>`__)
+- Fixed a bug where the way we dealt with `astropy.units.Quantity` objects was inconsistent with
+  `~dask.array.Array` objects in newer versions of `~numpy`. The ``pre_check_hook`` option keyword
+  argument has also been removed from `~sunkit_image.time_lag.time_lag` and ``post_check_hook``
+  has been renamed to ``array_check`` and now accepts two arguments. (`#72 <https://github.com/sunpy/sunkit-image/pull/72>`__)
 
 
 Trivial/Internal Changes
@@ -154,7 +154,7 @@ Features
 Bug Fixes
 ---------
 
-- Increased the minimum version of "skimage" to 0.18.0, preventing faulty code in :meth:`sunkit-image.utils.points_in_poly`. (`#59 <https://github.com/sunpy/sunkit-image/pull/59>`__)
+- Increased the minimum version of "skimage" to 0.18.0, preventing faulty code in :meth:`sunkit_image.utils.points_in_poly`. (`#59 <https://github.com/sunpy/sunkit-image/pull/59>`__)
 
 
 Trivial/Internal Changes
@@ -170,7 +170,7 @@ Trivial/Internal Changes
 Features
 --------
 
-- Added a class (`sunkit_image.utils.noise.NoiseLevelEstimation`) for noise level estimation of an image. (`#12 <https://github.com/sunpy/sunkit-image/pull/12>`__)
+- Added a class (``sunkit_image.utils.noise.NoiseLevelEstimation``) for noise level estimation of an image. (`#12 <https://github.com/sunpy/sunkit-image/pull/12>`__)
 - Added a new function (`sunkit_image.radial.fnrgf`) to normalize the radial brightness gradient using a Fourier approximation. (`#17 <https://github.com/sunpy/sunkit-image/pull/17>`__)
 - Added a function (`sunkit_image.enhance.mgn`) for applying Multi-scale Gaussian Normalization to an image (`numpy.ndarray`). (`#30 <https://github.com/sunpy/sunkit-image/pull/30>`__)
 - Added a new function (`sunkit_image.trace.occult2`) to automatically trace out loops/curved structures in an image. (`#31 <https://github.com/sunpy/sunkit-image/pull/31>`__)
@@ -186,4 +186,4 @@ Improved Documentation
 Trivial/Internal Changes
 ------------------------
 
-- Transferred sunkit_image.utils.noise.NoiseLevelEstimation from class object into a series of functions. (`#38 <https://github.com/sunpy/sunkit-image/pull/38>`__)
+- Transferred ``sunkit_image.utils.noise.NoiseLevelEstimation`` from class object into a series of functions. (`#38 <https://github.com/sunpy/sunkit-image/pull/38>`__)
