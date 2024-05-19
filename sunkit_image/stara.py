@@ -75,6 +75,6 @@ def stara(
     circle = disk(c_pix / 2)
 
     finite = white_tophat(med, circle)
-    finite[np.isnan(finite)] = 0  # Filter out nans
+    finite[np.isnan(finite)] = 0
 
     return finite > threshold

@@ -5,7 +5,7 @@
   "sunkit_image.tests.test_enhance.test_wow[map]": "e6ecab34b5dbeb312fb5782dabf3a96d02fbf509c5d3277e97c233d40f98b18e",
   "sunkit_image.tests.test_radial.test_fig_nrgf": "52b448fa9d845841066d71a1fc6e7bfc471a658d726af1cf16403ddb858fcfc0",
   "sunkit_image.tests.test_radial.test_fig_fnrgf": "62621426ff8c3ee03cb1de004f9e08f63c4869dbd8b55d440adc73c74bfc5bcc",
-  "sunkit_image.tests.test_stara.test_stara_plot": "8225ee47d28da222d14c80ced97198cc8d20bc70b878fccd54c3bb3d2eeeb0cc",
+  "sunkit_image.tests.test_stara.test_stara_plot": "26b148a9cd2f841853a3d50ef5773558bb6c37ab433e9c0333ad4ad0b72f92de",
   "sunkit_image.tests.test_trace.test_occult2_fig[array]": "c5ff1416cb51dc51ad1705174e5b13f8cb02486dc3c58fd79dc1b80534f6caf5",
   "sunkit_image.tests.test_trace.test_occult2_fig[map]": "c5ff1416cb51dc51ad1705174e5b13f8cb02486dc3c58fd79dc1b80534f6caf5"
 }

@@ -11,6 +11,7 @@ import skimage
 import sunpy.data.sample
 import sunpy.map
 from astropy.utils.data import get_pkg_data_filename
+from scipy.ndimage import gaussian_filter
 from sunpy.coordinates import Helioprojective, get_earth
 from sunpy.map.header_helper import make_fitswcs_header
 
@@ -176,8 +177,21 @@ def aia_171(request):
 
 
 @pytest.fixture()
-def mock_hmi_map():
-    data = np.random.default_rng(42).random((100, 100))
+def hmi_map():
+    # Creating the data
+    np.random.default_rng(42)
+    data = np.random.default_rng(42).random((50, 50))
+    # Create a circular feature for representing the sun
+    theta = np.linspace(0, 2 * np.pi, 200)
+    circle_x = 25 + 20 * np.cos(theta)
+    circle_y = 25 + 20 * np.sin(theta)
+
+    for x, y in zip(circle_x, circle_y, strict=False):
+        data[int(y), int(x)] = -50
+    # Smooth the data
+    data = gaussian_filter(data, sigma=2)
+
+    # Create the header with appropriate metadata
     header = {
         "date-obs": "2022-01-01T00:00:00.000",
         "crpix1": 50,
@@ -190,6 +204,7 @@ def mock_hmi_map():
         "cunit2": "arcsec",
         "ctype1": "HPLN-TAN",
         "ctype2": "HPLT-TAN",
-        "rsun_obs": 1000,
+        "rsun_obs": 2500,
     }
+
     return sunpy.map.GenericMap(data, header)
