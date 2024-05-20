@@ -1,2 +1,2 @@
-Added the `~sunkit_image.stara` module which is an implementation of Sunspot Tracking And Recognition (STARA).
-Added an example of plotting sunspots using the stara.
+Added the `sunkit_image.stara.stara` module which is an implementation of Sunspot Tracking And Recognition (STARA).
+Added an example of plotting sunspots using the stara :ref:`sphx_glr_download_generated_gallery_finding_sunspots_using_stara.py`.

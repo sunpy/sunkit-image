@@ -5,7 +5,7 @@ Finding sunspots using STARA
 
 This example demonstrates the use of Sunspot Tracking And Recognition
 Algorithm (STARA) in detecting and plotting sunspots. More information
-on the algorithm can be found in [this](https://arxiv.org/abs/1009.5884) paper.
+on the algorithm can be found in [this](https://doi.org/10.1017/S1743921311014992) paper.
 If you wish to perform analysis over a large period of time we suggest to refer
 [this](https://gitlab.com/wtbarnes/aia-on-pleiades/-/blob/master/notebooks/tidy/finding_sunspots.ipynb)
 notebook implementation of the same algorithm using dask arrays.
@@ -78,8 +78,6 @@ ax.contour(segs, levels=0)
 # on areas of interest. We define the coordinates of the rectangle to crop
 # in pixel coordinates.
 
-# Convert the pixel coordinates to world coordinates. This step is necessary
-# because the submap method expects input in world coordinates.
 bottom_left = cont_rotated_resample.pixel_to_world(240 * u.pix, 350 * u.pix)
 top_right = cont_rotated_resample.pixel_to_world(310 * u.pix, 410 * u.pix)
 
