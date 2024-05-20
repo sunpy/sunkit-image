@@ -28,8 +28,7 @@ query = Fido.search(a.Time("2023-01-01 00:00", "2023-01-01 00:01"), a.Instrument
 file = Fido.fetch(query[0, 0])
 
 ###############################################################################
-# Once the data is downloaded, we read the FITS files into a Map object
-# using SunPy's `sunpy.map.Map` function.
+# Once the data is downloaded, we read the FITS file using`sunpy.map.Map`.
 
 hmi_map = sunpy.map.Map(file)
 
@@ -46,9 +45,8 @@ cont_rotated = hmi_map.rotate(order=3)
 
 fig = plt.figure()
 ax = plt.subplot(projection=cont_rotated)
-im = cont_rotated.plot(axes=ax, autoalign=True)
+im = cont_rotated.plot(axes=ax)
 
-plt.show()
 
 ###############################################################################
 # To reduce computational expense, we resample the continuum image to a lower
@@ -73,7 +71,6 @@ ax = plt.subplot(projection=cont_rotated_resample)
 im = cont_rotated_resample.plot(axes=ax, autoalign=True)
 ax.contour(segs, levels=0)
 
-plt.show()
 
 ###############################################################################
 # To focus on specific regions containing sunspots, we can create a submap,
