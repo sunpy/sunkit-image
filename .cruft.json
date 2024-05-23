@@ -1,0 +1,31 @@
+{
+  "template": "https://github.com/sunpy/package-template",
+  "commit": "fd1d86af6e2672a52a33defb525f8e00120f31c5",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "package_name": "sunkit-image",
+      "module_name": "sunkit_image",
+      "short_description": "An image processing toolbox for Solar Physics.",
+      "author_name": "The SunPy Community",
+      "author_email": "sunpy@googlegrouups.com",
+      "project_url": "https://sunpy.org",
+      "license": "BSD 2-Clause",
+      "minimum_python_version": "3.10",
+      "use_compiled_extensions": "n",
+      "enable_dynamic_dev_versions": "y",
+      "include_example_code": "n",
+      "include_cruft_update_github_workflow": "y",
+      "_sphinx_theme": "alabaster",
+      "_parent_project": "",
+      "_install_requires": "",
+      "_copy_without_render": [
+        "docs/_templates",
+        "docs/_static",
+        ".github/workflows/sub_package_update.yml"
+      ],
+      "_template": "https://github.com/sunpy/package-template"
+    }
+  },
+  "directory": null
+}

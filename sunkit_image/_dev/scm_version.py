@@ -1,14 +1,12 @@
 # Try to use setuptools_scm to get the current version; this is only used
 # in development installations from the git repository.
-from pathlib import Path
+import os.path
 
 try:
     from setuptools_scm import get_version
 
-    version = get_version(root=Path("..") / "..", relative_to=__file__)
-except ImportError as e:
-    msg = "setuptools_scm not installed"
-    raise ImportError(msg) from e
-except Exception as e:  # NOQA: BLE001
-    msg = f"setuptools_scm broken with {e}"
-    raise ValueError(msg) from e
+    version = get_version(root=os.path.join('..', '..'), relative_to=__file__)
+except ImportError:
+    raise
+except Exception as e:
+    raise ValueError('setuptools_scm can not determine version.') from e
