@@ -56,7 +56,7 @@ def stara(
     ----------
     * Fraser Watson and Fletcher Lyndsay
       "Automated sunspot detection and the evolution of sunspot magnetic fields during solar cycle 23"
-      `Proceedings of the International Astronomical Union, vol. 6, no. S273, pp. 51-55, 2010. doi:10.1017/S1743921311014992 <https://doi.org/10.1017/S1743921311014992>__`
+      Proceedings of the International Astronomical Union, vol. 6, no. S273, pp. 51-55, 2010. (doi:10.1017/S1743921311014992)[https://doi.org/10.1017/S1743921311014992]
     """
     data = invert(smap.data)
 

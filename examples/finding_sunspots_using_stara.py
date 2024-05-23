@@ -25,7 +25,7 @@ from sunkit_image.stara import stara
 
 query = Fido.search(a.Time("2023-01-01 00:00", "2023-01-01 00:01"), a.Instrument("HMI"), a.Physobs("intensity"))
 # We only download the first file in the search results in this example.
-file = Fido.fetch(query[0, 0])
+file = Fido.fetch(query)
 
 ###############################################################################
 # Once the data is downloaded, we read the FITS file using`sunpy.map.Map`.
@@ -47,10 +47,11 @@ fig = plt.figure()
 ax = plt.subplot(projection=cont_rotated)
 im = cont_rotated.plot(axes=ax)
 
-
 ###############################################################################
 # To reduce computational expense, we resample the continuum image to a lower
-# resolution. This step ensures that running the algorithm on the full-resolution
+# resolution. For computational perspective, the ``hmi_map`` has a dimension of ``4102*4102`` pixels.
+# The next step downsamples this continuum image to a dimension of ``1024*1024`` pixels,
+# reducing the data size by nearly 16 times. This step ensures that running the algorithm on the full-resolution
 # image is not overly computationally expensive.
 
 cont_rotated_resample = cont_rotated.resample((1024, 1024) * u.pixel)
@@ -70,7 +71,6 @@ fig = plt.figure()
 ax = plt.subplot(projection=cont_rotated_resample)
 im = cont_rotated_resample.plot(axes=ax, autoalign=True)
 ax.contour(segs, levels=0)
-
 
 ###############################################################################
 # To focus on specific regions containing sunspots, we can create a submap,
