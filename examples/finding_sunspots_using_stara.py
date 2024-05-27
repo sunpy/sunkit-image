@@ -24,7 +24,6 @@ from sunkit_image.stara import stara
 # Firstly, let's download HMI continuum data from the Virtual Solar Observatory.
 
 query = Fido.search(a.Time("2023-01-01 00:00", "2023-01-01 00:01"), a.Instrument("HMI"), a.Physobs("intensity"))
-# We only download the first file in the search results in this example.
 file = Fido.fetch(query)
 
 ###############################################################################
