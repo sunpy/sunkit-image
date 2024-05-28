@@ -10,7 +10,7 @@ template is in your image. The images are then shifted to the location of the
 best match. This aligns your images to the position of the features in your
 representative template.
 
-This example demonstrates how to coalign maps in a `~sunpy.MapSequence` using
+This example demonstrates how to coalign maps in a `~sunpy.map.MapSequence` using
 the :func:`~sunkit_image.coalignment.mapsequence_coalign_by_match_template`
 function. The implementation of this functionality requires the installation
 of the image processing library

@@ -141,7 +141,7 @@ def intensity_enhance(
     summarize_bin_edges : `str`, optional
         How to summarize the bin edges.
         Defaults to "center".
-    summary : `function`, optional
+    summary : ``function``, optional
         A function that returns a summary statistic of the radial intensity.
         Defaults to `numpy.mean`.
     degree : `int`, optional
@@ -244,16 +244,16 @@ def nrgf(
         For example, in typical Helioprojective Cartesian maps the solar radius is expressed in
         units of arcseconds.
         Defaults to None, which means that the map scale is used.
-    intensity_summary : `function`, optional
+    intensity_summary : ``function``, optional
         A function that returns a summary statistic of the radial intensity.
         Defaults to `numpy.nanmean`.
     intensity_summary_kwargs : `dict`, optional
         Keywords applicable to the summary function.
-    width_function : `function`, optional
+    width_function : ``function``, optional
         A function that returns a summary statistic of the distribution of intensity,
         at a given radius.
         Defaults to `numpy.std`.
-    width_function_kwargs : `function`, optional
+    width_function_kwargs : ``function``, optional
         Keywords applicable to the width function.
     application_radius : `astropy.units.Quantity`, optional
         The NRGF is applied to emission at radii above the application_radius.
@@ -422,10 +422,10 @@ def fnrgf(
         A one dimensional array of shape ``[2, 1]`` with values equal to ``[K1, K2]``.
         The ratio in which the original image and filtered image are mixed.
         Defaults to ``[15, 1]``.
-    intensity_summary :`function`, optional
+    intensity_summary :``function``, optional
         A function that returns a summary statistic of the radial intensity.
         Default is `numpy.nanmean`.
-    width_function : `function`
+    width_function : ``function``
         A function that returns a summary statistic of the distribution of intensity, at a given radius.
         Defaults to `numpy.std`.
     application_radius : `astropy.units.Quantity`

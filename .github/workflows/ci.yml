@@ -73,6 +73,20 @@ jobs:
       envs: |
         - linux: build_docs
 
+  online:
+    if: "!startsWith(github.event.ref, 'refs/tags/v')"
+    needs: [test]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      submodules: false
+      coverage: codecov
+      toxdeps: tox-pypi-filter
+      posargs: -n auto --dist loadgroup
+      envs: |
+        - linux: py312-online
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   cron:
     if: |
       github.event_name == 'workflow_dispatch' || (

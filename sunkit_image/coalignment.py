@@ -377,7 +377,7 @@ def calculate_match_template_shift(mc, template=None, layer_index=0, func=_defau
     mc : `sunpy.map.MapSequence`
         A `~sunpy.map.MapSequence` of shape ``(ny, nx, nt)``, where ``nt`` is the number of
         layers in the `~sunpy.map.MapSequence`.
-    template : {`None` | `~sunpy.map.Map` | `numpy.ndarray`}, optional
+    template : {`None` , `~sunpy.map.Map` , `numpy.ndarray`}, optional
         The template used in the matching. If an ~numpy.ndarray` is passed,
         the `numpy.ndarray` has to have two dimensions.
     layer_index : `int`,  optional
@@ -480,7 +480,7 @@ def mapsequence_coalign_by_match_template(
     mc : `sunpy.map.MapSequence`
         A `~sunpy.map.MapSequence` of shape ``(ny, nx, nt)``, where ``nt`` is the number of
         layers in the `~sunpy.map.MapSequence`.
-    template : {None | sunpy.map.Map | `numpy.ndarray`}, optional
+    template : { `None` , `sunpy.map.Map` , `numpy.ndarray` }, optional
         The template used in the matching. If an `numpy.ndarray` is passed,
         the `numpy.ndarray` has to have two dimensions.
     layer_index : `int`, optional
@@ -489,7 +489,7 @@ def mapsequence_coalign_by_match_template(
         `~sunpy.map.MapSequence` are assumed to be relative to this layer. The
         displacements of the template relative to this layer are therefore
         ``(0, 0)``.
-    func : function, optional
+    func : ``function``, optional
         A function which is applied to the data values before the coalignment
         method is applied. This can be useful in coalignment, because it is
         sometimes better to co-align on a function of the data rather than the
@@ -498,10 +498,10 @@ def mapsequence_coalign_by_match_template(
         logarithm or the square root. The function is of the form
         ``func = F(data)``. The default function ensures that the data are
         floats.
-    clip : bool, optional
+    clip : `bool`, optional
         If True, then clip off x, y edges of the maps in the sequence that are
         potentially affected by edges effects.
-    shift : dict, optional
+    shift : `dict`, optional
         A dictionary with two keys, 'x' and 'y'.  Key 'x' is an astropy
         quantities array of corresponding to the amount of shift in the
         x-direction (in arcseconds, assuming the helio-projective

@@ -12,6 +12,7 @@ omit =
   */sunkit_image/data/sample.py
   */sunkit_image/data/_sample.py
 
+[report]
 exclude_lines =
   # Have to re-enable the standard pragma
   pragma: no cover
