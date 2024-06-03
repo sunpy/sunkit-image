@@ -257,14 +257,7 @@ def test_fig_rhef(smap):
     # Adjust layout
     plt.tight_layout()
 
-    # Show the plot
-    plt.show()
-
-    # # Save the plot as a PNG file
-    plt.savefig('rhe_test.png', dpi=350)
-
-    # Close the plot to free up memory
-    plt.close(fig)
+    return fig
 
 # test_fig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
 # Tests needed for RHEF:
