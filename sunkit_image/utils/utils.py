@@ -9,6 +9,7 @@ import numpy as np
 from scipy.interpolate import RectBivariateSpline
 from skimage import measure
 from sunpy.map import all_coordinates_from_map
+import sunpy
 
 __all__ = [
     "bin_edge_summary",
@@ -301,37 +302,53 @@ def calculate_gamma(pm, vel, pnorm, n):
 
 
 
-def upsilon_norm(input, alpha=0.35, alpha_high=None):
+def apply_upsilon(data, upsilon=(0.5, 0.5)):
     """
     Apply the upsilon function to the input array.
 
     This function applies the upsilon function, a double-sided gamma adjustment,
     to the input array. It uses the specified exponents for the lower and upper halves
-    of the array to normalize and stretch the values. The name "upsilon function" is
-    inspired by the visual resemblance of the Greek letter upsilon (Υ) to two gammas.
+    of the array to normalize and stretch the values.
 
     Parameters
     ----------
-    in_array : array-like
+    data : array-like
         Input array to be normalized and stretched.
-    alpha : float, optional
-        Scalar exponent for the lower half of the input array. Default is 0.35.
-    alpha_high : float, optional
-        Scalar exponent for the upper half of the input array. If None, defaults to the value of alpha.
+    upsilon : float or tuple of float or None, optional
+        Parameters for the upsilon function. Default is (0.5, 0.5). If None or contains all None, the original data is returned.
+        If a single float is provided, both alpha and alpha_high are set to this value.
 
     Returns
     -------
     np.ndarray
         Normalized and stretched array.
-    """
-    if alpha_high is None:
-        alpha_high = alpha
 
-    in_array = np.asarray(input)
+    Raises
+    ------
+    TypeError
+        If the input is a `sunpy.map.Map` object.
+    """
+    if upsilon is None or all([x is None for x in upsilon]):
+        return data
+
+    if isinstance(data, sunpy.map.GenericMap):
+        raise TypeError("Input data must be a raw ndarray, not a SunPy map object")
+
+    if isinstance(upsilon, float):
+        alpha = alpha_high = upsilon
+    else:
+        alpha, alpha_high = upsilon
+        if alpha_high is None:
+            alpha_high = 1.0
+        elif alpha is None:
+            alpha = 1.0
+
+    in_array = np.asarray(data)
 
     # Calculate indices for low and high values
-    lows = in_array < 0.5
-    highs = in_array >= 0.5
+    mid = np.nanmean(in_array)
+    lows = in_array < mid
+    highs = in_array >= mid
 
     # Compute curve values
     curve_low = ((2 * in_array[lows]) ** alpha) / 2
@@ -344,45 +361,11 @@ def upsilon_norm(input, alpha=0.35, alpha_high=None):
 
     return out_curve
 
-import sunpy
-
-def apply_upsilon(data, upsilon=(0.5, 0.5)):
-    """
-    Apply the upsilon function to the input array.
-
-    This function rescales the image, akin to a gamma transform, using the upsilon function.
-    The upsilon parameter should be a tuple containing the alpha and alpha_high values.
-
-    Parameters
-    ----------
-    data : array-like
-        Input array to be normalized and stretched.
-    upsilon : tuple of float or None, optional
-        Parameters for the upsilon function. Default is (0.5, 0.5). If None or contains None, the original data is returned.
-
-    Returns
-    -------
-    np.ndarray
-        Normalized and stretched array.
-
-    Raises
-    ------
-    TypeError
-        If the input is a `sunpy.map.Map` object.
-    """
-    if upsilon is None or all(u is None for u in upsilon):
-        return data
-
-    import sunpy.map
-    if isinstance(data, sunpy.map.GenericMap):
-        raise TypeError("Input data must be a raw ndarray, not a SunPy map object")
-
-    alpha, alpha_high = upsilon
-    return upsilon_norm(data, alpha=alpha, alpha_high=alpha_high)
 
 def _percentile_ranks_scipy(arr):
     from scipy import stats
     return stats.rankdata(arr, method="average") / len(arr)
+
 
 def _percentile_ranks_numpy(arr):
     sorted_indices = np.argsort(arr)
@@ -390,6 +373,7 @@ def _percentile_ranks_numpy(arr):
     ranks[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
     percentiles = ranks / float(len(arr))
     return percentiles
+
 
 def _percentile_ranks_numpy_inplace(arr):
     sorted_indices = np.argsort(arr)
