@@ -20,9 +20,6 @@ __all__ = [
     "points_in_poly",
     "reform2d",
     "remove_duplicate",
-    "_percentile_ranks_numpy_inplace",
-    "_percentile_ranks_numpy",
-    "_percentile_ranks_scipy",
     "apply_upsilon"
 ]
 
