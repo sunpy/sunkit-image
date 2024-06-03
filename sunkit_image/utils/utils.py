@@ -20,7 +20,10 @@ __all__ = [
     "points_in_poly",
     "reform2d",
     "remove_duplicate",
-    "apply_upsilon"
+    "apply_upsilon",
+    "percentile_ranks_numpy",
+    "percentile_ranks_scipy",
+    "percentile_ranks_numpy_inplace"
 ]
 
 
@@ -359,20 +362,18 @@ def apply_upsilon(data, upsilon=(0.5, 0.5)):
     return out_curve
 
 
-def _percentile_ranks_scipy(arr):
+def percentile_ranks_scipy(arr):
     from scipy import stats
     return stats.rankdata(arr, method="average") / len(arr)
 
-
-def _percentile_ranks_numpy(arr):
+def percentile_ranks_numpy(arr):
     sorted_indices = np.argsort(arr)
     ranks = np.empty_like(sorted_indices)
     ranks[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
     percentiles = ranks / float(len(arr))
     return percentiles
 
-
-def _percentile_ranks_numpy_inplace(arr):
+def percentile_ranks_numpy_inplace(arr):
     sorted_indices = np.argsort(arr)
     arr[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
     arr = arr / float(len(arr))

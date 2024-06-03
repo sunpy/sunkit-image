@@ -9,7 +9,7 @@ import sunpy.map
 from sunpy.coordinates import frames
 
 from sunkit_image.utils import bin_edge_summary, equally_spaced_bins, find_pixel_radii, get_radial_intensity_summary
-from sunkit_image.utils import _percentile_ranks_numpy_inplace, _percentile_ranks_numpy, _percentile_ranks_scipy, apply_upsilon
+from sunkit_image.utils import percentile_ranks_numpy_inplace, percentile_ranks_numpy, percentile_ranks_scipy, apply_upsilon
 
 
 
@@ -631,7 +631,7 @@ def rhef(
 
     * The implementation is highly inspired by this doctoral thesis:
       Gilly, G. Spectroscopic Analysis and Image Processing of the Optically-Thin Solar Corona
-      <TODO link>.
+      https://www.proquest.com/docview/2759080511
     """
 
     # Get the radii for every pixel
@@ -651,11 +651,11 @@ def rhef(
 
     # Select the sort method
     if method == "inplace":
-        rhe_func = _percentile_ranks_numpy_inplace
+        rhe_func = percentile_ranks_numpy_inplace
     elif method == "numpy":
-        rhe_func = _percentile_ranks_numpy
+        rhe_func = percentile_ranks_numpy
     elif method == "scipy":
-        rhe_func = _percentile_ranks_scipy
+        rhe_func = percentile_ranks_scipy
     else:
         raise NotImplementedError("{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'")
 

@@ -253,13 +253,14 @@ def test_fig_rhef(smap):
     im3 = axs[5].imshow(data5, origin='lower', extent=extent, cmap=aia_171_colormap)
     axs[5].set_title("Upsilon = (0.4, 0.4)")
 
-
     # Adjust layout
     plt.tight_layout()
 
     return fig
 
-# test_fig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
+if False:
+    fig=test_fig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
+    plt.show()
 # Tests needed for RHEF:
 # > With and without bins given
 # > Various inputs for Upsilon
