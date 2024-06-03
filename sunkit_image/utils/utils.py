@@ -19,6 +19,10 @@ __all__ = [
     "points_in_poly",
     "reform2d",
     "remove_duplicate",
+    "_percentile_ranks_numpy_inplace",
+    "_percentile_ranks_numpy",
+    "_percentile_ranks_scipy",
+    "apply_upsilon"
 ]
 
 
@@ -294,3 +298,101 @@ def calculate_gamma(pm, vel, pnorm, n):
     vel_norm = np.linalg.norm(vel, axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
     return np.nansum(sint, axis=1) / n
+
+
+
+def upsilon_norm(input, alpha=0.35, alpha_high=None):
+    """
+    Apply the upsilon function to the input array.
+
+    This function applies the upsilon function, a double-sided gamma adjustment,
+    to the input array. It uses the specified exponents for the lower and upper halves
+    of the array to normalize and stretch the values. The name "upsilon function" is
+    inspired by the visual resemblance of the Greek letter upsilon (Υ) to two gammas.
+
+    Parameters
+    ----------
+    in_array : array-like
+        Input array to be normalized and stretched.
+    alpha : float, optional
+        Scalar exponent for the lower half of the input array. Default is 0.35.
+    alpha_high : float, optional
+        Scalar exponent for the upper half of the input array. If None, defaults to the value of alpha.
+
+    Returns
+    -------
+    np.ndarray
+        Normalized and stretched array.
+    """
+    if alpha_high is None:
+        alpha_high = alpha
+
+    in_array = np.asarray(input)
+
+    # Calculate indices for low and high values
+    lows = in_array < 0.5
+    highs = in_array >= 0.5
+
+    # Compute curve values
+    curve_low = ((2 * in_array[lows]) ** alpha) / 2
+    curve_high = -(((2 - 2 * in_array[highs]) ** alpha_high) / 2 - 1)
+
+    # Create output array and assign calculated values
+    out_curve = np.zeros_like(in_array)
+    out_curve[lows] = curve_low
+    out_curve[highs] = curve_high
+
+    return out_curve
+
+import sunpy
+
+def apply_upsilon(data, upsilon=(0.5, 0.5)):
+    """
+    Apply the upsilon function to the input array.
+
+    This function rescales the image, akin to a gamma transform, using the upsilon function.
+    The upsilon parameter should be a tuple containing the alpha and alpha_high values.
+
+    Parameters
+    ----------
+    data : array-like
+        Input array to be normalized and stretched.
+    upsilon : tuple of float or None, optional
+        Parameters for the upsilon function. Default is (0.5, 0.5). If None or contains None, the original data is returned.
+
+    Returns
+    -------
+    np.ndarray
+        Normalized and stretched array.
+
+    Raises
+    ------
+    TypeError
+        If the input is a `sunpy.map.Map` object.
+    """
+    if upsilon is None or all(u is None for u in upsilon):
+        return data
+
+    import sunpy.map
+    if isinstance(data, sunpy.map.GenericMap):
+        raise TypeError("Input data must be a raw ndarray, not a SunPy map object")
+
+    alpha, alpha_high = upsilon
+    return upsilon_norm(data, alpha=alpha, alpha_high=alpha_high)
+
+def _percentile_ranks_scipy(arr):
+    from scipy import stats
+    return stats.rankdata(arr, method="average") / len(arr)
+
+def _percentile_ranks_numpy(arr):
+    sorted_indices = np.argsort(arr)
+    ranks = np.empty_like(sorted_indices)
+    ranks[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
+    percentiles = ranks / float(len(arr))
+    return percentiles
+
+def _percentile_ranks_numpy_inplace(arr):
+    sorted_indices = np.argsort(arr)
+    arr[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
+    arr = arr / float(len(arr))
+    return arr

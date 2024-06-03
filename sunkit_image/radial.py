@@ -9,12 +9,16 @@ import sunpy.map
 from sunpy.coordinates import frames
 
 from sunkit_image.utils import bin_edge_summary, equally_spaced_bins, find_pixel_radii, get_radial_intensity_summary
+from sunkit_image.utils import _percentile_ranks_numpy_inplace, _percentile_ranks_numpy, _percentile_ranks_scipy, apply_upsilon
+
+
 
 __all__ = [
     "fnrgf",
     "intensity_enhance",
     "set_attenuation_coefficients",
     "nrgf",
+    "rhef"
 ]
 
 
@@ -578,24 +582,6 @@ def fnrgf(
 
     return sunpy.map.Map(data, smap.meta)
 
-
-def percentile_ranks_scipy(arr):
-    from scipy import stats
-    return stats.rankdata(arr, method="average") / len(arr)
-
-def percentile_ranks_numpy(arr):
-    sorted_indices = np.argsort(arr)
-    ranks = np.empty_like(sorted_indices)
-    ranks[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
-    percentiles = ranks / float(len(arr))
-    return percentiles
-
-def percentile_ranks_numpy_inplace(arr):
-    sorted_indices = np.argsort(arr)
-    arr[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
-    arr = arr / float(len(arr))
-    return arr
-
 def rhef(
     smap,
     radial_bin_edges=None,
@@ -611,11 +597,6 @@ def rhef(
     Radial Histogram Equalization is a simple algorithm for removing the radial gradient to reveal
     coronal structure. It also significantly improves the visualization of high dynamic range solar imagery.
     It takes the input map and bins the pixels by radius, then ranks each element sequentially and normalizes the pixels at that radius.
-
-    # Applied to polarized brightness observations of the corona, the NRGF produces
-    # images which are striking in their detail. It takes the input map and find the intensity summary
-    # and width of intenstiy values in radial bins above the application radius. The intensity summary
-    # and the width is then used to normalize the intensity values in a particular radial bin.
 
     .. note::
 
@@ -647,7 +628,8 @@ def rhef(
     References
     ----------
     * Gilly & Cranmer 2024, in prep.
-    * The implementation is highly inspired by this doctoral thesis.
+
+    * The implementation is highly inspired by this doctoral thesis:
       Gilly, G. Spectroscopic Analysis and Image Processing of the Optically-Thin Solar Corona
       <TODO link>.
     """
@@ -657,7 +639,9 @@ def rhef(
 
     # Make sure bins are in the map.
     if radial_bin_edges is None:
-        radial_bin_edges = []
+        radial_bin_edges = equally_spaced_bins(map_r.min(), map_r.max(), map_r.data.shape[0])
+        radial_bin_edges *= u.R_sun
+
     if radial_bin_edges[1, -1] > np.max(map_r):
         radial_bin_edges = equally_spaced_bins(
             inner_value=radial_bin_edges[0, 0],
@@ -667,36 +651,30 @@ def rhef(
 
     # Select the sort method
     if method == "inplace":
-        rhe_func = percentile_ranks_numpy_inplace
+        rhe_func = _percentile_ranks_numpy_inplace
     elif method == "numpy":
-        rhe_func = percentile_ranks_numpy
+        rhe_func = _percentile_ranks_numpy
     elif method == "scipy":
-        rhe_func = percentile_ranks_scipy
+        rhe_func = _percentile_ranks_scipy
     else:
         raise NotImplementedError("{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'")
 
     # Allocate storage for the filtered data
-    data = np.empty_like(smap.data)
-
-    # Calculate the filter value for each radial bin.
+    data = np.ones_like(smap.data)
+    meta = smap.meta
+    import matplotlib.pyplot as plt
+    # Calculate the filter values for each radial bin.
     for i in range(radial_bin_edges.shape[1]):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
-        if application_radius is not None:
+        if application_radius is not None and application_radius>0:
             here = np.logical_and(here, map_r >= application_radius)
 
         # Perform the filtering operation
         data[here] = rhe_func(smap.data[here])
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
+    # plt.imshow(data)
+    # plt.show()
 
-    return sunpy.map.Map(data, smap.meta)
-
-def apply_upsilon(smap, upsilon):
-    """ Apply Upsilon
-    This function rescales the image akin to a gamma transform.
-    TODO Implementation Pending, probably in the utils file
-    """
-    if upsilon is None or None in upsilon:
-        return smap
-    raise NotImplementedError
+    return sunpy.map.Map(data, meta)
