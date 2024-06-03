@@ -9,6 +9,9 @@ import sunkit_image.radial as rad
 import sunkit_image.utils as utils
 from sunkit_image.tests.helpers import figure_test, skip_windows
 
+import matplotlib
+import matplotlib.pyplot as plt
+import sunpy.visualization.colormaps.cm
 
 @pytest.fixture()
 def map_test1():
@@ -192,6 +195,75 @@ def test_fig_fnrgf(smap):
     out = rad.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
 
     out.plot()
+
+@figure_test
+@pytest.mark.remote_data()
+def test_fig_rhef(smap):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+    radial_bin_edges *= u.R_sun
+
+    # Get the SDO AIA 171 colormap
+    aia_171_colormap=matplotlib.colormaps['sdoaia171']
+
+    # Assuming rad and smap are already defined
+    out_map1 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=None, method="numpy")
+    out_map2 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.5, 0.5), method="numpy")
+    out_map3 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.5, 0.25), method="numpy")
+
+    # Extract the data from the maps
+    data0 = np.log10(smap.data-np.nanmin(smap.data))**2
+    data1 = out_map1.data
+    data2 = out_map2.data
+    data3 = out_map3.data
+
+    # Get the coordinate ranges from the meta information
+    x_coords = out_map1.meta['cdelt1'] * (out_map1.data.shape[1] // 2)
+    y_coords = out_map1.meta['cdelt2'] * (out_map1.data.shape[0] // 2)
+    extent = [-x_coords, x_coords, -y_coords, y_coords]
+
+    # Create a figure with four subplots
+    fig, axs = plt.subplots(2, 2, figsize=(10, 10), sharey='all', sharex='all')
+    axs = axs.flatten()
+
+    # Plot the original map
+    im0 = axs[0].imshow(data0, origin='lower', extent=extent, cmap=aia_171_colormap)
+    axs[0].set_title("Log10(data)")
+    fig.colorbar(im0, ax=axs[0])
+
+    # Plot the first map
+    im1 = axs[1].imshow(data1, origin='lower', extent=extent, cmap=aia_171_colormap)
+    axs[1].set_title("Upsilon = None")
+    fig.colorbar(im1, ax=axs[1])
+
+    # Plot the second map
+    im2 = axs[2].imshow(data2, origin='lower', extent=extent, cmap=aia_171_colormap)
+    axs[2].set_title("Upsilon = (0.5, 0.5)")
+    fig.colorbar(im2, ax=axs[2])
+
+    # Plot the third map
+    im3 = axs[3].imshow(data3, origin='lower', extent=extent, cmap=aia_171_colormap)
+    axs[3].set_title("Upsilon = (0.5, 0.25)")
+    fig.colorbar(im3, ax=axs[3])
+
+    # Adjust layout
+    plt.tight_layout()
+
+    # Show the plot
+    plt.show()
+
+    # # Save the plot as a PNG file
+    plt.savefig('rhe_test.png', dpi=350)
+
+    # Close the plot to free up memory
+    plt.close(fig)
+
+# test_fig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
+# Tests needed for RHEF:
+# > With and without bins given
+# > Various inputs for Upsilon
+# > plotting smaps natively
+# > Doing upsilon on a map that doesn't have RHE on it
+
 
 
 def test_set_attenuation_coefficients():
