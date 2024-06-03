@@ -207,43 +207,52 @@ def test_fig_rhef(smap):
 
     # Assuming rad and smap are already defined
     out_map1 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=None, method="numpy")
-    out_map2 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.5, 0.5), method="numpy")
+    out_map2 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.5, 0.5), method="scipy")
     out_map3 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.5, 0.25), method="numpy")
+    out_map4 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.25, 0.5), method="numpy")
+    out_map5 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.4, 0.4), method="scipy")
 
     # Extract the data from the maps
     data0 = np.log10(smap.data-np.nanmin(smap.data))**2
     data1 = out_map1.data
     data2 = out_map2.data
     data3 = out_map3.data
+    data4 = out_map4.data
+    data5 = out_map5.data
 
     # Get the coordinate ranges from the meta information
     x_coords = out_map1.meta['cdelt1'] * (out_map1.data.shape[1] // 2)
     y_coords = out_map1.meta['cdelt2'] * (out_map1.data.shape[0] // 2)
     extent = [-x_coords, x_coords, -y_coords, y_coords]
 
-    # Create a figure with four subplots
-    fig, axs = plt.subplots(2, 2, figsize=(10, 10), sharey='all', sharex='all')
+    # Create a figure with six subplots
+    fig, axs = plt.subplots(2, 3, figsize=(15, 10), sharey='all', sharex='all')
     axs = axs.flatten()
 
     # Plot the original map
     im0 = axs[0].imshow(data0, origin='lower', extent=extent, cmap=aia_171_colormap)
-    axs[0].set_title("Log10(data)")
-    fig.colorbar(im0, ax=axs[0])
+    axs[0].set_title("Log10(data)^2")
 
     # Plot the first map
     im1 = axs[1].imshow(data1, origin='lower', extent=extent, cmap=aia_171_colormap)
     axs[1].set_title("Upsilon = None")
-    fig.colorbar(im1, ax=axs[1])
 
     # Plot the second map
     im2 = axs[2].imshow(data2, origin='lower', extent=extent, cmap=aia_171_colormap)
     axs[2].set_title("Upsilon = (0.5, 0.5)")
-    fig.colorbar(im2, ax=axs[2])
 
     # Plot the third map
     im3 = axs[3].imshow(data3, origin='lower', extent=extent, cmap=aia_171_colormap)
     axs[3].set_title("Upsilon = (0.5, 0.25)")
-    fig.colorbar(im3, ax=axs[3])
+
+    # Plot the fourth map
+    im2 = axs[4].imshow(data4, origin='lower', extent=extent, cmap=aia_171_colormap)
+    axs[4].set_title("Upsilon = (0.25, 0.5)")
+
+    # Plot the fifth map
+    im3 = axs[5].imshow(data5, origin='lower', extent=extent, cmap=aia_171_colormap)
+    axs[5].set_title("Upsilon = (0.4, 0.4)")
+
 
     # Adjust layout
     plt.tight_layout()
@@ -263,7 +272,7 @@ def test_fig_rhef(smap):
 # > Various inputs for Upsilon
 # > plotting smaps natively
 # > Doing upsilon on a map that doesn't have RHE on it
-
+# > Make a notebook as an example of usage
 
 
 def test_set_attenuation_coefficients():
