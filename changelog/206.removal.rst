@@ -1,0 +1,5 @@
+The coalignment methods ``calculate_solar_rotate_shift`` and ``mapsequence_coalign_by_rotation`` present in the `sunkit_image.coalignment` have been removed, with no replacement.
+Correspondingly the gallery example ``Compensating for Solar Rotation`` making use of these methods are removed.
+This is because they are worse versions of the functionality already present in sunpy to reproject images given some model of differential rotation.
+
+If you wish to coalign differentially rotated maps, refer to this `example <https://docs.sunpy.org/en/stable/generated/gallery/differential_rotation/reprojected_map.html>`__ in sunpy
