@@ -179,8 +179,8 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.s = None, **kwargs):
 
     where :math:`\mathcal{C}_{AB}` is the cross-correlation as a function of
     lag (computed in :func:`cross_correlation`). Qualitatively, this can be
-    thought of as how much `signal_a` needs to be shifted in time to best
-    "match" `signal_b`. Note that the sign of :math:`\tau_{AB}`` is determined
+    thought of as how much ``signal_a`` needs to be shifted in time to best
+    "match" ``signal_b``. Note that the sign of :math:`\tau_{AB}`` is determined
     by the ordering of the two signals such that,
 
     .. math::
@@ -205,11 +205,11 @@ def time_lag(signal_a, signal_b, time: u.s, lag_bounds: u.s = None, **kwargs):
     ----------------
     array_check_hook : function
         Function to apply to the resulting time lag result. This should take in the
-        `lags` array and the indices that specify the location of the maximum of the
+        ``lags`` array and the indices that specify the location of the maximum of the
         cross-correlation and return an array that has used those indices to select
-        the `lags` which maximize the cross-correlation. As an example, if `lags`
-        and `indices` are both `~numpy.ndarray` objects, this would just return
-        `lags[indices]`. It is probably only necessary to specify this if you
+        the ``lags`` which maximize the cross-correlation. As an example, if ``lags``
+        and ``indices`` are both `~numpy.ndarray` objects, this would just return
+        ``lags[indices]``. It is probably only necessary to specify this if you
         are working with arrays that are something other than a `~numpy.ndarray`
         or `~dask.array.Array` object.
 

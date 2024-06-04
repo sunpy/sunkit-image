@@ -37,10 +37,10 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
         Number of pixels in the loop below the flux threshold.
     qthresh1 : `float`
         The ratio of image base flux and median flux. All the pixels in the image below
-        `qthresh1 * median` intensity value are made to zero before tracing the loops.
+        ``qthresh1 * median`` intensity value are made to zero before tracing the loops.
     qthresh2 : `float`
         The factor which determines noise in the image. All the intensity values between
-        `qthresh2 * median` are considered to be noise. The median for noise is chosen
+        ``qthresh2 * median`` are considered to be noise. The median for noise is chosen
         after the base level is fixed.
 
     Returns
@@ -230,7 +230,7 @@ def bandpass_filter(image, nsm1=1, nsm2=3):
         Defaults to 1.
     nsm2 : `int`
         High pass filter boxcar smoothing constant.
-        The value of `nsm2` equal to `nsm1 + 1` gives the best enhancement.
+        The value of ``nsm2`` equal to ``nsm1 + 1`` gives the best enhancement.
         Defaults to 3.
 
     Returns
@@ -261,10 +261,10 @@ def smooth(image, width, nanopt="replace"):
     image : `numpy.ndarray`, `sunpy.map.GenericMap`
         Image to be filtered.
     width : `int`
-        Width of the boxcar window. The `width` should always be odd but if even value is given then
-        `width + 1` is used as the width of the boxcar.
-    nanopt : {"propagate" | "replace"}
-        It decides whether to `propagate` NAN's or `replace` them.
+        Width of the boxcar window. The ``width`` should always be odd but if even value is given then
+        ``width + 1`` is used as the width of the boxcar.
+    nanopt : {"propagate" , "replace"}
+        It decides whether to propagate NAN's or replace them.
 
     Returns
     -------

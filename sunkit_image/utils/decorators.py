@@ -5,6 +5,8 @@ from functools import wraps
 import numpy as np
 from sunpy.map import GenericMap, Map
 
+__all__ = ["accept_array_or_map"]
+
 
 def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Callable], Callable]:
     """
@@ -21,7 +23,7 @@ def accept_array_or_map(*, arg_name: str, output_to_map=True) -> Callable[[Calla
     ----------
     arg_name : `str`
         Name of data/map argument in function signature.
-    output_to_map : `bool`
+    output_to_map : `bool`, optional
         If `True` (the default), convert the function return to a map if a map
         is given as input. For this to work the decorated function must return
         an array where pixels have the same coordinates as the input map data.

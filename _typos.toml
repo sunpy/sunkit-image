@@ -1,0 +1,7 @@
+default.extend-ignore-identifiers-re = [
+    "EIT",
+    # Badly named variables
+    "iy_ip",
+    "iy",
+    "BA",
+]

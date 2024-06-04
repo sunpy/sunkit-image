@@ -1,12 +1,12 @@
 [run]
 omit =
-  sunkit_iamge/cython_version*
-  sunkit_iamge/extern/*
-  sunkit_iamge/version*
-  sunkit_iamge/data/sample.py
-  sunkit_iamge/data/_sample.py
-  */sunkit_iamge/cython_version*
-  */sunkit_iamge/extern/*
-  */sunkit_iamge/version*
-  */sunkit_iamge/data/sample.py
-  */sunkit_iamge/data/_sample.py
+  sunkit_image/cython_version*
+  sunkit_image/extern/*
+  sunkit_image/version*
+  sunkit_image/data/sample.py
+  sunkit_image/data/_sample.py
+  */sunkit_image/cython_version*
+  */sunkit_image/extern/*
+  */sunkit_image/version*
+  */sunkit_image/data/sample.py
+  */sunkit_image/data/_sample.py

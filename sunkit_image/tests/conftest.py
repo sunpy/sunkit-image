@@ -1,4 +1,5 @@
 import importlib.util
+import logging
 import os
 import tempfile
 
@@ -16,18 +17,21 @@ from sunpy.map.header_helper import make_fitswcs_header
 # Force MPL to use non-gui backends for testing.
 try:
     import matplotlib as mpl
-except ImportError:
-    pass
-else:
+    import matplotlib.pyplot as plt
+
+    HAVE_MATPLOTLIB = True
     mpl.use("Agg")
+except ImportError:
+    HAVE_MATPLOTLIB = False
 
 # Don't actually import pytest_remotedata because that can do things to the
 # entrypoints code in pytest.
 remotedata_spec = importlib.util.find_spec("pytest_remotedata")
 HAVE_REMOTEDATA = remotedata_spec is not None
-
 # Do not collect the sample data file because this would download the sample data.
 collect_ignore = ["data/sample.py"]
+console_logger = logging.getLogger()
+console_logger.setLevel("INFO")
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -82,13 +86,23 @@ def _undo_download_dir_patch():
     os.environ["SUNPY_DOWNLOADDIR"] = oridir
 
 
-def pytest_runtest_setup(item):
+@pytest.fixture(scope="session", autouse=True)
+def _hide_parfive_progress(request):  # NOQA: ARG001
     """
-    Pytest hook to skip all tests that have the mark 'remotedata' if the
-    pytest_remotedata plugin is not installed.
+    Set the PARFIVE_HIDE_PROGRESS to hide the parfive progress bar in tests.
     """
-    if isinstance(item, pytest.Function) and "remote_data" in item.keywords and not HAVE_REMOTEDATA:
-        pytest.skip("skipping remotedata tests as pytest-remotedata is not installed")
+    os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
+    yield
+    del os.environ["PARFIVE_HIDE_PROGRESS"]
+
+
+def pytest_runtest_teardown(item):
+    # Clear the pyplot figure stack if it is not empty after the test
+    # You can see these log messages by passing "-o log_cli=true" to pytest on the command line
+    if HAVE_MATPLOTLIB and plt.get_fignums():
+        msg = f"Removing {len(plt.get_fignums())} pyplot figure(s) " f"left open by {item.name}"
+        console_logger.info(msg)
+        plt.close("all")
 
 
 @pytest.fixture()

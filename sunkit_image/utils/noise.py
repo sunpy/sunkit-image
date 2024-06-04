@@ -36,9 +36,9 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
     Returns
     -------
     `dict`
-        A dictionary containing the estimated noise levels, `nlevel`;  threshold to extract weak texture
-        patches at the last iteration, `thresh`; number of extracted weak texture patches `num` and the
-        weak texture mask, `mask`.
+        A dictionary containing the estimated noise levels, ``nlevel``;  threshold to extract weak texture
+        patches at the last iteration, ``thresh``; number of extracted weak texture patches ``num`` and the
+        weak texture mask, ``mask``.
 
     Examples
     --------
