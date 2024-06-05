@@ -15,6 +15,9 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 import sunpy.io._fits
 import sunpy.map
+from astropy.table import QTable
+from astropy.time import Time
+from skimage.measure import label, regionprops_table
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 
@@ -91,3 +94,37 @@ im = hmi_submap.plot(axes=ax, autoalign=True)
 ax.contour(segs, levels=0)
 
 plt.show()
+
+###############################################################################
+# We can further enhance our analysis by extracting key properties from the
+# segmented image and organizing them into a structured table.
+
+# First, a labeled image is created where each connected component (sunspot)
+# is assigned a unique label.
+labelled = label(segs)
+# If no sunspots are detected (labelled.max() == 0), print an empty table.
+if labelled.max() == 0:
+    print(QTable())
+else:
+    # Extract properties of the labeled regions (sunspots)
+    regions = regionprops_table(
+        labelled,
+        hmi_submap.data,
+        properties=[
+            "label",  # Unique for each sunspot
+            "centroid",  # Centroid coordinates (center of mass)
+            "area",  # Total area (number of pixels)
+            "min_intensity",
+        ],
+    )
+    # A new column named "obstime" is added to the table, which contains
+    # the observation date for each sunspot.
+    regions["obstime"] = Time([hmi_submap.date] * regions["label"].size)
+    # The pixel coordinates of sunspot centroids are converted to world coordinates
+    # (solar longitude and latitude) in the heliographic Stonyhurst projection.
+    regions["center_coord"] = hmi_submap.pixel_to_world(
+        regions["centroid-0"] * u.pix,
+        regions["centroid-1"] * u.pix,
+    ).heliographic_stonyhurst
+    # Finally, the QTable containing the extracted sunspot properties is printed.
+    print(QTable(regions))
