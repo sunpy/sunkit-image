@@ -1,3 +1,4 @@
+import astropy.units as u
 import numpy as np
 
 from sunkit_image.stara import stara
@@ -5,18 +6,23 @@ from sunkit_image.tests.helpers import figure_test
 
 
 def test_stara(hmi_map):
-    result = stara(hmi_map)
+    hmi_upscaled = hmi_map.resample((1024, 1024) * u.pixel)
+    result = stara(hmi_upscaled)
     assert isinstance(result, np.ndarray)
-    assert result.shape == hmi_map.data.shape
-    assert not np.any(result)
+    assert result.shape == hmi_upscaled.data.shape
+    total_true_value_count = np.array(result)
+    assert total_true_value_count.sum() == 5516
 
 
 @figure_test
 def test_stara_plot(hmi_map):
     import matplotlib.pyplot as plt
 
-    segmentation = stara(hmi_map)
+    hmi_upscaled = hmi_map.resample((1024, 1024) * u.pixel)
+    segmentation = stara(hmi_upscaled)
     fig = plt.figure()
-    ax = plt.subplot(projection=hmi_map)
-    ax.contour(segmentation, levels=[0.5])
+    ax = plt.subplot(projection=hmi_upscaled)
+    hmi_upscaled.plot(axes=ax, autoalign=True)
+    ax.contour(segmentation, levels=0)
+    plt.title("Sunspots identified by STARA")
     return fig

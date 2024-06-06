@@ -5,11 +5,12 @@ Finding sunspots using STARA
 
 This example demonstrates the use of Sunspot Tracking And Recognition
 Algorithm (STARA) in detecting and plotting sunspots. More information
-on the algorithm can be found in [this](https://doi.org/10.1017/S1743921311014992) paper.
+on the algorithm can be found in `this <https://doi.org/10.1017/S1743921311014992>`__ paper.
 If you wish to perform analysis over a large period of time we suggest to refer
-[this](https://gitlab.com/wtbarnes/aia-on-pleiades/-/blob/master/notebooks/tidy/finding_sunspots.ipynb)
+`this <https://gitlab.com/wtbarnes/aia-on-pleiades/-/blob/master/notebooks/tidy/finding_sunspots.ipynb>`__
 notebook implementation of the same algorithm using dask arrays.
 """
+# sphinx_gallery_thumbnail_number = 4 # NOQA: ERA001
 
 import astropy.units as u
 import matplotlib.pyplot as plt
@@ -93,38 +94,58 @@ ax = plt.subplot(projection=hmi_submap)
 im = hmi_submap.plot(axes=ax, autoalign=True)
 ax.contour(segs, levels=0)
 
-plt.show()
-
 ###############################################################################
 # We can further enhance our analysis by extracting key properties from the
 # segmented image and organizing them into a structured table.
-
 # First, a labeled image is created where each connected component (sunspot)
 # is assigned a unique label.
+
 labelled = label(segs)
-# If no sunspots are detected (labelled.max() == 0), print an empty table.
-if labelled.max() == 0:
-    print(QTable())
-else:
-    # Extract properties of the labeled regions (sunspots)
-    regions = regionprops_table(
-        labelled,
-        hmi_submap.data,
-        properties=[
-            "label",  # Unique for each sunspot
-            "centroid",  # Centroid coordinates (center of mass)
-            "area",  # Total area (number of pixels)
-            "min_intensity",
-        ],
-    )
-    # A new column named "obstime" is added to the table, which contains
-    # the observation date for each sunspot.
-    regions["obstime"] = Time([hmi_submap.date] * regions["label"].size)
-    # The pixel coordinates of sunspot centroids are converted to world coordinates
-    # (solar longitude and latitude) in the heliographic Stonyhurst projection.
-    regions["center_coord"] = hmi_submap.pixel_to_world(
-        regions["centroid-0"] * u.pix,
-        regions["centroid-1"] * u.pix,
-    ).heliographic_stonyhurst
-    # Finally, the QTable containing the extracted sunspot properties is printed.
-    print(QTable(regions))
+
+# Extract properties of the labeled regions (sunspots)
+regions = regionprops_table(
+    labelled,
+    hmi_submap.data,
+    properties=[
+        "label",  # Unique for each sunspot
+        "centroid",  # Centroid coordinates (center of mass)
+        "area",  # Total area (number of pixels)
+        "min_intensity",
+    ],
+)
+# A new column named "obstime" is added to the table, which contains
+# the observation date for each sunspot.
+regions["obstime"] = Time([hmi_submap.date] * regions["label"].size)
+# The pixel coordinates of sunspot centroids are converted to world coordinates
+# (solar longitude and latitude) in the heliographic Stonyhurst projection.
+regions["center_coord"] = hmi_submap.pixel_to_world(
+    regions["centroid-0"] * u.pix,
+    regions["centroid-1"] * u.pix,
+).heliographic_stonyhurst
+# Finally, the QTable containing the extracted sunspot properties is printed.
+print(QTable(regions))
+
+###############################################################################
+# Further we could also plot a map with the corresponding center coordinates
+# marked and their number.
+
+# Extract centroid coordinates.
+centroids_x = regions["centroid-1"]
+centroids_y = regions["centroid-0"]
+
+# Plot the submap with centroids.
+fig = plt.figure()
+ax = plt.subplot(projection=hmi_submap)
+im = hmi_submap.plot(axes=ax, autoalign=True)
+ax.contour(segs, levels=0)
+
+# Plot the centroids on the image.
+ax.scatter(centroids_x, centroids_y, color="red", marker="o", s=30, label="Centroids")
+
+# Label each centroid with its corresponding sunspot label for better identification.
+for i, labels in enumerate(regions["label"]):
+    ax.text(centroids_x[i], centroids_y[i], f"{labels}", color="yellow", fontsize=16)
+
+plt.legend()
+
+plt.show()
