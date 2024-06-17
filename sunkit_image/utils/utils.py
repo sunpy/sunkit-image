@@ -262,6 +262,7 @@ def _cross2d(x, y):
     # See https://numpy.org/doc/stable/reference/generated/numpy.cross.html
     return x[..., 0] * y[..., 1] - x[..., 1] * y[..., 0]
 
+
 def calculate_gamma(pm, vel, pnorm, n):
     """
     Calculate gamma values.
