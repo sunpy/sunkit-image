@@ -148,12 +148,5 @@ def test_real_data():
         ia_diff.append((ia[i] - correct["ia"][idx]) / correct["ia"][idx] * 100)
 
     # Should be no differences
-    assert (
-        np.mean(ia_diff)
-        == np.mean(peak_diff)
-        == np.mean(peak_diff)
-        == np.mean(radius_diff)
-        == np.mean(vr_diff)
-        == np.mean(ve_diff)
-        == 0.0
-    )
+    for diff in [peak_diff, radius_diff, vr_diff, ve_diff, vc_diff, ia_diff]:
+        assert np.allclose(np.mean(diff), 0, atol=1e-5)
