@@ -66,15 +66,11 @@ def test_occult2_remote(image_remote, filepath_IDL):
     # Validating the number of loops
     assert np.allclose(expect[-1, 0] + 1, len(loops))
 
-    # We know that the python code detects one point extra than the IDL code.
-    # So to test it we will remove that point.
-    coords_py = np.delete(coords_py, (1745), axis=0)
-
     # Taking all the coords from the IDL form
     coords_idl = expect[:, 1:3]
 
     # Checking all the coordinates must be close to each other
-    assert np.allclose(coords_py, coords_idl, atol=1e-0, rtol=1e-10)
+    assert np.allclose(coords_py, coords_idl, atol=1e-5)
 
     # We devise one more test where we will find the distance between the Python and IDL points
     # For the algorithm to work correctly this distance should be very small.
