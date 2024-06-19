@@ -1,13 +1,12 @@
-import warnings
-
 import astropy.units as u
 import numpy as np
-import sunpy.map
 from skimage.feature import match_template
-from sunpy.util.exceptions import SunpyUserWarning
+
+from sunkit_image.coalignment.util.decorators import register_coalignment_method
+
+__all__ = ["match_template_coalign"]
 
 
-############################ Coalignment Interface begins #################################
 @u.quantity_input
 def _clip_edges(data, yclips: u.pix, xclips: u.pix):
     """
@@ -99,94 +98,112 @@ def _lower_clip(z):
     return zlower
 
 
-def convert_array_to_map(array_obj, map_obj):
+def _parabolic_turning_point(y):
     """
-    Convert a 2D numpy array to a sunpy Map object using the header of a given
-    map object.
+    Calculate the turning point of a parabola given three points.
 
     Parameters
     ----------
-    array_obj : `numpy.ndarray`
-        The 2D numpy array to be converted.
-    map_obj : `sunpy.map.Map`
-        The map object whose header is to be used for the new map.
+    y : `numpy.ndarray`
+        An array of three points defining the parabola.
 
     Returns
     -------
-    `sunpy.map.Map`
-        A new sunpy map object with the data from `array_obj` and the header from `map_obj`.
+    float
+        The x-coordinate of the turning point.
     """
-    header = map_obj.meta.copy()
-    header["crpix1"] -= array_obj.shape[1] / 2.0 - map_obj.data.shape[1] / 2.0
-    header["crpix2"] -= array_obj.shape[0] / 2.0 - map_obj.data.shape[0] / 2.0
-    return sunpy.map.Map(array_obj, header)
+    numerator = -0.5 * y.dot([-1, 0, 1])
+    denominator = y.dot([1, -2, 1])
+    return numerator / denominator
 
 
-def coalignment_interface(method, input_map, template_map, handle_nan=None):
+def _get_correlation_shifts(array):
     """
-    Interface for performing image coalignment using a specified method.
+    Calculate the shifts in x and y directions based on the correlation array.
 
     Parameters
     ----------
-    method : str
-        The name of the registered coalignment method to use.
-    input_map : `sunpy.map.Map`
-        The input map to be coaligned.
-    template_map : `sunpy.map.Map`
-        The template map to which the input map is to be coaligned.
-    handle_nan : callable, optional
-        Function to handle NaN values in the input and template arrays.
+    array : `numpy.ndarray`
+        A 2D array representing the correlation values.
 
     Returns
     -------
-    `sunpy.map.Map`
-        The coaligned input map.
+    tuple
+        The shifts in y and x directions.
 
     Raises
     ------
     ValueError
-        If the specified method is not registered.
+        If the input array dimensions are greater than 3 in any direction.
     """
-    if method not in registered_methods:
-        msg = f"Method {method} is not a registered method. Please register before using."
+    ny, nx = array.shape
+    if nx > 3 or ny > 3:
+        msg = "Input array dimension should not be greater than 3 in any dimension."
         raise ValueError(msg)
-    input_array = np.float64(input_map.data)
-    template_array = np.float64(template_map.data)
 
-    # Warn user if any NANs, Infs, etc are present in the input or the template array
-    if not np.all(np.isfinite(input_array)):
-        if not handle_nan:
-            warnings.warn(
-                "The layer image has nonfinite entries. "
-                "This could cause errors when calculating shift between two "
-                "images. Please make sure there are no infinity or "
-                "Not a Number values. For instance, replacing them with a "
-                "local mean.",
-                SunpyUserWarning,
-                stacklevel=3,
-            )
-        else:
-            input_array = handle_nan(input_array)
+    ij = np.unravel_index(np.argmax(array), array.shape)
+    x_max_location, y_max_location = ij[::-1]
 
-    if not np.all(np.isfinite(template_array)):
-        if not handle_nan:
-            warnings.warn(
-                "The template image has nonfinite entries. "
-                "This could cause errors when calculating shift between two "
-                "images. Please make sure there are no infinity or "
-                "Not a Number values. For instance, replacing them with a "
-                "local mean.",
-                SunpyUserWarning,
-                stacklevel=3,
-            )
-        else:
-            template_array = handle_nan(template_array)
+    y_location = _parabolic_turning_point(array[:, x_max_location]) if ny == 3 else 1.0 * y_max_location
+    x_location = _parabolic_turning_point(array[y_max_location, :]) if nx == 3 else 1.0 * x_max_location
 
-    shifts = registered_methods[method](input_array, template_array)
+    return y_location, x_location
+
+
+def _find_best_match_location(corr):
+    """
+    Find the best match location in the correlation array.
+
+    Parameters
+    ----------
+    corr : `numpy.ndarray`
+        The correlation array.
+
+    Returns
+    -------
+    tuple
+        The best match location in the y and x directions.
+    """
+    ij = np.unravel_index(np.argmax(corr), corr.shape)
+    cor_max_x, cor_max_y = ij[::-1]
+
+    array_maximum = corr[
+        max(0, cor_max_y - 1) : min(cor_max_y + 2, corr.shape[0] - 1),
+        max(0, cor_max_x - 1) : min(cor_max_x + 2, corr.shape[1] - 1),
+    ]
+
+    y_shift_maximum, x_shift_maximum = _get_correlation_shifts(array_maximum)
+
+    y_shift_correlation_array = y_shift_maximum + cor_max_y
+    x_shift_correlation_array = x_shift_maximum + cor_max_x
+
+    return y_shift_correlation_array, x_shift_correlation_array
+
+
+@register_coalignment_method("match_template")
+def match_template_coalign(input_array, template_array):
+    """
+    Perform coalignment by matching the template array to the input array.
+
+    Parameters
+    ----------
+    input_array : `numpy.ndarray`
+        The input 2D array to be coaligned.
+    template_array : `numpy.ndarray`
+        The template 2D array to align to.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the shifts in x and y directions.
+    """
+    corr = match_template(input_array, template_array)
+
+    # Find the best match location
+    y_shift, x_shift = _find_best_match_location(corr)
     # Calculate the clipping required
-    yclips, xclips = _calculate_clipping(shifts["x"] * u.pix, shifts["y"] * u.pix)
+    yclips, xclips = _calculate_clipping(x_shift * u.pix, y_shift * u.pix)
     # Clip 'em
-    coaligned_input_array = _clip_edges(input_array, yclips, xclips)
-    return convert_array_to_map(coaligned_input_array, input_map)
-
-######################################## Coalignment interface ends ##################
+    coaligned_target_array = _clip_edges(input_array, yclips, xclips)
+    # Apply the shift to get the coaligned input array
+    return {"shifts": {"x": x_shift, "y": y_shift}, "coaligned_array": coaligned_target_array}
