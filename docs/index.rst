@@ -29,7 +29,7 @@ Mission Statement
 The goal of the ``sunkit-image`` library is to provide access to image processing routines that are:
 
 1. Focused on being applied to solar physics data.
-2. Are published in the literature.
+2. Are published in the literature or in preparation to be published.
 3. If there is no publication, it must be widely used or perceived as generally useful throughout the solar physics community.
 
 As this is a SunPy affiliated package, the inputs to these routines are required to be Maps (sunpy) or NDCubes (ndcube).
