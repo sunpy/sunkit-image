@@ -10,7 +10,7 @@ def test_stara(hmi_map):
     result = stara(hmi_upscaled)
     assert isinstance(result, np.ndarray)
     assert result.shape == hmi_upscaled.data.shape
-    total_true_value_count = np.sum(np.array(result))
+    total_true_value_count = sum(result.ravel())
     assert total_true_value_count == 18712
 
 
