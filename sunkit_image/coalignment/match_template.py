@@ -195,7 +195,7 @@ def match_template_coalign(input_array, template_array):
     Returns
     -------
     dict
-        A dictionary containing the shifts in x and y directions.
+        A dictionary containing the shifts in x and y directions and the coaligned array.
     """
     corr = match_template(input_array, template_array)
 

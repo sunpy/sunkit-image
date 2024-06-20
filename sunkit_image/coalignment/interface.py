@@ -34,12 +34,14 @@ def convert_array_to_map(array_obj, map_obj):
 
 def warn_user_of_nan(array, name):
     """
-    Warn the user if there are NaN values in the input array.
+    Issues a warning if there are NaN values in the input array.
 
     Parameters
     ----------
     array : `numpy.ndarray`
         The input array to be checked for NaN values.
+    name : str
+        The name of the array, used in the warning message.
     """
     if not np.all(np.isfinite(array)):
         warnings.warn(
@@ -55,23 +57,21 @@ def warn_user_of_nan(array, name):
 
 def coalignment(reference_map, target_map, method):
     """
-    Interface for performing image coalignment using a specified method.
+    Performs image coalignment using a specified method.
 
     Parameters
     ----------
+    reference_map : `sunpy.map.Map`
+        The reference map to which the target map is to be coaligned.
+    target_map : `sunpy.map.Map`
+        The target map to be coaligned to the reference map.
     method : str
         The name of the registered coalignment method to use.
-    input_map : `sunpy.map.Map`
-        The input map to be coaligned.
-    template_map : `sunpy.map.Map`
-        The template map to which the input map is to be coaligned.
-    handle_nan : callable, optional
-        Function to handle NaN values in the input and template arrays.
 
     Returns
     -------
     `sunpy.map.Map`
-        The coaligned input map.
+        The coaligned target map.
 
     Raises
     ------
