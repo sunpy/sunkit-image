@@ -231,17 +231,19 @@ def test_multifig_rhef(smap):
 
     # Define the list of upsilon pairs
     upsilon_list = [
+        0.35,
         None,
         (0.1, 0.1),
-        (0.75, 0.75),
-        (0.2, 0.5),
-        0.35,
+        (0.5, 0.5),
+        (0.7, 0.2),
     ]
 
     # Call the plotting functions
     # Adjust the map data to avoid log of zero
-    epsilon = 1e-10
-    data0 = np.log10(np.abs(smap.data - np.nanmin(smap.data)) + epsilon) ** 2
+    try:
+        data0 = np.log10(smap.data)**2
+    except RuntimeWarning as w:
+        print(w)
 
     # Extract the coordinate ranges from the meta information
     x_coords = smap.meta['cdelt1'] * (smap.data.shape[1] // 2)
@@ -256,6 +258,7 @@ def test_multifig_rhef(smap):
     im0 = axs[0].imshow(data0, origin='lower', extent=extent, cmap=matplotlib.colormaps['sdoaia171'])
     axs[0].set_title("Log10(data)^2")
 
+
     # Loop through the upsilon_list and plot each filtered map
     for i, upsilon in enumerate(upsilon_list):
         out_map = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=upsilon, method="scipy")
@@ -268,9 +271,9 @@ def test_multifig_rhef(smap):
     return fig
 
 
-# if True:
-#     fig = test_multifig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
-#     plt.show()
+if False:
+    fig = test_multifig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
+    plt.show()
 
 # Tests needed for RHEF:
 # > With and without bins given
