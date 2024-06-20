@@ -24,7 +24,6 @@ def map_test1():
     header = {"cunit1": "arcsec", "cunit2": "arcsec", "CTYPE1": "HPLN-TAN", "CTYPE2": "HPLT-TAN"}
     return sunpy.map.Map((test_data1, header))
 
-
 @pytest.fixture()
 def map_test2():
     x = np.linspace(-2, 2, 5)
@@ -38,12 +37,10 @@ def map_test2():
     test_data2 = np.concatenate((test_data2, test_data1[:, 2:]), axis=1)
     return sunpy.map.Map((test_data2, header))
 
-
 @pytest.fixture()
 def radial_bin_edges():
     radial_bins = utils.equally_spaced_bins(inner_value=0.001, outer_value=0.003, nbins=5)
     return radial_bins * u.R_sun
-
 
 def test_nrgf(map_test1, map_test2, radial_bin_edges):
     result = np.zeros_like(map_test1.data)
@@ -65,7 +62,6 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
 
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
-
 
 def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     order = 1
@@ -110,7 +106,7 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
 
-    # The below tests are dummy testa. These values were not verified by hand rather they were
+    # The below tests are dummy tests. These values were not verified by hand rather they were
     # generated using the code itself.
     order = 5
 
@@ -196,78 +192,91 @@ def test_fig_fnrgf(smap):
 
     out.plot()
 
+
 @figure_test
 @pytest.mark.remote_data()
 def test_fig_rhef(smap):
     radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
     radial_bin_edges *= u.R_sun
 
-    # Get the SDO AIA 171 colormap
-    aia_171_colormap=matplotlib.colormaps['sdoaia171']
+    out = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=0.35, method="scipy")
 
-    # Assuming rad and smap are already defined
-    out_map1 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=None, method="numpy")
-    out_map2 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.5, 0.5), method="scipy")
-    out_map3 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.5, 0.25), method="numpy")
-    out_map4 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.25, 0.5), method="numpy")
-    out_map5 = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=(0.4, 0.4), method="scipy")
+    out.plot()
 
-    # Extract the data from the maps
-    data0 = np.log10(smap.data-np.nanmin(smap.data))**2
-    data1 = out_map1.data
-    data2 = out_map2.data
-    data3 = out_map3.data
-    data4 = out_map4.data
-    data5 = out_map5.data
 
-    # Get the coordinate ranges from the meta information
-    x_coords = out_map1.meta['cdelt1'] * (out_map1.data.shape[1] // 2)
-    y_coords = out_map1.meta['cdelt2'] * (out_map1.data.shape[0] // 2)
+@figure_test
+@pytest.mark.remote_data()
+def test_rhef(aia_171):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+    radial_bin_edges *= u.R_sun
+    out = rad.rhef(aia_171, radial_bin_edges=radial_bin_edges, upsilon=0.35, method="scipy")
+    assert type(out) == type(aia_171)
+    if isinstance(out, sunpy.map.GenericMap):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection=out)
+        out.plot(axes=ax)
+        return fig
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.imshow(out, origin="lower", interpolation="nearest", cmap="sdoaia171")
+    return fig
+
+
+@figure_test
+@pytest.mark.remote_data()
+def test_multifig_rhef(smap):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+    radial_bin_edges *= u.R_sun
+
+    # Define the list of upsilon pairs
+    upsilon_list = [
+        None,
+        (0.1, 0.1),
+        (0.75, 0.75),
+        (0.2, 0.5),
+        0.35,
+    ]
+
+    # Call the plotting functions
+
+    # Original map data
+    data0 = np.log10(smap.data - np.nanmin(smap.data)) ** 2
+
+    # Extract the coordinate ranges from the meta information
+    x_coords = smap.meta['cdelt1'] * (smap.data.shape[1] // 2)
+    y_coords = smap.meta['cdelt2'] * (smap.data.shape[0] // 2)
     extent = [-x_coords, x_coords, -y_coords, y_coords]
 
-    # Create a figure with six subplots
+    # Create a figure with subplots for each upsilon pair plus the original map
     fig, axs = plt.subplots(2, 3, figsize=(15, 10), sharey='all', sharex='all')
     axs = axs.flatten()
 
     # Plot the original map
-    im0 = axs[0].imshow(data0, origin='lower', extent=extent, cmap=aia_171_colormap)
+    im0 = axs[0].imshow(data0, origin='lower', extent=extent, cmap=matplotlib.colormaps['sdoaia171'])
     axs[0].set_title("Log10(data)^2")
 
-    # Plot the first map
-    im1 = axs[1].imshow(data1, origin='lower', extent=extent, cmap=aia_171_colormap)
-    axs[1].set_title("Upsilon = None")
-
-    # Plot the second map
-    im2 = axs[2].imshow(data2, origin='lower', extent=extent, cmap=aia_171_colormap)
-    axs[2].set_title("Upsilon = (0.5, 0.5)")
-
-    # Plot the third map
-    im3 = axs[3].imshow(data3, origin='lower', extent=extent, cmap=aia_171_colormap)
-    axs[3].set_title("Upsilon = (0.5, 0.25)")
-
-    # Plot the fourth map
-    im2 = axs[4].imshow(data4, origin='lower', extent=extent, cmap=aia_171_colormap)
-    axs[4].set_title("Upsilon = (0.25, 0.5)")
-
-    # Plot the fifth map
-    im3 = axs[5].imshow(data5, origin='lower', extent=extent, cmap=aia_171_colormap)
-    axs[5].set_title("Upsilon = (0.4, 0.4)")
+    # Loop through the upsilon_list and plot each filtered map
+    for i, upsilon in enumerate(upsilon_list):
+        out_map = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=upsilon, method="scipy")
+        data = out_map.data
+        im = axs[i + 1].imshow(data, origin='lower', extent=extent, cmap=matplotlib.colormaps['sdoaia171'])
+        axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
     # Adjust layout
     plt.tight_layout()
-
     return fig
 
-if False:
-    fig=test_fig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
-    plt.show()
+
+# if True:
+#     fig = test_multifig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
+#     plt.show()
+
 # Tests needed for RHEF:
 # > With and without bins given
 # > Various inputs for Upsilon
 # > plotting smaps natively
 # > Doing upsilon on a map that doesn't have RHE on it
 # > Make a notebook as an example of usage
-
 
 def test_set_attenuation_coefficients():
     order = 1
@@ -292,7 +301,6 @@ def test_set_attenuation_coefficients():
     with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
         rad.set_attenuation_coefficients(order, cutoff=5)
 
-
 def test_fit_polynomial_to_log_radial_intensity():
     radii = (0.001, 0.002) * u.R_sun
     intensity = np.asarray([1, 2])
@@ -301,14 +309,12 @@ def test_fit_polynomial_to_log_radial_intensity():
 
     assert np.allclose(rad._fit_polynomial_to_log_radial_intensity(radii, intensity, degree), expected)  # NOQA: SLF001
 
-
 def test_calculate_fit_radial_intensity():
     polynomial = np.asarray([1, 2, 3])
     radii = (0.001, 0.002) * u.R_sun
     expected = np.exp(np.poly1d(polynomial)(radii.to(u.R_sun).value))
 
     assert np.allclose(rad._calculate_fit_radial_intensity(radii, polynomial), expected)  # NOQA: SLF001
-
 
 def test_normalize_fit_radial_intensity():
     polynomial = np.asarray([1, 2, 3])
