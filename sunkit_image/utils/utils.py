@@ -328,7 +328,8 @@ def apply_upsilon(data, upsilon=(0.5, 0.5)):
     TypeError
         If the input is a `sunpy.map.Map` object.
     """
-    if upsilon is None or all([x is None for x in upsilon]):
+
+    if upsilon is None:
         return data
 
     if isinstance(data, sunpy.map.GenericMap):
