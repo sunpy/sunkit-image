@@ -262,6 +262,12 @@ def remove_duplicate(edge):
     return new_edge
 
 
+def _cross2d(x, y):
+    # Dimension-2 input arrays were deprecated in 2.0.0.
+    # See https://numpy.org/doc/stable/reference/generated/numpy.cross.html
+    return x[..., 0] * y[..., 1] - x[..., 1] * y[..., 0]
+
+
 def calculate_gamma(pm, vel, pnorm, n):
     """
     Calculate gamma values.
@@ -295,7 +301,7 @@ def calculate_gamma(pm, vel, pnorm, n):
       Astrophys. J., 872, 22, 2019.
       (https://doi.org/10.3847/1538-4357/aabd34)
     """
-    cross = np.cross(pm, vel)
+    cross = _cross2d(pm, vel)
     vel_norm = np.linalg.norm(vel, axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
     return np.nansum(sint, axis=1) / n

@@ -131,7 +131,7 @@ def test_calculate_gamma():
     )
     N = (2 * r + 1) ** 2
     pnorm = np.linalg.norm(pm, axis=1)
-    cross = np.cross(pm, vel[..., 0])
+    cross = utils.utils._cross2d(pm, vel[..., 0])  # NOQA: SLF001
     vel_norm = np.linalg.norm(vel[..., 0], axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
     expected = np.nansum(sint, axis=1) / N

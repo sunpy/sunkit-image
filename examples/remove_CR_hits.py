@@ -17,18 +17,19 @@ from sunpy.net import attrs as a
 
 ###############################################################################
 # For more details on how to download and plot LASCO FITS file see
-# SunPy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
-# To make this example work you need to have SunPy with all the "net" dependencies installed.
+# sunpy's example `Downloading and plotting LASCO C3 data <https://docs.sunpy.org/en/stable/generated/gallery/acquiring_data/skip_downloading_lascoC3.html>`__.
+# To make this example work you need to have sunpy with all the "net" dependencies installed.
 
 ###############################################################################
 # In order to download the required FITS file, we use
-# `Fido <sunpy.net.fido_factory.UnifiedDownloaderFactory>`, SunPy's downloader client.
-# We need to define two search variables:  a time range and the instrument.
+# `Fido <sunpy.net.fido_factory.UnifiedDownloaderFactory>`, sunpy's downloader client.
+# We need to define two search variables: a time range and the instrument.
 
 time_range = a.Time("2000/11/09 00:06", "2000/11/09 00:07")
 instrument = a.Instrument("LASCO")
 detector = a.Detector("C2")
 result = Fido.search(time_range, instrument)
+print(result)
 
 downloaded_files = Fido.fetch(result[0])
 data, header = fits.open(downloaded_files[0])[0].data, fits.open(downloaded_files[0])[0].header
