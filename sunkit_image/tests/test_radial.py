@@ -235,14 +235,19 @@ def test_multifig_rhef(smap):
         None,
         (0.1, 0.1),
         (0.5, 0.5),
-        (0.7, 0.2),
+        (0.8, 0.8),
     ]
 
     # Call the plotting functions
     # Adjust the map data to avoid log of zero
     sdata= smap.data
-    data0 = np.log10(sdata-np.nanmin(sdata))**2
-    # data0 = np.nan_to_num(data0, nan=1e-3)
+
+    # Small constant to avoid log of zero
+    epsilon = 1e-2
+
+    # Adjust the data to avoid log of zero
+    data0 = np.log10(np.maximum(sdata - np.nanmin(sdata), epsilon)) ** 2
+
     # Extract the coordinate ranges from the meta information
     x_coords = smap.meta['cdelt1'] * (smap.data.shape[1] // 2)
     y_coords = smap.meta['cdelt2'] * (smap.data.shape[0] // 2)
