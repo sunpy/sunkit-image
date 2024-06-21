@@ -7,7 +7,6 @@ import astropy.units as u
 import numpy as np
 import sunpy.map
 from sunpy.coordinates import frames
-
 from tqdm import tqdm
 
 from sunkit_image.utils import (

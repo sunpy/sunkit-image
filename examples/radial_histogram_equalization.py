@@ -7,9 +7,7 @@ This example applies the radial histogram equalizing filter (`sunkit_image.radia
 """
 
 import astropy.units as u
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
 import sunpy.data.sample
 import sunpy.map
 
@@ -39,7 +37,7 @@ ax.set_title("Original AIA Map")
 
 # RHEF map.plot()
 ax = axes[1]
-rhef_map.plot(axes=ax, norm=None) #This norm=None is very important for visualization
+rhef_map.plot(axes=ax, norm=None)  # This norm=None is very important for visualization
 ax.set_title("RHE Filtered Map")
 
 plt.tight_layout()
@@ -70,7 +68,7 @@ axs[0].set_title("Original AIA Map")
 # # Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
     out_map = radial.rhef(aia_map, upsilon=upsilon, method="scipy")
-    out_map.plot(axes=axs[i+1], norm=None)
+    out_map.plot(axes=axs[i + 1], norm=None)
     axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
 # Adjust layout
@@ -83,7 +81,7 @@ plt.show()
 mgn_map = enhance.mgn(aia_map)
 wow_map = enhance.wow(aia_map)
 
-rhef_map     = radial.rhef(aia_map)
+rhef_map = radial.rhef(aia_map)
 rhef_mgn_map = radial.rhef(mgn_map)
 rhef_wow_map = radial.rhef(wow_map)
 
