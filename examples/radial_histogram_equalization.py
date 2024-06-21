@@ -30,21 +30,26 @@ radial_bin_edges *= u.R_sun
 # Apply the radial filter to the map
 rhe_map = radial.rhef(aia_map, radial_bin_edges)
 
+
+#######################################################################################
+# It seems that the native sunpy plot routine has a strong effect on the output,
+# so we reccomend using imshow.
+
 # Plot the three maps in a single figure with one row and three columns
 fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharex='all', sharey='all',
                          subplot_kw={'projection': aia_map})
 
-# Original AIA map
+# Original AIA map.plot()
 ax = axes[0]
 aia_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
 ax.set_title('Original AIA Map')
 
-# Radially segmented map
+# RHEF map.plot()
 ax = axes[1]
 rhe_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
 ax.set_title('RHE map.plot()')
 
-# RHE filtered map
+# RHE imshow(map.data)
 ax = axes[2]
 ax.imshow(rhe_map.data, origin='lower', extent=None, cmap=plt.get_cmap('sdoaia171'))
 ax.set_title('RHE imshow()')
@@ -55,8 +60,10 @@ plt.show()
 
 #######################################################################################
 # The RHEF has one free parameter that works in post processing to modulate the output.
+# Lets see a few of the choices you could make.
+# See the thesis (Gilly 2022) for details about upsilon.
 
-# Define the list of upsilon pairs
+# Define the list of upsilon pairs where the first number affects dark components and the second number affects bright ones
 upsilon_list = [
     0.35,
     None,
@@ -95,5 +102,46 @@ for i, upsilon in enumerate(upsilon_list):
 
 # Adjust layout
 plt.tight_layout()
+plt.show()
 
+#######################################################################################
+# Note that multiple filters can be used in a row to get the best images
+
+import sunkit_image.enhance as enhance
+
+
+mgn_map      = enhance.mgn(aia_map)
+rhef_mgn_map = radial.rhef(mgn_map, radial_bin_edges)
+rhef_map     = radial.rhef(aia_map, radial_bin_edges)
+
+# Plot the three maps in a single figure with one row and three columns
+fig, axes = plt.subplots(2, 2, figsize=(10, 10), sharex='all', sharey='all',
+                         subplot_kw={'projection': aia_map})
+axes = axes.flatten()
+
+
+ax = axes[0]
+ax.imshow(mgn_map.data, origin='lower', cmap=plt.get_cmap('sdoaia171'))
+ax.set_title('MGN()')
+
+
+ax = axes[1]
+ax.imshow(rhef_mgn_map.data, origin='lower', cmap=plt.get_cmap('sdoaia171'))
+ax.set_title('RHEF(MGN())')
+
+
+ax = axes[3]
+toplot = (rhef_map.data + rhef_mgn_map.data)/2
+ax.imshow(toplot, origin='lower', cmap=plt.get_cmap('sdoaia171'))
+ax.set_title('(RHEF() + RHEF(MGN()))/2')
+
+
+ax = axes[2]
+ax.imshow(rhe_map.data, origin='lower', cmap=plt.get_cmap('sdoaia171'))
+ax.set_title('RHEF()')
+
+# ax.set_xlim((extent[0], 0))
+# ax.set_ylim((0, extent[-1]))
+
+plt.tight_layout()
 plt.show()
