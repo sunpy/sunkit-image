@@ -258,10 +258,6 @@ def test_multifig_rhef(smap):
     return fig
 
 
-if True:
-    fig = test_multifig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
-    plt.show()
-
 # Tests needed for RHEF:
 # > With and without bins given
 # > Various inputs for Upsilon
