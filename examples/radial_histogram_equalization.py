@@ -45,7 +45,7 @@ ax.set_title("Original AIA Map")
 
 # RHEF map.plot()
 ax = axes[1]
-rhef_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
+rhef_map.plot(axes=ax, norm=None)
 ax.set_title("RHE map.plot()")
 
 # RHE imshow(map.data)
