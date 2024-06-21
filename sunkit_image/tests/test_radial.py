@@ -240,11 +240,9 @@ def test_multifig_rhef(smap):
 
     # Call the plotting functions
     # Adjust the map data to avoid log of zero
-    try:
-        data0 = np.log10(smap.data)**2
-    except RuntimeWarning as w:
-        print(w)
-
+    sdata= smap.data
+    data0 = np.log10(sdata-np.nanmin(sdata))**2
+    # data0 = np.nan_to_num(data0, nan=1e-3)
     # Extract the coordinate ranges from the meta information
     x_coords = smap.meta['cdelt1'] * (smap.data.shape[1] // 2)
     y_coords = smap.meta['cdelt2'] * (smap.data.shape[0] // 2)
@@ -271,7 +269,7 @@ def test_multifig_rhef(smap):
     return fig
 
 
-if False:
+if True:
     fig = test_multifig_rhef(sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE))
     plt.show()
 
