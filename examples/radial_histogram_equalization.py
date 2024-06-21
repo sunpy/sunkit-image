@@ -18,7 +18,7 @@ import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins
 
 #######################################################################################
-# Let us us the sample AIA image to test the THE filter
+# Let us us the sample AIA image to test the RHE filter
 
 # Load AIA image
 aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
@@ -46,12 +46,12 @@ ax.set_title("Original AIA Map")
 # RHEF map.plot()
 ax = axes[1]
 rhef_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
-ax.set_title("THE map.plot()")
+ax.set_title("RHE map.plot()")
 
-# THE imshow(map.data)
+# RHE imshow(map.data)
 ax = axes[2]
 ax.imshow(rhef_map.data, origin="lower", extent=None, cmap=plt.get_cmap("sdoaia171"))
-ax.set_title("THE imshow()")
+ax.set_title("RHE imshow()")
 
 plt.tight_layout()
 plt.show()

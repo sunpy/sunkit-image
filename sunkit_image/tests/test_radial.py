@@ -266,7 +266,7 @@ if True:
 # > With and without bins given
 # > Various inputs for Upsilon
 # > plotting smaps natively
-# > Doing upsilon on a map that doesn't have THE on it
+# > Doing upsilon on a map that doesn't have RHE on it
 # > Make a notebook as an example of usage
 
 
