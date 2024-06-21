@@ -24,6 +24,7 @@ __all__ = [
     "percentile_ranks_numpy",
     "percentile_ranks_scipy",
     "percentile_ranks_numpy_inplace",
+    "blackout_pixels_above_radius",
 ]
 
 
@@ -386,3 +387,29 @@ def percentile_ranks_numpy_inplace(arr):
     sorted_indices = np.argsort(arr)
     arr[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
     return arr / float(len(arr))
+
+
+def blackout_pixels_above_radius(smap, radius_limit=1.5*u.R_sun):
+    """
+    Black out any pixels above a certain radius in a SunPy map.
+
+    Parameters:
+    sunpy_map (sunpy.map.GenericMap): The input SunPy map.
+    radius_limit (astropy.units.Quantity): The radius limit above which to black out pixels.
+
+    Returns:
+    sunpy.map.GenericMap: A new SunPy map with pixels above the specified radius blacked out.
+    """
+    # Create a grid of coordinates corresponding to each pixel in the map
+    map_r = find_pixel_radii(smap).to(u.R_sun)
+
+    # Create a mask for pixels above the radius limit
+    mask = map_r > radius_limit
+
+    # Apply the mask to the map data
+    masked_data = np.where(mask, 0, smap.data)
+
+    # Create a new map with the masked data
+    masked_map = sunpy.map.Map(masked_data, smap.meta)
+
+    return masked_map
