@@ -8,6 +8,8 @@ import numpy as np
 import sunpy.map
 from sunpy.coordinates import frames
 
+from tqdm import tqdm
+
 from sunkit_image.utils import (
     apply_upsilon,
     bin_edge_summary,
@@ -588,10 +590,10 @@ def rhef(
     radial_bin_edges=None,
     application_radius=0 * u.R_sun,
     upsilon=0.35,
-    method="inplace",
+    method="numpy",
 ):
     """
-    Implementation of the radial histogram equalizing filter (RHEF).
+    Implementation of the Radial Histogram Equalizing Filter (RHEF).
 
     The filter works as follows:
 
@@ -601,8 +603,7 @@ def rhef(
 
     .. note::
 
-        After applying the filter, current plot settings such as the image normalization
-        may have to be changed in order to obtain a good-looking plot.
+        After applying the filter, the maps need to be plotted with smap.plot(norm=False) to be visualized correctly.
 
     Parameters
     ----------
@@ -616,11 +617,11 @@ def rhef(
         Defaults to 0 solar radii.
     upsilon : None or int or tuple of size 2, optional
         A double-sided gamma function applied to the equalized histograms.
-        Equation (TODO) in the paper
+        See Equation (4.15) in the thesis
         Defaults to 0.35
     method: {"inplace", "numpy", "scipy"}
         A string describing which method to use for sorting.
-        Defaults to "inplace".
+        Defaults to "numpy".
 
     Returns
     -------
@@ -639,11 +640,11 @@ def rhef(
     # Get the radii for every pixel
     map_r = find_pixel_radii(smap).to(u.R_sun)
 
-    # Make sure bins are in the map.
     if radial_bin_edges is None:
-        radial_bin_edges = equally_spaced_bins(map_r.min(), map_r.max(), map_r.data.shape[0])
+        radial_bin_edges = equally_spaced_bins(0, 2, smap.data.shape[0] // 2)
         radial_bin_edges *= u.R_sun
 
+    # Make sure bins are in the map.
     if radial_bin_edges[1, -1] > np.max(map_r):
         radial_bin_edges = equally_spaced_bins(
             inner_value=radial_bin_edges[0, 0],
@@ -659,13 +660,12 @@ def rhef(
     elif method == "scipy":
         the_func = percentile_ranks_scipy
     else:
-        msg = "{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
+        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
         raise NotImplementedError(msg)
 
     # Allocate storage for the filtered data
     data = np.ones_like(smap.data)
     meta = smap.meta
-    from tqdm import tqdm
 
     # Calculate the filter values for each radial bin.
     for i in tqdm(range(radial_bin_edges.shape[1])):

@@ -29,12 +29,8 @@ radial_bin_edges *= u.R_sun
 rhef_map = radial.rhef(aia_map, radial_bin_edges)
 
 
-#######################################################################################
-# It seems that the native sunpy plot routine has a strong effect on the output,
-# so we recommend using imshow.
-
-# Plot the three maps in a single figure with one row and three columns
-fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
+# Plot the 2 maps in a single figure with one row and three columns
+fig, axes = plt.subplots(1, 2, figsize=(10, 5), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 
 # Original AIA map.plot()
 ax = axes[0]
@@ -43,13 +39,8 @@ ax.set_title("Original AIA Map")
 
 # RHEF map.plot()
 ax = axes[1]
-rhef_map.plot(axes=ax, norm=None)
-ax.set_title("RHE map.plot()")
-
-# RHE imshow(map.data)
-ax = axes[2]
-ax.imshow(rhef_map.data, origin="lower", extent=None, cmap=plt.get_cmap("sdoaia171"))
-ax.set_title("RHE imshow()")
+rhef_map.plot(axes=ax, norm=None) #This norm=None is very important for visualization
+ax.set_title("RHE Filtered Map")
 
 plt.tight_layout()
 plt.show()
@@ -58,7 +49,7 @@ plt.show()
 #######################################################################################
 # The RHEF has one free parameter that works in post processing to modulate the output.
 # Here are some of the choices one could make.
-# See the thesis (Gilly 2022) for details about upsilon.
+# See the thesis (Gilly 2022) Eq 4.15 for details about upsilon: https://www.proquest.com/docview/2759080511
 
 # Define the list of upsilon pairs where the first number affects dark components and the second number affects bright ones
 upsilon_list = [
@@ -69,32 +60,17 @@ upsilon_list = [
     (0.8, 0.8),
 ]
 
-
-#######################################################################################
-# Call the plotting functions
-
 # Create a figure with subplots for each upsilon pair plus the original map
-fig, axs = plt.subplots(2, 3, figsize=(15, 10), sharey="all", sharex="all")
-axs = axs.flatten()
+fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
+axs = axes.flatten()
 
-# Extract the coordinate ranges from the meta information
-x_coords = aia_map.meta["cdelt1"] * (aia_map.data.shape[1] // 2)
-y_coords = aia_map.meta["cdelt2"] * (aia_map.data.shape[0] // 2)
-extent = [-x_coords, x_coords, -y_coords, y_coords]
+aia_map.plot(axes=axs[0], clip_interval=(1, 99.99) * u.percent)
+axs[0].set_title("Original AIA Map")
 
-# Plot the original map
-# Adjust the map data to avoid log of zero
-sdata = aia_map.data
-epsilon = 1e-2
-data0 = np.log10(np.maximum(sdata - np.nanmin(sdata), epsilon)) ** 2
-im0 = axs[0].imshow(data0, origin="lower", extent=extent, cmap=mpl.colormaps["sdoaia171"])
-axs[0].set_title("Log10(data)^2")
-
-# Loop through the upsilon_list and plot each filtered map
+# # Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
-    out_map = radial.rhef(aia_map, radial_bin_edges=radial_bin_edges, upsilon=upsilon, method="scipy")
-    data = out_map.data
-    im = axs[i + 1].imshow(data, origin="lower", extent=extent, cmap=mpl.colormaps["sdoaia171"])
+    out_map = radial.rhef(aia_map, upsilon=upsilon, method="scipy")
+    out_map.plot(axes=axs[i+1], norm=None)
     axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
 # Adjust layout
@@ -104,35 +80,41 @@ plt.show()
 #######################################################################################
 # Note that multiple filters can be used in a row to get the best images
 
-
 mgn_map = enhance.mgn(aia_map)
-rhef_mgn_map = radial.rhef(mgn_map, radial_bin_edges)
-rhef_map = radial.rhef(aia_map, radial_bin_edges)
+wow_map = enhance.wow(aia_map)
 
-# Plot the three maps in a single figure with one row and three columns
-fig, axes = plt.subplots(2, 2, figsize=(10, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
+rhef_map     = radial.rhef(aia_map)
+rhef_mgn_map = radial.rhef(mgn_map)
+rhef_wow_map = radial.rhef(wow_map)
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 axes = axes.flatten()
 
-
-ax = axes[0]
-ax.imshow(mgn_map.data, origin="lower", cmap=plt.get_cmap("sdoaia171"))
+ax = axes[1]
+mgn_map.plot(axes=ax, norm=None)
 ax.set_title("MGN()")
 
-
-ax = axes[1]
-ax.imshow(rhef_mgn_map.data, origin="lower", cmap=plt.get_cmap("sdoaia171"))
+ax = axes[4]
+rhef_mgn_map.plot(axes=ax, norm=None)
 ax.set_title("RHEF(MGN())")
 
+ax = axes[0]
+rhef_map.plot(axes=ax, norm=None)
+ax.set_title("RHEF()")
 
 ax = axes[3]
 toplot = (rhef_map.data + rhef_mgn_map.data) / 2
-ax.imshow(toplot, origin="lower", cmap=plt.get_cmap("sdoaia171"))
+combo_map = sunpy.map.Map(toplot, rhef_map.meta)
+combo_map.plot(axes=ax, norm=None)
 ax.set_title("(RHEF() + RHEF(MGN()))/2")
 
-
 ax = axes[2]
-ax.imshow(rhef_map.data, origin="lower", cmap=plt.get_cmap("sdoaia171"))
-ax.set_title("RHEF()")
+wow_map.plot(axes=ax, norm=None)
+ax.set_title("WOW()")
+
+ax = axes[5]
+rhef_wow_map.plot(axes=ax, norm=None)
+ax.set_title("RHEF(WOW())")
 
 plt.tight_layout()
 plt.show()
