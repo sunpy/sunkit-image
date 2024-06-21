@@ -8,18 +8,18 @@ import numpy as np
 import sunpy.map
 from sunpy.coordinates import frames
 
-from sunkit_image.utils import bin_edge_summary, equally_spaced_bins, find_pixel_radii, get_radial_intensity_summary
-from sunkit_image.utils import percentile_ranks_numpy_inplace, percentile_ranks_numpy, percentile_ranks_scipy, apply_upsilon
+from sunkit_image.utils import (
+    apply_upsilon,
+    bin_edge_summary,
+    equally_spaced_bins,
+    find_pixel_radii,
+    get_radial_intensity_summary,
+    percentile_ranks_numpy,
+    percentile_ranks_numpy_inplace,
+    percentile_ranks_scipy,
+)
 
-
-
-__all__ = [
-    "fnrgf",
-    "intensity_enhance",
-    "set_attenuation_coefficients",
-    "nrgf",
-    "rhef"
-]
+__all__ = ["fnrgf", "intensity_enhance", "set_attenuation_coefficients", "nrgf", "rhef"]
 
 
 def _fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
@@ -582,6 +582,7 @@ def fnrgf(
 
     return sunpy.map.Map(data, smap.meta)
 
+
 def rhef(
     smap,
     radial_bin_edges=None,
@@ -651,28 +652,29 @@ def rhef(
 
     # Select the sort method
     if method == "inplace":
-        rhe_func = percentile_ranks_numpy_inplace
+        the_func = percentile_ranks_numpy_inplace
     elif method == "numpy":
-        rhe_func = percentile_ranks_numpy
+        the_func = percentile_ranks_numpy
     elif method == "scipy":
-        rhe_func = percentile_ranks_scipy
+        the_func = percentile_ranks_scipy
     else:
-        raise NotImplementedError("{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'")
+        msg = "{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
+        raise NotImplementedError(msg)
 
     # Allocate storage for the filtered data
     data = np.ones_like(smap.data)
     meta = smap.meta
-    import matplotlib.pyplot as plt
     from tqdm import tqdm
+
     # Calculate the filter values for each radial bin.
     for i in tqdm(range(radial_bin_edges.shape[1])):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
-        if application_radius is not None and application_radius>0:
+        if application_radius is not None and application_radius > 0:
             here = np.logical_and(here, map_r >= application_radius)
 
         # Perform the filtering operation
-        data[here] = rhe_func(smap.data[here])
+        data[here] = the_func(smap.data[here])
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
 

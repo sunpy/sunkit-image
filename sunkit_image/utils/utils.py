@@ -6,10 +6,10 @@ import warnings
 
 import astropy.units as u
 import numpy as np
+import sunpy
 from scipy.interpolate import RectBivariateSpline
 from skimage import measure
 from sunpy.map import all_coordinates_from_map
-import sunpy
 
 __all__ = [
     "bin_edge_summary",
@@ -23,7 +23,7 @@ __all__ = [
     "apply_upsilon",
     "percentile_ranks_numpy",
     "percentile_ranks_scipy",
-    "percentile_ranks_numpy_inplace"
+    "percentile_ranks_numpy_inplace",
 ]
 
 
@@ -307,7 +307,6 @@ def calculate_gamma(pm, vel, pnorm, n):
     return np.nansum(sint, axis=1) / n
 
 
-
 def apply_upsilon(data, upsilon=(0.5, 0.5)):
     """
     Apply the upsilon function to the input array.
@@ -339,7 +338,8 @@ def apply_upsilon(data, upsilon=(0.5, 0.5)):
         return data
 
     if isinstance(data, sunpy.map.GenericMap):
-        raise TypeError("Input data must be a raw ndarray, not a SunPy map object")
+        msg = "Input data must be a raw ndarray, not a SunPy map object"
+        raise TypeError(msg)
 
     if isinstance(upsilon, float):
         alpha = alpha_high = upsilon
@@ -371,17 +371,18 @@ def apply_upsilon(data, upsilon=(0.5, 0.5)):
 
 def percentile_ranks_scipy(arr):
     from scipy import stats
+
     return stats.rankdata(arr, method="average") / len(arr)
+
 
 def percentile_ranks_numpy(arr):
     sorted_indices = np.argsort(arr)
     ranks = np.empty_like(sorted_indices)
     ranks[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
-    percentiles = ranks / float(len(arr))
-    return percentiles
+    return ranks / float(len(arr))
+
 
 def percentile_ranks_numpy_inplace(arr):
     sorted_indices = np.argsort(arr)
     arr[sorted_indices] = np.arange(1, len(arr) + 1)  # Ranks start from 1
-    arr = arr / float(len(arr))
-    return arr
+    return arr / float(len(arr))
