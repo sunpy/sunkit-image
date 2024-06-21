@@ -1,7 +1,7 @@
 """
-=======================
-Radial Gradient Filters
-=======================
+===================================
+Normalizing Radial Gradient Filters
+===================================
 
 This example applies both the normalizing radial gradient (`sunkit_image.radial.nrgf`) filter and Fourier
 normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
