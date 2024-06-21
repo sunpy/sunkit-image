@@ -3,7 +3,7 @@
 Radial Histogram Equalization
 =============================
 
-This example applies the radial histogram equalizing filter (`sunkit_image.radial.rhef`) filter to a sunpy map.
+This example applies the Radial Histogram Equalizing Filter (`sunkit_image.radial.rhef`) to a sunpy map.
 """
 
 import astropy.units as u
