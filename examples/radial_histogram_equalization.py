@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import sunpy.data.sample
 import sunpy.map
+import numpy as np
 
 import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins
@@ -43,6 +44,8 @@ ax = plt.subplot(projection=out1)
 out1.plot()
 plt.show()
 
+
+#######################################################################################
 # The RHEF has one free parameter that works in post processing to modulate the output.
 
 radial_bin_edges = utils.equally_spaced_bins(0, 2, aia_map.data.shape[1])
@@ -57,7 +60,7 @@ upsilon_list = [
     (0.8, 0.8),
 ]
 
-import numpy as np
+
 
 # Call the plotting functions
 # Adjust the map data to avoid log of zero
