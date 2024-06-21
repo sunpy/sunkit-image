@@ -618,8 +618,9 @@ def rhef(
         A double-sided gamma function applied to the equalized histograms.
         Equation (TODO) in the paper
         Defaults to 0.35
-    method: str "inplace", "numpy", "scipy"
-        A string describing which method to use for sorting
+    method: {"inplace", "numpy", "scipy"}
+        A string describing which method to use for sorting.
+        Defaults to "inplace".
 
     Returns
     -------

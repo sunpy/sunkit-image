@@ -1,7 +1,7 @@
 """
-===================================
+=============================
 Radial Histogram Equalization
-===================================
+=============================
 
 This example applies the radial histogram equalizing filter (`sunkit_image.radial.rhef`) filter to a sunpy map.
 """
@@ -18,16 +18,14 @@ import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins
 
 #######################################################################################
-# Let us us the sample AIA image to test the RHE filter
+# Let us use the sunpy sample data AIA image to showcase the RHE filter.
 
-# Load AIA image
 aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 # Create radial segments (RHEF should use a dense grid)
 radial_bin_edges = equally_spaced_bins(0, 2, aia_map.data.shape[0] // 2)
 radial_bin_edges *= u.R_sun
 
-# Apply the radial filter to the map
 rhef_map = radial.rhef(aia_map, radial_bin_edges)
 
 
@@ -58,8 +56,8 @@ plt.show()
 
 
 #######################################################################################
-# The RHEF has one free parameter that works in post processing to modulate The output.
-# Lets see a few of The choices you could make.
+# The RHEF has one free parameter that works in post processing to modulate the output.
+# Here are some of the choices one could make.
 # See the thesis (Gilly 2022) for details about upsilon.
 
 # Define the list of upsilon pairs where the first number affects dark components and the second number affects bright ones
