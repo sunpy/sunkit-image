@@ -586,7 +586,7 @@ def rhef(
     smap,
     radial_bin_edges=None,
     application_radius=0 * u.R_sun,
-    upsilon=(0.5, 0.5),
+    upsilon=0.35,
     method="inplace",
 ):
     """
@@ -616,7 +616,7 @@ def rhef(
     upsilon : None or int or tuple of size 2, optional
         A double-sided gamma function applied to the equalized histograms.
         Equation (TODO) in the paper
-        Defaults to (0.5, 0.5)
+        Defaults to 0.35
     method: str "inplace", "numpy", "scipy"
         A string describing which method to use for sorting
 
@@ -675,7 +675,5 @@ def rhef(
         data[here] = rhe_func(smap.data[here])
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
-    # plt.imshow(data)
-    # plt.show()
 
     return sunpy.map.Map(data, meta)
