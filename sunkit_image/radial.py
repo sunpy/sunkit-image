@@ -12,13 +12,13 @@ from tqdm import tqdm
 from sunkit_image.utils import (
     apply_upsilon,
     bin_edge_summary,
+    blackout_pixels_above_radius,
     equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,
     percentile_ranks_numpy,
     percentile_ranks_numpy_inplace,
     percentile_ranks_scipy,
-    blackout_pixels_above_radius,
 )
 
 __all__ = ["fnrgf", "intensity_enhance", "set_attenuation_coefficients", "nrgf", "rhef"]
@@ -591,7 +591,7 @@ def rhef(
     application_radius=0 * u.R_sun,
     upsilon=0.35,
     method="numpy",
-    vignette=False,
+    vignette=None,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -681,7 +681,7 @@ def rhef(
             data[here] = apply_upsilon(data[here], upsilon)
     new_map = sunpy.map.Map(data, meta)
 
-    if not vignette in [False, None]:
+    if vignette not in [False, None]:
         if vignette is True:
             vignette = 1.5 * u.R_sun
         new_map = blackout_pixels_above_radius(new_map, vignette)

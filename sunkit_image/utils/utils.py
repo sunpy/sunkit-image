@@ -389,7 +389,7 @@ def percentile_ranks_numpy_inplace(arr):
     return arr / float(len(arr))
 
 
-def blackout_pixels_above_radius(smap, radius_limit=1.5*u.R_sun):
+def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
     """
     Black out any pixels above a certain radius in a SunPy map.
 
@@ -410,6 +410,4 @@ def blackout_pixels_above_radius(smap, radius_limit=1.5*u.R_sun):
     masked_data = np.where(mask, 0, smap.data)
 
     # Create a new map with the masked data
-    masked_map = sunpy.map.Map(masked_data, smap.meta)
-
-    return masked_map
+    return sunpy.map.Map(masked_data, smap.meta)
