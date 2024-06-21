@@ -4,7 +4,7 @@ import numpy as np
 import sunpy.map
 from sunpy.util.exceptions import SunpyUserWarning
 
-from sunkit_image.coalignment.util.decorators import registered_methods
+from sunkit_image.coalignment_module.util.decorators import registered_methods
 
 __all__ = ["coalignment"]
 
@@ -81,8 +81,8 @@ def coalignment(reference_map, target_map, method):
     if method not in registered_methods:
         msg = f"Method {method} is not a registered method. Please register before using."
         raise ValueError(msg)
-    target_array = np.float64(target_map.data)
-    reference_array = np.float64(reference_map.data)
+    target_array = target_map.data
+    reference_array = reference_map.data
 
     # Warn user if any NANs, Infs, etc are present in the input or the template array
     warn_user_of_nan(target_array, "target")

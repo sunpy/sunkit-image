@@ -2,7 +2,7 @@ import astropy.units as u
 import numpy as np
 from skimage.feature import match_template
 
-from sunkit_image.coalignment.util.decorators import register_coalignment_method
+from sunkit_image.coalignment_module.util.decorators import register_coalignment_method
 
 __all__ = ["match_template_coalign"]
 
@@ -197,7 +197,7 @@ def match_template_coalign(input_array, template_array):
     dict
         A dictionary containing the shifts in x and y directions and the coaligned array.
     """
-    corr = match_template(input_array, template_array)
+    corr = match_template(np.float64(input_array), np.float64(template_array))
 
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
