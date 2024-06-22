@@ -3,8 +3,8 @@
 Normalizing Radial Gradient Filters
 ===================================
 
-This example applies both the normalizing radial gradient (`sunkit_image.radial.nrgf`) filter and Fourier
-normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
+This example applies both the Normalizing Radial Gradient Filter (NRGF) (`sunkit_image.radial.nrgf`) and Fourier
+Normalizing Radial Gradient Filter (FNRGF) (`sunkit_image.radial.fnrgf`) to a sunpy map.
 """
 
 import astropy.units as u
@@ -42,7 +42,7 @@ out1 = radial.nrgf(aia_map, radial_bin_edges)
 # for a clearer output.
 fig = plt.figure()
 ax = plt.subplot(projection=out1)
-out1.plot()
+out1.plot(norm=None)
 
 ###########################################################################
 # We will need to work out  a few parameters for the FNRGF.
@@ -59,6 +59,6 @@ out2 = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients)
 # The FNRGF filtered map is plotted.
 fig = plt.figure()
 ax = plt.subplot(projection=out2)
-out2.plot()
+out2.plot(norm=None)
 
 plt.show()
