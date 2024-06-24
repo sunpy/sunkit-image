@@ -313,7 +313,7 @@ def nrgf(
     data = np.zeros_like(smap.data)
 
     # Calculate the filter value for each radial bin.
-    for i in range(radial_bin_edges.shape[1]):
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="NRGF: "):
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         here = np.logical_and(here, map_r > application_radius)
         data[here] = smap.data[here] - radial_intensity[i]
@@ -489,7 +489,7 @@ def fnrgf(
     data = np.zeros_like(smap.data)
 
     # Iterate over each circular ring
-    for i in range(nbins):
+    for i in tqdm(range(nbins), desc="FNRGF: "):
         # Finding the pixels which belong to a certain circular ring
         annulus = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         annulus = np.logical_and(annulus, map_r > application_radius)
@@ -667,11 +667,11 @@ def rhef(
         raise NotImplementedError(msg)
 
     # Allocate storage for the filtered data
-    data = np.ones_like(smap.data)
+    data = np.zeros_like(smap.data)
     meta = smap.meta
 
     # Calculate the filter values for each radial bin.
-    for i in tqdm(range(radial_bin_edges.shape[1])):
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: "):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         if application_radius is not None and application_radius > 0:
