@@ -31,11 +31,11 @@ aia_map.plot(clip_interval=(1, 99.99) * u.percent)
 # equal dimensions radially. The distance between 1 solar radii and 2 solar radii
 # is divided into 100 equal parts by the following two lines.
 
-radial_bin_edges = equally_spaced_bins(1, 2, aia_map.data.shape[0]//4)
+radial_bin_edges = equally_spaced_bins(1, 2, aia_map.data.shape[0] // 4)
 radial_bin_edges *= u.R_sun
 
 # The NRGF filter is applied after it.
-out1 = radial.nrgf(aia_map, radial_bin_edges, application_radius=1*u.R_sun)
+out1 = radial.nrgf(aia_map, radial_bin_edges, application_radius=1 * u.R_sun)
 
 # The NRGF filtered map is plotted.
 # The image seems a little washed out so you may need to change some plotting settings
@@ -55,7 +55,7 @@ order = 20
 attenuation_coefficients = radial.set_attenuation_coefficients(order)
 
 # The FNRGF filter is applied after it.
-out2 = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1*u.R_sun)
+out2 = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1 * u.R_sun)
 
 # The FNRGF filtered map is plotted.
 fig = plt.figure()
@@ -65,7 +65,7 @@ ax.set_title("FNRGF")
 
 ###########################################################################
 # We can compare to the new RHEF as well.
-rhef_map = radial.rhef(aia_map, radial_bin_edges, application_radius=1*u.R_sun)
+rhef_map = radial.rhef(aia_map, radial_bin_edges, application_radius=1 * u.R_sun)
 
 # The RHE filtered map is plotted.
 fig = plt.figure()

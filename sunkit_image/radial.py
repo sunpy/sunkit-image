@@ -620,10 +620,12 @@ def rhef(
         A double-sided gamma function applied to the equalized histograms.
         See Equation (4.15) in the thesis
         Defaults to 0.35
-    method : {"inplace", "numpy", "scipy"}
+    method : str
         A string describing which method to use for sorting.
+        Options are {"inplace", "numpy", "scipy"}.
         Defaults to "numpy".
     vignette : None or Bool or `astropy.units.Quantity`, optional
+        Set pixels above this radius to black.
         Defaults to None.
 
     Returns
