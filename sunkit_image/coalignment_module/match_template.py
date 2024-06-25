@@ -194,8 +194,9 @@ def match_template_coalign(input_array, template_array):
 
     Returns
     -------
-    dict
-        A dictionary containing the shifts in x and y directions and the coaligned array.
+    tuple
+        A tuple where the first element is another tuple containing the shifts in x and y directions (x_shift, y_shift),
+        and the second element is the coaligned array.
     """
     corr = match_template(np.float64(input_array), np.float64(template_array))
 
@@ -206,4 +207,4 @@ def match_template_coalign(input_array, template_array):
     # Clip 'em
     coaligned_target_array = _clip_edges(input_array, yclips, xclips)
     # Apply the shift to get the coaligned input array
-    return {"shifts": {"x": x_shift, "y": y_shift}, "coaligned_array": coaligned_target_array}
+    return ((x_shift, y_shift), coaligned_target_array)
