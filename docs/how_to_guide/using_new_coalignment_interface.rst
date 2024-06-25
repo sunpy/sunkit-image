@@ -1,34 +1,39 @@
-.. _sunkit-image-how-to-guide-using-the-coalignment-interface:
+.. _using-the-coalignment-interface:
 
 *******************************
 Using the Coalignment Interface
 *******************************
 
-This guide explains how to use the coalignment interface in the sunkit-image package to align solar images. The ``sunkit_image.coalignment_module.interface.coalignment`` function facilitates image coalignment using various registered methods.
+This guide explains how to use the coalignment interface in the sunkit-image package to align solar images. The :func:`sunkit_image.coalignment_module.coalignment` function facilitates image coalignment using various registered methods.
 
 Function Overview
 =================
-The ``sunkit_image.coalignment_module.interface.coalignment`` function performs image coalignment using a specified method that is registered using the decorator ``sunkit_image.coalignment_module.util.decorators.register_coalignment_method``. For registering a new method, please check the ``_sunkit-image-how-to-guide-adding-a-new-coalignment-method`` guide.
 
-Refer to the docstring of ``sunkit_image.coalignment_module.interface.coalignment`` for detailed information on the parameters, return values, and exceptions.
+The :func:`sunkit_image.coalignment_module.coalignment` function performs image coalignment using a specified method that is registered using the decorator :func:`sunkit_image.coalignment_module.register_coalignment_method`. For registering a new method, please check the :doc:`adding_a_coalignment_method` guide.
+
+Refer to the docstring of :func:`sunkit_image.coalignment_module.coalignment` for detailed information on the parameters, return values, and exceptions.
 
 Function Parameters
 ===================
+
 - **reference_map** (`sunpy.map.Map`): The reference map to which the target map is to be coaligned.
 - **target_map** (`sunpy.map.Map`): The target map to be coaligned to the reference map.
 - **method** (str): The name of the registered coalignment method to use.
 
 Returns
 =======
+
 - **sunpy.map.Map**: The coaligned target map.
 
 Raises
 ======
+
 - **ValueError**: If the specified method is not registered.
 
 Example Usage
 =============
-Below is an example of how to use the ``sunkit_image.coalignment_module.interface.coalignment`` function:
+
+Below is an example of how to use the :func:`sunkit_image.coalignment_module.coalignment` function:
 
 .. code-block:: python
 
@@ -41,16 +46,16 @@ Below is an example of how to use the ``sunkit_image.coalignment_module.interfac
 
     coaligned_map = coalignment(reference_map, target_map, method="match_template")
 
-The ``sunkit_image.coalignment_module.interface.coalignment`` function aligns the ``target_map`` to the ``reference_map`` using the specified method (e.g., ``"match_template"``).
+The :func:`sunkit_image.coalignment_module.coalignment` function aligns the ``target_map`` to the ``reference_map`` using the specified method (e.g., ``"match_template"``).
 
 Registered Methods
 ==================
-Ensure that the coalignment method you intend to use is registered. You can add custom methods as described in ``_sunkit-image-how-to-guide-adding-a-new-coalignment-method``.
+Ensure that the coalignment method you intend to use is registered. You can add custom methods as described in :doc:`adding_a_coalignment_method`.
 
 Handling NaNs and Infs
 ======================
-The ``sunkit_image.coalignment_module.interface.coalignment`` function includes a warning mechanism to alert users if there are any NaNs, Infs, or other problematic values in the input or template arrays. Proper handling of these values is expected to be included in the registered methods.
+The :func:`sunkit_image.coalignment_module.coalignment` function includes a warning mechanism to alert users if there are any NaNs, Infs, or other problematic values in the input or template arrays. Proper handling of these values is expected to be included in the registered methods.
 
 Further Reading
 ===============
-For more details on how to register new coalignment methods, refer to ``_sunkit-image-how-to-guide-adding-a-new-coalignment-method``.
+For more details on how to register new coalignment methods, refer to :doc:`adding_a_coalignment_method`.

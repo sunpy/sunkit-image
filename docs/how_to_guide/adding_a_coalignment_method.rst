@@ -1,10 +1,10 @@
-.. _sunkit-image-how-to-guide-adding-a-new-coalignment-method:
+.. _add-a-new-coalignment-method:
 
 ****************************
 Add a New Coalignment Method
 ****************************
 
-You can add a custom coalignment method in the sunkit-image package using the decorator ``sunkit_image.coalignment_module.util.decorators.register_coalignment_method``:
+You can add a custom coalignment method in the sunkit-image package using the decorator :func:`sunkit_image.coalignment_module.register_coalignment_method`:
 
 .. code-block:: python
 
@@ -20,10 +20,12 @@ You can add a custom coalignment method in the sunkit-image package using the de
 
 Decorator Parameters
 ====================
+
 - **"my_coalign"**: The name of your custom coalignment method.
 
 Function Requirements
 =====================
+
 Your coalignment function should:
 1. **Take Input Parameters**:
 
@@ -38,4 +40,5 @@ Your coalignment function should:
 
 Example Usage
 =============
-Once you have added your custom coalignment method, you can use it as discussed in this ``_sunkit-image-how-to-guide-using-the-coalignment-interface`` guide
+
+Once you have added your custom coalignment method, you can use it as discussed in this :doc:`using_new_coalignment_interface` guide
