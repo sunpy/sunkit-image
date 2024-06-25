@@ -1,8 +1,8 @@
 .. _sunkit-image-how-to-guide-using-the-coalignment-interface:
 
-*****************************
+*******************************
 Using the Coalignment Interface
-*****************************
+*******************************
 
 This guide explains how to use the coalignment interface in the sunkit-image package to align solar images. The ``sunkit_image.coalignment_module.interface.coalignment`` function facilitates image coalignment using various registered methods.
 

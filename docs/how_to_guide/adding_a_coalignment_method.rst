@@ -26,10 +26,14 @@ Function Requirements
 =====================
 Your coalignment function should:
 1. **Take Input Parameters**:
+
     - ``input_array``: The 2D array to be coaligned.
     - ``template_array``: The 2D template array to align to.
+
 2. **Compute Shifts**: Calculate the shifts in the x and y directions needed to align ``input_array`` with ``template_array``.
+
 3. **Apply Shifts**: Apply these shifts to ``input_array`` to generate the coaligned array.
+
 4. **Return**: A tuple where the first element is another tuple containing the shifts ``(x_shift, y_shift)``, and the second element is the coaligned array.
 
 Example Usage
