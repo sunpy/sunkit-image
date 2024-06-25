@@ -1,4 +1,4 @@
-.. _add-a-new-coalignment-method:
+.. _sunkit-image-how-to-guide-add-a-new-coalignment-method:
 
 ****************************
 Add a New Coalignment Method
@@ -16,7 +16,7 @@ You can add a custom coalignment method in the sunkit-image package using the de
         # This should encompass calculating the shifts, applying these shifts to the data,
         # handling NaN values appropriately, and implementing any necessary clipping logic.
         # Return the shifts and the coaligned array
-        return (x_shift, y_shift), coaligned_array
+        return (coaligned_array, (x_shift, y_shift))
 
 Decorator Parameters
 ====================
@@ -36,7 +36,7 @@ Your coalignment function should:
 
 3. **Apply Shifts**: Apply these shifts to ``input_array`` to generate the coaligned array.
 
-4. **Return**: A tuple where the first element is another tuple containing the shifts ``(x_shift, y_shift)``, and the second element is the coaligned array.
+4. **Return**: A tuple where the first element is the coaligned array and the second element is another tuple containing the shifts ``(x_shift, y_shift)``.
 
 Example Usage
 =============

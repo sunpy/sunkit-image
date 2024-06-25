@@ -1,4 +1,4 @@
-.. _using-the-coalignment-interface:
+.. _sunkit-image-how-to-guide-using-the-coalignment-interface:
 
 *******************************
 Using the Coalignment Interface

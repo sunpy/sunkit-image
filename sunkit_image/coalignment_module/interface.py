@@ -88,6 +88,6 @@ def coalignment(reference_map, target_map, method):
     warn_user_of_nan(target_array, "target")
     warn_user_of_nan(reference_array, "reference")
 
-    shifts, coalign_array = registered_methods[method](target_array, reference_array)
+    coalign_array, shifts = registered_methods[method](target_array, reference_array)
 
     return convert_array_to_map(coalign_array, target_map)
