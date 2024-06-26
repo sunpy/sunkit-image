@@ -4,7 +4,7 @@
 Add a New Coalignment Method
 ****************************
 
-You can add a custom coalignment method in the sunkit-image package using the decorator :func:`sunkit_image.coalignment_module.register_coalignment_method`:
+You can add a custom coalignment method in the sunkit-image package using the decorator :func:`~sunkit_image.coalignment_module.register_coalignment_method`:
 
 .. code-block:: python
 
@@ -27,10 +27,11 @@ Function Requirements
 =====================
 
 Your coalignment function should:
+
 1. **Take Input Parameters**:
 
-    - ``input_array``: The 2D array to be coaligned.
-    - ``template_array``: The 2D template array to align to.
+   - ``input_array``: The 2D array to be coaligned.
+   - ``template_array``: The 2D template array to align to.
 
 2. **Compute Shifts**: Calculate the shifts in the x and y directions needed to align ``input_array`` with ``template_array``.
 
