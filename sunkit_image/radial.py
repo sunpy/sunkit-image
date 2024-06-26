@@ -585,13 +585,16 @@ def fnrgf(
     return sunpy.map.Map(data, smap.meta)
 
 
+@u.quantity_input(application_radius=u.R_sun, vignette=u.R_sun)
 def rhef(
     smap,
     radial_bin_edges=None,
     application_radius=0 * u.R_sun,
     upsilon=0.35,
     method="numpy",
-    vignette=None,
+    vignette=1.5 * u.R_sun,
+    do_vignette=None,
+    do_progressbar=None,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -624,9 +627,15 @@ def rhef(
         A string describing which method to use for sorting.
         Options are {"inplace", "numpy", "scipy"}.
         Defaults to "numpy".
-    vignette : None or Bool or `astropy.units.Quantity`, optional
+    do_vignette : Bool,optional
+        Switch on and off the vignetting.
+        Defaults to True
+    vignette: `astropy.units.Quantity`, optional
         Set pixels above this radius to black.
-        Defaults to None.
+        Defaults to 1.5 R_sun.
+    do_progressbar: bool, optional
+        Display a progressbar on the main loop
+        Defaults to True.
 
     Returns
     -------
@@ -671,9 +680,9 @@ def rhef(
     # Allocate storage for the filtered data
     data = np.zeros_like(smap.data)
     meta = smap.meta
-    disable_pb = True
     # Calculate the filter values for each radial bin.
-    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=disable_pb):
+    disable = np.logical_not(do_progressbar)
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=disable):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         if application_radius is not None and application_radius > 0:
@@ -685,9 +694,7 @@ def rhef(
             data[here] = apply_upsilon(data[here], upsilon)
     new_map = sunpy.map.Map(data, meta)
 
-    if vignette not in [False, None]:
-        if vignette is True:
-            vignette = 1.5 * u.R_sun
+    if do_vignette:
         new_map = blackout_pixels_above_radius(new_map, vignette)
 
     return new_map

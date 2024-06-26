@@ -24,7 +24,7 @@ aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 radial_bin_edges = equally_spaced_bins(0, 2, aia_map.data.shape[0] // 2)
 radial_bin_edges *= u.R_sun
 
-rhef_map = radial.rhef(aia_map, radial_bin_edges, vignette=True)
+rhef_map = radial.rhef(aia_map, radial_bin_edges, do_vignette=True, do_progressbar=True)
 
 
 # Plot the 2 maps in a single figure with one row and three columns
@@ -40,6 +40,7 @@ ax = axes[1]
 rhef_map.plot(axes=ax, norm=None)  # This norm=None is very important for visualization
 ax.set_title("RHE Filtered Map")
 
+plt.tight_layout()
 plt.show()
 
 
@@ -66,11 +67,12 @@ axs[0].set_title("Original AIA Map")
 
 # # Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
-    out_map = radial.rhef(aia_map, upsilon=upsilon, vignette=True, method="scipy")
+    out_map = radial.rhef(aia_map, upsilon=upsilon, do_vignette=True, method="scipy")
     out_map.plot(axes=axs[i + 1], norm=None)
     axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
 # Adjust layout
+plt.tight_layout()
 plt.show()
 
 #######################################################################################
@@ -79,10 +81,10 @@ plt.show()
 mgn_map = enhance.mgn(aia_map)
 wow_map = enhance.wow(aia_map)
 
-rhef_map = radial.rhef(aia_map, vignette=True)
+rhef_map = radial.rhef(aia_map, do_vignette=True)
 
-rhef_mgn_map = radial.rhef(mgn_map, vignette=True)
-rhef_wow_map = radial.rhef(wow_map, vignette=True)
+rhef_mgn_map = radial.rhef(mgn_map, do_vignette=True)
+rhef_wow_map = radial.rhef(wow_map, do_vignette=True)
 
 fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 axes = axes.flatten()
@@ -113,4 +115,5 @@ ax = axes[5]
 rhef_wow_map.plot(axes=ax, norm=None)
 ax.set_title("RHEF( WOW(smap) )")
 
+plt.tight_layout()
 plt.show()
