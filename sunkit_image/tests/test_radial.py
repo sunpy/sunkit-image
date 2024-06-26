@@ -253,8 +253,6 @@ def test_multifig_rhef(smap):
         axs[i + 1].imshow(data, origin="lower", extent=extent, cmap=mpl.colormaps["sdoaia171"])
         axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
-    # Adjust layout
-    plt.tight_layout()
     return fig
 
 

@@ -40,7 +40,6 @@ ax = axes[1]
 rhef_map.plot(axes=ax, norm=None)  # This norm=None is very important for visualization
 ax.set_title("RHE Filtered Map")
 
-plt.tight_layout()
 plt.show()
 
 
@@ -72,16 +71,16 @@ for i, upsilon in enumerate(upsilon_list):
     axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
 # Adjust layout
-plt.tight_layout()
 plt.show()
 
 #######################################################################################
 # Note that multiple filters can be used in a row to get the best images
-
+# Here, we will use both MGN and WOW, then apply RHEF after.
 mgn_map = enhance.mgn(aia_map)
 wow_map = enhance.wow(aia_map)
 
 rhef_map = radial.rhef(aia_map, vignette=True)
+
 rhef_mgn_map = radial.rhef(mgn_map, vignette=True)
 rhef_wow_map = radial.rhef(wow_map, vignette=True)
 
@@ -90,29 +89,28 @@ axes = axes.flatten()
 
 ax = axes[1]
 mgn_map.plot(axes=ax, norm=None)
-ax.set_title("MGN()")
+ax.set_title("MGN(smap)")
 
 ax = axes[4]
 rhef_mgn_map.plot(axes=ax, norm=None)
-ax.set_title("RHEF(MGN())")
+ax.set_title("RHEF( MGN(smap) )")
 
 ax = axes[0]
 rhef_map.plot(axes=ax, norm=None)
-ax.set_title("RHEF()")
+ax.set_title("RHEF(smap)")
 
 ax = axes[3]
 toplot = (rhef_map.data + rhef_mgn_map.data) / 2
 combo_map = sunpy.map.Map(toplot, rhef_map.meta)
 combo_map.plot(axes=ax, norm=None)
-ax.set_title("(RHEF() + RHEF(MGN()))/2")
+ax.set_title("AVG( RHEF(smap), RHEF(MGN(smap) )")
 
 ax = axes[2]
 wow_map.plot(axes=ax, norm=None)
-ax.set_title("WOW()")
+ax.set_title("WOW(smap)")
 
 ax = axes[5]
 rhef_wow_map.plot(axes=ax, norm=None)
-ax.set_title("RHEF(WOW())")
+ax.set_title("RHEF( WOW(smap) )")
 
-plt.tight_layout()
 plt.show()
