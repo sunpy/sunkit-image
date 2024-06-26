@@ -671,9 +671,9 @@ def rhef(
     # Allocate storage for the filtered data
     data = np.zeros_like(smap.data)
     meta = smap.meta
-
+    disable_pb = True
     # Calculate the filter values for each radial bin.
-    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: "):
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=disable_pb):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         if application_radius is not None and application_radius > 0:
