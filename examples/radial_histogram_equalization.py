@@ -27,27 +27,22 @@ radial_bin_edges *= u.R_sun
 rhef_map = radial.rhef(aia_map, radial_bin_edges, do_vignette=True, do_progressbar=True)
 
 
-# Plot the 2 maps in a single figure with one row and three columns
 fig, axes = plt.subplots(1, 2, figsize=(10, 5), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 
-# Original AIA map.plot()
 ax = axes[0]
 aia_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
 ax.set_title("Original AIA Map")
 
-# RHEF map.plot()
 ax = axes[1]
-rhef_map.plot(axes=ax, norm=None)  # This norm=None is very important for visualization
+# By default, the new output map has the same normalization as the input map.
+# This means that when you plot it by default, the image is pretty pale.
+# So by setting it to None here, we bypass this issue.
+rhef_map.plot(axes=ax, norm=None)
 ax.set_title("RHE Filtered Map")
-
-plt.tight_layout()
-plt.show()
-
-
 #######################################################################################
 # The RHEF has one free parameter that works in post processing to modulate the output.
 # Here are some of the choices one could make.
-# See the thesis (Gilly 2022) Eq 4.15 for details about upsilon: https://www.proquest.com/docview/2759080511
+# `See the thesis (Gilly 2022) Eq 4.15 for details about upsilon. <https://www.proquest.com/docview/2759080511>`__
 
 # Define the list of upsilon pairs where the first number affects dark components and the second number affects bright ones
 upsilon_list = [
@@ -58,14 +53,13 @@ upsilon_list = [
     (0.8, 0.8),
 ]
 
-# Create a figure with subplots for each upsilon pair plus the original map
 fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 axs = axes.flatten()
 
 aia_map.plot(axes=axs[0], clip_interval=(1, 99.99) * u.percent)
 axs[0].set_title("Original AIA Map")
 
-# # Loop through the upsilon_list and plot each filtered map
+# Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
     out_map = radial.rhef(aia_map, upsilon=upsilon, do_vignette=True, method="scipy")
     out_map.plot(axes=axs[i + 1], norm=None)
@@ -76,8 +70,9 @@ plt.tight_layout()
 plt.show()
 
 #######################################################################################
-# Note that multiple filters can be used in a row to get the best images
-# Here, we will use both MGN and WOW, then apply RHEF after.
+# Note that multiple filters can be used in a row to get a better output image.
+# Here, we will use both :func:`~.mgn` and :func:`~.wow`, then apply RHE filter after.
+
 mgn_map = enhance.mgn(aia_map)
 wow_map = enhance.wow(aia_map)
 
@@ -89,31 +84,24 @@ rhef_wow_map = radial.rhef(wow_map, do_vignette=True)
 fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 axes = axes.flatten()
 
-ax = axes[1]
-mgn_map.plot(axes=ax, norm=None)
-ax.set_title("MGN(smap)")
+rhef_map.plot(axes=axes[0], norm=None)
+axes[0].set_title("RHEF(smap)")
 
-ax = axes[4]
-rhef_mgn_map.plot(axes=ax, norm=None)
-ax.set_title("RHEF( MGN(smap) )")
+mgn_map.plot(axes=axes[1], norm=None)
+axes[1].set_title("MGN(smap)")
 
-ax = axes[0]
-rhef_map.plot(axes=ax, norm=None)
-ax.set_title("RHEF(smap)")
+wow_map.plot(axes=axes[2], norm=None)
+axes[2].set_title("WOW(smap)")
 
-ax = axes[3]
 toplot = (rhef_map.data + rhef_mgn_map.data) / 2
 combo_map = sunpy.map.Map(toplot, rhef_map.meta)
-combo_map.plot(axes=ax, norm=None)
-ax.set_title("AVG( RHEF(smap), RHEF(MGN(smap) )")
+combo_map.plot(axes=axes[3], norm=None)
+axes[3].set_title("AVG( RHEF(smap), RHEF(MGN(smap) )")
 
-ax = axes[2]
-wow_map.plot(axes=ax, norm=None)
-ax.set_title("WOW(smap)")
+rhef_mgn_map.plot(axes=axes[4], norm=None)
+axes[4].set_title("RHEF( MGN(smap) )")
 
-ax = axes[5]
-rhef_wow_map.plot(axes=ax, norm=None)
-ax.set_title("RHEF( WOW(smap) )")
+rhef_wow_map.plot(axes=axes[5], norm=None)
+axes[5].set_title("RHEF( WOW(smap) )")
 
-plt.tight_layout()
 plt.show()

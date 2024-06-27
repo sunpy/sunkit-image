@@ -202,9 +202,7 @@ def test_fig_fnrgf(smap):
 def test_fig_rhef(smap):
     radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
     radial_bin_edges *= u.R_sun
-
     out = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=0.35, method="scipy")
-
     out.plot()
 
 
@@ -223,8 +221,6 @@ def test_multifig_rhef(smap):
         (0.8, 0.8),
     ]
 
-    # Call the plotting functions
-    # Adjust the map data to avoid log of zero
     sdata = smap.data
 
     # Small constant to avoid log of zero

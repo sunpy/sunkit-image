@@ -592,9 +592,8 @@ def rhef(
     application_radius=0 * u.R_sun,
     upsilon=0.35,
     method="numpy",
-    vignette=1.5 * u.R_sun,
-    do_vignette=None,
-    do_progressbar=None,
+    vignette=None
+    progress=True,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -632,9 +631,10 @@ def rhef(
         Defaults to True
     vignette: `astropy.units.Quantity`, optional
         Set pixels above this radius to black.
-        Defaults to 1.5 R_sun.
-    do_progressbar: bool, optional
-        Display a progressbar on the main loop
+        Defaults to None which is no vignette.
+        One suggested value is ``1.5*u.R_sun``.
+    progress: bool, optional
+        Display a progressbar on the main loop.
         Defaults to True.
 
     Returns
@@ -681,8 +681,7 @@ def rhef(
     data = np.zeros_like(smap.data)
     meta = smap.meta
     # Calculate the filter values for each radial bin.
-    disable = np.logical_not(do_progressbar)
-    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=disable):
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=~progress):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         if application_radius is not None and application_radius > 0:
@@ -694,7 +693,7 @@ def rhef(
             data[here] = apply_upsilon(data[here], upsilon)
     new_map = sunpy.map.Map(data, meta)
 
-    if do_vignette:
+    if vignette is not None:
         new_map = blackout_pixels_above_radius(new_map, vignette)
 
     return new_map
