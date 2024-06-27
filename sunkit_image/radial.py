@@ -694,5 +694,7 @@ def rhef(
 
     if vignette is not None:
         new_map = blackout_pixels_above_radius(new_map, vignette)
+    else:
+        new_map = blackout_pixels_above_radius(new_map, 1.5 * u.R_sun)
 
     return new_map
