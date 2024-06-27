@@ -680,7 +680,7 @@ def rhef(
     # Calculate the filter values for each radial bin.
     if progress is None:
         progress = True
-    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=~progress):
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=not progress):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         if application_radius is not None and application_radius > 0:
