@@ -592,8 +592,8 @@ def rhef(
     application_radius=0 * u.R_sun,
     upsilon=0.35,
     method="numpy",
-    vignette=None
-    progress=True,
+    vignette=None,
+    progress=None,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -626,9 +626,6 @@ def rhef(
         A string describing which method to use for sorting.
         Options are {"inplace", "numpy", "scipy"}.
         Defaults to "numpy".
-    do_vignette : Bool,optional
-        Switch on and off the vignetting.
-        Defaults to True
     vignette: `astropy.units.Quantity`, optional
         Set pixels above this radius to black.
         Defaults to None which is no vignette.
@@ -681,6 +678,8 @@ def rhef(
     data = np.zeros_like(smap.data)
     meta = smap.meta
     # Calculate the filter values for each radial bin.
+    if progress is None:
+        progress = True
     for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=~progress):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
