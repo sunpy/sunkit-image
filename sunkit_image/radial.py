@@ -600,7 +600,7 @@ def rhef(
     upsilon=0.35,
     method="numpy",
     vignette=None,
-    progress=None,
+    progress=True,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -613,7 +613,7 @@ def rhef(
 
     .. note::
 
-        After applying the filter, the maps need to be plotted with smap.plot(norm=False) to be visualized correctly.
+        The returned maps have their ``plot_settings`` changed to remove the normalization.
 
     Parameters
     ----------
@@ -685,8 +685,6 @@ def rhef(
     data = np.zeros_like(smap.data)
     meta = smap.meta
     # Calculate the filter values for each radial bin.
-    if progress is None:
-        progress = True
     for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=not progress):
         # Identify the appropriate radial slice
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])

@@ -26,22 +26,18 @@ radial_bin_edges *= u.R_sun
 
 rhef_map = radial.rhef(aia_map, radial_bin_edges)
 
-
 fig, axes = plt.subplots(1, 2, figsize=(10, 5), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 
-ax = axes[0]
-aia_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
-ax.set_title("Original AIA Map")
+aia_map.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
+axes[0].set_title("Original AIA Map")
 
-ax = axes[1]
 # By default, the new output map has the same normalization as the input map.
 # This means that when you plot it by default, the image is pretty pale.
 # So by setting it to None here, we bypass this issue.
-rhef_map.plot(axes=ax)
-ax.set_title(r"RHE Filtered Map, $\Upsilon$=0.35")
+rhef_map.plot(axes=axes[1], norm=None)
+axes[1].set_title(r"RHE Filtered Map, $\Upsilon$=0.35")
 
-# Adjust layout
-plt.tight_layout()
+fig.tight_layout()
 
 #######################################################################################
 # The RHEF has one free parameter that works in post processing to modulate the output.
@@ -58,19 +54,18 @@ upsilon_list = [
 ]
 
 fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
-axs = axes.flatten()
+axes = axes.flatten()
 
-aia_map.plot(axes=axs[0], clip_interval=(1, 99.99) * u.percent)
-axs[0].set_title("Original AIA Map")
+aia_map.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
+axes[0].set_title("Original AIA Map")
 
 # Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
     out_map = radial.rhef(aia_map, upsilon=upsilon, method="scipy")
-    out_map.plot(axes=axs[i + 1])
-    axs[i + 1].set_title(f"Upsilon = {upsilon}")
+    out_map.plot(axes=axes[i + 1], norm=None)
+    axes[i + 1].set_title(f"Upsilon = {upsilon}")
 
-# Adjust layout
-plt.tight_layout()
+fig.tight_layout()
 
 #######################################################################################
 # Note that multiple filters can be used in a row to get a better output image.
@@ -108,6 +103,6 @@ axes[4].set_title("RHEF( MGN(smap) )")
 rhef_wow_map.plot(axes=axes[5])
 axes[5].set_title("RHEF( WOW(smap) )")
 
-plt.tight_layout()
+fig.tight_layout()
 
 plt.show()

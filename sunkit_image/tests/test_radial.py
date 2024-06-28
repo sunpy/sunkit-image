@@ -110,7 +110,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
 
-    # The below tests are dummy tests. These values were not verified by hand rather they were
+    # The below tests are dummy tests.
+    # These values were not verified by hand rather they were
     # generated using the code itself.
     order = 5
 
@@ -250,14 +251,6 @@ def test_multifig_rhef(smap):
         axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
     return fig
-
-
-# Tests needed for RHEF:
-# > With and without bins given
-# > Various inputs for Upsilon
-# > plotting smaps natively
-# > Doing upsilon on a map that doesn't have RHE on it
-# > Make a notebook as an example of usage
 
 
 def test_set_attenuation_coefficients():
