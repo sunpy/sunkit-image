@@ -106,9 +106,10 @@ def mgn(
     # 1. Replace spurious negative pixels with zero
     if clip is True:
         data[data <= 0] = 1e-15  # Makes sure that all values are above zero
-    image = np.zeros_like(data, dtype=np.float32)
-    conv = np.zeros_like(data, dtype=np.float32)
-    sigmaw = np.zeros_like(data, dtype=np.float32)
+    data = data.astype(np.float32) if data.dtype != np.float32 else data
+    image = np.zeros_like(data)
+    conv = np.zeros_like(data)
+    sigmaw = np.zeros_like(data)
     for s, weight in zip(sigma, weights, strict=True):
         # 2 & 3 Create kernel and convolve with image
         # Refer to equation (1) in the paper
