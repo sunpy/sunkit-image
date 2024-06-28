@@ -70,7 +70,7 @@ jobs:
       submodules: false
       coverage: codecov
       toxdeps: tox-pypi-filter
-      posargs: -n auto --dist loadgroup
+      posargs: -n 1
       envs: |
         - linux: py312-online
     secrets:
