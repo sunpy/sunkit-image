@@ -209,7 +209,10 @@ def intensity_enhance(
 
     # Return a map with the intensity enhanced above the normalization radius
     # and the same meta data as the input map.
-    return sunpy.map.Map(smap.data * enhancement, smap.meta)
+
+    new_map = sunpy.map.Map(smap.data * enhancement, smap.meta)
+    new_map.plot_settings["norm"] = None
+    return new_map
 
 
 def nrgf(
@@ -320,7 +323,9 @@ def nrgf(
         if radial_intensity_distribution_summary[i] != 0.0:
             data[here] = data[here] / radial_intensity_distribution_summary[i]
 
-    return sunpy.map.Map(data, smap.meta)
+    new_map = sunpy.map.Map(data, smap.meta)
+    new_map.plot_settings["norm"] = None
+    return new_map
 
 
 def set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=0):
@@ -582,7 +587,9 @@ def fnrgf(
         # Linear combination of original image and the filtered data.
         data[annulus] = ratio_mix[0] * smap.data[annulus] + ratio_mix[1] * data[annulus]
 
-    return sunpy.map.Map(data, smap.meta)
+    new_map = sunpy.map.Map(data, smap.meta)
+    new_map.plot_settings["norm"] = None
+    return new_map
 
 
 @u.quantity_input(application_radius=u.R_sun, vignette=u.R_sun)
@@ -696,5 +703,7 @@ def rhef(
         new_map = blackout_pixels_above_radius(new_map, vignette)
     else:
         new_map = blackout_pixels_above_radius(new_map, 1.5 * u.R_sun)
+
+    new_map.plot_settings["norm"] = None
 
     return new_map

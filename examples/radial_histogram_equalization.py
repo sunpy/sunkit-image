@@ -37,7 +37,7 @@ ax = axes[1]
 # By default, the new output map has the same normalization as the input map.
 # This means that when you plot it by default, the image is pretty pale.
 # So by setting it to None here, we bypass this issue.
-rhef_map.plot(axes=ax, norm=None)
+rhef_map.plot(axes=ax)
 ax.set_title(r"RHE Filtered Map, $\Upsilon$=0.35")
 
 # Adjust layout
@@ -66,7 +66,7 @@ axs[0].set_title("Original AIA Map")
 # Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
     out_map = radial.rhef(aia_map, upsilon=upsilon, method="scipy")
-    out_map.plot(axes=axs[i + 1], norm=None)
+    out_map.plot(axes=axs[i + 1])
     axs[i + 1].set_title(f"Upsilon = {upsilon}")
 
 # Adjust layout
@@ -87,7 +87,7 @@ rhef_wow_map = radial.rhef(wow_map)
 fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
 axes = axes.flatten()
 
-rhef_map.plot(axes=axes[0], norm=None)
+rhef_map.plot(axes=axes[0])
 axes[0].set_title("RHEF(smap)")
 
 mgn_map.plot(axes=axes[1], norm=None)
@@ -98,13 +98,14 @@ axes[2].set_title("WOW(smap)")
 
 toplot = (rhef_map.data + rhef_mgn_map.data) / 2
 combo_map = sunpy.map.Map(toplot, rhef_map.meta)
-combo_map.plot(axes=axes[3], norm=None)
+combo_map.plot_settings["norm"] = None
+combo_map.plot(axes=axes[3])
 axes[3].set_title("AVG( RHEF(smap), RHEF(MGN(smap) )")
 
-rhef_mgn_map.plot(axes=axes[4], norm=None)
+rhef_mgn_map.plot(axes=axes[4])
 axes[4].set_title("RHEF( MGN(smap) )")
 
-rhef_wow_map.plot(axes=axes[5], norm=None)
+rhef_wow_map.plot(axes=axes[5])
 axes[5].set_title("RHEF( WOW(smap) )")
 
 plt.tight_layout()
