@@ -616,7 +616,7 @@ def rhef(
 
         The returned maps have their ``plot_settings`` changed to remove the normalization.
 
-    Parameters
+        Parameters
     ----------
     smap : `sunpy.map.Map`
         The sunpy map to enhance.
@@ -626,10 +626,10 @@ def rhef(
     application_radius : `astropy.units.Quantity`, optional
         The RHEF is applied to emission at radii above the application_radius.
         Defaults to 0 solar radii.
-    upsilon : None or int or tuple of size 2, optional
+    upsilon : None, float, or tuple of `float`, optional
         A double-sided gamma function applied to the equalized histograms.
-        See Equation (4.15) in the thesis
-        Defaults to 0.35
+        See Equation (4.15) in the thesis.
+        Defaults to 0.35.
     method : str
         A string describing which method to use for sorting.
         Options are {"inplace", "numpy", "scipy"}.
