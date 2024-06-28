@@ -51,7 +51,7 @@ def occult2(smap, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
       Entropy, vol. 15, issue 8, pp. 3007-3030
       https://doi.org/10.3390/e15083007
     """
-    image = smap.data.astype(np.float32)
+    image = smap.data[:].astype(np.float32)
     # Image is transposed because IDL works column major and python is row major. This is done
     # so that the python and the IDL codes look similar
     image = image.T

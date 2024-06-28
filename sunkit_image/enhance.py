@@ -90,7 +90,7 @@ def mgn(
       Sol Phys 289, 2945-2955, 2014
       `doi:10.1007/s11207-014-0523-9 <https://doi.org/10.1007/s11207-014-0523-9>`__
     """
-    data = smap.data
+    data = smap.data[:]
     if sigma is None:
         sigma = [1.25, 2.5, 5, 10, 20, 40]
     if np.isnan(data).any():
