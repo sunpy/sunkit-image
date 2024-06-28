@@ -169,7 +169,7 @@ def granule_minimap3():
     return sunpy.map.GenericMap(arr, header)
 
 
-@pytest.fixture(params=["array", "map"])
+@pytest.fixture(scope="session", autouse=True, params=["array", "map"])
 def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":
