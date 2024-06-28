@@ -31,10 +31,7 @@ fig, axes = plt.subplots(1, 2, figsize=(10, 5), sharex="all", sharey="all", subp
 aia_map.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
 axes[0].set_title("Original AIA Map")
 
-# By default, the new output map has the same normalization as the input map.
-# This means that when you plot it by default, the image is pretty pale.
-# So by setting it to None here, we bypass this issue.
-rhef_map.plot(axes=axes[1], norm=None)
+rhef_map.plot(axes=axes[1])
 axes[1].set_title(r"RHE Filtered Map, $\Upsilon$=0.35")
 
 fig.tight_layout()
@@ -62,7 +59,7 @@ axes[0].set_title("Original AIA Map")
 # Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
     out_map = radial.rhef(aia_map, upsilon=upsilon, method="scipy")
-    out_map.plot(axes=axes[i + 1], norm=None)
+    out_map.plot(axes=axes[i + 1])
     axes[i + 1].set_title(f"Upsilon = {upsilon}")
 
 fig.tight_layout()
