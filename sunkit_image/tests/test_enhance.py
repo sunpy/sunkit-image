@@ -24,6 +24,16 @@ def test_mgn(aia_171):
     return fig
 
 
+@figure_test
+def test_mgn_cutout(aia_171_cutout):
+    out = enhance.mgn(aia_171_cutout)
+    assert type(out) == type(aia_171_cutout)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection=out)
+    out.plot(axes=ax)
+    return fig
+
+
 @pytest.fixture()
 def map_test():
     return np.ones((4, 4), dtype=float)
@@ -73,4 +83,14 @@ def test_wow(aia_171):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.imshow(out, origin="lower", interpolation="nearest", cmap="sdoaia171")
+    return fig
+
+
+@figure_test
+def test_wow_cutout(aia_171_cutout):
+    out = enhance.wow(aia_171_cutout)
+    assert type(out) == type(aia_171_cutout)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection=out)
+    out.plot(axes=ax)
     return fig
