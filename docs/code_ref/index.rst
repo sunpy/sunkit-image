@@ -12,6 +12,7 @@ API Reference
    enhance
    granule
    radial
+   stara
    time_lag
    trace
    utils

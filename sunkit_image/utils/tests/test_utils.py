@@ -10,14 +10,6 @@ from sunkit_image import asda
 from sunkit_image.data.test import get_test_filepath
 
 
-@pytest.fixture()
-def smap():
-    import sunpy.data.sample
-    from sunpy.data.sample import AIA_171_IMAGE
-
-    return sunpy.map.Map(AIA_171_IMAGE)
-
-
 def test_equally_spaced_bins():
     # test the default
     esb = utils.equally_spaced_bins()
@@ -82,36 +74,40 @@ def test_bin_edge_summary():
 
 
 @pytest.mark.remote_data()
-def test_find_pixel_radii(smap):
+def test_find_pixel_radii(aia_171):
+    if isinstance(aia_171, np.ndarray):
+        pytest.skip("This test is not compatible with numpy arrays")
     # The known maximum radius
     known_maximum_pixel_radius = 1.84183121
     # Calculate the pixel radii
-    pixel_radii = utils.find_pixel_radii(smap)
+    pixel_radii = utils.find_pixel_radii(aia_171)
     # The shape of the pixel radii is the same as the input map
-    assert pixel_radii.shape[0] == int(smap.dimensions[0].value)
-    assert pixel_radii.shape[1] == int(smap.dimensions[1].value)
+    assert pixel_radii.shape[0] == int(aia_171.dimensions[0].value)
+    assert pixel_radii.shape[1] == int(aia_171.dimensions[1].value)
     # Make sure the unit is solar radii
     assert pixel_radii.unit == u.R_sun
     # Make sure the maximum
     assert_quantity_allclose((np.max(pixel_radii)).value, known_maximum_pixel_radius)
     # Test that the new scale is used
-    pixel_radii = utils.find_pixel_radii(smap, scale=2 * smap.rsun_obs)
+    pixel_radii = utils.find_pixel_radii(aia_171, scale=2 * aia_171.rsun_obs)
     assert_quantity_allclose(np.max(pixel_radii).value, known_maximum_pixel_radius / 2)
 
 
 @pytest.mark.remote_data()
-def test_get_radial_intensity_summary(smap):
+def test_get_radial_intensity_summary(aia_171):
+    if isinstance(aia_171, np.ndarray):
+        pytest.skip("This test is not compatible with numpy arrays")
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins(inner_value=1, outer_value=1.5)) * u.R_sun
     summary = np.mean
-    map_r = utils.find_pixel_radii(smap, scale=smap.rsun_obs).to(u.R_sun)
+    map_r = utils.find_pixel_radii(aia_171, scale=aia_171.rsun_obs).to(u.R_sun)
     nbins = radial_bin_edges.shape[1]
     lower_edge = [map_r > radial_bin_edges[0, i].to(u.R_sun) for i in range(nbins)]
     upper_edge = [map_r < radial_bin_edges[1, i].to(u.R_sun) for i in range(nbins)]
     with warnings.catch_warnings():
         # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
-        expected = np.asarray([summary(smap.data[lower_edge[i] * upper_edge[i]]) for i in range(nbins)])
-    assert np.allclose(utils.get_radial_intensity_summary(smap=smap, radial_bin_edges=radial_bin_edges), expected)
+        expected = np.asarray([summary(aia_171.data[lower_edge[i] * upper_edge[i]]) for i in range(nbins)])
+    assert np.allclose(utils.get_radial_intensity_summary(aia_171, radial_bin_edges=radial_bin_edges), expected)
 
 
 def test_calculate_gamma():
