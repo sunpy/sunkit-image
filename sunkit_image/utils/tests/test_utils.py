@@ -75,6 +75,8 @@ def test_bin_edge_summary():
 
 @pytest.mark.remote_data()
 def test_find_pixel_radii(aia_171):
+    if isinstance(aia_171, np.ndarray):
+        pytest.skip("This test is not compatible with numpy arrays")
     # The known maximum radius
     known_maximum_pixel_radius = 1.84183121
     # Calculate the pixel radii
@@ -93,6 +95,8 @@ def test_find_pixel_radii(aia_171):
 
 @pytest.mark.remote_data()
 def test_get_radial_intensity_summary(aia_171):
+    if isinstance(aia_171, np.ndarray):
+        pytest.skip("This test is not compatible with numpy arrays")
     radial_bin_edges = u.Quantity(utils.equally_spaced_bins(inner_value=1, outer_value=1.5)) * u.R_sun
     summary = np.mean
     map_r = utils.find_pixel_radii(aia_171, scale=aia_171.rsun_obs).to(u.R_sun)
@@ -103,7 +107,7 @@ def test_get_radial_intensity_summary(aia_171):
         # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
         expected = np.asarray([summary(aia_171.data[lower_edge[i] * upper_edge[i]]) for i in range(nbins)])
-    assert np.allclose(utils.get_radial_intensity_summary(aia_171=aia_171, radial_bin_edges=radial_bin_edges), expected)
+    assert np.allclose(utils.get_radial_intensity_summary(aia_171, radial_bin_edges=radial_bin_edges), expected)
 
 
 def test_calculate_gamma():

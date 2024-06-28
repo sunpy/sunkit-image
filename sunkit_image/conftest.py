@@ -1,5 +1,7 @@
 import importlib.util
 import logging
+import os
+import tempfile
 
 import astropy
 import astropy.config.paths
@@ -34,6 +36,68 @@ console_logger = logging.getLogger()
 console_logger.setLevel("INFO")
 
 
+@pytest.fixture(scope="session", autouse=True)
+def _tmp_config_dir(request):  # NOQA: ARG001
+    """
+    Globally set the default config for all tests.
+    """
+    tmpdir = tempfile.TemporaryDirectory()
+
+    os.environ["SUNPY_CONFIGDIR"] = str(tmpdir.name)
+    astropy.config.paths.set_temp_config._temp_path = str(tmpdir.name)  # NOQA: SLF001
+    astropy.config.paths.set_temp_cache._temp_path = str(tmpdir.name)  # NOQA: SLF001
+
+    yield
+
+    del os.environ["SUNPY_CONFIGDIR"]
+    tmpdir.cleanup()
+    astropy.config.paths.set_temp_config._temp_path = None  # NOQA: SLF001
+    astropy.config.paths.set_temp_cache._temp_path = None  # NOQA: SLF001
+
+
+@pytest.fixture()
+def _undo_config_dir_patch():
+    """
+    Provide a way for certain tests to not have the config dir.
+    """
+    oridir = os.environ["SUNPY_CONFIGDIR"]
+    del os.environ["SUNPY_CONFIGDIR"]
+    yield
+    os.environ["SUNPY_CONFIGDIR"] = oridir
+
+
+@pytest.fixture(scope="session", autouse=True)
+def tmp_dl_dir(request):  # NOQA: ARG001
+    """
+    Globally set the default download directory for the test run to a tmp dir.
+    """
+    with tempfile.TemporaryDirectory() as tmpdir:
+        os.environ["SUNPY_DOWNLOADDIR"] = tmpdir
+        yield tmpdir
+        del os.environ["SUNPY_DOWNLOADDIR"]
+
+
+@pytest.fixture()
+def _undo_download_dir_patch():
+    """
+    Provide a way for certain tests to not have tmp download dir.
+    """
+    oridir = os.environ["SUNPY_DOWNLOADDIR"]
+    del os.environ["SUNPY_DOWNLOADDIR"]
+    yield
+    os.environ["SUNPY_DOWNLOADDIR"] = oridir
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _hide_parfive_progress(request):  # NOQA: ARG001
+    """
+    Set the PARFIVE_HIDE_PROGRESS to hide the parfive progress bar in tests.
+    """
+    os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
+    yield
+    del os.environ["PARFIVE_HIDE_PROGRESS"]
+
+
 def pytest_runtest_teardown(item):
     # Clear the pyplot figure stack if it is not empty after the test
     # You can see these log messages by passing "-o log_cli=true" to pytest on the command line
@@ -43,12 +107,12 @@ def pytest_runtest_teardown(item):
         plt.close("all")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def granule_map():
     return sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def granule_map_he():
     granule_map = sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
     # min-max normalization to [0, 1]
@@ -61,7 +125,7 @@ def granule_map_he():
     )
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def granule_minimap1():
     # Array with "intergranule region"
     arr = np.ones((10, 10))
@@ -76,7 +140,7 @@ def granule_minimap1():
     return sunpy.map.GenericMap(arr, header)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def granule_minimap2():
     # Modified array with "intergranule region"
     arr = np.ones((10, 10))
@@ -91,7 +155,7 @@ def granule_minimap2():
     return sunpy.map.GenericMap(arr, header)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def granule_minimap3():
     # Array with no "intergranule region"
     arr = np.ones((10, 10))
@@ -105,7 +169,7 @@ def granule_minimap3():
     return sunpy.map.GenericMap(arr, header)
 
 
-@pytest.fixture(scope="session", params=["array", "map"])
+@pytest.fixture(params=["array", "map"])
 def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":
@@ -113,7 +177,7 @@ def aia_171(request):
     return smap.data if request.param == "array" else None
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def hmi_map():
     hmi_file = get_test_filepath("hmi_continuum_test_lowres_data.fits")
     return sunpy.map.Map(hmi_file)
