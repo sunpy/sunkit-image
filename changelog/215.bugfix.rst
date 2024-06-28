@@ -1,0 +1,2 @@
+Added tests with JSOC cutouts and found issues with the data type of the files.
+Now, `sunkit_image.enhance.mgn` now convert to float 32 internally for its operations.
