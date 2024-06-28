@@ -6,15 +6,13 @@ import warnings
 
 import numpy as np
 import scipy.ndimage as ndimage
-
-from sunkit_image.utils.decorators import accept_array_or_map
+import sunpy.map
 
 __all__ = ["mgn", "wow"]
 
 
-@accept_array_or_map(arg_name="data")
 def mgn(
-    data,
+    smap,
     *,
     sigma=None,
     k=0.7,
@@ -47,7 +45,7 @@ def mgn(
 
     Parameters
     ----------
-    data : `numpy.ndarray`, `sunpy.map.GenericMap`
+    data : `sunpy.map.GenericMap`
         Image to be transformed.
     sigma : `list` of `float`, optional
         Range of Gaussian widths (i.e. the standard deviation of the Gaussian kernel) to transform over.
@@ -92,6 +90,7 @@ def mgn(
       Sol Phys 289, 2945-2955, 2014
       `doi:10.1007/s11207-014-0523-9 <https://doi.org/10.1007/s11207-014-0523-9>`__
     """
+    data = smap.data
     if sigma is None:
         sigma = [1.25, 2.5, 5, 10, 20, 40]
     if np.isnan(data).any():
@@ -161,12 +160,11 @@ def mgn(
     image *= 1 - h
     image += Cprime_g
 
-    return image
+    return sunpy.map.Map(image, smap.meta)
 
 
-@accept_array_or_map(arg_name="data")
 def wow(
-    data,
+    smap,
     *,
     scaling_function=None,
     n_scales=None,
@@ -206,7 +204,7 @@ def wow(
 
     Parameters
     ----------
-    data : `numpy.ndarray` or `sunpy.map.GenericMap`
+    smap : `sunpy.map.GenericMap`
         Image to be transformed.
     scaling_function : {``Triangle`` , ``B3spline``}, optional
         The wavelet scaling function, comes from the ``watroo`` package.
@@ -285,7 +283,7 @@ def wow(
     if scaling_function is None:
         scaling_function = B3spline
     wow_image, _ = utils.wow(
-        data,
+        smap.data,
         scaling_function=scaling_function,
         n_scales=n_scales,
         weights=weights,
@@ -301,4 +299,4 @@ def wow(
         gamma_max=gamma_max,
         h=h,
     )
-    return wow_image
+    return sunpy.map.Map(wow_image, smap.meta)

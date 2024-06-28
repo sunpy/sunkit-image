@@ -9,13 +9,13 @@ from astropy.io import fits
 import sunkit_image.data.test as data
 from sunkit_image.tests.helpers import figure_test
 from sunkit_image.trace import (
+    _bandpass_filter,
     _curvature_radius,
     _erase_loop_in_image,
     _initial_direction_finding,
     _loop_add,
-    bandpass_filter,
+    _smooth,
     occult2,
-    smooth,
 )
 
 
@@ -166,14 +166,14 @@ def test_map_ones():
     return np.ones((4, 4), dtype=np.float32)
 
 
-def test_bandpass_filter_ones(test_map_ones):
+def test__bandpass_filter_ones(test_map_ones):
     expect = np.zeros((4, 4))
-    result = bandpass_filter(test_map_ones)
+    result = _bandpass_filter(test_map_ones)
 
     assert np.allclose(expect, result)
 
 
-def test_bandpass_filter(test_map):
+def test__bandpass_filter(test_map):
     expect = np.array(
         [
             [0.0, 0.0, 0.0, 0.0],
@@ -183,35 +183,35 @@ def test_bandpass_filter(test_map):
         ],
     )
 
-    result = bandpass_filter(test_map)
+    result = _bandpass_filter(test_map)
     assert np.allclose(expect, result)
 
 
 @pytest.mark.remote_data()
-def test_bandpass_filter_output(aia_171):
+def test__bandpass_filter_output(aia_171):
     # Check that bandpass filter works with both arrays and maps
-    result = bandpass_filter(aia_171)
+    result = _bandpass_filter(aia_171)
     assert type(result) == type(aia_171)
 
 
-def test_bandpass_filter_error(test_map_ones):
+def test__bandpass_filter_error(test_map_ones):
     with pytest.raises(ValueError, match="nsm1 should be less than nsm2"):
-        bandpass_filter(test_map_ones, 5, 1)
+        _bandpass_filter(test_map_ones, 5, 1)
 
 
-def test_smooth_ones(test_map_ones):
-    filtered = smooth(test_map_ones, 1)
+def test__smooth_ones(test_map_ones):
+    filtered = _smooth(test_map_ones, 1)
     assert np.allclose(filtered, test_map_ones)
 
-    filtered = smooth(test_map_ones, 4)
+    filtered = _smooth(test_map_ones, 4)
     assert np.allclose(filtered, test_map_ones)
 
 
-def test_smooth(test_map):
-    filtered = smooth(test_map, 1)
+def test__smooth(test_map):
+    filtered = _smooth(test_map, 1)
     assert np.allclose(filtered, test_map)
 
-    filtered = smooth(test_map, 3)
+    filtered = _smooth(test_map, 3)
     expect = np.array(
         [
             [1.0, 1.0, 1.0, 1.0],
@@ -225,9 +225,9 @@ def test_smooth(test_map):
 
 
 @pytest.mark.remote_data()
-def test_smooth_output(aia_171):
-    # Check that smooth works with both arrays and maps
-    result = smooth(aia_171, 1)
+def test__smooth_output(aia_171):
+    # Check that _smooth works with both arrays and maps
+    result = _smooth(aia_171, 1)
     assert type(result) == type(aia_171)
 
 
