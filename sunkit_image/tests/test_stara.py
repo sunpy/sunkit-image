@@ -6,12 +6,12 @@ from sunkit_image.tests.helpers import figure_test
 
 
 def test_stara(hmi_map):
-    hmi_upscaled = hmi_map.resample((1024, 1024) * u.pixel)
+    hmi_upscaled = hmi_map.resample((512, 512) * u.pixel)
     result = stara(hmi_upscaled)
     assert isinstance(result, np.ndarray)
     assert result.shape == hmi_upscaled.data.shape
     total_true_value_count = sum(result.ravel())
-    assert total_true_value_count == 18712
+    assert total_true_value_count == 5033
 
 
 @figure_test
