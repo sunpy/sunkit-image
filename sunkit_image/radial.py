@@ -616,7 +616,7 @@ def rhef(
 
         The returned maps have their ``plot_settings`` changed to remove the normalization.
 
-        Parameters
+    Parameters
     ----------
     smap : `sunpy.map.Map`
         The sunpy map to enhance.
