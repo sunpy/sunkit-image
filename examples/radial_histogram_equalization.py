@@ -39,6 +39,10 @@ ax = axes[1]
 # So by setting it to None here, we bypass this issue.
 rhef_map.plot(axes=ax, norm=None)
 ax.set_title(r"RHE Filtered Map, $\Upsilon$=0.35")
+
+# Adjust layout
+plt.tight_layout()
+
 #######################################################################################
 # The RHEF has one free parameter that works in post processing to modulate the output.
 # Here are some of the choices one could make.
