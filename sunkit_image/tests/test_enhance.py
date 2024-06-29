@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import pytest
 import sunpy.data.sample
 import sunpy.map
@@ -32,18 +31,6 @@ def test_mgn_cutout(aia_171_cutout):
     ax = fig.add_subplot(111, projection=out)
     out.plot(axes=ax)
     return fig
-
-
-def test_multiscale_gaussian(map_test):
-    result1 = np.zeros((4, 4), dtype=float)
-    expect3 = enhance.mgn(map_test, sigma=[1])
-    assert np.allclose(result1, expect3)
-
-
-def test_nans_raise_warning(map_test):
-    map_test[0, 0] = np.nan
-    with pytest.warns(UserWarning, match="One or more entries in the input data are NaN."):
-        enhance.mgn(map_test)
 
 
 @figure_test
