@@ -3,7 +3,7 @@
 Detecting Swirls in the Solar Atmosphere
 ========================================
 
-This example demonstrates the use of Automatic Swirl Detection Algorithm (ASDA) in detecting and
+This example demonstrates the use of Automated Swirl Detection Algorithm (ASDA) in detecting and
 plotting swirls (vortices) in a 2D velocity flow field.
 
 More information on the algorithm can be found in `this paper. <https://doi.org/10.3847/1538-4357/aabd34>`__
