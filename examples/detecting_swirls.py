@@ -29,7 +29,6 @@ data = vxvy["data"]
 
 ###########################################################################
 # Now we will perform swirl detection using the methods provided in the `~sunkit_image.asda` module.
-
 # The first step is to calculate the Gamma values. Gamma1 (Γ1) is useful for identifying
 # vortex centers, while Gamma2 (Γ2) helps in detecting the edges of vortices.
 # These values are calculated based on the method proposed by `Graftieaux et al. (2001) <https://doi.org/10.1088/0957-0233/12/9/307>`__
