@@ -26,6 +26,28 @@ vy = vxvy["vy"]
 data = vxvy["data"]
 
 ###########################################################################
+# Before we proceed with swirl detection, let's understand the flow field data by
+# visualizing the field data and the velocity magnitude.
+
+# Calculate velocity magnitude
+velocity_magnitude = np.sqrt(vx**2 + vy**2)
+fig, axs = plt.subplots(1, 2, figsize=(20, 10))
+
+# Visualize the field data on the first subplot
+im1 = axs[0].imshow(data, origin="lower", cmap="gray")
+axs[0].set_title("Field Data")
+axs[0].set_xlabel("X")
+axs[0].set_ylabel("Y")
+
+# Visualize the velocity magnitude on the second subplot
+im2 = axs[1].imshow(velocity_magnitude, origin="lower", cmap="viridis")
+axs[1].set_title("Velocity Magnitude")
+cbar = fig.colorbar(im2, ax=axs[1])
+cbar.set_label("Velocity (m/s)")
+
+plt.tight_layout()
+
+###########################################################################
 # Now we will perform swirl detection using the methods provided in the `~sunkit_image.asda` module.
 #
 # The first step is to calculate the Gamma values. Gamma1 (Γ1) is useful for identifying
@@ -59,15 +81,14 @@ ve, vr, vc, ia = get_vortex_properties(vx, vy, center_edge, image=data)
 # Finally, we visualize the results. We will plot the Gamma1 and Gamma2 values,
 # which highlight the vortex centers and edges respectively.
 
-fig, ax = plt.subplots()
-ax.imshow(gamma[..., 0], origin="lower")
-ax.set_title(r"$\Gamma_1$")
-ax.set(xlabel="x", ylabel="y")
+fig, axs = plt.subplots(1, 2, figsize=(20, 10))
+axs[0].imshow(gamma[..., 0], origin="lower")
+axs[0].set_title(r"$\Gamma_1$")
+axs[0].set(xlabel="x", ylabel="y")
 
-fig, ax = plt.subplots()
-ax.imshow(gamma[..., 1], origin="lower")
-ax.set_title(r"$\Gamma_2$")
-ax.set(xlabel="x", ylabel="y")
+axs[1].imshow(gamma[..., 1], origin="lower")
+axs[1].set_title(r"$\Gamma_2$")
+axs[1].set(xlabel="x", ylabel="y")
 
 fig.tight_layout()
 ###########################################################################
@@ -87,7 +108,7 @@ ax.quiver(np.arange(vx.shape[1]), np.arange(vx.shape[0]), vx, vy, scale=50, colo
 centers = np.array(center_edge["center"])
 for i, center in enumerate(centers):
     ax.plot(center[0], center[1], "bo")
-    ax.text(center[0], center[1], str(i), color="white", ha="right", va="bottom")
+    ax.text(center[0], center[1], str(i), color="red", ha="right", va="bottom")
 
 # Overlay swirl edges
 for edge in center_edge["edge"]:
