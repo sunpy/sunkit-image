@@ -9,6 +9,7 @@ API Reference
 
    asda
    coalignment
+   coalignment_module
    enhance
    granule
    radial

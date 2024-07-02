@@ -14,6 +14,7 @@ sunkit-image
           :maxdepth: 1
 
           code_ref/index
+          how_to_guide/index
 
     .. grid-item-card:: Other info
 
