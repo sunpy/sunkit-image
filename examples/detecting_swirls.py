@@ -3,11 +3,9 @@
 Detecting Swirls in the Solar Atmosphere
 ========================================
 
-This example demonstrates the use of Automated Swirl Detection Algorithm (ASDA) in detecting and
-plotting swirls (vortices) in a 2D velocity flow field.
+This example demonstrates the use of Automated Swirl Detection Algorithm (ASDA) in detecting and plotting swirls (vortices) in a 2D velocity flow field.
 
-More information on the algorithm can be found in `this paper. <https://doi.org/10.3847/1538-4357/aabd34>`__
-
+`More information on the algorithm can be found in the original paper. <https://doi.org/10.3847/1538-4357/aabd34>`__
 """
 # sphinx_gallery_thumbnail_number = 4 # NOQA: ERA001
 
@@ -29,6 +27,7 @@ data = vxvy["data"]
 
 ###########################################################################
 # Now we will perform swirl detection using the methods provided in the `~sunkit_image.asda` module.
+#
 # The first step is to calculate the Gamma values. Gamma1 (Γ1) is useful for identifying
 # vortex centers, while Gamma2 (Γ2) helps in detecting the edges of vortices.
 # These values are calculated based on the method proposed by `Graftieaux et al. (2001) <https://doi.org/10.1088/0957-0233/12/9/307>`__
@@ -39,7 +38,7 @@ data = vxvy["data"]
 # more precise detection of sub-grid vortex centers and boundaries. By default, the
 # factor is set to 1, but it can be adjusted based on the resolution of the data.
 
-gamma = calculate_gamma_values(vx, vy, factor=1)
+gamma = calculate_gamma_values(vx, vy)
 
 ###########################################################################
 # Next, we identify the edges and centers of the swirls using the calculated Gamma values.
@@ -70,8 +69,10 @@ ax.imshow(gamma[..., 1], origin="lower")
 ax.set_title(r"$\Gamma_2$")
 ax.set(xlabel="x", ylabel="y")
 
+fig.tight_layout()
 ###########################################################################
 # Furthermore, we can create a swirl map visualization.
+#
 # Generating a swirl map is a crucial step in analyzing the dynamics of fluid flow,
 # particularly in identifying and understanding the spatial distribution, size, and
 # characteristics of swirls within the velocity field. This visualization not only
@@ -127,4 +128,6 @@ for edge in center_edge["edge"]:
 
 ax.set_title("Magnified Swirl Map Region with Streamlines")
 ax.set(xlabel="x", ylabel="y")
+fig.tight_layout()
+
 plt.show()
