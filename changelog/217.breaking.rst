@@ -1,0 +1,2 @@
+All public API now only accepts sunpy Maps as input.
+This means that all functions that previously accepted numpy arrays now only accept sunpy Maps.
