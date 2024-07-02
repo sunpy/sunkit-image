@@ -12,18 +12,18 @@ from astropy.utils.exceptions import AstropyDeprecationWarning
 from matplotlib import MatplotlibDeprecationWarning
 from packaging.version import Version
 from sunpy.util.exceptions import SunpyDeprecationWarning, SunpyPendingDeprecationWarning
-from sunpy_sphinx_theme.conf import *  # NOQA: F403
+from sunpy_sphinx_theme import PNG_ICON
 
 from sunkit_image import __version__
 
 # -- Read the Docs Specific Configuration --------------------------------------
+os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 if on_rtd:
     os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
     os.environ["HOME"] = "/home/docs/"
     os.environ["LANG"] = "C"
     os.environ["LC_ALL"] = "C"
-    os.environ["HIDE_PARFIVE_PROGRESS"] = "True"
 
 project = "sunkit_image"
 author = "The SunPy Community"
@@ -61,7 +61,6 @@ rst_epilog = """
 suppress_warnings = [
     "app.add_directive",
 ]
-
 extensions = [
     "sphinx_design",
     "sphinx_gallery.gen_gallery",
@@ -116,6 +115,7 @@ with Path("nitpick-exceptions").open() as f:
         nitpick_ignore.append((dtype, target))
 
 # -- Options for HTML output ---------------------------------------------------
+html_theme = "sunpy"
 graphviz_output_format = "svg"
 graphviz_dot_args = [
     "-Nfontsize=10",
@@ -134,7 +134,7 @@ sphinx_gallery_conf = {
     "filename_pattern": "^((?!skip_).)*$",
     "examples_dirs": example_dir,
     "gallery_dirs": path.joinpath("generated", "gallery"),
-    "default_thumb_file": path.joinpath("logo", "sunpy_icon_128x128.png"),
+    "default_thumb_file": PNG_ICON,
     "abort_on_example_error": False,
     "plot_gallery": "True",
     "remove_config_comments": True,
