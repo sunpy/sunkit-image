@@ -1,9 +1,12 @@
 import astropy.units as u
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import sunpy
 import sunpy.data.sample
 import sunpy.map
+import sunpy.visualization.colormaps.cm
 
 import sunkit_image.radial as rad
 import sunkit_image.utils as utils
@@ -107,7 +110,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
 
-    # The below tests are dummy testa. These values were not verified by hand rather they were
+    # The below tests are dummy tests.
+    # These values were not verified by hand rather they were
     # generated using the code itself.
     order = 5
 
@@ -192,6 +196,61 @@ def test_fig_fnrgf(smap):
     out = rad.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
 
     out.plot()
+
+
+@figure_test
+@pytest.mark.remote_data()
+def test_fig_rhef(smap):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+    radial_bin_edges *= u.R_sun
+    out = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=0.35, method="scipy")
+    out.plot()
+
+
+@figure_test
+@pytest.mark.remote_data()
+def test_multifig_rhef(smap):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+    radial_bin_edges *= u.R_sun
+
+    # Define the list of upsilon pairs
+    upsilon_list = [
+        0.35,
+        None,
+        (0.1, 0.1),
+        (0.5, 0.5),
+        (0.8, 0.8),
+    ]
+
+    sdata = smap.data
+
+    # Small constant to avoid log of zero
+    epsilon = 1e-2
+
+    # Adjust the data to avoid log of zero
+    data0 = np.log10(np.maximum(sdata - np.nanmin(sdata), epsilon)) ** 2
+
+    # Extract the coordinate ranges from the meta information
+    x_coords = smap.meta["cdelt1"] * (smap.data.shape[1] // 2)
+    y_coords = smap.meta["cdelt2"] * (smap.data.shape[0] // 2)
+    extent = [-x_coords, x_coords, -y_coords, y_coords]
+
+    # Create a figure with subplots for each upsilon pair plus the original map
+    fig, axs = plt.subplots(2, 3, figsize=(15, 10), sharey="all", sharex="all")
+    axs = axs.flatten()
+
+    # Plot the original map
+    axs[0].imshow(data0, origin="lower", extent=extent, cmap=mpl.colormaps["sdoaia171"])
+    axs[0].set_title("Log10(data)^2")
+
+    # Loop through the upsilon_list and plot each filtered map
+    for i, upsilon in enumerate(upsilon_list):
+        out_map = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=upsilon, method="scipy")
+        data = out_map.data
+        axs[i + 1].imshow(data, origin="lower", extent=extent, cmap=mpl.colormaps["sdoaia171"])
+        axs[i + 1].set_title(f"Upsilon = {upsilon}")
+
+    return fig
 
 
 def test_set_attenuation_coefficients():
