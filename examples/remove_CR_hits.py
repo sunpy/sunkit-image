@@ -5,9 +5,11 @@ Removing Cosmic Ray Hits
 
 This example illustrates how to remove cosmic ray hits from a LASCO C2 FITS file.
 using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__.
+
 Astroscrappy is a separate Python package and can be installed separately using ``pip`` or ``conda``.
 """
 
+import astropy.units as u
 import astroscrappy
 import matplotlib.pyplot as plt
 from astropy.io import fits
@@ -39,15 +41,14 @@ header["CUNIT1"] = "arcsec"
 header["CUNIT2"] = "arcsec"
 
 ###############################################################################
-# With this fix we can load it into a map and plot the results.
+# With this fix we can load it into a map.
 
 lasco_map = Map(data, header)
-fig1 = plt.figure()
-lasco_map.plot()
 
 ###############################################################################
 # Now we will call the `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/latest/api/astroscrappy.detect_cosmics.html>`__
 # to remove the cosmic ray hits.
+#
 # This algorithm can perform well with both high and low noise levels in the original data.
 # The function takes a `~numpy.ndarray` as input so we only pass the map data.
 # This particular image has lots of high intensity cosmic ray hits which
@@ -64,10 +65,20 @@ mask, clean_data = astroscrappy.detect_cosmics(lasco_map.data, sigclip=2, objlim
 # a cosmic ray hit at that pixel, clean_data is the cleaned image after removing those
 # hits.
 #
-# Now we can now plot the cleaned image.
+# Now we can now plot the before and after.
 
-clean_map1 = Map(clean_data, lasco_map.meta)
-fig2 = plt.figure()
-clean_map1.plot()
+# Create a new map with the cleaned data and the original metadata
+clean_lasco_map = Map(clean_data, lasco_map.meta)
+
+fig = plt.figure(figsize=(10, 7))
+
+ax = fig.add_subplot(121, projection=lasco_map)
+lasco_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
+
+ax1 = fig.add_subplot(122, projection=clean_lasco_map, sharey=ax, sharex=ax)
+clean_lasco_map.plot(axes=ax1, clip_interval=(1, 99.99) * u.percent)
+ax1.set_title("Cleaned")
+
+fig.tight_layout()
 
 plt.show()

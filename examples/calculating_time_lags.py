@@ -7,8 +7,10 @@ This example shows how to compute cross-correlations
 between light curves and map the resulting time lags,
 those temporal offsets which maximize the cross-correlation
 between the two signals, back to an image pixel.
+
 This method was developed for studying temporal evolution of AIA intensities
 by `Viall and Klimchuk (2012) <https://doi.org/10.1088/0004-637X/753/1/35>`__.
+
 The specific implementation in this package is described in detail
 in Appendix C of `Barnes et al. (2019) <https://doi.org/10.3847/1538-4357/ab290c>`__.
 """
@@ -107,17 +109,20 @@ max_cc_map = max_cross_correlation(s_a, s_b, time)
 tl_map = time_lag(s_a, s_b, time)
 
 fig = plt.figure(figsize=(10, 5))
+
 ax = fig.add_subplot(121)
 im = ax.imshow(tl_map.value, cmap="RdBu", vmin=-1, vmax=1)
 cax = make_axes_locatable(ax).append_axes("right", size="5%", pad="1%")
 cb = fig.colorbar(im, cax=cax)
 cb.set_label(r"$\tau_{AB}$ [s]")
+
 ax = fig.add_subplot(122)
 im = ax.imshow(max_cc_map.value, vmin=0, vmax=1, cmap="magma")
 cax = make_axes_locatable(ax).append_axes("right", size="5%", pad="1%")
 cb = fig.colorbar(im, cax=cax)
 cb.set_label(r"Max cross-correlation")
-plt.tight_layout()
+
+fig.tight_layout()
 
 ###################################################################
 # In practice, these data cubes are often very large, sometimes many
