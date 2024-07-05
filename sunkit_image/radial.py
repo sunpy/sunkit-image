@@ -672,6 +672,7 @@ def rhef(
         # For now, we have more than one option for ranking the values
         def _percentile_ranks_scipy(arr):
             from scipy import stats
+
             return stats.rankdata(arr, method="average") / len(arr)
 
         def _percentile_ranks_numpy(arr):
@@ -712,7 +713,7 @@ def rhef(
             here = np.logical_and(here, map_r >= application_radius)
 
         # Perform the filtering operation
-        ranking_func=_select_rank_method(method)
+        ranking_func = _select_rank_method(method)
         data[here] = ranking_func(smap.data[here])
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
