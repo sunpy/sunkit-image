@@ -10,6 +10,7 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 import sunpy.data.sample
 import sunpy.map
+from astropy.coordinates import SkyCoord
 
 import sunkit_image.enhance as enhance
 import sunkit_image.radial as radial
@@ -17,12 +18,13 @@ from sunkit_image.utils import equally_spaced_bins
 
 #######################################################################################
 # Let us use the sunpy sample data AIA image to showcase the RHE filter.
-
-aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
+print("\nPlotting Original Map...")
+aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE, autoalign=True)
 
 # Create radial segments (RHEF should use a dense grid)
 radial_bin_edges = equally_spaced_bins(0, 2, aia_map.data.shape[0] // 2)
 radial_bin_edges *= u.R_sun
+print("Performing default RHE...")
 
 rhef_map = radial.rhef(aia_map, radial_bin_edges)
 
@@ -49,24 +51,32 @@ upsilon_list = [
     (0.5, 0.5),
     (0.8, 0.8),
 ]
+print("Plotting Upsilon Examples", end="")
 
-fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map})
+# Crop the figures to see better detail
+top_right = SkyCoord(1200 * u.arcsec, 0 * u.arcsec, frame=aia_map.coordinate_frame)
+bottom_left = SkyCoord(0 * u.arcsec, -1200 * u.arcsec, frame=aia_map.coordinate_frame)
+aia_map_cropped = aia_map.submap(bottom_left, top_right=top_right)
+fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map_cropped})
 axes = axes.flatten()
 
-aia_map.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
+aia_map_cropped.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
 axes[0].set_title("Original AIA Map")
 
 # Loop through the upsilon_list and plot each filtered map
 for i, upsilon in enumerate(upsilon_list):
     out_map = radial.rhef(aia_map, upsilon=upsilon, method="scipy")
-    out_map.plot(axes=axes[i + 1])
+    out_map_crop = out_map.submap(bottom_left, top_right=top_right)
+    out_map_crop.plot(axes=axes[i + 1])
     axes[i + 1].set_title(f"Upsilon = {upsilon}")
+    print(".", end="")
 
 fig.tight_layout()
 
 #######################################################################################
 # Note that multiple filters can be used in a row to get a better output image.
 # Here, we will use both :func:`~.mgn` and :func:`~.wow`, then apply RHE filter after.
+print("Plotting Serial Processing", end="")
 
 mgn_map = enhance.mgn(aia_map)
 wow_map = enhance.wow(aia_map)
@@ -101,5 +111,6 @@ rhef_wow_map.plot(axes=axes[5])
 axes[5].set_title("RHEF( WOW(smap) )")
 
 fig.tight_layout()
+print("Done!")
 
 plt.show()
