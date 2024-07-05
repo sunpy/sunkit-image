@@ -4,7 +4,8 @@ Normalizing Radial Gradient Filters
 ===================================
 
 This example applies both the Normalizing Radial Gradient Filter (NRGF) (`sunkit_image.radial.nrgf`) and Fourier
-Normalizing Radial Gradient Filter (FNRGF) (`sunkit_image.radial.fnrgf`) to a sunpy map.
+Normalizing Radial Gradient Filter (FNRGF) (`sunkit_image.radial.fnrgf`) to a sunpy map,
+along with the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`) for comparison.
 """
 
 import astropy.units as u
@@ -42,7 +43,7 @@ out1 = radial.nrgf(aia_map, radial_bin_edges, application_radius=1 * u.R_sun)
 # for a clearer output.
 fig = plt.figure()
 ax = plt.subplot(projection=out1)
-out1.plot(clip_interval=(1, 99.99) * u.percent)
+out1.plot()
 ax.set_title("NRGF")
 
 ###########################################################################
@@ -60,7 +61,7 @@ out2 = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, 
 # The FNRGF filtered map is plotted.
 fig = plt.figure()
 ax = plt.subplot(projection=out2)
-out2.plot(clip_interval=(1, 99.99) * u.percent)
+out2.plot()
 ax.set_title("FNRGF")
 
 ###########################################################################
@@ -70,7 +71,7 @@ rhef_map = radial.rhef(aia_map, radial_bin_edges, application_radius=1 * u.R_sun
 # The RHE filtered map is plotted.
 fig = plt.figure()
 ax = plt.subplot(projection=rhef_map)
-rhef_map.plot(norm=None)
+rhef_map.plot()
 ax.set_title("RHEF")
 
 plt.show()

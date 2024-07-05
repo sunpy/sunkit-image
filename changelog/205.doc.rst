@@ -1,0 +1,2 @@
+Added an example for `sunkit-image.radial.rhef` in the `sunkit-image.radial.examples` directory.
+Renamed `sunkit-image.examples.radial_gradient_filters` to `sunkit-image.examples.normalizing_radial_gradient_filters` and included RHEF as a comparison.

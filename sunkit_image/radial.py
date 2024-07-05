@@ -614,7 +614,7 @@ def rhef(
 
     .. note::
 
-        The returned maps have their ``plot_settings`` changed to remove the normalization.
+        The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
 
     Parameters
     ----------
