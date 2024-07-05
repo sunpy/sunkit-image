@@ -6,18 +6,20 @@ Radial Histogram Equalization
 This example applies the Radial Histogram Equalizing Filter (`sunkit_image.radial.rhef`) to a sunpy map.
 """
 
+import logging
+
 import astropy.units as u
 import matplotlib.pyplot as plt
 import sunpy.data.sample
 import sunpy.map
 from astropy.coordinates import SkyCoord
-import logging
 
 import sunkit_image.enhance as enhance
 import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
 
 def load_sample_data():
     """
@@ -25,6 +27,7 @@ def load_sample_data():
     """
     logging.info("Loading sample data...")
     return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE, autoalign=True)
+
 
 def plot_original_and_filtered_map(aia_map, rhef_map):
     """
@@ -40,6 +43,7 @@ def plot_original_and_filtered_map(aia_map, rhef_map):
 
     fig.tight_layout()
 
+
 def apply_rhef(aia_map):
     """
     Apply the Radial Histogram Equalizing Filter (RHEF) to the SunPy map.
@@ -48,6 +52,7 @@ def apply_rhef(aia_map):
     radial_bin_edges = equally_spaced_bins(0, 2, aia_map.data.shape[0] // 2)
     radial_bin_edges *= u.R_sun
     return radial.rhef(aia_map, radial_bin_edges)
+
 
 def plot_upsilon_examples(aia_map, upsilon_list):
     """
@@ -58,7 +63,9 @@ def plot_upsilon_examples(aia_map, upsilon_list):
     bottom_left = SkyCoord(0 * u.arcsec, -1200 * u.arcsec, frame=aia_map.coordinate_frame)
     aia_map_cropped = aia_map.submap(bottom_left, top_right=top_right)
 
-    fig, axes = plt.subplots(2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map_cropped})
+    fig, axes = plt.subplots(
+        2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map_cropped}
+    )
     axes = axes.flatten()
 
     aia_map_cropped.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
@@ -69,9 +76,11 @@ def plot_upsilon_examples(aia_map, upsilon_list):
         out_map_crop = out_map.submap(bottom_left, top_right=top_right)
         out_map_crop.plot(axes=axes[i + 1])
         axes[i + 1].set_title(f"Upsilon = {upsilon}")
-        logging.info(f"Plotted Upsilon = {upsilon}")
+        lgg = "Plotted Upsilon = " + str(upsilon)
+        logging.info(lgg)
 
     fig.tight_layout()
+
 
 def plot_serial_processing(aia_map):
     """
@@ -113,6 +122,7 @@ def plot_serial_processing(aia_map):
     fig.tight_layout()
     logging.info("Done!")
 
+
 def main():
     aia_map = load_sample_data()
     rhef_map = apply_rhef(aia_map)
@@ -124,6 +134,7 @@ def main():
     plot_serial_processing(aia_map)
 
     plt.show()
+
 
 if __name__ == "__main__":
     main()
