@@ -16,9 +16,6 @@ from sunkit_image.utils import (
     equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,
-    percentile_ranks_numpy,
-    percentile_ranks_numpy_inplace,
-    percentile_ranks_scipy,
 )
 
 __all__ = ["fnrgf", "intensity_enhance", "set_attenuation_coefficients", "nrgf", "rhef"]
@@ -601,7 +598,7 @@ def rhef(
     method="numpy",
     *,
     vignette=None,
-    progress=True,
+    progress=False,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -610,7 +607,7 @@ def rhef(
 
     Radial Histogram Equalization is a simple algorithm for removing the radial gradient to reveal
     coronal structure. It also significantly improves the visualization of high dynamic range solar imagery.
-    It takes the input map and bins the pixels by radius, then ranks each element sequentially and normalizes the pixels at that radius.
+    RHE takes the input map and bins the pixels by radius, then ranks the elements in each bin sequentially and normalizes the set to 1.
 
     .. note::
 
@@ -640,7 +637,7 @@ def rhef(
         One suggested value is ``1.5*u.R_sun``.
     progress: bool, optional
         Display a progressbar on the main loop.
-        Defaults to True.
+        Defaults to False. Reverts to True if the image is 2k pixels wide or longer.
 
     Returns
     -------
@@ -671,20 +668,42 @@ def rhef(
             nbins=radial_bin_edges.shape[1],
         )
 
-    # Select the sort method
-    if method == "inplace":
-        the_func = percentile_ranks_numpy_inplace
-    elif method == "numpy":
-        the_func = percentile_ranks_numpy
-    elif method == "scipy":
-        the_func = percentile_ranks_scipy
-    else:
-        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
-        raise NotImplementedError(msg)
+    def _select_rank_method(method):
+        # For now, we have more than one option for ranking the values
+        def _percentile_ranks_scipy(arr):
+            from scipy import stats
+            return stats.rankdata(arr, method="average") / len(arr)
+
+        def _percentile_ranks_numpy(arr):
+            sorted_indices = np.argsort(arr)
+            ranks = np.empty_like(sorted_indices)
+            ranks[sorted_indices] = np.arange(1, len(arr) + 1)
+            return ranks / float(len(arr))
+
+        def _percentile_ranks_numpy_inplace(arr):
+            sorted_indices = np.argsort(arr)
+            arr[sorted_indices] = np.arange(1, len(arr) + 1)
+            return arr / float(len(arr))
+
+        # Select the sort method
+        if method == "inplace":
+            ranking_func = _percentile_ranks_numpy_inplace
+        elif method == "numpy":
+            ranking_func = _percentile_ranks_numpy
+        elif method == "scipy":
+            ranking_func = _percentile_ranks_scipy
+        else:
+            msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
+            raise NotImplementedError(msg)
+        return ranking_func
 
     # Allocate storage for the filtered data
     data = np.zeros_like(smap.data)
     meta = smap.meta
+
+    if radial_bin_edges.shape[1] > 2000:
+        progress = True
+
     # Calculate the filter values for each radial bin.
     for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=not progress):
         # Identify the appropriate radial slice
@@ -693,16 +712,18 @@ def rhef(
             here = np.logical_and(here, map_r >= application_radius)
 
         # Perform the filtering operation
-        data[here] = the_func(smap.data[here])
+        ranking_func=_select_rank_method(method)
+        data[here] = ranking_func(smap.data[here])
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
-    new_map = sunpy.map.Map(data, meta)
+    new_map = sunpy.map.Map(data, meta, autoalign=True)
 
     if vignette is not None:
         new_map = blackout_pixels_above_radius(new_map, vignette)
     else:
         new_map = blackout_pixels_above_radius(new_map, 1.5 * u.R_sun)
 
+    # This must be done whenever one is adjusting the overall statistical distribution of values
     new_map.plot_settings["norm"] = None
 
     return new_map
