@@ -63,12 +63,12 @@ suppress_warnings = [
 ]
 
 extensions = [
-    "sphinx_design",
-    "sphinx_gallery.gen_gallery",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
     "sphinx_changelog",
+    "sphinx_design",
+    "sphinx_gallery.gen_gallery",
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
