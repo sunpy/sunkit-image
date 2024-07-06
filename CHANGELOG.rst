@@ -49,7 +49,7 @@ Backwards Incompatible Changes
 Features
 --------
 
-- Add two examples demonstrating the usage of :func:`~sunkit_image.coalignment.mapsequence_coalign_by_match_template` and :func:`~sunkit_image.coalignment.mapsequence_coalign_by_rotation`. (`#90 <https://github.com/sunpy/sunkit-image/pull/90>`__)
+- Add two examples demonstrating the usage of ``~sunkit_image.coalignment.mapsequence_coalign_by_match_template`` and ``~sunkit_image.coalignment.mapsequence_coalign_by_rotation``. (`#90 <https://github.com/sunpy/sunkit-image/pull/90>`__)
 - Added the `sunkit_image.granule` module which provides functions to segment granulation in images of the solar photosphere.
   The key functionality is contained in the `~sunkit_image.granule.segment` function, which
   segments an image into intergranule, granule, faculae, and, optionally, dim granule. (`#114 <https://github.com/sunpy/sunkit-image/pull/114>`__)
@@ -94,8 +94,8 @@ Breaking Changes
 Features
 --------
 
-- Add `~sunkit_image.coalignment.calculate_solar_rotate_shift` and
-  `~sunkit_image.coalignment.mapsequence_coalign_by_rotation` to
+- Add ``~sunkit_image.coalignment.calculate_solar_rotate_shift`` and
+  ``~sunkit_image.coalignment.mapsequence_coalign_by_rotation`` to
   the `sunkit_image.coalignment` module. (`#81 <https://github.com/sunpy/sunkit-image/pull/81>`__)
 
 
