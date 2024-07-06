@@ -100,10 +100,7 @@ intersphinx_mapping = {
         (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
     ),
     "matplotlib": ("https://matplotlib.org/stable", None),
-    "sunpy": (
-        "https://sunpy.org/",
-        (None, "https://docs.sunpy.org/en/stable/"),
-    ),
+    "sunpy": ("https://docs.sunpy.org/en/stable/", None),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "dask": ("https://docs.dask.org/en/latest", None),
     "skimage": ("https://scikit-image.org/docs/stable/", None),

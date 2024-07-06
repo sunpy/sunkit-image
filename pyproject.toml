@@ -32,7 +32,7 @@ classifiers = [
 ]
 dependencies = [
   'astropy>=5.2.0',
-  'numpy>=1.21.0',
+  'numpy>=1.23.0',
   'matplotlib>=3.5.0',
   'scipy>=1.8.0,!=1.10.0',
   'scikit-image>=0.19.0',
@@ -65,7 +65,7 @@ docs = [
   'sunpy[data,net]>=5.0.0',
 ]
 
-dev = ["sunkit_image[tests,docs]"]
+dev = ["sunkit_image[all,tests,docs]"]
 
 [project.urls]
 changelog = "https://docs.sunpy.org/projects/sunkit-image/en/latest/changelog.html"
