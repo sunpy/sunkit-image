@@ -16,7 +16,7 @@ repos:
           ]
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|docs/conf.py)$"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.5.0"
+    rev: "v0.5.1"
     hooks:
       - id: ruff
         args: ["--fix"]
@@ -40,12 +40,15 @@ repos:
       - id: debug-statements
       - id: check-added-large-files
         args: ["--enforce-all", "--maxkb=1054"]
+        exclude: "sunkit_image/data/test/asda_vxvy.npz"
       - id: end-of-file-fixer
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.json)$|^CITATION.rst$"
       - id: mixed-line-ending
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*)$"
   - repo: https://github.com/crate-ci/typos
-    rev: v1.22.9
+    rev: v1.23.1
+    hooks:
+      - id: typos
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v1.10.1"
     hooks:

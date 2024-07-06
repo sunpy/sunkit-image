@@ -8,6 +8,7 @@ import matplotlib as mpl
 import numpy as np
 import scipy
 import skimage
+
 import sunpy
 import sunpy.map
 

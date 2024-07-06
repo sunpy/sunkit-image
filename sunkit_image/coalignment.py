@@ -7,11 +7,13 @@ corrections due to solar rotation.
 import warnings
 from copy import deepcopy
 
-import astropy.units as u
 import numpy as np
-import sunpy.map
 from scipy.ndimage import shift
 from skimage.feature import match_template
+
+import astropy.units as u
+
+import sunpy.map
 from sunpy.map.mapbase import GenericMap
 from sunpy.util.exceptions import SunpyUserWarning
 

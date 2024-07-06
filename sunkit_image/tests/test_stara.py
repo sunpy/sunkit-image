@@ -1,5 +1,6 @@
-import astropy.units as u
 import numpy as np
+
+import astropy.units as u
 
 from sunkit_image.stara import stara
 from sunkit_image.tests.helpers import figure_test

@@ -5,8 +5,13 @@ Configuration file for the Sphinx documentation builder.
 import datetime
 import os
 import pathlib
+import warnings
+from pathlib import Path
 
+from astropy.utils.exceptions import AstropyDeprecationWarning
+from matplotlib import MatplotlibDeprecationWarning
 from packaging.version import Version
+from sunpy.util.exceptions import SunpyDeprecationWarning, SunpyPendingDeprecationWarning
 from sunpy_sphinx_theme.conf import *  # NOQA: F403
 
 from sunkit_image import __version__
@@ -18,7 +23,7 @@ if on_rtd:
     os.environ["HOME"] = "/home/docs/"
     os.environ["LANG"] = "C"
     os.environ["LC_ALL"] = "C"
-    os.environ["HIDE_PARFIVE_PROGESS"] = "True"
+    os.environ["HIDE_PARFIVE_PROGRESS"] = "True"
 
 project = "sunkit_image"
 author = "The SunPy Community"
@@ -27,6 +32,12 @@ copyright = f"{datetime.datetime.now(datetime.UTC).year}, {author}"  # NOQA: A00
 release = __version__
 sunkit_image_version = Version(__version__)
 is_release = not (sunkit_image_version.is_prerelease or sunkit_image_version.is_devrelease)
+
+# We want to make sure all the following warnings fail the build
+warnings.filterwarnings("error", category=SunpyDeprecationWarning)
+warnings.filterwarnings("error", category=SunpyPendingDeprecationWarning)
+warnings.filterwarnings("error", category=MatplotlibDeprecationWarning)
+warnings.filterwarnings("error", category=AstropyDeprecationWarning)
 
 # For the linkcheck
 linkcheck_ignore = [
@@ -94,14 +105,21 @@ intersphinx_mapping = {
         (None, "https://docs.sunpy.org/en/stable/"),
     ),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
-    "sqlalchemy": ("https://docs.sqlalchemy.org/en/latest/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "dask": ("https://docs.dask.org/en/latest", None),
     "skimage": ("https://scikit-image.org/docs/stable/", None),
-    "drms": ("https://docs.sunpy.org/projects/drms/en/stable/", None),
-    "parfive": ("https://parfive.readthedocs.io/en/stable/", None),
-    "reproject": ("https://reproject.readthedocs.io/en/stable/", None),
-    "aiapy": ("https://aiapy.readthedocs.io/en/stable/", None),
 }
+
+# Enable nitpicky mode, which forces links to be non-broken
+nitpicky = True
+# This is not used. See docs/nitpick-exceptions file for the actual listing.
+nitpick_ignore = []
+with Path("nitpick-exceptions").open() as f:
+    for line in f.readlines():
+        if line.strip() == "" or line.startswith("#"):
+            continue
+        dtype, target = line.split(None, 1)
+        target = target.strip()
+        nitpick_ignore.append((dtype, target))
 
 # -- Options for HTML output ---------------------------------------------------
 graphviz_output_format = "svg"

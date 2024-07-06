@@ -8,9 +8,11 @@ This example applies Wavelets Optimized Whitening to a `sunpy.map.Map` using `su
 # sphinx_gallery_thumbnail_number = 2  # NOQA: ERA001
 
 import matplotlib.pyplot as plt
+
+from astropy import units as u
+
 import sunpy.data.sample
 import sunpy.map
-from astropy import units as u
 
 import sunkit_image.enhance as enhance
 
