@@ -127,7 +127,7 @@ jobs:
           lfs: true
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          installer-url: https://github.com/conda-forge/miniforge/releases/download/24.3.0-0/Mambaforge-24.3.0-0-Linux-x86_64.sh
+          installer-url: https://github.com/conda-forge/miniforge/releases/download/24.3.0-0/Miniforge3-24.3.0-0-Linux-x86_64.sh
           python-version: "3.12"
           activate-environment: sunkit_image_test
           environment-file: sunkit-test-env.yaml
