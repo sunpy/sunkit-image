@@ -1,2 +1,2 @@
-Added an example for `sunkit-image.radial.rhef` in the `sunkit-image.radial.examples` directory.
-Renamed `sunkit-image.examples.radial_gradient_filters` to `sunkit-image.examples.normalizing_radial_gradient_filters` and included RHEF as a comparison.
+Added a new example for `sunkit-image.radial.rhef` at :ref:`sphx_glr_generated_gallery_radial_histogram_equalization.py`
+Added RFEF to :ref:`sphx_glr_generated_gallery_radial_gradient_filters.py` as a comparison to the other filters.

@@ -1,1 +1,1 @@
-Addresses part of #216: Fixed the normalization of the output image maps from `sunkit-image.radial.nrgf` and `sunkit-image.radial.fnrgf`. The modules in `sunkit-image.enhance` still need a similar treatment.
+Removed the default normalization of the output maps from `sunkit-image.radial.nrgf` and `sunkit-image.radial.fnrgf`.

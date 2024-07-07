@@ -126,8 +126,8 @@ def intensity_enhance(
 
     .. note::
 
-        After applying the filter, current plot settings such as the image normalization
-        may have to be changed in order to obtain a good-looking plot.
+        The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
+
 
     Parameters
     ----------
@@ -235,8 +235,8 @@ def nrgf(
 
     .. note::
 
-        After applying the filter, current plot settings such as the image normalization
-        may have to be changed in order to obtain a good-looking plot.
+        The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
+
 
     Parameters
     ----------
@@ -345,6 +345,10 @@ def set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=
         The optimal coefficients depends on the size and quality of image. There is no generalized formula
         for choosing them and its up to the user to choose a optimum value.
 
+    .. note::
+
+    The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
+
     Parameters
     ----------
     order : `int`
@@ -411,8 +415,7 @@ def fnrgf(
 
     .. note::
 
-        After applying the filter, current plot settings such as the image normalization
-        may have to be changed in order to obtain a good-looking plot.
+        The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
 
     Parameters
     ----------
@@ -597,7 +600,7 @@ def rhef(
     upsilon=0.35,
     method="numpy",
     *,
-    vignette=None,
+    vignette=1.5 * u.R_sun,
     progress=False,
 ):
     """
@@ -628,10 +631,10 @@ def rhef(
         See Equation (4.15) in the thesis.
         Defaults to 0.35.
     method : str
-        A string describing which method to use for sorting.
-        Options are {"inplace", "numpy", "scipy"}.
-        Defaults to "numpy".
     vignette: `astropy.units.Quantity`, optional
+        Set pixels above this radius to black.
+        Defaults to ``1.5*u.R_sun``.
+        If you want to disable this, pass in None.
         Set pixels above this radius to black.
         Defaults to None which is no vignette.
         One suggested value is ``1.5*u.R_sun``.

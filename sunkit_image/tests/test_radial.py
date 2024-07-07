@@ -1,5 +1,4 @@
 import astropy.units as u
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
@@ -7,6 +6,7 @@ import sunpy
 import sunpy.data.sample
 import sunpy.map
 import sunpy.visualization.colormaps.cm
+from astropy.coordinates import SkyCoord
 
 import sunkit_image.radial as rad
 import sunkit_image.utils as utils
@@ -213,7 +213,7 @@ def test_multifig_rhef(smap):
     radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
     radial_bin_edges *= u.R_sun
 
-    # Define the list of upsilon pairs
+    # Define the list of upsilon pairs where the first number affects dark components and the second number affects bright ones
     upsilon_list = [
         0.35,
         None,
@@ -222,33 +222,26 @@ def test_multifig_rhef(smap):
         (0.8, 0.8),
     ]
 
-    sdata = smap.data
+    # Crop the figures to see better detail
+    top_right = SkyCoord(1200 * u.arcsec, 0 * u.arcsec, frame=smap.coordinate_frame)
+    bottom_left = SkyCoord(0 * u.arcsec, -1200 * u.arcsec, frame=smap.coordinate_frame)
+    aia_map_cropped = smap.submap(bottom_left, top_right=top_right)
+    fig, axes = plt.subplots(
+        2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map_cropped}
+    )
+    axes = axes.flatten()
 
-    # Small constant to avoid log of zero
-    epsilon = 1e-2
-
-    # Adjust the data to avoid log of zero
-    data0 = np.log10(np.maximum(sdata - np.nanmin(sdata), epsilon)) ** 2
-
-    # Extract the coordinate ranges from the meta information
-    x_coords = smap.meta["cdelt1"] * (smap.data.shape[1] // 2)
-    y_coords = smap.meta["cdelt2"] * (smap.data.shape[0] // 2)
-    extent = [-x_coords, x_coords, -y_coords, y_coords]
-
-    # Create a figure with subplots for each upsilon pair plus the original map
-    fig, axs = plt.subplots(2, 3, figsize=(15, 10), sharey="all", sharex="all")
-    axs = axs.flatten()
-
-    # Plot the original map
-    axs[0].imshow(data0, origin="lower", extent=extent, cmap=mpl.colormaps["sdoaia171"])
-    axs[0].set_title("Log10(data)^2")
+    aia_map_cropped.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
+    axes[0].set_title("Original AIA Map")
 
     # Loop through the upsilon_list and plot each filtered map
     for i, upsilon in enumerate(upsilon_list):
-        out_map = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=upsilon, method="scipy")
-        data = out_map.data
-        axs[i + 1].imshow(data, origin="lower", extent=extent, cmap=mpl.colormaps["sdoaia171"])
-        axs[i + 1].set_title(f"Upsilon = {upsilon}")
+        out_map = rad.rhef(smap, upsilon=upsilon, method="scipy")
+        out_map_crop = out_map.submap(bottom_left, top_right=top_right)
+        out_map_crop.plot(axes=axes[i + 1])
+        axes[i + 1].set_title(f"Upsilon = {upsilon}")
+
+    fig.tight_layout()
 
     return fig
 

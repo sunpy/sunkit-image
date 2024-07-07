@@ -18,13 +18,11 @@ from sunkit_image.utils import equally_spaced_bins
 
 #######################################################################################
 # Let us use the sunpy sample data AIA image to showcase the RHE filter.
-print("\nPlotting Original Map...")
 aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE, autoalign=True)
 
 # Create radial segments (RHEF should use a dense grid)
 radial_bin_edges = equally_spaced_bins(0, 2, aia_map.data.shape[0] // 2)
 radial_bin_edges *= u.R_sun
-print("Performing default RHE...")
 
 rhef_map = radial.rhef(aia_map, radial_bin_edges)
 
@@ -51,7 +49,6 @@ upsilon_list = [
     (0.5, 0.5),
     (0.8, 0.8),
 ]
-print("Plotting Upsilon Examples", end="")
 
 # Crop the figures to see better detail
 top_right = SkyCoord(1200 * u.arcsec, 0 * u.arcsec, frame=aia_map.coordinate_frame)
@@ -69,14 +66,12 @@ for i, upsilon in enumerate(upsilon_list):
     out_map_crop = out_map.submap(bottom_left, top_right=top_right)
     out_map_crop.plot(axes=axes[i + 1])
     axes[i + 1].set_title(f"Upsilon = {upsilon}")
-    print(".", end="")
 
 fig.tight_layout()
 
 #######################################################################################
 # Note that multiple filters can be used in a row to get a better output image.
 # Here, we will use both :func:`~.mgn` and :func:`~.wow`, then apply RHE filter after.
-print("Plotting Serial Processing", end="")
 
 mgn_map = enhance.mgn(aia_map)
 wow_map = enhance.wow(aia_map)

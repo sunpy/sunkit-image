@@ -371,12 +371,17 @@ def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
     """
     Black out any pixels above a certain radius in a SunPy map.
 
-    Parameters:
-    sunpy_map (sunpy.map.GenericMap): The input SunPy map.
-    radius_limit (astropy.units.Quantity): The radius limit above which to black out pixels.
+    Parameters
+    ----------
+    sunpy_map : `sunpy.map.GenericMap`
+        The input sunpy map.
+    radius_limit : `astropy.units.Quantity`
+        The radius limit above which to black out pixels.
 
-    Returns:
-    sunpy.map.GenericMap: A new SunPy map with pixels above the specified radius blacked out.
+    Returns
+    -------
+    `sunpy.map.GenericMap`
+        A new sunpy map with pixels above the specified radius blacked out.
     """
     # Create a grid of coordinates corresponding to each pixel in the map
     map_r = find_pixel_radii(smap).to(u.R_sun)
