@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 import astropy.units as u
 import numpy as np
 from skimage.feature import match_template
@@ -7,95 +9,10 @@ from sunkit_image.coalignment_module.util.decorators import register_coalignment
 __all__ = ["match_template_coalign"]
 
 
-@u.quantity_input
-def _clip_edges(data, yclips: u.pix, xclips: u.pix):
-    """
-    Clips off the "y" and "x" edges of a 2D array according to a list of pixel
-    values. This function is useful for removing data at the edge of 2d images
-    that may be affected by shifts from solar de- rotation and layer co-
-    registration, leaving an image unaffected by edge effects.
-
-    Parameters
-    ----------
-    data : `numpy.ndarray`
-        A numpy array of shape ``(ny, nx)``.
-    yclips : `astropy.units.Quantity`
-        The amount to clip in the y-direction of the data. Has units of
-        pixels, and values should be whole non-negative numbers.
-    xclips : `astropy.units.Quantity`
-        The amount to clip in the x-direction of the data. Has units of
-        pixels, and values should be whole non-negative numbers.
-
-    Returns
-    -------
-    `numpy.ndarray`
-        A 2D image with edges clipped off according to ``yclips`` and ``xclips``
-        arrays.
-    """
-    ny = data.shape[0]
-    nx = data.shape[1]
-    # The purpose of the int below is to ensure integer type since by default
-    # astropy quantities are converted to floats.
-    return data[int(yclips[0].value) : ny - int(yclips[1].value), int(xclips[0].value) : nx - int(xclips[1].value)]
-
-
-@u.quantity_input
-def _calculate_clipping(y: u.pix, x: u.pix):
-    """
-    Return the upper and lower clipping values for the "y" and "x" directions.
-
-    Parameters
-    ----------
-    y : `astropy.units.Quantity`
-        An array of pixel shifts in the y-direction for an image.
-    x : `astropy.units.Quantity`
-        An array of pixel shifts in the x-direction for an image.
-
-    Returns
-    -------
-    `tuple`
-        The tuple is of the form ``([y0, y1], [x0, x1])``.
-        The number of (integer) pixels that need to be clipped off at each
-        edge in an image. The first element in the tuple is a list that gives
-        the number of pixels to clip in the y-direction. The first element in
-        that list is the number of rows to clip at the lower edge of the image
-        in y. The clipped image has "clipping[0][0]" rows removed from its
-        lower edge when compared to the original image. The second element in
-        that list is the number of rows to clip at the upper edge of the image
-        in y. The clipped image has "clipping[0][1]" rows removed from its
-        upper edge when compared to the original image. The second element in
-        the "clipping" tuple applies similarly to the x-direction (image
-        columns). The parameters ``y0, y1, x0, x1`` have the type
-        `~astropy.units.Quantity`.
-    """
-    return (
-        [_lower_clip(y.value), _upper_clip(y.value)] * u.pix,
-        [_lower_clip(x.value), _upper_clip(x.value)] * u.pix,
-    )
-
-
-def _upper_clip(z):
-    """
-    Find smallest integer bigger than all the positive entries in the input
-    array.
-    """
-    zupper = 0
-    zcond = z >= 0
-    if np.any(zcond):
-        zupper = int(np.max(np.ceil(z[zcond])))
-    return zupper
-
-
-def _lower_clip(z):
-    """
-    Find smallest positive integer bigger than the absolute values of the
-    negative entries in the input array.
-    """
-    zlower = 0
-    zcond = z <= 0
-    if np.any(zcond):
-        zlower = int(np.max(np.ceil(-z[zcond])))
-    return zlower
+class affineParams(NamedTuple):
+    scale: tuple[tuple[float, float], tuple[float, float]]
+    rotation: float
+    translation: tuple[float, float]
 
 
 def _parabolic_turning_point(y):
@@ -202,9 +119,7 @@ def match_template_coalign(input_array, template_array):
 
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
-    # Calculate the clipping required
-    yclips, xclips = _calculate_clipping(x_shift * u.pix, y_shift * u.pix)
-    # Clip 'em
-    coaligned_target_array = _clip_edges(input_array, yclips, xclips)
-    # Apply the shift to get the coaligned input array
-    return (coaligned_target_array, (x_shift, y_shift))
+    # Particularly for this, there is no change in the rotation or scaling, hence the hardcoded values of scale to 1.0 & rotation to identity matrix
+    scale = [(1.0, 0), (0, 1.0)]
+    rotation = 0.0  # Considering the angle is in radians by default
+    return affineParams(scale=scale, rotation=rotation, translation=(x_shift * u.pixel, y_shift * u.pixel))

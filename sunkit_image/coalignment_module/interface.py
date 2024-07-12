@@ -9,27 +9,50 @@ from sunkit_image.coalignment_module.util.decorators import registered_methods
 __all__ = ["coalignment"]
 
 
-def convert_array_to_map(array_obj, map_obj):
+def update_metadata(target_map, affineParams):
     """
-    Convert a 2D numpy array to a sunpy Map object using the header of a given
-    map object.
+    Update the metadata of a sunpy Map object based on affine transformation
+    parameters.
 
     Parameters
     ----------
-    array_obj : `numpy.ndarray`
-        The 2D numpy array to be converted.
-    map_obj : `sunpy.map.Map`
-        The map object whose header is to be used for the new map.
+    target_map : `sunpy.map.Map`
+        The original map object whose metadata is to be updated.
+    affineParams : object
+        An object containing the affine transformation parameters. This object must
+        have attributes for translation (dx, dy), scale, and rotation.
 
     Returns
     -------
     `sunpy.map.Map`
-        A new sunpy map object with the data from `array_obj` and the header from `map_obj`.
+        A new sunpy map object with updated metadata reflecting the affine transformation.
     """
-    header = map_obj.meta.copy()
-    header["crpix1"] -= array_obj.shape[1] / 2.0 - map_obj.data.shape[1] / 2.0
-    header["crpix2"] -= array_obj.shape[0] / 2.0 - map_obj.data.shape[0] / 2.0
-    return sunpy.map.Map(array_obj, header)
+    ref_pix = target_map.reference_pixel
+    pc_matrix = target_map.rotation_matrix
+
+    # Extacting the affine parameters
+    translation = affineParams.translation
+    scale = affineParams.scale
+    rotation = affineParams.rotation
+
+    # Updating the reference pixel
+    new_ref = ref_pix + translation
+    # Updating the PC matrix
+    cos_theta = np.cos(rotation)
+    sin_theta = np.sin(rotation)
+    rotation_matrix = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
+    new_pc_matrix = pc_matrix @ rotation_matrix @ scale
+
+    # Create a new map with the updated metadata
+    new_meta = target_map.meta.copy()
+    new_meta["CRPIX1"] = new_ref[0].value
+    new_meta["CRPIX2"] = new_ref[1].value
+    new_meta["PC1_1"] = new_pc_matrix[0, 0]
+    new_meta["PC1_2"] = new_pc_matrix[0, 1]
+    new_meta["PC2_1"] = new_pc_matrix[1, 0]
+    new_meta["PC2_2"] = new_pc_matrix[1, 1]
+
+    return sunpy.map.Map(target_map.data, new_meta)
 
 
 def warn_user_of_nan(array, name):
@@ -57,7 +80,8 @@ def warn_user_of_nan(array, name):
 
 def coalignment(reference_map, target_map, method):
     """
-    Performs image coalignment using a specified method.
+    Performs image coalignment using a specified method. It updates the
+    metadata of the target map so as to align it with the reference map.
 
     Parameters
     ----------
@@ -71,7 +95,7 @@ def coalignment(reference_map, target_map, method):
     Returns
     -------
     `sunpy.map.Map`
-        The coaligned target map.
+        The coaligned target map with the updated metadata.
 
     Raises
     ------
@@ -88,6 +112,5 @@ def coalignment(reference_map, target_map, method):
     warn_user_of_nan(target_array, "target")
     warn_user_of_nan(reference_array, "reference")
 
-    coalign_array, shifts = registered_methods[method](target_array, reference_array)
-
-    return convert_array_to_map(coalign_array, target_map)
+    affineParams = registered_methods[method](target_array, reference_array)
+    return update_metadata(target_map, affineParams)
