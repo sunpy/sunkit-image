@@ -14,9 +14,9 @@ You can add a custom coalignment method in the sunkit-image package using the de
     def my_coalignment_method(input_array, template_array):
         # Your coalignment code goes here
         # This should encompass calculating the shifts, applying these shifts to the data,
-        # handling NaN values appropriately, and implementing any necessary clipping logic.
-        # Return the shifts and the coaligned array
-        return (coaligned_array, (x_shift, y_shift))
+        # handling NaN values appropriately.
+        # Return the shifts in a affine style, such as the scale
+        return affineParams(scale, rotation, translation)
 
 Decorator Parameters
 ====================
@@ -35,9 +35,9 @@ Your coalignment function should:
 
 2. **Compute Shifts**: Calculate the shifts in the x and y directions needed to align ``input_array`` with ``template_array``.
 
-3. **Apply Shifts**: Apply these shifts to ``input_array`` to generate the coaligned array.
+3. **Determine Affine Parameters**: Decide the parameters of the affine parameters like the scale, rotation and translation(generally shifts in x and y direction).
 
-4. **Return**: A tuple where the first element is the coaligned array and the second element is another tuple containing the shifts ``(x_shift, y_shift)``.
+4. **Return**: A named tuple that contains the affine transformation parameters.
 
 Example Usage
 =============
