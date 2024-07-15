@@ -29,14 +29,10 @@ def update_fits_wcs_metadata(target_map, affine_params):
     """
     ref_pix = target_map.reference_pixel
     pc_matrix = target_map.rotation_matrix
-
     # Extacting the affine parameters
     translation = affine_params.translation
     scale = affine_params.scale
     rotation = affine_params.rotation
-
-    # Updating the reference pixel
-    new_ref = ref_pix + translation
     # Updating the PC matrix
     cos_theta = np.cos(rotation)
     sin_theta = np.sin(rotation)
@@ -45,8 +41,8 @@ def update_fits_wcs_metadata(target_map, affine_params):
 
     # Create a new map with the updated metadata
     new_meta = target_map.meta.copy()
-    new_meta["CRPIX1"] = new_ref[0].value
-    new_meta["CRPIX2"] = new_ref[1].value
+    new_meta["CRPIX1"] = ref_pix.x.value + translation[0].value + 1
+    new_meta["CRPIX2"] = ref_pix.y.value + translation[1].value + 1
     new_meta["PC1_1"] = new_pc_matrix[0, 0]
     new_meta["PC1_2"] = new_pc_matrix[0, 1]
     new_meta["PC2_1"] = new_pc_matrix[1, 0]
