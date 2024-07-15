@@ -5,15 +5,15 @@ Using the Coalignment Interface
 *******************************
 
 This guide explains how to use the coalignment interface in the sunkit-image package to align solar images.
-The :func:`~sunkit_image.coalignment_module.coalignment` function facilitates image coalignment using various registered methods.
+The :func:`~sunkit_image.coalignment.coalignment` function facilitates image coalignment using various registered methods.
 
 Function Overview
 =================
 
-The :func:`~sunkit_image.coalignment_module.coalignment` function performs image coalignment using a specified method that is registered using the decorator :func:`~sunkit_image.coalignment_module.register_coalignment_method`.
+The :func:`~sunkit_image.coalignment.coalignment` function performs image coalignment using a specified method that is registered using the decorator :func:`~sunkit_image.utils.decorators.register_coalignment_method`.
 For registering a new method, please check :ref:`this <sunkit-image-how-to-guide-add-a-new-coalignment-method>` guide.
 
-Refer to the docstring of :func:`~sunkit_image.coalignment_module.coalignment` for detailed information on the parameters, return values, and exceptions.
+Refer to the docstring of :func:`~sunkit_image.coalignment.coalignment` for detailed information on the parameters, return values, and exceptions.
 
 Function Parameters
 ===================
@@ -35,12 +35,12 @@ Raises
 Example Usage
 =============
 
-Below is an example of how to use the :func:`~sunkit_image.coalignment_module.coalignment` function:
+Below is an example of how to use the :func:`~sunkit_image.coalignment.coalignment` function:
 
 .. code-block:: python
 
     from sunpy.map import Map
-    from sunkit_image.coalignment_module.interface import coalignment
+    from sunkit_image.coalignment.interface import coalignment
     import  sunpy.data.sample
 
     reference_map = Map(sunpy.data.sample.AIA_193_CUTOUT01_IMAGE)
@@ -48,7 +48,7 @@ Below is an example of how to use the :func:`~sunkit_image.coalignment_module.co
 
     coaligned_map = coalignment(reference_map, target_map, method="match_template")
 
-The :func:`~sunkit_image.coalignment_module.coalignment` function aligns the ``target_map`` to the ``reference_map`` using the specified method (e.g., ``"match_template"``).
+The :func:`~sunkit_image.coalignment.coalignment` function aligns the ``target_map`` to the ``reference_map`` using the specified method (e.g., ``"match_template"``).
 
 Registered Methods
 ==================
@@ -59,7 +59,7 @@ You can add custom methods as described in :ref:`this <sunkit-image-how-to-guide
 Handling NaNs and Infs
 ======================
 
-The :func:`~sunkit_image.coalignment_module.coalignment` function includes a warning mechanism to alert users if there are any NaNs, Infs, or other problematic values in the input or template arrays.
+The :func:`~sunkit_image.coalignment.coalignment` function includes a warning mechanism to alert users if there are any NaNs, Infs, or other problematic values in the input or template arrays.
 Proper handling of these values is expected to be included in the registered methods.
 
 Further Reading

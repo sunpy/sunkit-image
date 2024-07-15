@@ -4,19 +4,19 @@
 Add a New Coalignment Method
 ****************************
 
-You can add a custom coalignment method in the sunkit-image package using the decorator :func:`~sunkit_image.coalignment_module.register_coalignment_method`:
+You can add a custom coalignment method in the sunkit-image package using the decorator :func:`~sunkit_image.utils.decorators.register_coalignment_method`:
 
 .. code-block:: python
 
-    from sunkit_image.coalignment_module.util.decorators import register_coalignment_method
+    from sunkit_image.utils.decorators import register_coalignment_method
 
     @register_coalignment_method("my_coalign")
     def my_coalignment_method(input_array, template_array):
         # Your coalignment code goes here
-        # This should encompass calculating the shifts, applying these shifts to the data,
+        # This should encompass calculating the shifts,
         # handling NaN values appropriately.
-        # Return the shifts in a affine style, such as the scale
-        return affineParams(scale, rotation, translation)
+        # Return the shifts in a affine style, such as the scale, rotation and translation.
+        return affine_params(scale, rotation, translation)
 
 Decorator Parameters
 ====================

@@ -4,7 +4,7 @@ import pytest
 from numpy.testing import assert_allclose
 from skimage.feature import match_template
 
-from sunkit_image.coalignment_module.match_template import (
+from sunkit_image.coalignment.match_template import (
     _find_best_match_location,
     _get_correlation_shifts,
     _parabolic_turning_point,

@@ -4,12 +4,12 @@ import numpy as np
 import sunpy.map
 from sunpy.util.exceptions import SunpyUserWarning
 
-from sunkit_image.coalignment_module.util.decorators import registered_methods
+from sunkit_image.utils.decorators import registered_methods
 
 __all__ = ["coalignment"]
 
 
-def update_metadata(target_map, affineParams):
+def update_fits_wcs_metadata(target_map, affine_params):
     """
     Update the metadata of a sunpy Map object based on affine transformation
     parameters.
@@ -18,7 +18,7 @@ def update_metadata(target_map, affineParams):
     ----------
     target_map : `sunpy.map.Map`
         The original map object whose metadata is to be updated.
-    affineParams : object
+    affine_params : object
         An object containing the affine transformation parameters. This object must
         have attributes for translation (dx, dy), scale, and rotation.
 
@@ -31,9 +31,9 @@ def update_metadata(target_map, affineParams):
     pc_matrix = target_map.rotation_matrix
 
     # Extacting the affine parameters
-    translation = affineParams.translation
-    scale = affineParams.scale
-    rotation = affineParams.rotation
+    translation = affine_params.translation
+    scale = affine_params.scale
+    rotation = affine_params.rotation
 
     # Updating the reference pixel
     new_ref = ref_pix + translation
@@ -112,5 +112,5 @@ def coalignment(reference_map, target_map, method):
     warn_user_of_nan(target_array, "target")
     warn_user_of_nan(reference_array, "reference")
 
-    affineParams = registered_methods[method](target_array, reference_array)
-    return update_metadata(target_map, affineParams)
+    affine_params = registered_methods[method](target_array, reference_array)
+    return update_fits_wcs_metadata(target_map, affine_params)

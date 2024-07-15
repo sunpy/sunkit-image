@@ -4,12 +4,12 @@ import astropy.units as u
 import numpy as np
 from skimage.feature import match_template
 
-from sunkit_image.coalignment_module.util.decorators import register_coalignment_method
+from sunkit_image.utils.decorators import register_coalignment_method
 
 __all__ = ["match_template_coalign"]
 
 
-class affineParams(NamedTuple):
+class affine_params(NamedTuple):
     scale: tuple[tuple[float, float], tuple[float, float]]
     rotation: float
     translation: tuple[float, float]
@@ -111,7 +111,7 @@ def match_template_coalign(input_array, template_array):
 
     Returns
     -------
-    AffineParams
+    affine_params
         A named tuple containing the following affine transformation parameters:
         - scale: list
             A list of tuples representing the scale transformation as an identity matrix.
@@ -127,4 +127,4 @@ def match_template_coalign(input_array, template_array):
     # Particularly for this, there is no change in the rotation or scaling, hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = [(1.0, 0), (0, 1.0)]
     rotation = 0.0  # Considering the angle is in radians by default
-    return affineParams(scale=scale, rotation=rotation, translation=(x_shift * u.pixel, y_shift * u.pixel))
+    return affine_params(scale=scale, rotation=rotation, translation=(x_shift * u.pixel, y_shift * u.pixel))
