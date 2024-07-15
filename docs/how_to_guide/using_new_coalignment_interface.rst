@@ -10,7 +10,7 @@ The :func:`~sunkit_image.coalignment.coalignment` function facilitates image coa
 Function Overview
 =================
 
-The :func:`~sunkit_image.coalignment.coalignment` function performs image coalignment using a specified method that is registered using the decorator :func:`~sunkit_image.utils.decorators.register_coalignment_method`.
+The :func:`~sunkit_image.coalignment.coalignment` function performs image coalignment using a specified method that is registered using the decorator :func:`~sunkit_image.utils.register_coalignment_method`.
 For registering a new method, please check :ref:`this <sunkit-image-how-to-guide-add-a-new-coalignment-method>` guide.
 
 Refer to the docstring of :func:`~sunkit_image.coalignment.coalignment` for detailed information on the parameters, return values, and exceptions.

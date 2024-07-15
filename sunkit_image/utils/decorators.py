@@ -5,7 +5,7 @@ from functools import wraps
 import numpy as np
 from sunpy.map import GenericMap, Map
 
-__all__ = ["accept_array_or_map","register_coalignment_method", "registered_methods"]
+__all__ = ["accept_array_or_map", "register_coalignment_method", "registered_methods"]
 
 # Global Dictionary to store the registered methods and their names
 registered_methods = {}
