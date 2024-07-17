@@ -15,13 +15,15 @@ You can add a custom coalignment method in the sunkit-image package using the de
         # Your coalignment code goes here
         # This should encompass calculating the shifts,
         # handling NaN values appropriately.
-        # Return the shifts in a affine style, such as the scale, rotation and translation.
+        # Return the shifts in an affine style, such as the scale, rotation and translation.
         return affine_params(scale, rotation, translation)
 
 Decorator Parameters
 ====================
 
-- **"my_coalign"**: The name of your custom coalignment method.
+Currently the decorator takes one parameter:
+
+- ``name``: The name of your custom coalignment method, which in the above example is  "my_coalign"
 
 Function Requirements
 =====================
@@ -37,7 +39,7 @@ Your coalignment function should:
 
 3. **Determine Affine Parameters**: Decide the parameters of the affine parameters like the scale, rotation and translation(generally shifts in x and y direction).
 
-4. **Return**: A named tuple that contains the affine transformation parameters.
+4. **Return**: Use the ``affine_params`` named tuple from `sunkit_image` or provide your own that exposes the three parameters as attributes. 
 
 Example Usage
 =============

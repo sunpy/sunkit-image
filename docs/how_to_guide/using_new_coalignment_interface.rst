@@ -7,8 +7,6 @@ Using the Coalignment Interface
 This guide explains how to use the coalignment interface in the sunkit-image package to align solar images.
 The :func:`~sunkit_image.coalignment.coalignment` function facilitates image coalignment using various registered methods.
 
-Function Overview
-=================
 
 The :func:`~sunkit_image.coalignment.coalignment` function performs image coalignment using a specified method that is registered using the decorator :func:`~sunkit_image.utils.register_coalignment_method`.
 For registering a new method, please check :ref:`this <sunkit-image-how-to-guide-add-a-new-coalignment-method>` guide.
@@ -62,7 +60,3 @@ Handling NaNs and Infs
 The :func:`~sunkit_image.coalignment.coalignment` function includes a warning mechanism to alert users if there are any NaNs, Infs, or other problematic values in the input or template arrays.
 Proper handling of these values is expected to be included in the registered methods.
 
-Further Reading
-===============
-
-For more details on how to register new coalignment methods, refer to :ref:`this <sunkit-image-how-to-guide-add-a-new-coalignment-method>`.
