@@ -7,8 +7,10 @@ This example applies both the normalizing radial gradient (`sunkit_image.radial.
 normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
 """
 
-import astropy.units as u
 import matplotlib.pyplot as plt
+
+import astropy.units as u
+
 import sunpy.data.sample
 import sunpy.map
 

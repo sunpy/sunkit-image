@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 import sunpy
 from sunpy.map import all_pixel_indices_from_map
 

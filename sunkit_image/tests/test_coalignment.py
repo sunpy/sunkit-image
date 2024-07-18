@@ -2,13 +2,15 @@ import warnings
 from copy import deepcopy
 from pathlib import Path
 
-import astropy.units as u
 import numpy as np
 import pytest
-import sunpy.data.test
-from astropy.coordinates import SkyCoord
 from numpy.testing import assert_allclose, assert_array_almost_equal
 from scipy.ndimage import shift as sp_shift
+
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
+import sunpy.data.test
 from sunpy.map import Map, MapSequence
 from sunpy.util import SunpyUserWarning
 

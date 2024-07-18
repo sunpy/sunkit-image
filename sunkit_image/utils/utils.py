@@ -4,10 +4,12 @@ This module contains a collection of functions of general utility.
 
 import warnings
 
-import astropy.units as u
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 from skimage import measure
+
+import astropy.units as u
+
 from sunpy.map import all_coordinates_from_map
 
 __all__ = [

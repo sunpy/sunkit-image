@@ -10,9 +10,11 @@ algorithm used in this example, see this
 """
 
 import matplotlib.pyplot as plt
-import sunpy.data.sample
-from astropy.visualization import make_lupton_rgb
 from matplotlib.lines import Line2D
+
+from astropy.visualization import make_lupton_rgb
+
+import sunpy.data.sample
 from sunpy.map import Map
 
 from sunkit_image.enhance import mgn

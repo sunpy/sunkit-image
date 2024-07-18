@@ -1,16 +1,17 @@
+
 name: CI
 
 on:
   push:
     branches:
-      - "main"
-      - "*.*"
-      - "!*backport*"
+      - 'main'
+      - '*.*'
+      - '!*backport*'
     tags:
-      - "v*"
-      - "!*dev*"
-      - "!*pre*"
-      - "!*post*"
+      - 'v*'
+      - '!*dev*'
+      - '!*pre*'
+      - '!*post*'
   pull_request:
   # Allow manual runs through the web UI
   workflow_dispatch:
@@ -26,14 +27,25 @@ jobs:
       submodules: false
       coverage: codecov
       toxdeps: tox-pypi-filter
-      posargs: -n auto
       envs: |
         - linux: py312
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  sdist_verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -U --user build
+      - run: python -m build . --sdist
+      - run: python -m pip install -U --user twine
+      - run: python -m twine check dist/*
+
   test:
-    needs: [core]
+    needs: [core, sdist_verify]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
       submodules: false
@@ -41,21 +53,20 @@ jobs:
       toxdeps: tox-pypi-filter
       posargs: -n auto
       envs: |
-        - macos: py310
         - windows: py311
+        - macos: py310
         - linux: py310-oldestdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   docs:
-    needs: [test]
+    needs: [core]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
-      default_python: "3.12"
+      default_python: '3.12'
       submodules: false
       pytest: false
       toxdeps: tox-pypi-filter
-      cache-key: docs-${{ github.run_id }}
       libraries: |
         apt:
           - graphviz
@@ -73,6 +84,23 @@ jobs:
       posargs: -n 1
       envs: |
         - linux: py312-online
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  cron:
+    if: |
+      github.event_name == 'workflow_dispatch' || (
+        github.event_name == 'pull_request' &&
+        contains(github.event.pull_request.labels.*.name, 'Run cron CI')
+      )
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
+    with:
+      default_python: '3.10'
+      submodules: false
+      coverage: codecov
+      toxdeps: tox-pypi-filter
+      envs: |
+        - linux: py311-devdeps
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -99,10 +127,10 @@ jobs:
           lfs: true
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          installer-url: https://github.com/conda-forge/miniforge/releases/download/4.8.3-2/Miniforge-pypy3-4.8.3-2-Linux-x86_64.sh
+          installer-url: https://github.com/conda-forge/miniforge/releases/download/24.3.0-0/Miniforge3-24.3.0-0-Linux-x86_64.sh
           python-version: "3.12"
           activate-environment: sunkit_image_test
-          environment-file: sunkit-test-env.yml
+          environment-file: sunkit-test-env.yaml
       - name: Run tests
         shell: bash -el {0}
         run: |

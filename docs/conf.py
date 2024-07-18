@@ -62,12 +62,12 @@ suppress_warnings = [
     "app.add_directive",
 ]
 extensions = [
-    "sphinx_design",
-    "sphinx_gallery.gen_gallery",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
     "sphinx_changelog",
+    "sphinx_design",
+    "sphinx_gallery.gen_gallery",
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
@@ -86,20 +86,23 @@ default_role = "obj"
 napoleon_use_rtype = False
 napoleon_google_docstring = False
 intersphinx_mapping = {
-    "astropy": ("https://docs.astropy.org/en/stable/", None),
-    "aiapy": ("https://aiapy.readthedocs.io/en/stable/", None),
-    "dask": ("https://docs.dask.org/en/latest", None),
-    "drms": ("https://docs.sunpy.org/projects/drms/en/stable/", None),
+    "python": (
+        "https://docs.python.org/3/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/python3.inv"),
+    ),
+    "numpy": (
+        "https://numpy.org/doc/stable/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
+    ),
+    "scipy": (
+        "https://docs.scipy.org/doc/scipy/reference/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
+    ),
     "matplotlib": ("https://matplotlib.org/stable", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "parfive": ("https://parfive.readthedocs.io/en/stable/", None),
-    "python": ("https://docs.python.org/3/", None),
-    "reproject": ("https://reproject.readthedocs.io/en/stable/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
-    "skimage": ("https://scikit-image.org/docs/stable/", None),
-    "sqlalchemy": ("https://docs.sqlalchemy.org/en/latest/", None),
     "sunpy": ("https://docs.sunpy.org/en/stable/", None),
+    "astropy": ("https://docs.astropy.org/en/stable/", None),
+    "dask": ("https://docs.dask.org/en/latest", None),
+    "skimage": ("https://scikit-image.org/docs/stable/", None),
 }
 
 # Enable nitpicky mode, which forces links to be non-broken
