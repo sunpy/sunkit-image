@@ -1,8 +1,9 @@
 import inspect
-from collections.abc import Callable
 from functools import wraps
+from collections.abc import Callable
 
 import numpy as np
+
 from sunpy.map import GenericMap, Map
 
 __all__ = ["accept_array_or_map", "register_coalignment_method", "registered_methods"]

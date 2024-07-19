@@ -14,13 +14,15 @@ notebook implementation of the same algorithm using dask arrays.
 """
 # sphinx_gallery_thumbnail_number = 2 # NOQA: ERA001
 
-import astropy.units as u
 import matplotlib.pyplot as plt
-import sunpy.io._fits
-import sunpy.map
+from skimage.measure import label, regionprops_table
+
+import astropy.units as u
 from astropy.table import QTable
 from astropy.time import Time
-from skimage.measure import label, regionprops_table
+
+import sunpy.io._fits
+import sunpy.map
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 

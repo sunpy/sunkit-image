@@ -1,10 +1,12 @@
-from functools import wraps
 from pathlib import Path
+from functools import wraps
 
-import astropy
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pytest
+
+import astropy
+
 import sunpy
 from sunpy.tests.helpers import skip_windows
 

@@ -14,9 +14,11 @@ results compared to the IDL version.
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sunpy.map
+
 from astropy import units as u
 from astropy.io import fits
+
+import sunpy.map
 
 import sunkit_image.trace as trace
 

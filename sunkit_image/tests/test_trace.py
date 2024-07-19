@@ -3,8 +3,10 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-import sunpy.map
+
 from astropy.io import fits
+
+import sunpy.map
 
 import sunkit_image.data.test as data
 from sunkit_image.tests.helpers import figure_test
