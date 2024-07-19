@@ -1,1 +1,1 @@
-Added the Radial Histogram Equalizing Filter (RHEF) (`sunkit-image.radial.rhef`) to the `sunkit-image.radial` package.
+Added the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`) to the `sunkit_image.radial` package.

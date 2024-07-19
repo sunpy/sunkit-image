@@ -1,1 +1,1 @@
-Removed the default normalization of the output maps from `sunkit-image.radial.nrgf` and `sunkit-image.radial.fnrgf`.
+Removed the default normalization of the output maps from `sunkit_image.radial.nrgf` and `sunkit_image.radial.fnrgf`.
