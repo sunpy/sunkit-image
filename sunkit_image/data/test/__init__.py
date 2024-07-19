@@ -2,12 +2,7 @@ from pathlib import Path
 
 from astropy.utils.data import get_pkg_data_filename
 
-import sunkit_image
-
-__all__ = ["rootdir", "file_list", "get_test_filepath"]
-
-rootdir = Path(sunkit_image.__file__).parent / "data" / "test"
-file_list = Path(rootdir).glob("/*.[!p]*")
+__all__ = ["get_test_filepath"]
 
 
 def get_test_filepath(filename, **kwargs):

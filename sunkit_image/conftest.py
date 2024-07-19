@@ -179,9 +179,12 @@ def aia_171(request):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=VerifyWarning)
         smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
-    if request.param == "map":
-        return smap
-    return smap.data if request.param == "array" else None
+    return smap if request.param == "map" else smap.data
+
+
+@pytest.fixture()
+def aia_171_cutout():
+    return sunpy.map.Map(get_test_filepath("aia_171_cutout.fits"))
 
 
 @pytest.fixture()

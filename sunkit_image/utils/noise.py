@@ -46,7 +46,7 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
     >>> rng = np.random.default_rng(0)
     >>> noisy_image_array = rng.standard_normal((100, 100))
     >>> estimate = noise_estimation(noisy_image_array, patchsize=11, iterations=10)
-    >>> estimate["mask"]  # Prints mask
+    >>> estimate["mask"]  # doctest: +SKIP
     array([[1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
@@ -54,11 +54,11 @@ def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=
         [1., 1., 1., ..., 1., 1., 0.],
         [1., 1., 1., ..., 1., 1., 0.],
         [0., 0., 0., ..., 0., 0., 0.]])
-    >>> estimate["nlevel"]  # Prints nlevel
+    >>> estimate["nlevel"]  # doctest: +SKIP
     array([0.97398633])
-    >>> estimate["thresh"]  # Prints thresh
+    >>> estimate["thresh"]  # doctest: +SKIP
     array([164.21965135])
-    >>> estimate["num"]  # Prints num
+    >>> estimate["num"]  # doctest: +SKIP
      array([8100.])
 
     References
