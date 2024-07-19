@@ -4,17 +4,17 @@ radius.
 """
 
 import numpy as np
+from tqdm import tqdm
 
 import astropy.units as u
 
 import sunpy.map
 from sunpy.coordinates import frames
-from tqdm import tqdm
 
 from sunkit_image.utils import (
     apply_upsilon,
-    blackout_pixels_above_radius,
     bin_edge_summary,
+    blackout_pixels_above_radius,
     equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,

@@ -1,14 +1,14 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 import astropy.units as u
-import matplotlib.pyplot as plt
+from astropy.coordinates import SkyCoord
 
 import sunpy
 import sunpy.data.sample
 import sunpy.map
 import sunpy.visualization.colormaps.cm
-from astropy.coordinates import SkyCoord
 
 import sunkit_image.radial as rad
 import sunkit_image.utils as utils
