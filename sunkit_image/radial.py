@@ -349,7 +349,7 @@ def set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=
 
     .. note::
 
-    The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
+        The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
 
     Parameters
     ----------
