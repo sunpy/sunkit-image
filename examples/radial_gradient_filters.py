@@ -3,9 +3,13 @@
 Normalizing Radial Gradient Filters
 ===================================
 
-This example showcases the filters found in the radial module.
+This example showcases the filters found in the "radial" module.
 
-These are the Normalizing Radial Gradient Filter (NRGF) (`sunkit_image.radial.nrgf`), Fourier Normalizing Radial Gradient Filter (FNRGF) (`sunkit_image.radial.fnrgf`) and the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`).
+These are:
+
+- Normalizing Radial Gradient Filter (NRGF) (`sunkit_image.radial.nrgf`)
+- Fourier Normalizing Radial Gradient Filter (FNRGF) (`sunkit_image.radial.fnrgf`)
+- Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`)
 """
 
 import matplotlib.pyplot as plt
@@ -34,13 +38,7 @@ aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 radial_bin_edges = equally_spaced_bins(1, 2, aia_map.data.shape[0] // 4)
 radial_bin_edges *= u.R_sun
 
-basic_nrgf = radial.nrgf(aia_map, radial_bin_edges, application_radius=1 * u.R_sun)
-
-# The NRGF filtered map is plotted.
-fig = plt.figure()
-ax = plt.subplot(projection=basic_nrgf)
-basic_nrgf.plot()
-ax.set_title("NRGF")
+base_nrgf = radial.nrgf(aia_map, radial_bin_edges, application_radius=1 * u.R_sun, progress=False)
 
 ###########################################################################
 # We will need to work out  a few parameters for the FNRGF.
@@ -52,32 +50,37 @@ ax.set_title("NRGF")
 order = 20
 attenuation_coefficients = radial.set_attenuation_coefficients(order)
 
-basic_fnrgf = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1 * u.R_sun)
+base_fnrgf = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1 * u.R_sun, progress=False)
 
 ###########################################################################
-# We can also compare to the RHEF as well.
+# Now we will also use the final filter, RHEF.
 
-basic_rhef = radial.rhef(aia_map, radial_bin_edges, application_radius=1 * u.R_sun)
+base_rhef = radial.rhef(aia_map, radial_bin_edges, application_radius=1 * u.R_sun, progress=False)
 
 ###########################################################################
-# Finally we will plot the filtered maps with the original to demonstrate the effect.
+# Finally we will plot the filtered maps with the original to demonstrate the effect of each.
 
-fig = plt.figure(figsize=(7, 15))
+fig = plt.figure(figsize=(15, 15))
 
-ax = fig.add_subplot(311, projection=aia_map)
+ax = fig.add_subplot(221, projection=aia_map)
 aia_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
 
-ax1 = fig.add_subplot(312, projection=basic_nrgf, sharey=ax, sharex=ax)
-basic_nrgf.plot(axes=ax1, clip_interval=(1, 99.99) * u.percent)
+ax1 = fig.add_subplot(222, projection=base_nrgf)
+base_nrgf.plot(axes=ax1)
 ax1.set_title("NRGF")
 
-ax2 = fig.add_subplot(313, projection=basic_fnrgf, sharey=ax, sharex=ax)
-basic_fnrgf.plot(axes=ax2, clip_interval=(1, 99.99) * u.percent)
+ax2 = fig.add_subplot(223, projection=base_fnrgf)
+base_fnrgf.plot(axes=ax2, clip_interval=(1, 99.99) * u.percent)
 ax2.set_title("FNRGF")
 
-ax3 = fig.add_subplot(314, projection=basic_rhef, sharey=ax, sharex=ax)
-basic_rhef.plot(axes=ax3, clip_interval=(1, 99.99) * u.percent)
+ax3 = fig.add_subplot(224, projection=base_rhef)
+base_rhef.plot(axes=ax3)
 ax3.set_title("RHEF")
+
+ax.coords[0].set_ticklabel_visible(False)
+ax1.coords[0].set_ticklabel_visible(False)
+ax1.coords[1].set_ticklabel_visible(False)
+ax3.coords[1].set_ticklabel_visible(False)
 
 fig.tight_layout()
 

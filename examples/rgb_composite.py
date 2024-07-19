@@ -57,7 +57,7 @@ custom_lines = [
     Line2D([0], [0], color=cmap(1), lw=4),
 ]
 
-fig = plt.figure()
+fig = plt.figure(figsize=(15, 15))
 
 ax = fig.add_subplot(111, projection=maps[0].wcs)
 im = ax.imshow(im_rgb)

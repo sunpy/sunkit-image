@@ -56,7 +56,8 @@ loops = trace.occult2(trace_map, nsm1=3, rmin=30, lmin=25, nstruc=1000, ngap=0, 
 # Now plot all the detected loops on the original image, we convert the image pixels to
 # to world coordinates to be plotted on the map.
 
-fig = plt.figure()
+fig = plt.figure(figsize=(15, 15))
+
 ax = fig.add_subplot(projection=trace_map)
 trace_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
 # We can now plot each loop in the list of loops.

@@ -9,10 +9,10 @@ using `astroscrappy.detect_cosmics <https://astroscrappy.readthedocs.io/en/lates
 Astroscrappy is a separate Python package and can be installed separately using ``pip`` or ``conda``.
 """
 
-import astropy.units as u
 import astroscrappy
 import matplotlib.pyplot as plt
 
+import astropy.units as u
 from astropy.io import fits
 
 from sunpy.map import Map
@@ -60,27 +60,28 @@ lasco_map = Map(data, header)
 # to clean the high intensity bright cosmic ray hits.
 # We also modify the ``readnoise`` parameter to obtain better results.
 
-mask, clean_data = astroscrappy.detect_cosmics(lasco_map.data, sigclip=2, objlim=2, readnoise=4, verbose=True)
+mask, clean_data = astroscrappy.detect_cosmics(lasco_map.data, sigclip=2, objlim=2, readnoise=4, verbose=False)
 
 ###############################################################################
 # This returns two variables - mask is a boolean array depicting whether there is
 # a cosmic ray hit at that pixel, clean_data is the cleaned image after removing those
 # hits.
-#
-# Now we can now plot the before and after.
+# We will need to create a new map with the cleaned data and the original metadata
+# and we can now plot the before and after.
 
-# Create a new map with the cleaned data and the original metadata
 clean_lasco_map = Map(clean_data, lasco_map.meta)
 
-fig = plt.figure(figsize=(10, 7))
+fig = plt.figure(figsize=(15, 10))
 
 ax = fig.add_subplot(121, projection=lasco_map)
 lasco_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
 
-ax1 = fig.add_subplot(122, projection=clean_lasco_map, sharey=ax, sharex=ax)
+ax1 = fig.add_subplot(122, projection=clean_lasco_map)
 clean_lasco_map.plot(axes=ax1, clip_interval=(1, 99.99) * u.percent)
-ax1.set_title("Cleaned")
+ax1.set_title("Cosmic Rays removed")
 
+ax1.coords[1].set_ticks_visible(False)
+ax1.coords[1].set_ticklabel_visible(False)
 fig.tight_layout()
 
 plt.show()

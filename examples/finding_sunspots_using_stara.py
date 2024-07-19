@@ -117,12 +117,10 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection=hmi_submap)
 hmi_submap.plot(axes=ax)
 ax.contour(stara_segments, levels=0)
-
 ax.scatter(centroids_x, centroids_y, color="red", marker="o", s=30, label="Centroids")
 # Label each centroid with its corresponding sunspot label for better identification.
 for i, labels in enumerate(regions["label"]):
     ax.text(centroids_x[i], centroids_y[i], f"{labels}", color="yellow", fontsize=16)
-
 fig.tight_layout()
 
 plt.show()

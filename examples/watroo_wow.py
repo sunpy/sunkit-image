@@ -37,12 +37,14 @@ wow_map = enhance.wow(aia_map, bilateral=1, denoise_coefficients=[5, 2, 1])
 fig = plt.figure(figsize=(10, 7))
 
 ax = fig.add_subplot(121, projection=aia_map)
-ax1 = fig.add_subplot(122, projection=wow_map, sharey=ax, sharex=ax)
-
 aia_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
+
+ax1 = fig.add_subplot(122, projection=wow_map)
 wow_map.plot(axes=ax1, clip_interval=(1, 99.99) * u.percent, norm=None)
 ax1.set_title("Wavelets Optimized Whitening (WOW)")
 
+ax1.coords[1].set_ticks_visible(False)
+ax1.coords[1].set_ticklabel_visible(False)
 fig.tight_layout()
 
 plt.show()
