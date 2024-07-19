@@ -101,66 +101,53 @@ def mgn(
             "behavior.",
             stacklevel=3,
         )
-
     if weights is None:
         weights = np.ones(len(sigma))
-
     # 1. Replace spurious negative pixels with zero
     if clip is True:
         data[data <= 0] = 1e-15  # Makes sure that all values are above zero
-
-    image = np.zeros_like(data)
-    conv = np.zeros_like(data)
-    sigmaw = np.zeros_like(data)
-
+    image = np.empty(data.shape, dtype=np.double)
+    sigmaw = np.empty(data.shape, dtype=np.double)
     for s, weight in zip(sigma, weights, strict=True):
         # 2 & 3 Create kernel and convolve with image
         # Refer to equation (1) in the paper
-        ndimage.gaussian_filter(data, sigma=s, truncate=truncate, mode="nearest", output=conv)
-
+        conv = ndimage.gaussian_filter(data, sigma=s, truncate=truncate, mode="nearest", output=np.double)
         # 4. Calculate difference between image and the local mean image,
         # square the difference, and convolve with kernel. Square-root the
         # resulting image to give `local standard deviation` image sigmaw
         # Refer to equation (2) in the paper
-        conv = data - conv
+        conv -= data
         ndimage.gaussian_filter(conv**2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw)
-        np.sqrt(sigmaw, out=sigmaw)
-
+        with np.errstate(invalid="ignore"):
+            np.sqrt(sigmaw, out=sigmaw)
         # 5. Normalize the gaussian transformed image to give C_i.
         sigmaw = np.where(sigmaw == 0.0, 1.0, sigmaw)
         conv /= sigmaw
-
         # 6. Apply arctan transformation on Ci to give C'i
         # Refer to equation (3) in the paper
         conv *= k
         np.arctan(conv, out=conv)
         conv *= weight
-
         image += conv
-
-    # delete these arrays here as it reduces the total memory consumption when
+    # Delete these arrays here as it reduces the total memory consumption when
     # we create the Cprime_g temp array below.
     del conv
     del sigmaw
-
     # 8. Take weighted mean of C'i to give a weighted mean locally normalised image.
     image /= len(sigma)
-
     # 9. Calculate global gamma-transformed image C'g
     # Refer to equation (4) in the paper
-    gamma_min = data.min() if gamma_min is None else gamma_min
-    gamma_max = data.max() if gamma_max is None else gamma_max
+    gamma_min = np.double(data.min()) if gamma_min is None else gamma_min
+    gamma_max = np.double(data.max()) if gamma_max is None else gamma_max
     Cprime_g = data - gamma_min
     if (gamma_max - gamma_min) != 0.0:
         Cprime_g /= gamma_max - gamma_min
     Cprime_g **= 1 / gamma
     Cprime_g *= h
-
     # 10. Sum the weighted mean locally transformed image with the global normalized image
     # Refer to equation (5) in the paper
     image *= 1 - h
     image += Cprime_g
-
     return image
 
 
