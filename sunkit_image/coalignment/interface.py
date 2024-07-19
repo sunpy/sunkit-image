@@ -1,6 +1,7 @@
 import warnings
-
+from typing import NamedTuple
 import numpy as np
+
 import sunpy.map
 from sunpy.util.exceptions import SunpyUserWarning
 
@@ -11,18 +12,19 @@ __all__ = ["coalignment", "affine_params"]
 
 class affine_params(NamedTuple):
     """
-    A named tuple to store the affine transformation parameters used for image alignment.
+    A named tuple to store the affine transformation parameters used for image
+    alignment.
 
     Attributes
     ----------
     scale : tuple[tuple[float, float], tuple[float, float]]
         The scale matrix representing the scaling transformation.
         This 2x2 matrix defines how the image is scaled along the x and y axes.
-        
+
     rotation_matrix : tuple[tuple[float, float], tuple[float, float]]
         The rotation matrix representing the rotation transformation.
         This 2x2 matrix defines the rotation of the image in the plane.
-        
+
     translation : tuple[float, float]
         The translation vector representing the translation transformation.
         This 2-element tuple defines the shift of the image along the x and y axes in pixels.
