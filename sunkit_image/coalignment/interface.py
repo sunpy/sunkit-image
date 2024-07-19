@@ -6,7 +6,30 @@ from sunpy.util.exceptions import SunpyUserWarning
 
 from sunkit_image.utils.decorators import registered_methods
 
-__all__ = ["coalignment"]
+__all__ = ["coalignment", "affine_params"]
+
+
+class affine_params(NamedTuple):
+    """
+    A named tuple to store the affine transformation parameters used for image alignment.
+
+    Attributes
+    ----------
+    scale : tuple[tuple[float, float], tuple[float, float]]
+        The scale matrix representing the scaling transformation.
+        This 2x2 matrix defines how the image is scaled along the x and y axes.
+        
+    rotation_matrix : tuple[tuple[float, float], tuple[float, float]]
+        The rotation matrix representing the rotation transformation.
+        This 2x2 matrix defines the rotation of the image in the plane.
+        
+    translation : tuple[float, float]
+        The translation vector representing the translation transformation.
+        This 2-element tuple defines the shift of the image along the x and y axes in pixels.
+    """
+    scale: tuple[tuple[float, float], tuple[float, float]]
+    rotation_matrix: tuple[tuple[float, float], tuple[float, float]]
+    translation: tuple[float, float]
 
 
 def update_fits_wcs_metadata(target_map, affine_params):
@@ -32,11 +55,8 @@ def update_fits_wcs_metadata(target_map, affine_params):
     # Extacting the affine parameters
     translation = affine_params.translation
     scale = affine_params.scale
-    rotation = affine_params.rotation
+    rotation_matrix = affine_params.rotation_matrix
     # Updating the PC matrix
-    cos_theta = np.cos(rotation)
-    sin_theta = np.sin(rotation)
-    rotation_matrix = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
     new_pc_matrix = pc_matrix @ rotation_matrix @ scale
 
     # Create a new map with the updated metadata
@@ -81,16 +101,16 @@ def coalignment(reference_map, target_map, method):
 
     Parameters
     ----------
-    reference_map : `sunpy.map.Map`
+    reference_map : sunpy.map.Map
         The reference map to which the target map is to be coaligned.
-    target_map : `sunpy.map.Map`
+    target_map : sunpy.map.Map
         The target map to be coaligned to the reference map.
     method : str
         The name of the registered coalignment method to use.
 
     Returns
     -------
-    `sunpy.map.Map`
+    sunpy.map.Map
         The coaligned target map with the updated metadata.
 
     Raises

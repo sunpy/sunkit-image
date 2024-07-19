@@ -5,14 +5,9 @@ import numpy as np
 from skimage.feature import match_template
 
 from sunkit_image.utils.decorators import register_coalignment_method
+from sunkit_image.coalignment.interface import affine_params
 
 __all__ = ["match_template_coalign"]
-
-
-class affine_params(NamedTuple):
-    scale: tuple[tuple[float, float], tuple[float, float]]
-    rotation: float
-    translation: tuple[float, float]
 
 
 def _parabolic_turning_point(y):
@@ -98,15 +93,15 @@ def _find_best_match_location(corr):
 
 
 @register_coalignment_method("match_template")
-def match_template_coalign(input_array, template_array):
+def match_template_coalign(reference_array, target_array ):
     """
     Perform coalignment by matching the template array to the input array.
 
     Parameters
     ----------
-    input_array : `numpy.ndarray`
+    input_array : numpy.ndarray
         The input 2D array to be coaligned.
-    template_array : `numpy.ndarray`
+    template_array : numpy.ndarray
         The template 2D array to align to.
 
     Returns
@@ -120,11 +115,14 @@ def match_template_coalign(input_array, template_array):
         - translation: tuple
             A tuple containing the x and y translation values in pixels.
     """
-    corr = match_template(np.float64(input_array), np.float64(template_array))
+    corr = match_template(np.float64(target_array), np.float64(reference_array))
 
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
     # Particularly for this, there is no change in the rotation or scaling, hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = [(1.0, 0), (0, 1.0)]
     rotation = 0.0  # Considering the angle is in radians by default
-    return affine_params(scale=scale, rotation=rotation, translation=(x_shift * u.pixel, y_shift * u.pixel))
+    cos_theta = np.cos(rotation)
+    sin_theta = np.sin(rotation)
+    rotation_matrix = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
+    return affine_params(scale=scale, rotation_matrix=rotation_matrix, translation=(x_shift * u.pixel, y_shift * u.pixel))
