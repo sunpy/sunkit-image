@@ -18,6 +18,7 @@ of the image processing library
 """
 
 import matplotlib.pyplot as plt
+
 import sunpy.data.sample
 from sunpy.map import Map
 

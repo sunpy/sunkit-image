@@ -8,10 +8,10 @@ build:
     post_checkout:
       - git fetch --unshallow || true
     pre_install:
-      - git update-index --assume-unchanged .rtd-environment.yml docs/conf.py
+      - git update-index --assume-unchanged .rtd-environment.yaml docs/conf.py
 
 conda:
-  environment: .rtd-environment.yml
+  environment: .rtd-environment.yaml
 
 sphinx:
   builder: html

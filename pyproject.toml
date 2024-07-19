@@ -1,22 +1,21 @@
 [build-system]
 requires = [
-  "setuptools",
-  "setuptools_scm[toml]",
+  "setuptools>=62.1",
+  "setuptools_scm[toml]>=6.2",
   "wheel",
 ]
-build-backend = 'setuptools.build_meta'
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "sunkit_image"
 dynamic = ["version"]
 description = "An image processing toolbox for Solar Physics."
-readme = "README.rst"
 requires-python = ">=3.10"
+readme = { file = "README.rst", content-type = "text/x-rst" }
 license = {file = "LICENSE.txt"}
-keywords = ["solar physics", "solar", "science", "NASA", "image analysis"]
+keywords = ["solar physics", "solar", "science", "image analysis"]
 authors = [
-  {email = "sunpy@googlegroups.com"},
-  {name = "The SunPy Community"}
+  { name = "The SunPy Community", email = "sunpy@googlegrouups.com" },
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -33,19 +32,12 @@ classifiers = [
 ]
 dependencies = [
   'astropy>=5.2.0',
+  'numpy>=1.23.0',
   'matplotlib>=3.5.0',
-  'numpy>=1.21.0',
-  'scikit-image>=0.19.0',
   'scipy>=1.8.0,!=1.10.0',
+  'scikit-image>=0.20.0',
   'sunpy[map]>=5.0.0',
 ]
-
-[project.urls]
-changelog = "https://docs.sunpy.org/projects/sunkit-image/en/latest/changelog.html"
-documentation = "https://docs.sunpy.org/projects/sunkit-image/"
-homepage = "https://sunpy.org/"
-issue_tracker = "https://github.com/sunpy/sunkit-image/issues"
-repository = "https://github.com/sunpy/sunkit-image/"
 
 [project.optional-dependencies]
 core = ["sunkit_image"]
@@ -56,12 +48,12 @@ tests = [
   'dask',
   'pytest-astropy',
   'pytest-mpl',
+  "pytest-xdist",
   "sunpy[data]>=5.0.0",
 ]
 docs = [
   "sunkit_image[all]",
   'astroscrappy',
-  'beautifulsoup4',
   'dask',
   'matplotlib',
   'sphinx-automodapi',
@@ -71,12 +63,16 @@ docs = [
   'sphinx',
   'sunpy-sphinx-theme',
   'sunpy[data,net]>=5.0.0',
-  'zeep',
 ]
+
 dev = ["sunkit_image[all,tests,docs]"]
 
-[tool.setuptools_scm]
-write_to = "sunkit_image/_version.py"
+[project.urls]
+changelog = "https://docs.sunpy.org/projects/sunkit-image/en/latest/changelog.html"
+documentation = "https://docs.sunpy.org/projects/sunkit-image/"
+homepage = "https://sunpy.org/"
+issue_tracker = "https://github.com/sunpy/sunkit-image/issues"
+repository = "https://github.com/sunpy/sunkit-image/"
 
 [tool.setuptools]
 include-package-data = true
@@ -85,12 +81,11 @@ provides = ["sunkit_image"]
 license-files = ["LICENSE.rst"]
 
 [tool.setuptools.packages.find]
-exclude = ["sunkit_image._dev"]
+exclude = ["sunkit_image._dev*"]
 namespaces = false
 
-[tool.codespell]
-skip = "*.asdf,*.fits,*.fts,*.header,*.json,*.xsh,*cache*,*egg*,*extern*,.git,.idea,.tox,_build,*truncated,*.svg,.asv_env,.history"
-ignore-words-list = "sav,"
+[tool.setuptools_scm]
+write_to = "sunkit_image/_version.py"
 
 [ tool.gilesbot ]
   [ tool.gilesbot.circleci_artifacts ]

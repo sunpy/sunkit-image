@@ -4,10 +4,13 @@ This module contains a collection of functions of general utility.
 
 import warnings
 
-import astropy.units as u
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 from skimage import measure
+
+import astropy.units as u
+
+import sunpy
 from sunpy.map import all_coordinates_from_map
 
 __all__ = [
@@ -19,6 +22,8 @@ __all__ = [
     "points_in_poly",
     "reform2d",
     "remove_duplicate",
+    "apply_upsilon",
+    "blackout_pixels_above_radius",
 ]
 
 
@@ -300,3 +305,94 @@ def calculate_gamma(pm, vel, pnorm, n):
     vel_norm = np.linalg.norm(vel, axis=2)
     sint = cross / (pnorm * vel_norm + 1e-10)
     return np.nansum(sint, axis=1) / n
+
+
+def apply_upsilon(data, upsilon=(0.5, 0.5)):
+    """
+    Apply the upsilon function to the input array.
+
+    This function applies the upsilon function, a double-sided gamma adjustment,
+    to the input array. It uses the specified exponents for the lower and upper halves
+    of the array to normalize and stretch the values.
+
+    Parameters
+    ----------
+    data : array-like
+        Input array to be normalized and stretched.
+    upsilon : float or tuple of float or None, optional
+        Parameters for the upsilon function. Default is (0.5, 0.5). If None or contains all None, the original data is returned.
+        If a single float is provided, both alpha and alpha_high are set to this value.
+
+    Returns
+    -------
+    np.ndarray
+        Normalized and stretched array.
+
+    Raises
+    ------
+    TypeError
+        If the input is a `sunpy.map.Map` object.
+    """
+
+    if upsilon is None:
+        return data
+
+    if isinstance(data, sunpy.map.GenericMap):
+        msg = "Input data must be a raw ndarray, not a SunPy map object"
+        raise TypeError(msg)
+
+    if isinstance(upsilon, float):
+        alpha = alpha_high = upsilon
+    else:
+        alpha, alpha_high = upsilon
+        if alpha_high is None:
+            alpha_high = 1.0
+        elif alpha is None:
+            alpha = 1.0
+
+    in_array = np.asarray(data)
+
+    # Calculate indices for low and high values
+    mid = np.nanmean(in_array)
+    lows = in_array < mid
+    highs = in_array >= mid
+
+    # Compute curve values
+    curve_low = ((2 * in_array[lows]) ** alpha) / 2
+    curve_high = -(((2 - 2 * in_array[highs]) ** alpha_high) / 2 - 1)
+
+    # Create output array and assign calculated values
+    out_curve = np.zeros_like(in_array)
+    out_curve[lows] = curve_low
+    out_curve[highs] = curve_high
+
+    return out_curve
+
+
+def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
+    """
+    Black out any pixels above a certain radius in a SunPy map.
+
+    Parameters
+    ----------
+    sunpy_map : `sunpy.map.GenericMap`
+        The input sunpy map.
+    radius_limit : `astropy.units.Quantity`
+        The radius limit above which to black out pixels.
+
+    Returns
+    -------
+    `sunpy.map.GenericMap`
+        A new sunpy map with pixels above the specified radius blacked out.
+    """
+    # Create a grid of coordinates corresponding to each pixel in the map
+    map_r = find_pixel_radii(smap).to(u.R_sun)
+
+    # Create a mask for pixels above the radius limit
+    mask = map_r > radius_limit
+
+    # Apply the mask to the map data
+    masked_data = np.where(mask, 0, smap.data)
+
+    # Create a new map with the masked data
+    return sunpy.map.Map(masked_data, smap.meta)

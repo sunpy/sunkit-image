@@ -2,14 +2,15 @@ import warnings
 from copy import deepcopy
 from pathlib import Path
 
-import astropy.units as u
 import numpy as np
 import pytest
-import sunpy.data.test
-from astropy.coordinates import SkyCoord
-from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose, assert_array_almost_equal
 from scipy.ndimage import shift as sp_shift
+
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
+import sunpy.data.test
 from sunpy.map import Map, MapSequence
 from sunpy.util import SunpyUserWarning
 
@@ -25,9 +26,7 @@ from sunkit_image.coalignment import (
     _upper_clip,
     apply_shifts,
     calculate_match_template_shift,
-    calculate_solar_rotate_shift,
     mapsequence_coalign_by_match_template,
-    mapsequence_coalign_by_rotation,
     match_template_to_layer,
 )
 
@@ -416,52 +415,3 @@ def known_displacements_layer_index0():
 def known_displacements_layer_index1():
     # Known displacements for these mapsequence layers when the layer index is set to 1
     return {"x": np.asarray([9.804878, 0.0, -9.827465]), "y": np.asarray([-0.263369, 0.0, 0.251137])}
-
-
-def test_calculate_solar_rotate_shift(
-    aia171_test_mapsequence,
-    known_displacements_layer_index0,
-    known_displacements_layer_index1,
-):
-    # Test that the default works
-    test_output = calculate_solar_rotate_shift(aia171_test_mapsequence)
-    assert_allclose(test_output["x"].to("arcsec").value, known_displacements_layer_index0["x"], rtol=5e-2, atol=1e-5)
-    assert_allclose(test_output["y"].to("arcsec").value, known_displacements_layer_index0["y"], rtol=5e-2, atol=1e-5)
-
-    # Test that the rotation relative to a nonzero layer_index works
-    test_output = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=1)
-    assert_allclose(test_output["x"].to("arcsec").value, known_displacements_layer_index1["x"], rtol=5e-2, atol=1e-5)
-    assert_allclose(test_output["y"].to("arcsec").value, known_displacements_layer_index1["y"], rtol=5e-2, atol=1e-5)
-
-
-def test_mapsequence_solar_derotate(aia171_test_mapsequence, aia171_test_submap):
-    # Test that a mapsequence is returned when the clipping is False.
-    tmc = mapsequence_coalign_by_rotation(aia171_test_mapsequence, clip=False)
-    assert isinstance(tmc, sunpy.map.MapSequence)
-
-    # Test that all entries have the same shape when clipping is False
-    for m in tmc:
-        assert m.data.shape == aia171_test_submap.data.shape
-
-    # Test that a mapsequence is returned on default clipping (clipping is True)
-    tmc = mapsequence_coalign_by_rotation(aia171_test_mapsequence)
-    assert isinstance(tmc, sunpy.map.MapSequence)
-
-    # Test that the shape of data is correct when clipped
-    clipped_shape = (26, 20)
-    for m in tmc:
-        assert m.data.shape == clipped_shape
-
-    # Test that the returned reference pixels are correctly displaced.
-    layer_index = 0
-    derotated = mapsequence_coalign_by_rotation(aia171_test_mapsequence, clip=True, layer_index=layer_index)
-    tshift = calculate_solar_rotate_shift(aia171_test_mapsequence, layer_index=layer_index)
-    derotated_reference_pixel_at_layer_index = derotated[layer_index].reference_pixel
-    for i, _m_derotated in enumerate(derotated):
-        for i_s, s in enumerate(["x", "y"]):
-            diff_in_rotated_reference_pixel = (
-                derotated[i].reference_pixel[i_s] - derotated_reference_pixel_at_layer_index[i_s]
-            )
-            diff_arcsec = tshift[s][i] - tshift[s][layer_index]
-            diff_pixel = diff_arcsec / m.scale[0]
-            assert_quantity_allclose(diff_in_rotated_reference_pixel, diff_pixel, rtol=5e-2)

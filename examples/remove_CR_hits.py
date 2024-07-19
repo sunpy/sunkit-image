@@ -12,7 +12,9 @@ Astroscrappy is a separate Python package and can be installed separately using 
 import astropy.units as u
 import astroscrappy
 import matplotlib.pyplot as plt
+
 from astropy.io import fits
+
 from sunpy.map import Map
 from sunpy.net import Fido
 from sunpy.net import attrs as a

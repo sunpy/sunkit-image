@@ -5,8 +5,9 @@ lag between intensity cubes.
 Useful for understanding time variability in EUV light curves.
 """
 
-import astropy.units as u
 import numpy as np
+
+import astropy.units as u
 
 DASK_INSTALLED = False
 try:

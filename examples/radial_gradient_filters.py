@@ -1,14 +1,17 @@
 """
-=======================
-Radial Gradient Filters
-=======================
+===================================
+Normalizing Radial Gradient Filters
+===================================
 
-This example applies both the normalizing radial gradient (`sunkit_image.radial.nrgf`) filter and Fourier
-normalizing radial gradient filter (`sunkit_image.radial.fnrgf`) to a sunpy map.
+This example showcases the filters found in the radial module.
+
+These are the Normalizing Radial Gradient Filter (NRGF) (`sunkit_image.radial.nrgf`), Fourier Normalizing Radial Gradient Filter (FNRGF) (`sunkit_image.radial.fnrgf`) and the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`).
 """
 
-import astropy.units as u
 import matplotlib.pyplot as plt
+
+import astropy.units as u
+
 import sunpy.data.sample
 import sunpy.map
 
@@ -26,12 +29,18 @@ aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 #
 # Here we create those segments radial segments. Each segment created will be of
 # equal dimensions radially. The distance between 1 solar radii and 2 solar radii
-# is divided into 100 equal parts by the following two lines.
+# is divided into equal parts by the following two lines.
 
-radial_bin_edges = equally_spaced_bins()
+radial_bin_edges = equally_spaced_bins(1, 2, aia_map.data.shape[0] // 4)
 radial_bin_edges *= u.R_sun
 
-basic_nrgf = radial.nrgf(aia_map, radial_bin_edges)
+basic_nrgf = radial.nrgf(aia_map, radial_bin_edges, application_radius=1 * u.R_sun)
+
+# The NRGF filtered map is plotted.
+fig = plt.figure()
+ax = plt.subplot(projection=basic_nrgf)
+basic_nrgf.plot()
+ax.set_title("NRGF")
 
 ###########################################################################
 # We will need to work out  a few parameters for the FNRGF.
@@ -43,13 +52,15 @@ basic_nrgf = radial.nrgf(aia_map, radial_bin_edges)
 order = 20
 attenuation_coefficients = radial.set_attenuation_coefficients(order)
 
-basic_fnrgf = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients)
+basic_fnrgf = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1 * u.R_sun)
+
+###########################################################################
+# We can also compare to the RHEF as well.
+
+basic_rhef = radial.rhef(aia_map, radial_bin_edges, application_radius=1 * u.R_sun)
 
 ###########################################################################
 # Finally we will plot the filtered maps with the original to demonstrate the effect.
-#
-# The filtered images can be a little washed out so you may need to change some plotting settings
-# for a clearer output.
 
 fig = plt.figure(figsize=(7, 15))
 
@@ -63,6 +74,10 @@ ax1.set_title("NRGF")
 ax2 = fig.add_subplot(313, projection=basic_fnrgf, sharey=ax, sharex=ax)
 basic_fnrgf.plot(axes=ax2, clip_interval=(1, 99.99) * u.percent)
 ax2.set_title("FNRGF")
+
+ax3 = fig.add_subplot(314, projection=basic_rhef, sharey=ax, sharex=ax)
+basic_rhef.plot(axes=ax3, clip_interval=(1, 99.99) * u.percent)
+ax3.set_title("RHEF")
 
 fig.tight_layout()
 

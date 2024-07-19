@@ -16,11 +16,12 @@ in Appendix C of `Barnes et al. (2019) <https://doi.org/10.3847/1538-4357/ab290c
 """
 # sphinx_gallery_thumbnail_number = 4  # NOQA: ERA001
 
-import astropy.units as u
 import dask.array
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
+
+import astropy.units as u
 
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 

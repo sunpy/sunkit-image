@@ -1,18 +1,22 @@
-import importlib.util
-import logging
 import os
+import logging
 import tempfile
+import importlib.util
 
-import astropy
-import astropy.config.paths
 import numpy as np
 import pytest
 import skimage
+
+import astropy
+import astropy.config.paths
+from astropy.utils.data import get_pkg_data_filename
+
 import sunpy.data.sample
 import sunpy.map
-from astropy.utils.data import get_pkg_data_filename
 from sunpy.coordinates import Helioprojective, get_earth
 from sunpy.map.header_helper import make_fitswcs_header
+
+from sunkit_image.data.test import get_test_filepath
 
 # Force MPL to use non-gui backends for testing.
 try:
@@ -173,3 +177,9 @@ def aia_171(request):
     if request.param == "map":
         return smap
     return smap.data if request.param == "array" else None
+
+
+@pytest.fixture()
+def hmi_map():
+    hmi_file = get_test_filepath("hmi_continuum_test_lowres_data.fits")
+    return sunpy.map.Map(hmi_file)

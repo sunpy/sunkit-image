@@ -12,18 +12,18 @@ from astropy.utils.exceptions import AstropyDeprecationWarning
 from matplotlib import MatplotlibDeprecationWarning
 from packaging.version import Version
 from sunpy.util.exceptions import SunpyDeprecationWarning, SunpyPendingDeprecationWarning
-from sunpy_sphinx_theme.conf import *  # NOQA: F403
+from sunpy_sphinx_theme import PNG_ICON
 
 from sunkit_image import __version__
 
 # -- Read the Docs Specific Configuration --------------------------------------
+os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 if on_rtd:
     os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
     os.environ["HOME"] = "/home/docs/"
     os.environ["LANG"] = "C"
     os.environ["LC_ALL"] = "C"
-    os.environ["HIDE_PARFIVE_PROGRESS"] = "True"
 
 project = "sunkit_image"
 author = "The SunPy Community"
@@ -61,14 +61,13 @@ rst_epilog = """
 suppress_warnings = [
     "app.add_directive",
 ]
-
 extensions = [
-    "sphinx_design",
-    "sphinx_gallery.gen_gallery",
     "matplotlib.sphinxext.plot_directive",
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
     "sphinx_changelog",
+    "sphinx_design",
+    "sphinx_gallery.gen_gallery",
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.doctest",
@@ -87,20 +86,23 @@ default_role = "obj"
 napoleon_use_rtype = False
 napoleon_google_docstring = False
 intersphinx_mapping = {
-    "astropy": ("https://docs.astropy.org/en/stable/", None),
-    "aiapy": ("https://aiapy.readthedocs.io/en/stable/", None),
-    "dask": ("https://docs.dask.org/en/latest", None),
-    "drms": ("https://docs.sunpy.org/projects/drms/en/stable/", None),
+    "python": (
+        "https://docs.python.org/3/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/python3.inv"),
+    ),
+    "numpy": (
+        "https://numpy.org/doc/stable/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/numpy.inv"),
+    ),
+    "scipy": (
+        "https://docs.scipy.org/doc/scipy/reference/",
+        (None, "http://www.astropy.org/astropy-data/intersphinx/scipy.inv"),
+    ),
     "matplotlib": ("https://matplotlib.org/stable", None),
-    "numpy": ("https://numpy.org/doc/stable/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
-    "parfive": ("https://parfive.readthedocs.io/en/stable/", None),
-    "python": ("https://docs.python.org/3/", None),
-    "reproject": ("https://reproject.readthedocs.io/en/stable/", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy/reference/", None),
-    "skimage": ("https://scikit-image.org/docs/stable/", None),
-    "sqlalchemy": ("https://docs.sqlalchemy.org/en/latest/", None),
     "sunpy": ("https://docs.sunpy.org/en/stable/", None),
+    "astropy": ("https://docs.astropy.org/en/stable/", None),
+    "dask": ("https://docs.dask.org/en/latest", None),
+    "skimage": ("https://scikit-image.org/docs/stable/", None),
 }
 
 # Enable nitpicky mode, which forces links to be non-broken
@@ -116,6 +118,7 @@ with Path("nitpick-exceptions").open() as f:
         nitpick_ignore.append((dtype, target))
 
 # -- Options for HTML output ---------------------------------------------------
+html_theme = "sunpy"
 graphviz_output_format = "svg"
 graphviz_dot_args = [
     "-Nfontsize=10",
@@ -134,7 +137,7 @@ sphinx_gallery_conf = {
     "filename_pattern": "^((?!skip_).)*$",
     "examples_dirs": example_dir,
     "gallery_dirs": path.joinpath("generated", "gallery"),
-    "default_thumb_file": path.joinpath("logo", "sunpy_icon_128x128.png"),
+    "default_thumb_file": PNG_ICON,
     "abort_on_example_error": False,
     "plot_gallery": "True",
     "remove_config_comments": True,

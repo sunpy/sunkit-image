@@ -1,7 +1,8 @@
-import astropy.units as u
 import dask.array
 import numpy as np
 import pytest
+
+import astropy.units as u
 
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 

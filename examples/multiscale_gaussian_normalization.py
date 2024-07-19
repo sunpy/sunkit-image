@@ -7,6 +7,10 @@ This example applies Multi-scale Gaussian Normalization to a `sunpy.map.Map` usi
 """
 
 import matplotlib.pyplot as plt
+from matplotlib import colors
+
+from astropy import units as u
+
 import sunpy.data.sample
 import sunpy.map
 from astropy import units as u
