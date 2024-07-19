@@ -1,8 +1,9 @@
 import warnings
 
-import astropy.units as u
 import numpy as np
 import pytest
+
+import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 import sunkit_image.utils as utils

@@ -3,12 +3,14 @@ This module contains an implementation of the Sunspot Tracking And Recognition
 Algorithm (STARA).
 """
 
-import astropy.units as u
 import numpy as np
-import sunpy.map
 from skimage.filters import median
 from skimage.morphology import disk, square, white_tophat
 from skimage.util import invert
+
+import astropy.units as u
+
+import sunpy.map
 
 __all__ = ["stara"]
 

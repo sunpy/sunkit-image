@@ -1,16 +1,18 @@
-import importlib.util
-import logging
 import os
+import logging
 import tempfile
+import importlib.util
 
-import astropy
-import astropy.config.paths
 import numpy as np
 import pytest
 import skimage
+
+import astropy
+import astropy.config.paths
+from astropy.utils.data import get_pkg_data_filename
+
 import sunpy.data.sample
 import sunpy.map
-from astropy.utils.data import get_pkg_data_filename
 from sunpy.coordinates import Helioprojective, get_earth
 from sunpy.map.header_helper import make_fitswcs_header
 

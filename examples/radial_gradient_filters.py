@@ -8,8 +8,10 @@ This example showcases the filters found in the radial module.
 These are the Normalizing Radial Gradient Filter (NRGF) (`sunkit_image.radial.nrgf`), Fourier Normalizing Radial Gradient Filter (FNRGF) (`sunkit_image.radial.fnrgf`) and the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`).
 """
 
-import astropy.units as u
 import matplotlib.pyplot as plt
+
+import astropy.units as u
+
 import sunpy.data.sample
 import sunpy.map
 

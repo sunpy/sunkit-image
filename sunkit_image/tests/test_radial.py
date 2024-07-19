@@ -1,7 +1,9 @@
-import astropy.units as u
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+
+import astropy.units as u
+import matplotlib.pyplot as plt
+
 import sunpy
 import sunpy.data.sample
 import sunpy.map

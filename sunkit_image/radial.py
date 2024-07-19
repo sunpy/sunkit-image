@@ -3,16 +3,18 @@ This module contains functions that can be used to enhance the regions above a
 radius.
 """
 
-import astropy.units as u
 import numpy as np
+
+import astropy.units as u
+
 import sunpy.map
 from sunpy.coordinates import frames
 from tqdm import tqdm
 
 from sunkit_image.utils import (
     apply_upsilon,
-    bin_edge_summary,
     blackout_pixels_above_radius,
+    bin_edge_summary,
     equally_spaced_bins,
     find_pixel_radii,
     get_radial_intensity_summary,
