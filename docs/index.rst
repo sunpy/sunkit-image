@@ -26,7 +26,6 @@ sunkit-image
 Mission Statement
 =================
 
-
 The goal of ``sunkit-image`` is **not** to be a general purpose image processing library.
 
 The goal of ``sunkit-image`` is to provide access to image processing routines that are:
