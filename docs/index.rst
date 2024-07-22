@@ -28,15 +28,14 @@ Mission Statement
 
 The goal of the ``sunkit-image`` library is to provide access to image processing routines that are:
 
-1. Focused on being applied to solar physics data.
+1. Focused on being applied to solar image data.
 2. Are published in the literature or in preparation to be published.
-3. If there is no publication, it must be widely used throughout the solar physics community.
-   One example might be co-alignment routines that exist in SSWIDL.
+3. Widely used throughout the solar physics community.
+   Examples include co-alignment routines that compensate for incorrect pointing, solar feature identification algorithms, and filtering functions. 
 
-As this is a SunPy affiliated package, the inputs to these routines are required to be Maps (sunpy) or ANDCubes (ndcube).
+As this is a SunPy affiliated package, the inputs to these routines are required to be Maps (sunpy) or NDCubes (ndcube).
 
-The ownership of the code is also important.
-If the code is already in a released package, we will wrap it in a way that makes it easy to use with Maps or ANDCubes but otherwise leave it alone.
+If the code is already in a released package, we will wrap calls to the existing package in a way that makes it easy to use with `Map` or `NDCube` objects. Additional modifications to such packages are outside the scope of sunkit-image. 
 We will not copy code from other packages into this one.
 
 Finally, this library is not aiming to be a general purpose image processing library.
