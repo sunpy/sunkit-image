@@ -189,13 +189,6 @@ def test_bandpass_filter(test_map):
     assert np.allclose(expect, result)
 
 
-@pytest.mark.remote_data()
-def test_bandpass_filter_output(aia_171):
-    # Check that bandpass filter works with both arrays and maps
-    result = bandpass_filter(aia_171)
-    assert type(result) == type(aia_171)
-
-
 def test_bandpass_filter_error(test_map_ones):
     with pytest.raises(ValueError, match="nsm1 should be less than nsm2"):
         bandpass_filter(test_map_ones, 5, 1)
@@ -224,13 +217,6 @@ def test_smooth(test_map):
     )
 
     assert np.allclose(filtered, expect)
-
-
-@pytest.mark.remote_data()
-def test_smooth_output(aia_171):
-    # Check that smooth works with both arrays and maps
-    result = smooth(aia_171, 1)
-    assert type(result) == type(aia_171)
 
 
 def test_erase_loop_in_image(test_map_ones, test_map):

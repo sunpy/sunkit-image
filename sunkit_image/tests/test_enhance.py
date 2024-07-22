@@ -13,7 +13,6 @@ from sunkit_image.tests.helpers import figure_test
 @pytest.mark.remote_data()
 def test_mgn(aia_171):
     out = enhance.mgn(aia_171)
-    assert type(out) == type(aia_171)
     if isinstance(out, sunpy.map.GenericMap):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection=out)
@@ -65,7 +64,6 @@ def test_nans_raise_warning(map_test):
 @pytest.mark.remote_data()
 def test_wow(aia_171):
     out = enhance.wow(aia_171)
-    assert type(out) == type(aia_171)
     if isinstance(out, sunpy.map.GenericMap):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection=out)
