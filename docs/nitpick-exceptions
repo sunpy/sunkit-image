@@ -13,6 +13,7 @@ py:class path-like
 py:class str-like
 py:class time-like
 # Specific units
+py:class Unit
 py:class Unit('s')
 py:class Unit('pix')
 # It hates the numpy docstring
