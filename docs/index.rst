@@ -26,7 +26,10 @@ sunkit-image
 Mission Statement
 =================
 
-The goal of the ``sunkit-image`` library is to provide access to image processing routines that are:
+
+The goal of ``sunkit-image`` is not to be a general purpose image processing library.
+
+The goal of ``sunkit-image`` is to provide access to image processing routines that are:
 
 1. Focused on being applied to solar image data.
 2. Are published in the literature or in preparation to be published.
@@ -38,7 +41,6 @@ As this is a SunPy affiliated package, the inputs to these routines are required
 If the code is already in a released package, we will wrap calls to the existing package in a way that makes it easy to use with `Map` or `NDCube` objects. Additional modifications to such packages are outside the scope of sunkit-image. 
 We will not copy code from other packages into this one.
 
-Finally, this library is not aiming to be a general purpose image processing library.
 
 Installation
 ============
