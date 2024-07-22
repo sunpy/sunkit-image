@@ -16,7 +16,11 @@ repos:
           ]
         exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|docs/conf.py)$"
   - repo: https://github.com/astral-sh/ruff-pre-commit
+<<<<<<<
     rev: "v0.5.1"
+=======
+    rev: "v0.5.2"
+>>>>>>>
     hooks:
       - id: ruff
         args: ["--fix"]
