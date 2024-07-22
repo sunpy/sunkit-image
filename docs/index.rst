@@ -27,14 +27,15 @@ Mission Statement
 =================
 
 
-The goal of ``sunkit-image`` is not to be a general purpose image processing library.
+The goal of ``sunkit-image`` is **not** to be a general purpose image processing library.
 
 The goal of ``sunkit-image`` is to provide access to image processing routines that are:
 
 1. Focused on being applied to solar image data.
 2. Are published in the literature or in preparation to be published.
+   If for any reason, there is doubt to the publication status, the code will only be merged when it's close to actual publication i.e., after approval from the referees.
 3. Widely used throughout the solar physics community.
-   Examples include co-alignment routines that compensate for incorrect pointing, solar feature identification algorithms, and filtering functions. 
+   Examples include co-alignment routines that compensate for incorrect pointing, solar feature identification algorithms, and filtering functions.
 
 As this is a SunPy affiliated package, the inputs to these routines are required to be Maps (sunpy) or NDCubes (ndcube).
 
