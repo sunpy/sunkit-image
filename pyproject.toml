@@ -36,7 +36,7 @@ dependencies = [
   'matplotlib>=3.5.0',
   'scipy>=1.8.0,!=1.10.0',
   'scikit-image>=0.20.0',
-  'sunpy[map]>=5.0.0',
+  'sunpy[map]>=6.0.0',
 ]
 
 [project.optional-dependencies]
@@ -49,7 +49,7 @@ tests = [
   'pytest-astropy',
   'pytest-mpl',
   "pytest-xdist",
-  "sunpy[data]>=5.0.0",
+  "sunpy[data]>=56.0.0",
 ]
 docs = [
   "sunkit_image[all]",
@@ -62,7 +62,7 @@ docs = [
   'sphinx-gallery',
   'sphinx',
   'sunpy-sphinx-theme',
-  'sunpy[data,net]>=5.0.0',
+  'sunpy[data,net]>=6.0.0',
 ]
 
 dev = ["sunkit_image[all,tests,docs]"]
