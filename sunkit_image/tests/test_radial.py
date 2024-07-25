@@ -1,11 +1,14 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 import astropy.units as u
+from astropy.coordinates import SkyCoord
 
 import sunpy
 import sunpy.data.sample
 import sunpy.map
+import sunpy.visualization.colormaps.cm
 
 import sunkit_image.radial as rad
 import sunkit_image.utils as utils
@@ -109,7 +112,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     assert np.allclose(expect.data.shape, map_test2.data.shape)
     assert np.allclose(expect.data, result)
 
-    # The below tests are dummy testa. These values were not verified by hand rather they were
+    # The below tests are dummy tests.
+    # These values were not verified by hand rather they were
     # generated using the code itself.
     order = 5
 
@@ -194,6 +198,54 @@ def test_fig_fnrgf(smap):
     out = rad.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
 
     out.plot()
+
+
+@figure_test
+@pytest.mark.remote_data()
+def test_fig_rhef(smap):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+    radial_bin_edges *= u.R_sun
+    out = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=0.35, method="scipy")
+    out.plot()
+
+
+@figure_test
+@pytest.mark.remote_data()
+def test_multifig_rhef(smap):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+    radial_bin_edges *= u.R_sun
+
+    # Define the list of upsilon pairs where the first number affects dark components and the second number affects bright ones
+    upsilon_list = [
+        0.35,
+        None,
+        (0.1, 0.1),
+        (0.5, 0.5),
+        (0.8, 0.8),
+    ]
+
+    # Crop the figures to see better detail
+    top_right = SkyCoord(1200 * u.arcsec, 0 * u.arcsec, frame=smap.coordinate_frame)
+    bottom_left = SkyCoord(0 * u.arcsec, -1200 * u.arcsec, frame=smap.coordinate_frame)
+    aia_map_cropped = smap.submap(bottom_left, top_right=top_right)
+    fig, axes = plt.subplots(
+        2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map_cropped}
+    )
+    axes = axes.flatten()
+
+    aia_map_cropped.plot(axes=axes[0], clip_interval=(1, 99.99) * u.percent)
+    axes[0].set_title("Original AIA Map")
+
+    # Loop through the upsilon_list and plot each filtered map
+    for i, upsilon in enumerate(upsilon_list):
+        out_map = rad.rhef(smap, upsilon=upsilon, method="scipy")
+        out_map_crop = out_map.submap(bottom_left, top_right=top_right)
+        out_map_crop.plot(axes=axes[i + 1])
+        axes[i + 1].set_title(f"Upsilon = {upsilon}")
+
+    fig.tight_layout()
+
+    return fig
 
 
 def test_set_attenuation_coefficients():
