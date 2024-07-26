@@ -1,9 +1,10 @@
-import astropy.units as u
 import numpy as np
 from skimage.feature import match_template
 
-from sunkit_image.utils.decorators import register_coalignment_method
+import astropy.units as u
+
 from sunkit_image.coalignment.interface import affine_params
+from sunkit_image.coalignment.util.decorators import register_coalignment_method
 
 __all__ = ["match_template_coalign"]
 
@@ -113,8 +114,7 @@ def match_template_coalign(reference_array, target_array ):
         - translation: tuple
             A tuple containing the x and y translation values in pixels.
     """
-    corr = match_template(np.float64(target_array), np.float64(reference_array))
-
+    corr = match_template(np.float64(reference_array), np.float64(target_array))
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
     # Particularly for this, there is no change in the rotation or scaling, hence the hardcoded values of scale to 1.0 & rotation to identity matrix

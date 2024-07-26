@@ -4,7 +4,7 @@
 Add a New Coalignment Method
 ****************************
 
-You can add a custom coalignment method in the sunkit-image package using the decorator :func:`~sunkit_image.utils.register_coalignment_method`:
+You can add a custom coalignment method in the sunkit-image package using the decorator :func:`~sunkit_image.coalignment.util.decorators.register_coalignment_method`:
 
 .. code-block:: python
 
@@ -39,7 +39,7 @@ Your coalignment function should:
 
 3. **Determine Affine Parameters**: Decide the parameters of the affine parameters like the scale, rotation and translation(generally shifts in x and y direction).
 
-4. **Return**: Use the ``affine_params`` named tuple from `sunkit_image` or provide your own that exposes the three parameters as attributes. 
+4. **Return**: Use the ``affine_params`` named tuple from `sunkit_image` or provide your own that exposes the three parameters as attributes.
 
 Example Usage
 =============

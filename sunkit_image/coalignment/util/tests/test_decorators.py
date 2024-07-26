@@ -1,4 +1,4 @@
-from sunkit_image.utils.decorators import register_coalignment_method, registered_methods
+from sunkit_image.coalignment.util.decorators import register_coalignment_method, registered_methods
 
 
 def test_register_coalignment_method():

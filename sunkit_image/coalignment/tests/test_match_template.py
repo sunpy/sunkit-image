@@ -1,8 +1,9 @@
-import astropy.units as u
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 from skimage.feature import match_template
+
+import astropy.units as u
 
 from sunkit_image.coalignment.match_template import (
     _find_best_match_location,
