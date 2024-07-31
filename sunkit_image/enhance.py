@@ -92,6 +92,7 @@ def mgn(
       Sol Phys 289, 2945-2955, 2014
       `doi:10.1007/s11207-014-0523-9 <https://doi.org/10.1007/s11207-014-0523-9>`__
     """
+    olderr = np.seterr(all='ignore')
     if sigma is None:
         sigma = [1.25, 2.5, 5, 10, 20, 40]
     if np.isnan(data).any():
@@ -106,20 +107,21 @@ def mgn(
     # 1. Replace spurious negative pixels with zero
     if clip is True:
         data[data <= 0] = 1e-15  # Makes sure that all values are above zero
-    image = np.empty(data.shape, dtype=np.double)
-    sigmaw = np.empty(data.shape, dtype=np.double)
+    data = data.astype(np.float32)
+    image = np.zeros_like(data)
+    conv = np.zeros_like(data)
+    sigmaw = np.zeros_like(data)
     for s, weight in zip(sigma, weights, strict=True):
         # 2 & 3 Create kernel and convolve with image
         # Refer to equation (1) in the paper
-        conv = ndimage.gaussian_filter(data, sigma=s, truncate=truncate, mode="nearest", output=np.double)
+        ndimage.gaussian_filter(data, sigma=s, truncate=truncate, mode="nearest", output=conv)
         # 4. Calculate difference between image and the local mean image,
         # square the difference, and convolve with kernel. Square-root the
         # resulting image to give `local standard deviation` image sigmaw
         # Refer to equation (2) in the paper
-        conv -= data
+        conv = data - conv
         ndimage.gaussian_filter(conv**2, sigma=s, truncate=truncate, mode="nearest", output=sigmaw)
-        with np.errstate(invalid="ignore"):
-            np.sqrt(sigmaw, out=sigmaw)
+        np.sqrt(sigmaw, out=sigmaw)
         # 5. Normalize the gaussian transformed image to give C_i.
         sigmaw = np.where(sigmaw == 0.0, 1.0, sigmaw)
         conv /= sigmaw
@@ -137,8 +139,8 @@ def mgn(
     image /= len(sigma)
     # 9. Calculate global gamma-transformed image C'g
     # Refer to equation (4) in the paper
-    gamma_min = np.double(data.min()) if gamma_min is None else gamma_min
-    gamma_max = np.double(data.max()) if gamma_max is None else gamma_max
+    gamma_min = np.float32(data.min()) if gamma_min is None else gamma_min
+    gamma_max = np.float32(data.max()) if gamma_max is None else gamma_max
     Cprime_g = data - gamma_min
     if (gamma_max - gamma_min) != 0.0:
         Cprime_g /= gamma_max - gamma_min
@@ -148,6 +150,7 @@ def mgn(
     # Refer to equation (5) in the paper
     image *= 1 - h
     image += Cprime_g
+    np.seterr(**olderr)
     return image
 
 

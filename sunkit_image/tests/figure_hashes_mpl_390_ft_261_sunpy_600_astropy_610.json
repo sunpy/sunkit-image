@@ -1,8 +1,11 @@
 {
-  "sunkit_image.tests.test_enhance.test_mgn[array]": "bb5133b9014faeb209bc7af36e538a2acae88336a25d54e697e874cc07d194bf",
-  "sunkit_image.tests.test_enhance.test_mgn[map]": "204da4d58de6ee6df036afc4a1c753c1d0d2b483b44e8f7556962c13c148a44b",
+  "sunkit_image.tests.test_enhance.test_mgn[array]": "f7a8e5a7377422c652a47217981d1c3bd1a66b5c211eae6ef18e4cef2660e438",
+  "sunkit_image.tests.test_enhance.test_mgn[map]": "50bb490a6cc2408befe13c7f2a54f7433df80c2473dd21b619ace35de7e8f250",
+  "sunkit_image.tests.test_enhance.test_mgn_submap": "cf3948d3ffa8ed4eacc500bee170db68bb1a96d2cec1c92e48f74c01827dc397",
+  "sunkit_image.tests.test_enhance.test_mgn_cutout": "5b54d80ba0040a6eec181b8a83b5d294a4fbc60a5818651d67fc6dbf2690940f",
   "sunkit_image.tests.test_enhance.test_wow[array]": "fe6ee53b57b2fc6d8ce8a96e4273c3ddbe17057aeded32611b8e7294648d28e5",
   "sunkit_image.tests.test_enhance.test_wow[map]": "f5535fad0fe2d6ff2bfdfb10a984bb6a21ece95d971070482136fe6e6f874f1a",
+  "sunkit_image.tests.test_enhance.test_wow_submap": "73b8f7749ded1fd6898a7a83da4f755d4b6391c0215ca459be07982aeff9dae8",
   "sunkit_image.tests.test_enhance.test_wow_cutout": "880e8f961e6943cd2ee4ff32379ea0444e4b5cf1494b6b42b0dc027ee7adf532",
   "sunkit_image.tests.test_radial.test_fig_nrgf": "3193fd00cf0d48c8f7aee21ed4b3a71a65e30ef80edecf0fd55330528b475a4a",
   "sunkit_image.tests.test_radial.test_fig_fnrgf": "404b6b49279eb2ff76c7ec63b632ed397bcf71e2db4ac6cfaf20c00b9d885cf5",
