@@ -87,25 +87,8 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  cron:
-    if: |
-      github.event_name == 'workflow_dispatch' || (
-        github.event_name == 'pull_request' &&
-        contains(github.event.pull_request.labels.*.name, 'Run cron CI')
-      )
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
-    with:
-      default_python: '3.10'
-      submodules: false
-      coverage: codecov
-      toxdeps: tox-pypi-filter
-      envs: |
-        - linux: py311-devdeps
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
   devdeps:
-    needs: [online]
+    needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
       submodules: false
