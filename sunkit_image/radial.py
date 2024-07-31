@@ -207,8 +207,6 @@ def intensity_enhance(
     enhancement[map_r < normalization_radius] = 1
 
     # Return a map with the intensity enhanced above the normalization radius
-    # and the same meta data as the input map.
-
     new_map = sunpy.map.Map(smap.data * enhancement, smap.meta)
     new_map.plot_settings["norm"] = None
     return new_map
@@ -223,6 +221,7 @@ def nrgf(
     width_function=np.std,
     width_function_kwargs=None,
     application_radius=1 * u.R_sun,
+    progress=True,
 ):
     """
     Implementation of the normalizing radial gradient filter (NRGF).
@@ -266,6 +265,9 @@ def nrgf(
     application_radius : `astropy.units.Quantity`, optional
         The NRGF is applied to emission at radii above the application_radius.
         Defaults to 1 solar radii.
+    progress : `bool`, optional
+        Display a progressbar on the main loop.
+        Defaults to True.
 
     Returns
     -------
@@ -315,7 +317,7 @@ def nrgf(
     data = np.zeros_like(smap.data)
 
     # Calculate the filter value for each radial bin.
-    for i in tqdm(range(radial_bin_edges.shape[1]), desc="NRGF: "):
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="NRGF: ", disable=not progress):
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         here = np.logical_and(here, map_r > application_radius)
         data[here] = smap.data[here] - radial_intensity[i]
@@ -400,6 +402,7 @@ def fnrgf(
     width_function=np.std,
     application_radius=1 * u.R_sun,
     number_angular_segments=130,
+    progress=True,
 ):
     """
     Implementation of the fourier normalizing radial gradient filter (FNRGF).
@@ -447,6 +450,9 @@ def fnrgf(
     number_angular_segments : `int`
         Number of angular segments in a circular annulus.
         Defaults to 130.
+    progress : `bool`, optional
+        Display a progressbar on the main loop.
+        Defaults to True.
 
     Returns
     -------
@@ -496,7 +502,7 @@ def fnrgf(
     data = np.zeros_like(smap.data)
 
     # Iterate over each circular ring
-    for i in tqdm(range(nbins), desc="FNRGF: "):
+    for i in tqdm(range(nbins), desc="FNRGF: ", disable=not progress):
         # Finding the pixels which belong to a certain circular ring
         annulus = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         annulus = np.logical_and(annulus, map_r > application_radius)
@@ -594,6 +600,37 @@ def fnrgf(
     return new_map
 
 
+def _select_rank_method(method):
+    # For now, we have more than one option for ranking the values
+    def _percentile_ranks_scipy(arr):
+        from scipy import stats
+
+        return stats.rankdata(arr, method="average") / len(arr)
+
+    def _percentile_ranks_numpy(arr):
+        sorted_indices = np.argsort(arr)
+        ranks = np.empty_like(sorted_indices)
+        ranks[sorted_indices] = np.arange(1, len(arr) + 1)
+        return ranks / float(len(arr))
+
+    def _percentile_ranks_numpy_inplace(arr):
+        sorted_indices = np.argsort(arr)
+        arr[sorted_indices] = np.arange(1, len(arr) + 1)
+        return arr / float(len(arr))
+
+    # Select the sort method
+    if method == "inplace":
+        ranking_func = _percentile_ranks_numpy_inplace
+    elif method == "numpy":
+        ranking_func = _percentile_ranks_numpy
+    elif method == "scipy":
+        ranking_func = _percentile_ranks_scipy
+    else:
+        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
+        raise NotImplementedError(msg)
+    return ranking_func
+
+
 @u.quantity_input(application_radius=u.R_sun, vignette=u.R_sun)
 def rhef(
     smap,
@@ -603,7 +640,7 @@ def rhef(
     method="numpy",
     *,
     vignette=1.5 * u.R_sun,
-    progress=False,
+    progress=True,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -642,7 +679,7 @@ def rhef(
         One suggested value is ``1.5*u.R_sun``.
     progress: bool, optional
         Display a progressbar on the main loop.
-        Defaults to False. Reverts to True if the image is 2k pixels wide or longer.
+        Defaults to True.
 
     Returns
     -------
@@ -673,36 +710,6 @@ def rhef(
             nbins=radial_bin_edges.shape[1],
         )
 
-    def _select_rank_method(method):
-        # For now, we have more than one option for ranking the values
-        def _percentile_ranks_scipy(arr):
-            from scipy import stats
-
-            return stats.rankdata(arr, method="average") / len(arr)
-
-        def _percentile_ranks_numpy(arr):
-            sorted_indices = np.argsort(arr)
-            ranks = np.empty_like(sorted_indices)
-            ranks[sorted_indices] = np.arange(1, len(arr) + 1)
-            return ranks / float(len(arr))
-
-        def _percentile_ranks_numpy_inplace(arr):
-            sorted_indices = np.argsort(arr)
-            arr[sorted_indices] = np.arange(1, len(arr) + 1)
-            return arr / float(len(arr))
-
-        # Select the sort method
-        if method == "inplace":
-            ranking_func = _percentile_ranks_numpy_inplace
-        elif method == "numpy":
-            ranking_func = _percentile_ranks_numpy
-        elif method == "scipy":
-            ranking_func = _percentile_ranks_scipy
-        else:
-            msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
-            raise NotImplementedError(msg)
-        return ranking_func
-
     # Allocate storage for the filtered data
     data = np.zeros_like(smap.data)
     meta = smap.meta
@@ -726,8 +733,6 @@ def rhef(
 
     if vignette is not None:
         new_map = blackout_pixels_above_radius(new_map, vignette)
-    else:
-        new_map = blackout_pixels_above_radius(new_map, 1.5 * u.R_sun)
 
     # This must be done whenever one is adjusting the overall statistical distribution of values
     new_map.plot_settings["norm"] = None
