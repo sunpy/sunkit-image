@@ -116,7 +116,9 @@ def granule_map():
 
 @pytest.fixture()
 def granule_map_he():
-    granule_map = sunpy.map.Map(get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test"))
+    granule_map = sunpy.map.Map(
+        get_pkg_data_filename("dkist_photosphere.fits", package="sunkit_image.data.test")
+    )
     # min-max normalization to [0, 1]
     map_norm = (granule_map.data - np.nanmin(granule_map.data)) / (
         np.nanmax(granule_map.data) - np.nanmin(granule_map.data)

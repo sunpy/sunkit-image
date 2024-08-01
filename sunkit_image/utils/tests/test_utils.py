@@ -108,7 +108,9 @@ def test_get_radial_intensity_summary(aia_171):
         # We want to ignore RuntimeWarning: Mean of empty slice
         warnings.simplefilter("ignore", category=RuntimeWarning)
         expected = np.asarray([summary(aia_171.data[lower_edge[i] * upper_edge[i]]) for i in range(nbins)])
-    assert np.allclose(utils.get_radial_intensity_summary(aia_171, radial_bin_edges=radial_bin_edges), expected)
+    assert np.allclose(
+        utils.get_radial_intensity_summary(aia_171, radial_bin_edges=radial_bin_edges), expected
+    )
 
 
 def test_calculate_gamma():

@@ -204,9 +204,7 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
         The number of granules identified, after re-classification of brightpoint.
     """
     # General size limits
-    bp_size_limit = (
-        0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
-    )
+    bp_size_limit = 0.1  # Approximate max size of a photosphere bright point in square arcsec (see doi 10.3847/1538-4357/aab150)
     bp_pix_upper_limit = (bp_size_limit / resolution) ** 2  # Max area in pixels
     bp_pix_lower_limit = 4  # Very small bright regions are likely artifacts
     # General flux limit determined by visual inspection (set using equalized map)
@@ -227,7 +225,9 @@ def _mark_brightpoint(segmented_image, data, he_data, resolution, bp_min_flux=No
     labeled_bright_dim_seg = skimage.measure.label(bright_dim_seg + 1, connectivity=2)
     values = np.unique(labeled_bright_dim_seg)
     # From candidate regions, select those within pixel limit and gradient limit
-    segmented_image_fixed = np.copy(segmented_image.astype(float))  # Make type float to enable adding float values
+    segmented_image_fixed = np.copy(
+        segmented_image.astype(float)
+    )  # Make type float to enable adding float values
     bp_count = 0
     for value in values:
         if (bright_dim_seg[labeled_bright_dim_seg == value])[0] == 1:  # Check region is not the non-bp region

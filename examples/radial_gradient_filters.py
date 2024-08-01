@@ -50,7 +50,9 @@ base_nrgf = radial.nrgf(aia_map, radial_bin_edges, application_radius=1 * u.R_su
 order = 20
 attenuation_coefficients = radial.set_attenuation_coefficients(order)
 
-base_fnrgf = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1 * u.R_sun, progress=False)
+base_fnrgf = radial.fnrgf(
+    aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1 * u.R_sun, progress=False
+)
 
 ###########################################################################
 # Now we will also use the final filter, RHEF.

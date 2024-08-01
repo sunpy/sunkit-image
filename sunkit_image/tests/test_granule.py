@@ -28,7 +28,9 @@ def test_segment(granule_map):
 def test_segment_errors(granule_map):
     with pytest.raises(TypeError, match="Input must be an instance of a sunpy.map.GenericMap"):
         segment(np.array([[1, 2, 3], [1, 2, 3]]))
-    with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
+    with pytest.raises(
+        ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"
+    ):
         segment(granule_map, skimage_method="banana")
 
 
@@ -51,7 +53,9 @@ def test_get_threshold_range():
 def test_get_threshold_errors():
     with pytest.raises(TypeError, match="Input data must be an instance of a np.ndarray"):
         _get_threshold([], "li")
-    with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
+    with pytest.raises(
+        ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"
+    ):
         _get_threshold(np.array([[1, 2], [1, 2]]), "banana")
 
 
@@ -65,7 +69,9 @@ def test_trim_intergranules(granule_map):
     # e.g. inside of pad region, returned array has fewer 0-valued pixels then input
     middles_removed = _trim_intergranules(thresholded)
     pad = int(np.shape(thresholded)[0] / 200)
-    assert not np.count_nonzero(middles_removed[pad:-pad, pad:-pad]) < np.count_nonzero(thresholded[pad:-pad, pad:-pad])
+    assert not np.count_nonzero(middles_removed[pad:-pad, pad:-pad]) < np.count_nonzero(
+        thresholded[pad:-pad, pad:-pad]
+    )
     # Check that when mark=True, erroneous 0 values are set to 3
     middles_marked = _trim_intergranules(thresholded, mark=True)
     marked_as_3 = np.count_nonzero(middles_marked[middles_marked == 3])
@@ -104,7 +110,9 @@ def test_mark_brightpoint(granule_map, granule_map_he):
 def test_mark_brightpoint_error(granule_map, granule_map_he):
     # Check that errors are raised for incorrect granule_map.
     with pytest.raises(ValueError, match="segmented_image must have only"):
-        _mark_brightpoint(granule_map.data, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None)
+        _mark_brightpoint(
+            granule_map.data, granule_map.data, granule_map_he, resolution=0.016, bp_min_flux=None
+        )
 
 
 def test_segments_overlap_fraction(granule_minimap1):

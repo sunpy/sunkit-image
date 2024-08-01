@@ -14,6 +14,6 @@ except Exception:  # NOQA: BLE001
     )
     del warnings
 
-    version = '0.0.0'
+    version = "0.0.0"
 
 __all__ = ["version"]

@@ -1,3 +1,4 @@
+exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|sunkit_image/extern)$"
 repos:
   - repo: https://github.com/PyCQA/docformatter
     rev: v1.7.5
@@ -20,31 +21,24 @@ repos:
     hooks:
       - id: ruff
         args: ["--fix"]
+      - id: ruff-format
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
       - id: isort
-        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|sunkit_image/extern)$"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
       - id: check-ast
       - id: check-case-conflict
       - id: trailing-whitespace
-        exclude: ".*(.fits|.fts|.fit|.txt|.header|.csv)$"
-      - id: mixed-line-ending
-        exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
-      - id: end-of-file-fixer
-        exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
       - id: check-yaml
       - id: debug-statements
       - id: check-added-large-files
         args: ["--enforce-all", "--maxkb=1054"]
         exclude: "sunkit_image/data/test/asda_vxvy.npz"
       - id: end-of-file-fixer
-        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.json)$|^CITATION.rst$"
       - id: mixed-line-ending
-        exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*)$"
   - repo: https://github.com/crate-ci/typos
     rev: v1.23.1
     hooks:
