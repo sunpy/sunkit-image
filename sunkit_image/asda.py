@@ -60,7 +60,11 @@ def generate_velocity_field(vx, vy, i, j, r=3):
         msg = "Keyword 'r' must be an integer"
         raise TypeError(msg)
     vel = np.array(
-        [[vx[i + im, j + jm], vy[i + im, j + jm]] for im in np.arange(-r, r + 1) for jm in np.arange(-r, r + 1)],
+        [
+            [vx[i + im, j + jm], vy[i + im, j + jm]]
+            for im in np.arange(-r, r + 1)
+            for jm in np.arange(-r, r + 1)
+        ],
     )
     return np.array([vel, vel - vel.mean(axis=0)])
 
@@ -383,8 +387,11 @@ def get_velocity_field(gamma, rcore, ratio_vradial, x_range, y_range, x=None, y=
     r = np.sqrt(np.square(x) + np.square(y)) + 1e-10
     # Calculate velocity vector
     vector = [
-        0 - get_rotational_velocity(gamma, rcore, r) * y + get_radial_velocity(gamma, rcore, ratio_vradial, r) * x,
-        get_rotational_velocity(gamma, rcore, r) * x + get_radial_velocity(gamma, rcore, ratio_vradial, r) * y,
+        0
+        - get_rotational_velocity(gamma, rcore, r) * y
+        + get_radial_velocity(gamma, rcore, ratio_vradial, r) * x,
+        get_rotational_velocity(gamma, rcore, r) * x
+        + get_radial_velocity(gamma, rcore, ratio_vradial, r) * y,
     ]
     vx = vector[0] / r
     vy = vector[1] / r

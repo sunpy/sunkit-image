@@ -19,7 +19,9 @@ def get_hash_library_name():
     """
     ft2_version = f"{mpl.ft2font.__freetype_version__.replace('.', '')}"
     mpl_version = (
-        "dev" if (("dev" in mpl.__version__) or ("rc" in mpl.__version__)) else mpl.__version__.replace(".", "")
+        "dev"
+        if (("dev" in mpl.__version__) or ("rc" in mpl.__version__))
+        else mpl.__version__.replace(".", "")
     )
     astropy_version = (
         "dev"

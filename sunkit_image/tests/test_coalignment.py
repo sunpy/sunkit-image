@@ -90,12 +90,16 @@ def test_check_for_nonfinite_entries():
             a[i] = non_number
             b = a.reshape(3, 3)
 
-            with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries.") as warning_list:
+            with pytest.warns(
+                SunpyUserWarning, match="The layer image has nonfinite entries."
+            ) as warning_list:
                 _check_for_nonfinite_entries(b, np.ones((3, 3)))
 
             assert len(warning_list) == 1
 
-            with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries.") as warning_list:
+            with pytest.warns(
+                SunpyUserWarning, match="The template image has nonfinite entries."
+            ) as warning_list:
                 _check_for_nonfinite_entries(np.ones((3, 3)), b)
 
             assert len(warning_list) == 1
@@ -146,18 +150,24 @@ def test_get_correlation_shifts():
 
     # Input array is too big in either direction
     test_array = np.zeros((4, 3))
-    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
+    with pytest.raises(
+        ValueError, match="Input array dimension should not be greater than 3 in any dimension."
+    ):
         _get_correlation_shifts(test_array)
 
     test_array = np.zeros((3, 4))
-    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
+    with pytest.raises(
+        ValueError, match="Input array dimension should not be greater than 3 in any dimension."
+    ):
         _get_correlation_shifts(test_array)
 
 
 def test_find_best_match_location(aia171_test_map_layer, aia171_test_template, aia171_test_shift):
     result = match_template_to_layer(aia171_test_map_layer, aia171_test_template)
     match_location = u.Quantity(_find_best_match_location(result))
-    assert_allclose(match_location.value, np.array(result.shape) / 2.0 - 0.5 + aia171_test_shift, rtol=1e-3, atol=0)
+    assert_allclose(
+        match_location.value, np.array(result.shape) / 2.0 - 0.5 + aia171_test_shift, rtol=1e-3, atol=0
+    )
 
 
 def test_lower_clip(aia171_test_clipping):
@@ -207,8 +217,10 @@ def aia171_test_mc_pixel_displacements():
 @pytest.fixture()
 def aia171_mc_arcsec_displacements(aia171_test_mc_pixel_displacements, aia171_test_map):
     return {
-        "x": np.asarray([0.0, aia171_test_mc_pixel_displacements[1] * aia171_test_map.scale[0].value]) * u.arcsec,
-        "y": np.asarray([0.0, aia171_test_mc_pixel_displacements[0] * aia171_test_map.scale[1].value]) * u.arcsec,
+        "x": np.asarray([0.0, aia171_test_mc_pixel_displacements[1] * aia171_test_map.scale[0].value])
+        * u.arcsec,
+        "y": np.asarray([0.0, aia171_test_mc_pixel_displacements[0] * aia171_test_map.scale[1].value])
+        * u.arcsec,
     }
 
 
@@ -372,7 +384,9 @@ def test_apply_shifts(aia171_test_map):
 
     # Test that keywords are correctly passed
     # Test for an individual keyword
-    test_mc = apply_shifts(mc, astropy_displacements["y"], astropy_displacements["x"], clip=False, cval=np.nan)
+    test_mc = apply_shifts(
+        mc, astropy_displacements["y"], astropy_displacements["x"], clip=False, cval=np.nan
+    )
     assert np.all(np.logical_not(np.isfinite(test_mc[1].data[:, -1])))
 
     # Test for a combination of keywords, and that changing the interpolation
@@ -391,7 +405,9 @@ def test_apply_shifts(aia171_test_map):
 
 @pytest.fixture()
 def aia171_test_submap(aia171_test_map):
-    return aia171_test_map.submap(SkyCoord(((0, 0), (400, 500)) * u.arcsec, frame=aia171_test_map.coordinate_frame))
+    return aia171_test_map.submap(
+        SkyCoord(((0, 0), (400, 500)) * u.arcsec, frame=aia171_test_map.coordinate_frame)
+    )
 
 
 @pytest.fixture()

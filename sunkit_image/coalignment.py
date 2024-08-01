@@ -91,7 +91,9 @@ def _clip_edges(data, yclips: u.pix, xclips: u.pix):
     nx = data.shape[1]
     # The purpose of the int below is to ensure integer type since by default
     # astropy quantities are converted to floats.
-    return data[int(yclips[0].value) : ny - int(yclips[1].value), int(xclips[0].value) : nx - int(xclips[1].value)]
+    return data[
+        int(yclips[0].value) : ny - int(yclips[1].value), int(xclips[0].value) : nx - int(xclips[1].value)
+    ]
 
 
 @u.quantity_input
