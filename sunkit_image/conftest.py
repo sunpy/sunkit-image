@@ -174,9 +174,16 @@ def granule_minimap3():
 @pytest.fixture(params=["array", "map"])
 def aia_171(request):
     smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
-    if request.param == "map":
-        return smap
-    return smap.data if request.param == "array" else None
+    return smap if request.param == "map" else smap.data
+
+
+@pytest.fixture()
+def aia_171_map():
+    return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
+
+@pytest.fixture()
+def aia_171_cutout():
+    return sunpy.map.Map(get_test_filepath("aia_171_cutout.fits"))
 
 
 @pytest.fixture()
