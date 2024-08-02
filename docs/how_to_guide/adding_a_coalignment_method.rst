@@ -45,7 +45,7 @@ Handling NaNs and Infs
 ======================
 
 Proper handling of these values is expected to be included in the registered methods.
-The :func:`~sunkit_image.coalignment.coalignment` function does not change any problematic values. 
+The :func:`~sunkit_image.coalignment.coalignment` function does not change any problematic values.
 
 
 Checking if the Method is Registered
@@ -53,7 +53,7 @@ Checking if the Method is Registered
 To check if your method is registered, you can check if it is present in the registered methods dictionary :func:`~sunkit_image.coalignment.decorators.registered_methods` using the following code:
 
 .. code-block:: python
-    
+
     import pprint
     from sunkit_image.coalignment.decorators import registered_methods
     pprint(registered_methods)

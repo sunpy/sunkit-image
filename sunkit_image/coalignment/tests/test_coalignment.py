@@ -14,7 +14,7 @@ from sunkit_image.data.test import get_test_filepath
 
 @pytest.fixture()
 def is_test_map():
-    return sunpy.map.Map(get_test_filepath("eis_20140108_095727.fe_12_195_119.2c-0.int.fits"))
+    return sunpy.map.Map(get_test_filepath("is_20140108_095727.fe_12_195_119.2c-0.int.fits"))
 
 @pytest.fixture()
 def aia193_test_map():

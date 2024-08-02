@@ -3,6 +3,7 @@ import logging
 import tempfile
 import importlib.util
 from pathlib import Path
+
 import numpy as np
 import pytest
 import skimage
@@ -11,8 +12,8 @@ import astropy
 import astropy.config.paths
 from astropy.utils.data import get_pkg_data_filename
 
-import sunpy.data.test
 import sunpy.data.sample
+import sunpy.data.test
 import sunpy.map
 from sunpy.coordinates import Helioprojective, get_earth
 from sunpy.map.header_helper import make_fitswcs_header

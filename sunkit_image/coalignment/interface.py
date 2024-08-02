@@ -1,8 +1,6 @@
 import warnings
 from typing import NamedTuple
 
-import numpy as np
-
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
@@ -23,7 +21,8 @@ class affine_params(NamedTuple):
     """
     rotation_matrix: tuple[tuple[float, float], tuple[float, float]]
     """
-    A 2-element tuple stores the translation of the image along the x and y axes in pixels.
+    A 2-element tuple stores the translation of the image along the x and y
+    axes in pixels.
     """
     translation: tuple[float, float]
 

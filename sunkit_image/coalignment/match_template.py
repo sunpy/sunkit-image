@@ -3,8 +3,8 @@ from skimage.feature import match_template
 
 import astropy.units as u
 
-from sunkit_image.coalignment.interface import affine_params
 from sunkit_image.coalignment.decorators import register_coalignment_method
+from sunkit_image.coalignment.interface import affine_params
 
 __all__ = ["match_template_coalign"]
 
