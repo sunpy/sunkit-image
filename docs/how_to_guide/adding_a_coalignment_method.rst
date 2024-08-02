@@ -4,7 +4,7 @@
 Add a New Coalignment Method
 ****************************
 
-You can add a custom coalignment method in the sunkit-image package using the decorator :func:`~sunkit_image.coalignment.util.decorators.register_coalignment_method`:
+If you want to register a new coalignment method that can be used by :func:`~sunkit_image.coalignment.coalignment`, you can use :func:`~sunkit_image.coalignment.util.decorators.register_coalignment_method`:
 
 .. code-block:: python
 
@@ -23,7 +23,7 @@ Decorator Parameters
 
 Currently the decorator takes one parameter:
 
-- ``name``: The name of your custom coalignment method, which in the above example is  "my_coalign"
+- ``name``: The name of your custom coalignment method, which in the above example is  "my_coalign".
 
 Function Requirements
 =====================
@@ -33,15 +33,16 @@ Your coalignment function should:
 1. **Take Input Parameters**:
 
    - ``input_array``: The 2D array to be coaligned.
-   - ``template_array``: The 2D template array to align to.
+   - ``target_array``: The 2D array to align to.
 
-2. **Compute Shifts**: Calculate the shifts in the x and y directions needed to align ``input_array`` with ``template_array``.
+2. **Compute Shifts**: Calculate the shifts in the x and y directions needed to align ``input_array`` with ``target_array``.
 
-3. **Determine Affine Parameters**: Decide the parameters of the affine parameters like the scale, rotation and translation(generally shifts in x and y direction).
+3. **Determine Affine Parameters**: Decide the values of the affine parameters - translation, scale and rotation.
 
-4. **Return**: Use the ``affine_params`` named tuple from `sunkit_image` or provide your own that exposes the three parameters as attributes.
+4. **Return**: Use the ``affine_params`` named tuple included or provide your own that exposes the three parameters as attributes.
 
-Example Usage
-=============
+Handling NaNs and Infs
+======================
 
-Once you have added your custom coalignment method, you can use it as discussed in :ref:`sunkit-image-how-to-guide-using-the-coalignment-interface`.
+Proper handling of these values is expected to be included in the registered methods.
+The :func:`~sunkit_image.coalignment.coalignment` function does not change any problematic values. 

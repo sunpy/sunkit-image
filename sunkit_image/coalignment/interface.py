@@ -10,7 +10,7 @@ from sunpy.util.exceptions import SunpyUserWarning
 
 from sunkit_image.coalignment.util.decorators import registered_methods
 
-__all__ = ["coalignment", "affine_params"]
+__all__ = ["coalignment", "affine_params", "update_fits_wcs_metadata"]
 
 
 class affine_params(NamedTuple):
@@ -77,27 +77,6 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
 
     return fixed_map
 
-def warn_user_of_nan(array, name):
-    """
-    Issues a warning if there are NaN values in the input array.
-
-    Parameters
-    ----------
-    array : `numpy.ndarray`
-        The input array to be checked for NaN values.
-    name : str
-        The name of the array, used in the warning message.
-    """
-    if not np.all(np.isfinite(array)):
-        warnings.warn(
-            f"The {name} map has nonfinite entries. "
-            "This could cause errors when calculating shift between two "
-            "images. Please make sure there are no infinity or "
-            "Not a Number values. For instance, replacing them with a "
-            "local mean.",
-            SunpyUserWarning,
-            stacklevel=3,
-        )
 
 
 def warn_user_of_separation(reference_map,target_map):
@@ -112,7 +91,6 @@ def warn_user_of_separation(reference_map,target_map):
     target_map : sunpy.map.Map
         The target map to be coaligned to the reference map.
     """
-    # Calculate separation between the reference and target maps
     ref_coord = SkyCoord(reference_map.observer_coordinate)
     target_coord = SkyCoord(target_map.observer_coordinate)
     angular_separation = ref_coord.separation(target_coord)
@@ -165,16 +143,13 @@ def coalignment(reference_map, target_map, method):
         If the specified method is not registered.
     """
     if method not in registered_methods:
-        msg = f"Method {method} is not a registered method. Please register before using."
+        msg = (f"Method {method} is not a registered method: {list(registered_methods.keys())}."
+        "The method needs to be registered, with the correct import.")
         raise ValueError(msg)
     target_array = target_map.data
     reference_array = reference_map.data
 
-    # Warn user if any NANs, Infs, etc are present in the input or the template array
-    warn_user_of_nan(target_array, "target")
-    warn_user_of_nan(reference_array, "reference")
 
-    # Warn user if the separation between the reference and target maps is large
     warn_user_of_separation(reference_map, target_map)
 
     affine_params = registered_methods[method](reference_array, target_array)
