@@ -8,32 +8,23 @@ from astropy.coordinates import SkyCoord
 
 from sunpy.util.exceptions import SunpyUserWarning
 
-from sunkit_image.coalignment.util.decorators import registered_methods
+from sunkit_image.coalignment.decorators import registered_methods
 
 __all__ = ["coalignment", "affine_params", "update_fits_wcs_metadata"]
 
 
 class affine_params(NamedTuple):
     """
-    A named tuple to store the affine transformation parameters used for
-    updating the metadata.
-
-    Attributes
-    ----------
-    scale : tuple[tuple[float, float], tuple[float, float]]
-        The scale matrix representing the scaling transformation.
-        This 2x2 matrix defines how the image is scaled along the x and y axes.
-
-    rotation_matrix : tuple[tuple[float, float], tuple[float, float]]
-        The rotation matrix representing the rotation transformation.
-        This 2x2 matrix defines the rotation of the image in the plane.
-
-    translation : tuple[float, float]
-        The translation vector representing the translation transformation.
-        This 2-element tuple defines the shift of the image along the x and y axes in pixels.
+    A 2x2 scale matrix defining the image scaling along the x and y axes.
     """
     scale: tuple[tuple[float, float], tuple[float, float]]
+    """
+    A 2x2 matrix defining the rotation transformation of the image.
+    """
     rotation_matrix: tuple[tuple[float, float], tuple[float, float]]
+    """
+    A 2-element tuple stores the translation of the image along the x and y axes in pixels.
+    """
     translation: tuple[float, float]
 
 
@@ -44,6 +35,8 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
 
     Parameters
     ----------
+    reference_map : `sunpy.map.Map`
+        The reference map object to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
         The original map object whose metadata is to be updated.
     affine_params : object
