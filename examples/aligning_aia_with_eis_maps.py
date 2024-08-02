@@ -57,11 +57,11 @@ fig = plt.figure(figsize=(15, 7.5))
 ax = fig.add_subplot(121, projection=eis_map)
 
 eis_map.plot(axes=ax, title='Before')
-aia_193_full_disc_map.draw_contours(levels, axes=ax, alpha=0.3)
+aia_map.draw_contours(levels, axes=ax, alpha=0.3)
 
 ax = fig.add_subplot(122, projection=coaligned_eis_map)
 coaligned_eis_map.plot(axes=ax, title='After')
-aia_193_full_disc_map.draw_contours(levels, axes=ax, alpha=0.3)
+aia_map.draw_contours(levels, axes=ax, alpha=0.3)
 
 fig.tight_layout()
 
