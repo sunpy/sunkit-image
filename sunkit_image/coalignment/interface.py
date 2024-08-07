@@ -1,14 +1,16 @@
 import warnings
 from typing import NamedTuple
+import numpy as np
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
 from sunpy.util.exceptions import SunpyUserWarning
+from sunpy.sun.models import differential_rotation
 
 from sunkit_image.coalignment.decorators import registered_methods
 
-__all__ = ["coalignment", "affine_params", "update_fits_wcs_metadata"]
+__all__ = ["coalign"]
 
 
 class affine_params(NamedTuple):
@@ -47,18 +49,17 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     `sunpy.map.Map`
         A new sunpy map object with updated metadata reflecting the affine transformation.
     """
-    target_map.reference_pixel
     pc_matrix = target_map.rotation_matrix
     # Extacting the affine parameters
     translation = affine_params.translation
     scale = affine_params.scale
     rotation_matrix = affine_params.rotation_matrix
     # Updating the PC matrix
-    new_pc_matrix = pc_matrix @ rotation_matrix @ scale
+    new_pc_matrix = pc_matrix @ rotation_matrix
 
     reference_coord = reference_map.pixel_to_world(translation[0], translation[1])
-    Txshift = reference_coord.Tx - target_map.bottom_left_coord.Tx
-    Tyshift = reference_coord.Ty - target_map.bottom_left_coord.Ty
+    Txshift = reference_coord.Tx - target_map.reference_coordinate.Tx
+    Tyshift = reference_coord.Ty - target_map.reference_coordinate.Ty
     # Create a new map with the updated metadata
     fixed_map = target_map.shift_reference_coord(Txshift, Tyshift)
 
@@ -68,7 +69,6 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     fixed_map.meta["PC2_2"] = new_pc_matrix[1, 1]
 
     return fixed_map
-
 
 
 def warn_user_of_separation(reference_map,target_map):
@@ -87,10 +87,10 @@ def warn_user_of_separation(reference_map,target_map):
     target_coord = SkyCoord(target_map.observer_coordinate)
     angular_separation = ref_coord.separation(target_coord)
     if angular_separation > (1*u.deg):
-        warnings.warn(
-            "The separation between the reference and target maps is large. "
+        warnings.warn(## warn due to large angular separation
+            "The angular separation between the reference and target maps is large. "
             "This could cause errors when calculating shift between two "
-            "images. Please make sure the maps are close in time and space.",
+            "images. Please make sure the maps are close in space.",
             SunpyUserWarning,
             stacklevel=3,
         )
@@ -98,19 +98,18 @@ def warn_user_of_separation(reference_map,target_map):
     ref_time = reference_map.date
     target_time = target_map.date
     time_diff = abs(ref_time - target_time)
-    solar_rotation_rate = 13.33*u.deg / u.day ### Verify this value
-    time_separation_angle = (time_diff.to(u.day) * solar_rotation_rate).to(u.deg)
+    time_separation_angle = differential_rotation(time_diff.to(u.day), reference_map.center.Tx, model='howard')
     if time_separation_angle > (1*u.deg):
-        warnings.warn(
-            "The separation between the reference and target maps in time is large. "
+        warnings.warn(## warn due to large time separation
+            "The time difference between the reference and target maps in time is large. "
             "This could cause errors when calculating shift between two "
-            "images. Please make sure the maps are close in time and space.",
+            "images. Please make sure the maps are close in time.",
             SunpyUserWarning,
             stacklevel=3,
         )
 
 
-def coalignment(reference_map, target_map, method):
+def coalign(reference_map, target_map, method):
     """
     Performs image coalignment using a specified method. It updates the
     metadata of the target map so as to align it with the reference map.
@@ -140,7 +139,6 @@ def coalignment(reference_map, target_map, method):
         raise ValueError(msg)
     target_array = target_map.data
     reference_array = reference_map.data
-
 
     warn_user_of_separation(reference_map, target_map)
 

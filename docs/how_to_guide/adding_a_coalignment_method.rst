@@ -4,7 +4,7 @@
 Add a New Coalignment Method
 ****************************
 
-If you want to register a new coalignment method that can be used by :func:`~sunkit_image.coalignment.coalignment`, you can use :func:`~sunkit_image.coalignment.decorators.register_coalignment_method`:
+If you want to register a new coalignment method that can be used by :func:`~sunkit_image.coalignment.coalign`, you can use :func:`~sunkit_image.coalignment.decorators.register_coalignment_method`:
 
 .. code-block:: python
 
@@ -45,7 +45,7 @@ Handling NaNs and Infs
 ======================
 
 Proper handling of these values is expected to be included in the registered methods.
-The :func:`~sunkit_image.coalignment.coalignment` function does not change any problematic values.
+The :func:`~sunkit_image.coalignment.coalign` function does not change any problematic values.
 
 
 Checking if the Method is Registered
@@ -54,6 +54,5 @@ To check if your method is registered, you can check if it is present in the reg
 
 .. code-block:: python
 
-    import pprint
     from sunkit_image.coalignment.decorators import registered_methods
-    pprint(registered_methods)
+    print(registered_methods)

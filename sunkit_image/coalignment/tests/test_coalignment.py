@@ -8,7 +8,7 @@ from sunpy.map import Map
 from sunpy.net import Fido
 from sunpy.net import attrs as a
 
-from sunkit_image.coalignment import coalignment
+from sunkit_image.coalignment import coalign
 from sunkit_image.data.test import get_test_filepath
 
 
@@ -36,7 +36,7 @@ def aia193_test_shifted_map(aia193_test_map):
     return Map(shifted_data, aia193_test_map.meta)
 
 def test_coalignment(is_test_map, aia193_test_downsampled_map):
-    coaligned_is_map = coalignment(aia193_test_downsampled_map, is_test_map, "match_template")
+    coaligned_is_map = coalign(aia193_test_downsampled_map, is_test_map, "match_template")
 
     # Assertions to ensure the maps are aligned
     assert coaligned_is_map.data.shape == is_test_map.data.shape
@@ -44,7 +44,7 @@ def test_coalignment(is_test_map, aia193_test_downsampled_map):
     assert coaligned_is_map.wcs.wcs.crval[1] == aia193_test_downsampled_map.wcs.wcs.crval[1]
 
 def test_shifted_map_alignment(is_test_map, aia193_test_shifted_map):
-    coaligned_is_map = coalignment(aia193_test_shifted_map, is_test_map, "match_template")
+    coaligned_is_map = coalign(aia193_test_shifted_map, is_test_map, "match_template")
 
     # Ensure the alignment is corrected by comparing with the unshifted map
     assert coaligned_is_map.data.shape == is_test_map.data.shape

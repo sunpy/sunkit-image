@@ -5,16 +5,16 @@ Using the Coalignment Interface
 *******************************
 
 This guide explains how to use the coalignment interface to improve the alignment of solar images.
-The :func:`~sunkit_image.coalignment.coalignment` function facilitates image coalignment using a range of  registered methods.
-Refer to the docstring of :func:`~sunkit_image.coalignment.coalignment` for detailed information on the parameters, return values, and exceptions.
+The :func:`~sunkit_image.coalignment.coalign` function facilitates image coalignment using a range of registered methods.
+Refer to the docstring of :func:`~sunkit_image.coalignment.coalign` for detailed information on the parameters, return values, and exceptions.
 
-Here is an example of how to use the :func:`~sunkit_image.coalignment.coalignment` function:
+Here is an example of how to use the :func:`~sunkit_image.coalignment.coalign` function:
 
-.. code-block:: python
+.. mpl::
 
     import numpy as np
     from sunpy.map import Map
-    from sunkit_image.coalignment import coalignment
+    from sunkit_image.coalignment import coalign
     import sunpy.data.sample
     import matplotlib.pyplot as plt
     # Load the AIA images
@@ -25,7 +25,7 @@ Here is an example of how to use the :func:`~sunkit_image.coalignment.coalignmen
     ny= (reference_map.scale.axis2 * reference_map.dimensions.y )/target_map.scale.axis2
     aia_193_downsampled_map = reference_map.resample(u.Quantity([nx,ny]))
     # Coalign the target map to the reference map
-    coaligned_map = coalignment(aia_193_downsampled_map, target_map, method="match_template")
+    coaligned_map = coalign(aia_193_downsampled_map, target_map, method="match_template")
     # Define contour levels
     levels = np.linspace(200, 1200, 5) * target_map.unit
     # Plotting
@@ -42,6 +42,5 @@ Here is an example of how to use the :func:`~sunkit_image.coalignment.coalignmen
     ax.axis(bounds)
 
     plt.show()
-
 
 There is another example :ref:`sphx_glr_generated_gallery_adding_a_coalignment_method.py` focused on aligning an EIS raster with an AIA image.
