@@ -25,7 +25,8 @@ eis_map.plot()
 # Lets find the AIA image that we want to use as a reference.
 # We would be using the image near the date_average of this raster.
 
-query = Fido.search(a.Time(start=eis_map.date_start, near=eis_map.date_average, end=eis_map.date_end), a.Instrument('aia'), a.Wavelength(193*u.angstrom))
+# The following way is necessary because this eis doesn't have direct date_start, date_avg and date_end
+query = Fido.search(a.Time(start=eis_map.meta["date_beg"], near=eis_map.meta["date_avg"], end=eis_map.meta["date_end"]), a.Instrument('aia'), a.Wavelength(193*u.angstrom))
 aia_file = Fido.fetch(query)
 aia_map = sunpy.map.Map(aia_file)
 
