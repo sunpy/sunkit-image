@@ -10,7 +10,7 @@ from sunpy.sun.models import differential_rotation
 
 from sunkit_image.coalignment.decorators import registered_methods
 
-__all__ = ["coalign"]
+__all__ = ["coalign", "affine_params"]
 
 
 class affine_params(NamedTuple):
