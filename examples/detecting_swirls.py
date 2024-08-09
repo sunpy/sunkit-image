@@ -6,54 +6,56 @@ Detecting Swirls in the Solar Atmosphere
 This example demonstrates the use of Automated Swirl Detection Algorithm (ASDA) in detecting and plotting swirls (vortices) in a 2D velocity flow field.
 
 `More information on the algorithm can be found in the original paper. <https://doi.org/10.3847/1538-4357/aabd34>`__
+
+Unfortunately, currently ASDA within sunkit-image only works on arrays.
 """
-# sphinx_gallery_thumbnail_number = 4 # NOQA: ERA001
+# sphinx_gallery_thumbnail_number = 3 # NOQA: ERA001
 
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
 from sunkit_image.asda import calculate_gamma_values, get_vortex_edges, get_vortex_properties
 from sunkit_image.data.test import get_test_filepath
 
 ###########################################################################
 # This example demonstrates how to find swirls (vortices) in a 2D velocity flow field.
-# We will use precomputed flow field data from our test dataset.
-# First, we load the velocity field and additional data.
+#
+# Ideally you will want to calculate the velocity field from your data, but for this example
+# we will use precomputed flow field data from our test dataset.
+#
+# `pyflct <https://pyflct.readthedocs.io/en/latest/>`__ is a good tool to calculate the velocity field from your data.
 
 vxvy = np.load(get_test_filepath("asda_vxvy.npz"))
+# This is the original data used to calculate the velocity field
+data = vxvy["data"]
+# These are the velocity components in the x and y directions
 vx = vxvy["vx"]
 vy = vxvy["vy"]
-data = vxvy["data"]
 
 ###########################################################################
-# Before we proceed with swirl detection, let's understand the flow field data by
-# visualizing the field data and the velocity magnitude.
+# Before we proceed with swirl detection, let's understand data by
+# visualizing the velocity magnitude.
 
 # Calculate velocity magnitude
 velocity_magnitude = np.sqrt(vx**2 + vy**2)
-fig, axs = plt.subplots(1, 2, figsize=(20, 10))
+fig = plt.figure(figsize=(10, 7))
+ax = fig.add_subplot(111)
 
-# Visualize the field data on the first subplot
-im1 = axs[0].imshow(data, origin="lower", cmap="gray")
-axs[0].set_title("Field Data")
-axs[0].set_xlabel("X")
-axs[0].set_ylabel("Y")
-
-# Visualize the velocity magnitude on the second subplot
-im2 = axs[1].imshow(velocity_magnitude, origin="lower", cmap="viridis")
-axs[1].set_title("Velocity Magnitude")
-cbar = fig.colorbar(im2, ax=axs[1])
+im = ax.imshow(velocity_magnitude, origin="lower", cmap="viridis")
+ax.set_title("Velocity Magnitude")
+cax = make_axes_locatable(ax).append_axes("bottom", size="5%", pad="5%")
+cbar = fig.colorbar(im, ax=cax, orientation="horizontal")
 cbar.set_label("Velocity (m/s)")
 
-plt.tight_layout()
-
 ###########################################################################
-# Now we will perform swirl detection using the methods provided in the `~sunkit_image.asda` module.
+# Now we will perform swirl detection using the methods provided by `~sunkit_image.asda`.
 #
 # The first step is to calculate the Gamma values. Gamma1 (Γ1) is useful for identifying
 # vortex centers, while Gamma2 (Γ2) helps in detecting the edges of vortices.
 # These values are calculated based on the method proposed by `Graftieaux et al. (2001) <https://doi.org/10.1088/0957-0233/12/9/307>`__
 # and are used to quantify the swirling strength and structure of the flow field.
+#
 # To enhance the detection of smaller swirls and improve the accuracy in identifying
 # vortex boundaries, a factor is introduced that magnifies the original data. This
 # magnification aids in enhancing the resolution of the velocity field, allowing for
@@ -78,31 +80,35 @@ center_edge = get_vortex_edges(gamma)
 ve, vr, vc, ia = get_vortex_properties(vx, vy, center_edge, image=data)
 
 ###########################################################################
-# Finally, we visualize the results. We will plot the Gamma1 and Gamma2 values,
-# which highlight the vortex centers and edges respectively.
+# Now we will plot the Gamma1 and Gamma2 values, which highlight the vortex
+# centers and edges respectively.
 
-fig, axs = plt.subplots(1, 2, figsize=(20, 10))
-axs[0].imshow(gamma[..., 0], origin="lower")
-axs[0].set_title(r"$\Gamma_1$")
-axs[0].set(xlabel="x", ylabel="y")
+fig = plt.figure(figsize=(10, 10))
+ax = fig.add_subplot(211)
+ax2 = fig.add_subplot(212)
 
-axs[1].imshow(gamma[..., 1], origin="lower")
-axs[1].set_title(r"$\Gamma_2$")
-axs[1].set(xlabel="x", ylabel="y")
+ax.imshow(gamma[..., 0], origin="lower")
+ax.set_title(r"$\Gamma_1$")
+ax.set(ylabel="y")
+ax.set_xticklabels([])
+
+ax2.imshow(gamma[..., 1], origin="lower")
+ax2.set_title(r"$\Gamma_2$")
+ax2.set(xlabel="x", ylabel="y")
 
 fig.tight_layout()
-###########################################################################
-# Furthermore, we can create a swirl map visualization.
-#
-# Generating a swirl map is a crucial step in analyzing the dynamics of fluid flow,
-# particularly in identifying and understanding the spatial distribution, size, and
-# characteristics of swirls within the velocity field. This visualization not only
-# aids in the qualitative assessment of the flow patterns but also provides insights
-# into the underlying physical processes driving the formation and evolution of these swirls.
 
-fig, ax = plt.subplots()
+###########################################################################
+# Finally, we can create a swirl map visualization with streamlines.
+
+fig = plt.figure(figsize=(10, 7))
+ax = fig.add_subplot(111)
+
 ax.imshow(data, origin="lower", cmap="gray")
-ax.quiver(np.arange(vx.shape[1]), np.arange(vx.shape[0]), vx, vy, scale=50, color="lightgreen")
+
+# Overlay streamlines
+Y, X = np.mgrid[0:512, 0:1024]
+ax.streamplot(X, Y, vx, vy, color="green")
 
 # Mark and number swirl centers
 centers = np.array(center_edge["center"])
@@ -115,39 +121,7 @@ for edge in center_edge["edge"]:
     edge = np.array(edge)
     ax.plot(edge[:, 0], edge[:, 1], "b--")
 
-ax.set_title("Swirl Map with Velocity Field")
-ax.set(xlabel="x", ylabel="y")
-
-###########################################################################
-# Now we will magnify a specific region of interest (ROI) of the swirl map and overlay streamlines
-# to visualize the flow patterns around the identified swirls.
-
-# Define the region of interest (ROI) in pixel coordinates
-x_min, x_max = 1, 100
-y_min, y_max = 1, 100
-
-fig, ax = plt.subplots()
-ax.imshow(data[y_min:y_max, x_min:x_max], origin="lower", cmap="gray")
-
-# Overlay streamlines
-Y, X = np.mgrid[y_min:y_max, x_min:x_max]
-ax.streamplot(X, Y, vx[y_min:y_max, x_min:x_max], vy[y_min:y_max, x_min:x_max], color="green")
-
-# Mark and number swirl centers within ROI
-roi_centers = centers[
-    (centers[:, 0] >= x_min) & (centers[:, 0] < x_max) & (centers[:, 1] >= y_min) & (centers[:, 1] < y_max)
-]
-for center in roi_centers:
-    ax.plot(center[0] - x_min, center[1] - y_min, "ro")
-
-# Overlay swirl edges within ROI
-for edge in center_edge["edge"]:
-    edge = np.array(edge)
-    edge_in_roi = edge[(edge[:, 0] >= x_min) & (edge[:, 0] < x_max) & (edge[:, 1] >= y_min) & (edge[:, 1] < y_max)]
-    if edge_in_roi.size > 0:
-        ax.plot(edge_in_roi[:, 0] - x_min, edge_in_roi[:, 1] - y_min, "r--")
-
-ax.set_title("Magnified Swirl Map Region with Streamlines")
+ax.set_title("Swirl Map Region with Streamlines")
 ax.set(xlabel="x", ylabel="y")
 fig.tight_layout()
 
