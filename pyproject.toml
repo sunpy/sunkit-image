@@ -49,7 +49,7 @@ tests = [
   'pytest-astropy',
   'pytest-mpl',
   "pytest-xdist",
-  "sunpy[data]>=6.0.0",
+  "sunpy[data,net]>=6.0.0",
 ]
 docs = [
   "sunkit_image[all]",
