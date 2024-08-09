@@ -12,6 +12,7 @@ Here is an example of how to use the :func:`~sunkit_image.coalignment.coalign` f
 
 .. plot::
     :include-source:
+    :context: close-figs
 
     import numpy as np
     from sunpy.map import Map
