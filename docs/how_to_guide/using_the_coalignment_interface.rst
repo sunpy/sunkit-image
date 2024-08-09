@@ -10,7 +10,7 @@ Refer to the docstring of :func:`~sunkit_image.coalignment.coalign` for detailed
 
 Here is an example of how to use the :func:`~sunkit_image.coalignment.coalign` function:
 
-.. mpl::
+.. plot::
 
     import numpy as np
     from sunpy.map import Map
