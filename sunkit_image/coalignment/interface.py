@@ -56,7 +56,6 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     rotation_matrix = affine_params.rotation_matrix
     # Updating the PC matrix
     new_pc_matrix = pc_matrix @ rotation_matrix
-
     reference_coord = reference_map.pixel_to_world(translation[0], translation[1])
     Txshift = reference_coord.Tx - target_map.reference_coordinate.Tx
     Tyshift = reference_coord.Ty - target_map.reference_coordinate.Ty
@@ -67,6 +66,9 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     fixed_map.meta["PC1_2"] = new_pc_matrix[0, 1]
     fixed_map.meta["PC2_1"] = new_pc_matrix[1, 0]
     fixed_map.meta["PC2_2"] = new_pc_matrix[1, 1]
+    
+    fixed_map.meta['cdelt1'] = (target_map.scale[0] / scale[0, 0]).value
+    fixed_map.meta['cdelt2'] = (target_map.scale[1] / scale[1, 1]).value
 
     return fixed_map
 
