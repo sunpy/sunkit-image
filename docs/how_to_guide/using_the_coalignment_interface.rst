@@ -45,4 +45,4 @@ Here is an example of how to use the :func:`~sunkit_image.coalignment.coalign` f
 
     plt.show()
 
-There is another example :ref:`sphx_glr_generated_gallery_adding_a_coalignment_method.py` focused on aligning an EIS raster with an AIA image.
+There is another example :ref:`sphx_glr_generated_gallery_aligning_aia_with_eis_maps.py` focused on aligning an EIS raster with an AIA image.

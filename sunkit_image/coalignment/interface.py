@@ -81,9 +81,9 @@ def warn_user_of_separation(reference_map,target_map):
 
     Parameters
     ----------
-    reference_map : sunpy.map.Map
+    reference_map : `sunpy.map.Map`
         The reference map to which the target map is to be coaligned.
-    target_map : sunpy.map.Map
+    target_map : `sunpy.map.Map`
         The target map to be coaligned to the reference map.
     """
     ref_coord = SkyCoord(reference_map.observer_coordinate)
@@ -114,21 +114,21 @@ def warn_user_of_separation(reference_map,target_map):
 
 def coalign(reference_map, target_map, method='match_template'):
     """
-    Performs image coalignment using a specified method (defaults to `match_template`). It updates the
+    Performs image coalignment using a specified method (defaults to `~sunkit_image.coalignment.match_template`). It updates the
     metadata of the target map so as to align it with the reference map.
 
     Parameters
     ----------
-    reference_map : sunpy.map.Map
+    reference_map : `sunpy.map.Map`
         The reference map to which the target map is to be coaligned.
-    target_map : sunpy.map.Map
+    target_map : `sunpy.map.Map`
         The target map to be coaligned to the reference map.
-    method : str
+    method : `str`
         The name of the registered coalignment method to use.
 
     Returns
     -------
-    sunpy.map.Map
+    `sunpy.map.Map`
         The coaligned target map with the updated metadata.
 
     Raises

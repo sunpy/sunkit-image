@@ -8,7 +8,7 @@ If you want to register a new coalignment method that can be used by :func:`~sun
 
 .. code-block:: python
 
-    from sunkit_image.utils.decorators import register_coalignment_method
+    from sunkit_image.coalignment.decorators import register_coalignment_method
 
     @register_coalignment_method("my_coalign")
     def my_coalignment_method(input_array, template_array):
