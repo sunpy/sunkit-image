@@ -114,7 +114,7 @@ def warn_user_of_separation(reference_map,target_map):
 
 def coalign(reference_map, target_map, method='match_template'):
     """
-    Performs image coalignment using a specified method (defaults to `~sunkit_image.coalignment.match_template`). It updates the
+    Performs image coalignment using a specified method (defaults to `~sunkit_image.coalignment.match_template.match_template_coalign`). It updates the
     metadata of the target map so as to align it with the reference map.
 
     Parameters
