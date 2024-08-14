@@ -23,30 +23,14 @@ def is_test_map():
 
 
 @pytest.mark.remote_data()
-def aia193_test_map():
-    date_start = "2014-01-08T09:57:27"
-    date_end = "2014-01-08T10:00:00"
-    aia_map = Fido.fetch(Fido.search(a.Time(start=date_start, end=date_end), a.Instrument('aia'), a.Wavelength(193 * u.angstrom)))
-    return sunpy.map.Map(aia_map)
-
-
-@pytest.mark.remote_data()
-@pytest.fixture()
-def aia193_test_downsampled_map(is_test_map, aia193_test_map):
-    nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / is_test_map.scale.axis1
-    ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / is_test_map.scale.axis2
-    return aia193_test_map.resample(u.Quantity([nx, ny]))
-
-
-@pytest.mark.remote_data()
-def aia193_test_shifted_map(aia193_test_map):
-    pixel_displacements = np.array([5.0, 5.0])
-    shifted_data = sp_shift(aia193_test_map.data, pixel_displacements)
-    return sunpy.map.Map(shifted_data, aia193_test_map.meta)
-
-
-@pytest.mark.remote_data()
-def test_coalignment(is_test_map, aia193_test_downsampled_map):
+def test_coalignment(is_test_map):
+    aia193_test_map = sunpy.map.Map(Fido.fetch(Fido.search(a.Time(start=is_test_map.meta["date_beg"], near=is_test_map.meta["date_avg"], end=is_test_map.meta["date_end"]), a.Instrument('aia'), a.Wavelength(193*u.angstrom))))
+    # Synchronize obstime and rsun to reduce transformation issues
+    aia193_test_map.meta['rsun_obs'] = is_test_map.meta['dsun_obs']/2
+    aia193_test_map.meta['date-obs'] = is_test_map.meta['date-obs']
+    nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / is_test_map.scale[0]
+    ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / is_test_map.scale[1]
+    aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
     coaligned_is_map = coalign(aia193_test_downsampled_map, is_test_map, "match_template")
     assert coaligned_is_map.data.shape == is_test_map.data.shape
     assert coaligned_is_map.wcs.wcs.crval[0] == aia193_test_downsampled_map.wcs.wcs.crval[0]
