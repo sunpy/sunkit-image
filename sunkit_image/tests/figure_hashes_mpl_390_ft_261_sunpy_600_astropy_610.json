@@ -9,5 +9,6 @@
   "sunkit_image.tests.test_radial.test_multifig_rhef": "ac41a919a6a67fc47d34d9512d1177ff0fc7ef43bef0296d1751020b6ed5f2f0",
   "sunkit_image.tests.test_stara.test_stara_plot": "88a1fafc42b22264a68a9b633bfa3bbe22ce3e89cbf8db15920a9d28b62e49f6",
   "sunkit_image.tests.test_trace.test_occult2_fig[array]": "e59f4c476b6b27788ab8dc397cb0d2f34f8d6032eced289fd2eabeb324b39558",
-  "sunkit_image.tests.test_trace.test_occult2_fig[map]": "e59f4c476b6b27788ab8dc397cb0d2f34f8d6032eced289fd2eabeb324b39558"
+  "sunkit_image.tests.test_trace.test_occult2_fig[map]": "e59f4c476b6b27788ab8dc397cb0d2f34f8d6032eced289fd2eabeb324b39558",
+  "sunkit_image.coalignmnet.tests.test_coalignment.test_coalignment_figure": "f7a8e5a7377422c652a47217981d1c3bd1a66b5c211eae6ef18e4cef2660e438"
 }

@@ -116,6 +116,6 @@ def match_template_coalign(reference_array, target_array):
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
     # Particularly for this method, there is no change in the rotation or scaling, hence the hardcoded values of scale to 1.0 & rotation to identity matrix
-    scale = np.array([[1.0, 0], [0, 1.0]])
+    scale = np.array([1.0, 1.0])
     rotation_matrix = np.eye(2)
     return affine_params(scale=scale, rotation_matrix=rotation_matrix, translation=(x_shift * u.pixel, y_shift * u.pixel))

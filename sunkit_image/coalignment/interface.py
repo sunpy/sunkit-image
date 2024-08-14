@@ -15,16 +15,15 @@ __all__ = ["coalign", "affine_params"]
 
 class affine_params(NamedTuple):
     """
-    A 2x2 scale matrix defining the image scaling along the x and y axes.
+    A 2-element tuple containing scale values defining the image scaling along the x and y axes.
     """
-    scale: tuple[tuple[float, float], tuple[float, float]]
+    scale: tuple[float, float]
     """
     A 2x2 matrix defining the rotation transformation of the image.
     """
     rotation_matrix: tuple[tuple[float, float], tuple[float, float]]
     """
-    A 2-element tuple stores the translation of the image along the x and y
-    axes in pixels.
+    A 2-element tuple stores the translation of the image along the x and y axes in pixels.
     """
     translation: tuple[float, float]
 
@@ -49,14 +48,16 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     `sunpy.map.Map`
         A new sunpy map object with updated metadata reflecting the affine transformation.
     """
-    pc_matrix = target_map.rotation_matrix
     # Extacting the affine parameters
+    pc_matrix = target_map.rotation_matrix
     translation = affine_params.translation
     scale = affine_params.scale
     rotation_matrix = affine_params.rotation_matrix
     # Updating the PC matrix
     new_pc_matrix = pc_matrix @ rotation_matrix
-    reference_coord = reference_map.pixel_to_world(translation[0], translation[1])
+    # Calculate the new reference pixel. Currently this only accounts the translation, but in future it should also account for rotation and scaling(affine transformation)
+    new_reference_pixel = np.array([translation[0].value + target_map.reference_pixel.x.value, translation[1].value +target_map.reference_pixel.y.value])
+    reference_coord = reference_map.wcs.pixel_to_world(new_reference_pixel[0],new_reference_pixel[1])
     Txshift = reference_coord.Tx - target_map.reference_coordinate.Tx
     Tyshift = reference_coord.Ty - target_map.reference_coordinate.Ty
     # Create a new map with the updated metadata
@@ -66,9 +67,9 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     fixed_map.meta["PC1_2"] = new_pc_matrix[0, 1]
     fixed_map.meta["PC2_1"] = new_pc_matrix[1, 0]
     fixed_map.meta["PC2_2"] = new_pc_matrix[1, 1]
-    
-    fixed_map.meta['cdelt1'] = (target_map.scale[0] / scale[0, 0]).value
-    fixed_map.meta['cdelt2'] = (target_map.scale[1] / scale[1, 1]).value
+
+    fixed_map.meta['cdelt1'] = (target_map.scale[0] / scale[0]).value
+    fixed_map.meta['cdelt2'] = (target_map.scale[1] / scale[1]).value
 
     return fixed_map
 
@@ -111,9 +112,9 @@ def warn_user_of_separation(reference_map,target_map):
         )
 
 
-def coalign(reference_map, target_map, method):
+def coalign(reference_map, target_map, method='match_template'):
     """
-    Performs image coalignment using a specified method. It updates the
+    Performs image coalignment using a specified method (defaults to `match_template`). It updates the
     metadata of the target map so as to align it with the reference map.
 
     Parameters

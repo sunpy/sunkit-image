@@ -64,7 +64,7 @@ aia_map.draw_contours(levels, axes=ax, alpha=0.3)
 
 # Plot after coalignment
 ax = fig.add_subplot(122, projection=coaligned_eis_map)
-coaligned_eis_map.plot(axes=ax, title='After', aspect=eis_map.meta['cdelt2'] / eis_map.meta['cdelt1'],
+coaligned_eis_map.plot(axes=ax, title='After', aspect=coaligned_eis_map.meta['cdelt2'] / coaligned_eis_map.meta['cdelt1'],
              cmap='Blues_r', norm=ImageNormalize(stretch=AsinhStretch()))
 aia_map.draw_contours(levels, axes=ax, alpha=0.3)
 
