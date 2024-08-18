@@ -39,8 +39,8 @@ def test_coalignment(is_test_map):
 @pytest.fixture()
 def cutout_map(aia171_test_map):
     aia_map = sunpy.map.Map(aia171_test_map)
-    bottom_left = SkyCoord(300 * u.arcsec, -300 * u.arcsec, frame = aia_map.coordinate_frame)
-    top_right = SkyCoord(800 * u.arcsec, 200 * u.arcsec, frame = aia_map.coordinate_frame)
+    bottom_left = SkyCoord(-300 * u.arcsec, -300 * u.arcsec, frame = aia_map.coordinate_frame)
+    top_right = SkyCoord(800 * u.arcsec, 600 * u.arcsec, frame = aia_map.coordinate_frame)
     cutout_map = aia_map.submap(bottom_left, top_right=top_right)
     return cutout_map
 
