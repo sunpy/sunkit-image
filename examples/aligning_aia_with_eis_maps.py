@@ -45,7 +45,7 @@ aia_downsampled = aia_map.resample(u.Quantity([nx, ny]))
 # For details of the implementation refer to the
 # documentation of `~sunkit_image.coalignment.match_template.match_template_coalign`.
 
-coaligned_eis_map = coalign(aia_downsampled, eis_map, "match_template")
+coaligned_eis_map = coalign(aia_downsampled, eis_map)
 
 ####################################################################################
 # To check now effective this has been, we will plot the EIS data and

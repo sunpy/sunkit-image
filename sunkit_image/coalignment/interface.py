@@ -10,10 +10,10 @@ from sunpy.sun.models import differential_rotation
 
 from sunkit_image.coalignment.decorators import registered_methods
 
-__all__ = ["coalign", "affine_params"]
+__all__ = ["coalign", "AffineParams"]
 
 
-class affine_params(NamedTuple):
+class AffineParams(NamedTuple):
     """
     A 2-element tuple containing scale values defining the image scaling along the x and y axes.
     """
@@ -23,12 +23,12 @@ class affine_params(NamedTuple):
     """
     rotation_matrix: tuple[tuple[float, float], tuple[float, float]]
     """
-    A 2-element tuple stores the translation of the image along the x and y axes in pixels.
+    A 2-element tuple stores the translation of the image along the x and y axes.
     """
     translation: tuple[float, float]
 
 
-def update_fits_wcs_metadata(reference_map, target_map, affine_params):
+def update_fits_wcs_metadata(reference_map, target_map, AffineParams):
     """
     Update the metadata of a sunpy Map object based on affine transformation
     parameters.
@@ -39,7 +39,7 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
         The reference map object to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
         The original map object whose metadata is to be updated.
-    affine_params : object
+    AffineParams : object
         An object containing the affine transformation parameters. This object must
         have attributes for translation (dx, dy), scale, and rotation.
 
@@ -50,13 +50,14 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     """
     # Extacting the affine parameters
     pc_matrix = target_map.rotation_matrix
-    translation = affine_params.translation
-    scale = affine_params.scale
-    rotation_matrix = affine_params.rotation_matrix
+    translation = AffineParams.translation
+    scale = AffineParams.scale
+    rotation_matrix = AffineParams.rotation_matrix
     # Updating the PC matrix
     new_pc_matrix = pc_matrix @ rotation_matrix
-    # Calculate the new reference pixel. Currently this only accounts the translation, but in future it should also account for rotation and scaling(affine transformation)
-    new_reference_pixel = np.array([translation[0].value + target_map.reference_pixel.x.value, translation[1].value +target_map.reference_pixel.y.value])
+    # Calculate the new reference pixel. 
+    old_reference_pixel = np.array([target_map.reference_pixel.x.value, target_map.reference_pixel.y.value])
+    new_reference_pixel = scale*rotation_matrix @ old_reference_pixel + translation
     reference_coord = reference_map.wcs.pixel_to_world(new_reference_pixel[0],new_reference_pixel[1])
     Txshift = reference_coord.Tx - target_map.reference_coordinate.Tx
     Tyshift = reference_coord.Ty - target_map.reference_coordinate.Ty
@@ -145,5 +146,5 @@ def coalign(reference_map, target_map, method='match_template'):
 
     warn_user_of_separation(reference_map, target_map)
 
-    affine_params = registered_methods[method](reference_array, target_array)
-    return update_fits_wcs_metadata(reference_map, target_map, affine_params)
+    AffineParams = registered_methods[method](reference_array, target_array)
+    return update_fits_wcs_metadata(reference_map, target_map, AffineParams)

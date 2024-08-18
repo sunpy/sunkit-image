@@ -7,7 +7,6 @@ from scipy.ndimage import shift as sp_shift
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
-from astropy.visualization import ImageNormalize, AsinhStretch
 
 import sunpy.map
 from sunpy.net import Fido, attrs as a
@@ -47,48 +46,34 @@ def cutout_map(aia171_test_map):
 
 
 def test_coalignment_reflects_pixel_shifts(cutout_map, aia171_test_map):
-    """Check if coalignment adjusts world coordinates as expected based on pixel shifts."""
-    dx_pix, dy_pix = 10, 10  # Considering the pixel shifts are small enough to not cause any distortion
-    messed_map = copy.deepcopy(cutout_map)
-    messed_map.meta['crpix1'] += dx_pix
-    messed_map.meta['crpix2'] += dy_pix
-
+    """Check if coalignment adjusts world coordinates as expected based on reference coordinate shifts."""
+    messed_map = cutout_map.shift_reference_coord(25 * u.arcsec, 50 * u.arcsec)
     original_world_coords = cutout_map.reference_coordinate
-    shifted_world_coords = cutout_map.wcs.pixel_to_world(
-        cutout_map.reference_pixel.x.value + dx_pix,
-        cutout_map.reference_pixel.y.value + dy_pix
-    )
-    expected_shift_Tx = shifted_world_coords.Tx - original_world_coords.Tx
-    expected_shift_Ty = shifted_world_coords.Ty - original_world_coords.Ty
-    # Fix the messed map
+    # shifted_world_coords = messed_map.reference_coordinate
     fixed_cutout_map = coalign(aia171_test_map, messed_map)
-
     fixed_world_coords = fixed_cutout_map.reference_coordinate
-    actual_shift_Tx = fixed_world_coords.Tx - original_world_coords.Tx
-    actual_shift_Ty = fixed_world_coords.Ty - original_world_coords.Ty
-    # The shifts should be equal to the expected shifts
-    assert_allclose(actual_shift_Tx, expected_shift_Tx, rtol=1e-2, atol=0)
-    assert_allclose(actual_shift_Ty, expected_shift_Ty, rtol=1e-2, atol=0)
-
-    assert not np.allclose(original_world_coords.Tx, fixed_world_coords.Tx)
-    assert not np.allclose(original_world_coords.Ty, fixed_world_coords.Ty)
+    # The actual shifts applied by coalignment should be equal to the expected shifts
+    assert_allclose(original_world_coords.Tx, fixed_world_coords.Tx, rtol=1e-2, atol=0.4)
+    assert_allclose(original_world_coords.Ty, fixed_world_coords.Ty, rtol=1e-2, atol=0.4)
 
 
 @figure_test
 def test_coalignment_figure(cutout_map, aia171_test_map):
     levels = [200, 400, 500, 700, 800] * cutout_map.unit
-    messed_map = copy.deepcopy(cutout_map)
-    messed_map.meta['crpix1'] += 10
-    messed_map.meta['crpix2'] += 10
+    messed_map = cutout_map.shift_reference_coord(25*u.arcsec, 50*u.arcsec)
     fixed_cutout_map = coalign(aia171_test_map, messed_map)
     fig = plt.figure(figsize=(15, 7.5))
     # Before coalignment
-    ax1 = fig.add_subplot(121, projection=cutout_map)
-    cutout_map.plot(axes=ax1, title='Original Cutout', cmap='Blues_r', norm=ImageNormalize(stretch=AsinhStretch()))
+    ax1 = fig.add_subplot(131, projection=cutout_map)
+    cutout_map.plot(axes=ax1, title='Original Cutout')
     cutout_map.draw_contours(levels, axes=ax1, alpha=0.3)
+    # Messed up map
+    ax2 = fig.add_subplot(132, projection=messed_map)
+    messed_map.plot(axes=ax2, title='Messed Cutout')
+    cutout_map.draw_contours(levels, axes=ax2, alpha=0.3) 
     # After coalignment
-    ax2 = fig.add_subplot(122, projection=fixed_cutout_map)
-    fixed_cutout_map.plot(axes=ax2, title='Fixed Cutout', cmap='Blues_r', norm=ImageNormalize(stretch=AsinhStretch()))
-    fixed_cutout_map.draw_contours(levels, axes=ax2, alpha=0.3)
+    ax3 = fig.add_subplot(133, projection=fixed_cutout_map)
+    fixed_cutout_map.plot(axes=ax3, title='Fixed Cutout')
+    cutout_map.draw_contours(levels, axes=ax3, alpha=0.3)
     fig.tight_layout()
     return fig

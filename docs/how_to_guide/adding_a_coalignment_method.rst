@@ -16,7 +16,7 @@ If you want to register a new coalignment method that can be used by :func:`~sun
         # This should encompass calculating the shifts,
         # handling NaN values appropriately.
         # Return the shifts in an affine style, such as the scale, rotation and translation.
-        return affine_params(scale, rotation, translation)
+        return AffineParams(scale, rotation, translation)
 
 Decorator Parameters
 ====================
@@ -39,7 +39,7 @@ Your coalignment function should:
 
 3. **Determine Affine Parameters**: Decide the values of the affine parameters - translation, scale and rotation.
 
-4. **Return**: Use the ``affine_params`` named tuple included or provide your own that exposes the three parameters as attributes.
+4. **Return**: Use the ``AffineParams`` named tuple included or provide your own that exposes the three parameters as attributes.
 
 Handling NaNs and Infs
 ======================

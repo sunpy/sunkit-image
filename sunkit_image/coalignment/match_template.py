@@ -4,7 +4,7 @@ from skimage.feature import match_template
 import astropy.units as u
 
 from sunkit_image.coalignment.decorators import register_coalignment_method
-from sunkit_image.coalignment.interface import affine_params
+from sunkit_image.coalignment.interface import AffineParams
 
 __all__ = ["match_template_coalign"]
 
@@ -103,14 +103,14 @@ def match_template_coalign(reference_array, target_array):
 
     Returns
     -------
-    affine_params
+    AffineParams
         A named tuple containing the following affine transformation parameters:
         - scale: list
             A list of tuples representing the scale transformation as an identity matrix.
         - rotation: float
             The rotation angle in radians, which is fixed at 0.0 in this function.
         - translation: tuple
-            A tuple containing the x and y translation values in pixels.
+            A tuple containing the x and y translation values.
     """
     corr = match_template(np.float64(reference_array), np.float64(target_array))
     # Find the best match location
@@ -118,4 +118,4 @@ def match_template_coalign(reference_array, target_array):
     # Particularly for this method, there is no change in the rotation or scaling, hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = np.array([1.0, 1.0])
     rotation_matrix = np.eye(2)
-    return affine_params(scale=scale, rotation_matrix=rotation_matrix, translation=(x_shift * u.pixel, y_shift * u.pixel))
+    return AffineParams(scale=scale, rotation_matrix=rotation_matrix, translation=(x_shift , y_shift ))
