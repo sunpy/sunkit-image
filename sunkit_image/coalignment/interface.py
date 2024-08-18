@@ -115,9 +115,14 @@ def warn_user_of_separation(reference_map,target_map):
 
 def coalign(reference_map, target_map, method='match_template'):
     """
-    Performs image coalignment using a specified method (defaults to `~sunkit_image.coalignment.match_template.match_template_coalign`). It updates the
-    metadata of the target map so as to align it with the reference map.
+    Performs image coalignment using a specified method (defaults to `~sunkit_image.coalignment.match_template.match_template_coalign`).
+    This function updates the metadata of the target map to align it with the reference map.
 
+    .. note::
+
+        * This function is intended to correct maps with known incorrect metadata. It is not designed to address issues like differential rotation or changes in observer location, which are encoded in the coordinate metadata.
+        * The function modifies the metadata of the map, not the underlying array data. For adjustments that involve coordinate transformations, consider using `~sunpy.map.GenericMap.reproject_to` instead.
+    
     Parameters
     ----------
     reference_map : `sunpy.map.Map`
