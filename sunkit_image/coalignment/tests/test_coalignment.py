@@ -1,4 +1,4 @@
-import copy
+import warnings
 import numpy as np
 from numpy.testing import assert_allclose
 import matplotlib.pyplot as plt
@@ -6,7 +6,7 @@ import pytest
 from scipy.ndimage import shift as sp_shift
 
 import astropy.units as u
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import SkyCoord, baseframe
 
 import sunpy.map
 from sunpy.net import Fido, attrs as a
@@ -18,6 +18,8 @@ from sunkit_image.coalignment.interface import AffineParams
 from sunkit_image.data.test import get_test_filepath
 from sunkit_image.tests.helpers import figure_test
 
+# Ignore the warning from Astropy regarding the issue of large angular separation between the coordinates.
+warnings.simplefilter('ignore', baseframe.NonRotationTransformationWarning)
 
 @pytest.fixture()
 def eis_test_map():
@@ -27,9 +29,8 @@ def eis_test_map():
 @pytest.mark.remote_data()
 def test_coalignment(eis_test_map):
     aia193_test_map = sunpy.map.Map(Fido.fetch(Fido.search(a.Time(start=eis_test_map.meta["date_beg"], near=eis_test_map.meta["date_avg"], end=eis_test_map.meta["date_end"]), a.Instrument('aia'), a.Wavelength(193*u.angstrom))))
-    # Synchronize obstime and rsun to reduce transformation issues
+    # Synchronize rsun to reduce transformation issues
     aia193_test_map.meta['rsun_obs'] = eis_test_map.meta['dsun_obs']/2
-    aia193_test_map.meta['date-obs'] = eis_test_map.meta['date_obs']
     nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
     ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / eis_test_map.scale[1]
     aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
