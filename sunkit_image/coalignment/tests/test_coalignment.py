@@ -6,7 +6,7 @@ import pytest
 from scipy.ndimage import shift as sp_shift
 
 import astropy.units as u
-from astropy.coordinates import SkyCoord, baseframe
+from astropy.coordinates import SkyCoord,NonRotationTransformationWarning
 
 import sunpy.map
 from sunpy.net import Fido, attrs as a
@@ -19,7 +19,7 @@ from sunkit_image.data.test import get_test_filepath
 from sunkit_image.tests.helpers import figure_test
 
 # Ignore the warning from Astropy regarding the issue of large angular separation between the coordinates.
-warnings.simplefilter('ignore', baseframe.NonRotationTransformationWarning)
+warnings.simplefilter('ignore', NonRotationTransformationWarning)
 
 @pytest.fixture()
 def eis_test_map():
