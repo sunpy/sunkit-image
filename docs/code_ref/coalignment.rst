@@ -1,5 +1,5 @@
-Coalignment
-***********
+Coalignment Package
+*******************
 
 ``sunpy.coalignment`` provides routines to perform coalignment of solar images. The main entry point is the ``coalign`` function, which accepts a reference map, a target map, and a specified method
 for coalignment. This method returns a new map with updated metadata reflecting the applied affine transformations, such as scaling, rotation, and translation. 

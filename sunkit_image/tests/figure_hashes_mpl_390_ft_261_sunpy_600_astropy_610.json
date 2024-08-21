@@ -1,9 +1,7 @@
 {
-  "sunkit_image.coalignmnet.tests.test_coalignment.test_coalignment_figure": "2339ce38ff576888472a5f527b80c24ff34f0f7e9d7631af0eeefc96accb7ac7.",
+  "sunkit_image.coalignment.tests.test_coalignment.test_coalignment_figure": "2339ce38ff576888472a5f527b80c24ff34f0f7e9d7631af0eeefc96accb7ac7",
   "sunkit_image.tests.test_enhance.test_mgn[array]": "f7a8e5a7377422c652a47217981d1c3bd1a66b5c211eae6ef18e4cef2660e438",
   "sunkit_image.tests.test_enhance.test_mgn[map]": "50bb490a6cc2408befe13c7f2a54f7433df80c2473dd21b619ace35de7e8f250",
-  "sunkit_image.tests.test_enhance.test_wow[array]": "fe6ee53b57b2fc6d8ce8a96e4273c3ddbe17057aeded32611b8e7294648d28e5",
-  "sunkit_image.tests.test_enhance.test_wow[map]": "f5535fad0fe2d6ff2bfdfb10a984bb6a21ece95d971070482136fe6e6f874f1a",
   "sunkit_image.tests.test_radial.test_fig_nrgf": "3193fd00cf0d48c8f7aee21ed4b3a71a65e30ef80edecf0fd55330528b475a4a",
   "sunkit_image.tests.test_radial.test_fig_fnrgf": "404b6b49279eb2ff76c7ec63b632ed397bcf71e2db4ac6cfaf20c00b9d885cf5",
   "sunkit_image.tests.test_radial.test_fig_rhef": "c38e2522793b222438bc076576ef640a2c1b43b019b3e0558adecd6d25f61405",
