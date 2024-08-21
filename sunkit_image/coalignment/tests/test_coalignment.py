@@ -1,4 +1,5 @@
 import warnings
+from packaging import version
 import numpy as np
 from numpy.testing import assert_allclose
 import matplotlib.pyplot as plt
@@ -6,8 +7,8 @@ import pytest
 from scipy.ndimage import shift as sp_shift
 
 import astropy.units as u
+from astropy import __version__ as astropy_version
 from astropy.coordinates import SkyCoord
-from astropy.coordinates.errors import NonRotationTransformationWarning
 
 import sunpy.map
 from sunpy.net import Fido, attrs as a
@@ -19,8 +20,10 @@ from sunkit_image.coalignment.interface import AffineParams
 from sunkit_image.data.test import get_test_filepath
 from sunkit_image.tests.helpers import figure_test
 
-# Ignore the warning from Astropy regarding the issue of large angular separation between the coordinates.
-warnings.simplefilter('ignore', NonRotationTransformationWarning)
+if version.parse(astropy_version) >= version.parse("6.1"):
+    # Ignore the warning from Astropy regarding the issue of large angular separation between the coordinates.
+    from astropy.coordinates import NonRotationTransformationWarning
+    warnings.simplefilter('ignore', NonRotationTransformationWarning)
 
 @pytest.fixture()
 def eis_test_map():
