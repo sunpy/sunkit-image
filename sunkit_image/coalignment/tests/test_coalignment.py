@@ -6,7 +6,8 @@ import pytest
 from scipy.ndimage import shift as sp_shift
 
 import astropy.units as u
-from astropy.coordinates import SkyCoord,NonRotationTransformationWarning
+from astropy.coordinates import SkyCoord
+from astropy.coordinates.errors import NonRotationTransformationWarning
 
 import sunpy.map
 from sunpy.net import Fido, attrs as a

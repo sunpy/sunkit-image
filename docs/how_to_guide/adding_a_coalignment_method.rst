@@ -51,7 +51,7 @@ The :func:`~sunkit_image.coalignment.coalign` function does not change any probl
 Checking if the Method is Registered
 ====================================
 
-To check if your method is registered, you can check if it is present in the registered methods dictionary `~sunkit_image.coalignment.decorators.registered_methods` using the following code:
+To check if your method is registered, you can check if it is present in the registered methods dictionary ``registered_methods`` using the following code:
 
 .. code-block:: python
 
