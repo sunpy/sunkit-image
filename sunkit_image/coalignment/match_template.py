@@ -105,11 +105,12 @@ def match_template_coalign(reference_array, target_array):
     -------
     AffineParams
         A named tuple containing the following affine transformation parameters:
-        - scale: list
+
+        - scale : list
             A list of tuples representing the scale transformation as an identity matrix.
-        - rotation: float
+        - rotation : float
             The rotation angle in radians, which is fixed at 0.0 in this function.
-        - translation: tuple
+        - translation : tuple
             A tuple containing the x and y translation values.
     """
     corr = match_template(np.float64(reference_array), np.float64(target_array))
