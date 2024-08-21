@@ -115,7 +115,7 @@ def warn_user_of_separation(reference_map,target_map):
 
 def coalign(reference_map, target_map, method='match_template'):
     """
-    Performs image coalignment using a specified method (defaults to :func:`~sunkit_image.coalignment.match_template.match_template_coalign`).
+    Performs image coalignment using a specified method (defaults to `~sunkit_image.coalignment.match_template.match_template_coalign`).
     This function updates the metadata of the target map to align it with the reference map.
 
     .. note::
