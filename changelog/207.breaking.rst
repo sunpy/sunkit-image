@@ -1,1 +1,40 @@
-Adding the updated and better version of the Coalignment API.
+New Coalignment API `sunkit_image.coalignment`
+=======================================
+
+The new coalignment API, developed as part of the GSoC 2024 project, addresses the need for a more precise and flexible approach to image coalignment 
+within the `sunkit_image.coalignment` module. As solar imaging data continues to grow in complexity, the existing coalignment methods from ``sunpy.image.coalignment`` and ``sunpy.physics.solar_rotation``
+were found to be scattered and lacked a unified interface, leading to confusion and redundant code.
+
+This API refactor streamlines the coalignment process by consolidating these methods into a cohesive and user-friendly interface. Users can now easily select and apply different coalignment 
+techniques through a single, intuitive API, improving both accuracy and efficiency. Additionally, this new structure eliminates duplicate code and lays the groundwork for the seamless 
+integration of future coalignment functions.
+
+New Features
+------------
+
+1. **Coalignment Interface** (`sunkit_image.coalignment.interface`):
+   - **``coalign`` function**: A new high-level function for image coalignment, allowing users to coalign solar images with a specified method. The default method used is :func:`~sunkit_image.coalignment.match_template.match_template_coalign`. The function updates the metadata of the target map to align it with the reference map, while issuing warnings for large spatial or temporal separations between maps.
+   - **``AffineParams`` NamedTuple**: Introduced to store and pass affine transformation parameters, including scaling, rotation, and translation values.
+
+2. **Template Matching Coalignment** (`sunkit_image.coalignment.match_template`):
+   - **``match_template_coalign`` function**: A registered coalignment method that performs coalignment using template matching. This method computes the translation needed to align the target image with the reference image, while assuming no change in rotation or scaling.
+
+3. **Decorator Utility** (`sunkit_image.coalignment.decorators`):
+   - **``register_coalignment_method`` decorator**: Enables easy registration of coalignment methods by associating them with a name.
+   - **Global Registry**: Maintains a dictionary of all registered coalignment methods, allowing the :func:`~sunkit_image.coalignment.coalign` function to dynamically select and execute the desired method.
+
+Enhancements
+------------
+
+- **Improved Metadata Handling**: The ``update_fits_wcs_metadata`` function (in `sunkit_image.coalignment.interface`) updates WCS metadata based on affine transformation parameters, ensuring accurate alignment of solar images.
+- **User Warnings**: The ``warn_user_of_separation`` function (in `sunkit_image.coalignment.interface`) issues warnings when there are significant spatial or temporal separations between the reference and target maps, alerting users to avoid errors in the coalignment process.
+
+Documentation
+-------------
+
+All functions are documented with clear and concise docstrings and can be found in the API reference.
+
+Examples
+--------
+
+Please find the examples related to the :ref:`adding of coalignment method <sunkit-image-how-to-guide-add-a-new-coalignment-method>` and using a coalignment method here :ref:`sphx_glr_generated_gallery_aligning_aia_with_eis_maps.py`
