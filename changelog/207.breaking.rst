@@ -1,6 +1,7 @@
-**New Coalignment API `sunkit_image.coalignment`**
+**New Coalignment API in sunkit_image.coalignment**
 
-The new coalignment API, developed as part of the GSoC 2024 project, addresses the need for a more precise and flexible approach to image coalignment within the `sunkit_image.coalignment` module. As solar imaging data continues to grow in complexity, the existing coalignment methods from ``sunpy.image.coalignment`` and ``sunpy.physics.solar_rotation`` were found to be scattered and lacked a unified interface, leading to confusion and redundant code.
+The new coalignment API, developed as part of GSoC 2024, addresses the need for a more precise and flexible approach to image coalignment within the `sunkit_image.coalignment` module.
+As solar imaging data continues to grow in complexity, the existing coalignment methods from ``sunpy.image.coalignment`` and ``sunpy.physics.solar_rotation`` were found to be scattered and lacked a unified interface, leading to confusion and redundant code.
 
 **New Features:**
 
@@ -28,4 +29,3 @@ The new coalignment API, developed as part of the GSoC 2024 project, addresses t
 
 - Please find the examples related to the :ref:`adding of coalignment method <sunkit-image-how-to-guide-add-a-new-coalignment-method>` and using a 
 coalignment method here :ref:`sphx_glr_generated_gallery_aligning_aia_with_eis_maps.py`
- 

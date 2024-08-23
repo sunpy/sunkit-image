@@ -28,7 +28,6 @@ def eis_test_map():
 def test_coalignment(eis_test_map):
     aia193_test_map = sunpy.map.Map(Fido.fetch(Fido.search(a.Time(start=eis_test_map.meta["date_beg"], near=eis_test_map.meta["date_avg"], end=eis_test_map.meta["date_end"]), a.Instrument('aia'), a.Wavelength(193*u.angstrom))))
     # Synchronize rsun to reduce transformation issues
-    aia193_test_map.meta['rsun_obs'] = eis_test_map.meta['dsun_obs']/2
     nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
     ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / eis_test_map.scale[1]
     aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
@@ -97,7 +96,7 @@ def test_coalignment_reflects_scaling(cutout_map, aia171_test_map):
 
 @pytest.fixture()
 @register_coalignment_method("rotation")
-def coalign_scaling(reference_map, target_map):
+def coalign_rotation(reference_map, target_map):
     rotation_matrix = np.array([[0.866, -0.5], [0.5, 0.866]])
     return AffineParams(scale=np.array([1.0, 1.0]), rotation_matrix= rotation_matrix, translation=(0 , 0))
 

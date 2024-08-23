@@ -10,7 +10,7 @@ from sunpy.sun.models import differential_rotation
 
 from sunkit_image.coalignment.decorators import registered_methods
 
-__all__ = ["coalign", "AffineParams"]
+__all__ = ["AffineParams"]
 
 
 class AffineParams(NamedTuple):
@@ -28,7 +28,7 @@ class AffineParams(NamedTuple):
     translation: tuple[float, float]
 
 
-def update_fits_wcs_metadata(reference_map, target_map, AffineParams):
+def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     """
     Update the metadata of a sunpy Map object based on affine transformation
     parameters.
@@ -89,7 +89,7 @@ def warn_user_of_separation(reference_map,target_map):
     """
     ref_coord = SkyCoord(reference_map.observer_coordinate)
     target_coord = SkyCoord(target_map.observer_coordinate)
-    angular_separation = ref_coord.separation(target_coord)
+    angular_separation = ref_coord.separation(target_coord, origin_mismatch="ignore")
     if angular_separation > (1*u.deg):
         warnings.warn(## warn due to large angular separation
             "The angular separation between the reference and target maps is large. "
