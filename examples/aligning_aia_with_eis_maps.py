@@ -5,6 +5,7 @@ Coaligning EIS to AIA
 
 This example shows how to EISA data to AIA using cross-correlation which is implemented as the "match_template" method.
 """
+# sphinx_gallery_thumbnail_number = 2 # NOQA: ERA001
 
 import matplotlib.pyplot as plt
 
@@ -18,7 +19,8 @@ from sunkit_image.data.test import get_test_filepath
 ###################################################################################
 # Firstly, let us acquire the EIS and AIA data we need for this example.
 
-eis_map = sunpy.map.Map(get_test_filepath("eis_20140108_095727.fe_12_195_119.2c-0.int.fits"))
+with fits.open ("https://github.com/sunpy/data/raw/main/sunkit-image/eis_20140108_095727.fe_12_195_119.2c-0.int.fits") as hdul:
+    eis_map = sunpy.map.Map(hdul[0].data, hdul[0].header)
 eis_map.plot()
 
 ###################################################################################

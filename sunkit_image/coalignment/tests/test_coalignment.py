@@ -6,6 +6,7 @@ import pytest
 from scipy.ndimage import shift as sp_shift
 
 import astropy.units as u
+from astropy.io import fits
 from astropy.coordinates import SkyCoord
 
 import sunpy.map
@@ -20,7 +21,9 @@ from sunkit_image.tests.helpers import figure_test
 
 @pytest.fixture()
 def eis_test_map():
-    return sunpy.map.Map(get_test_filepath("eis_20140108_095727.fe_12_195_119.2c-0.int.fits"))
+    url = "https://github.com/sunpy/data/raw/main/sunkit-image/eis_20140108_095727.fe_12_195_119.2c-0.int.fits"
+    with fits.open(url) as hdul:
+        return sunpy.map.Map(hdul[0].data, hdul[0].header)
 
 
 @pytest.mark.remote_data()

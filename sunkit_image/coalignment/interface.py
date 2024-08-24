@@ -149,7 +149,7 @@ def coalign(reference_map, target_map, method='match_template'):
     target_array = target_map.data
     reference_array = reference_map.data
 
-    warn_user_of_separation(reference_map, target_map)
+    _warn_user_of_separation(reference_map, target_map)
 
     AffineParams = registered_methods[method](reference_array, target_array)
     return _update_fits_wcs_metadata(reference_map, target_map, AffineParams)
