@@ -1,12 +1,13 @@
 import warnings
 from typing import NamedTuple
+
 import numpy as np
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
-from sunpy.util.exceptions import SunpyUserWarning
 from sunpy.sun.models import differential_rotation
+from sunpy.util.exceptions import SunpyUserWarning
 
 from sunkit_image.coalignment.decorators import registered_methods
 
@@ -15,7 +16,8 @@ __all__ = ["AffineParams"]
 
 class AffineParams(NamedTuple):
     """
-    A 2-element tuple containing scale values defining the image scaling along the x and y axes.
+    A 2-element tuple containing scale values defining the image scaling along
+    the x and y axes.
     """
     scale: tuple[float, float]
     """
@@ -23,7 +25,8 @@ class AffineParams(NamedTuple):
     """
     rotation_matrix: tuple[tuple[float, float], tuple[float, float]]
     """
-    A 2-element tuple stores the translation of the image along the x and y axes.
+    A 2-element tuple stores the translation of the image along the x and y
+    axes.
     """
     translation: tuple[float, float]
 
@@ -55,7 +58,7 @@ def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
     rotation_matrix = affine_params.rotation_matrix
     # Updating the PC matrix
     new_pc_matrix = pc_matrix @ rotation_matrix
-    # Calculate the new reference pixel. 
+    # Calculate the new reference pixel.
     old_reference_pixel = np.array([target_map.reference_pixel.x.value, target_map.reference_pixel.y.value])
     new_reference_pixel = scale*rotation_matrix @ old_reference_pixel + translation
     reference_coord = reference_map.wcs.pixel_to_world(new_reference_pixel[0],new_reference_pixel[1])
@@ -87,11 +90,13 @@ def _warn_user_of_separation(reference_map,target_map):
     target_map : `sunpy.map.Map`
         The target map to be coaligned to the reference map.
     """
+    # Maximum angular separation allowed between the reference and target maps
+    tolerable_angular_separation = 1*u.deg
     ref_coord = SkyCoord(reference_map.observer_coordinate)
     target_coord = SkyCoord(target_map.observer_coordinate)
     angular_separation = ref_coord.separation(target_coord, origin_mismatch="ignore")
-    if angular_separation > (1*u.deg):
-        warnings.warn(## warn due to large angular separation
+    if angular_separation > tolerable_angular_separation:
+        warnings.warn(
             "The angular separation between the reference and target maps is large. "
             "This could cause errors when calculating shift between two "
             "images. Please make sure the maps are close in space.",
@@ -103,8 +108,8 @@ def _warn_user_of_separation(reference_map,target_map):
     target_time = target_map.date
     time_diff = abs(ref_time - target_time)
     time_separation_angle = differential_rotation(time_diff.to(u.day), reference_map.center.Tx, model='howard')
-    if time_separation_angle > (1*u.deg):
-        warnings.warn(## warn due to large time separation
+    if time_separation_angle > tolerable_angular_separation:
+        warnings.warn(
             "The time difference between the reference and target maps in time is large. "
             "This could cause errors when calculating shift between two "
             "images. Please make sure the maps are close in time.",
@@ -115,14 +120,16 @@ def _warn_user_of_separation(reference_map,target_map):
 
 def coalign(reference_map, target_map, method='match_template'):
     """
-    Performs image coalignment using a specified method (defaults to `~sunkit_image.coalignment.match_template.match_template_coalign`).
-    This function updates the metadata of the target map to align it with the reference map.
+    Performs image coalignment using a specified method (defaults to
+    `~sunkit_image.coalignment.match_template.match_template_coalign`). This
+    function updates the metadata of the target map to align it with the
+    reference map.
 
     .. note::
 
         * This function is intended to correct maps with known incorrect metadata. It is not designed to address issues like differential rotation or changes in observer location, which are encoded in the coordinate metadata.
         * The function modifies the metadata of the map, not the underlying array data. For adjustments that involve coordinate transformations, consider using `~sunpy.map.GenericMap.reproject_to` instead.
-    
+
     Parameters
     ----------
     reference_map : `sunpy.map.Map`
