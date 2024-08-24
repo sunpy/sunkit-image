@@ -10,6 +10,7 @@ This example shows how to EISA data to AIA using cross-correlation which is impl
 import matplotlib.pyplot as plt
 
 import astropy.units as u
+from astropy.io import fits
 from astropy.visualization import ImageNormalize, AsinhStretch
 from sunpy.net import Fido ,attrs as a
 import sunpy.map
