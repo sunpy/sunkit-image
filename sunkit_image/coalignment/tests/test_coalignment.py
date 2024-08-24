@@ -24,10 +24,8 @@ def eis_test_map():
 
 
 @pytest.mark.remote_data()
-@pytest.mark.filterwarnings("ignore:transforming other coordinates:astropy.coordinates.errors.NonRotationTransformationWarning")
 def test_coalignment(eis_test_map):
     aia193_test_map = sunpy.map.Map(Fido.fetch(Fido.search(a.Time(start=eis_test_map.meta["date_beg"], near=eis_test_map.meta["date_avg"], end=eis_test_map.meta["date_end"]), a.Instrument('aia'), a.Wavelength(193*u.angstrom))))
-    # Synchronize rsun to reduce transformation issues
     nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
     ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / eis_test_map.scale[1]
     aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
@@ -50,7 +48,6 @@ def test_coalignment_reflects_pixel_shifts(cutout_map, aia171_test_map):
     """Check if coalignment adjusts world coordinates as expected based on reference coordinate shifts."""
     messed_map = cutout_map.shift_reference_coord(25 * u.arcsec, 50 * u.arcsec)
     original_world_coords = cutout_map.reference_coordinate
-    # shifted_world_coords = messed_map.reference_coordinate
     fixed_cutout_map = coalign(aia171_test_map, messed_map)
     fixed_world_coords = fixed_cutout_map.reference_coordinate
     # The actual shifts applied by coalignment should be equal to the expected shifts

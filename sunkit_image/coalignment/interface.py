@@ -28,7 +28,7 @@ class AffineParams(NamedTuple):
     translation: tuple[float, float]
 
 
-def update_fits_wcs_metadata(reference_map, target_map, affine_params):
+def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
     """
     Update the metadata of a sunpy Map object based on affine transformation
     parameters.
@@ -39,7 +39,7 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
         The reference map object to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
         The original map object whose metadata is to be updated.
-    AffineParams : object
+    affine_params : object
         An object containing the affine transformation parameters. This object must
         have attributes for translation (dx, dy), scale, and rotation.
 
@@ -50,9 +50,9 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     """
     # Extacting the affine parameters
     pc_matrix = target_map.rotation_matrix
-    translation = AffineParams.translation
-    scale = AffineParams.scale
-    rotation_matrix = AffineParams.rotation_matrix
+    translation = affine_params.translation
+    scale = affine_params.scale
+    rotation_matrix = affine_params.rotation_matrix
     # Updating the PC matrix
     new_pc_matrix = pc_matrix @ rotation_matrix
     # Calculate the new reference pixel. 
@@ -75,7 +75,7 @@ def update_fits_wcs_metadata(reference_map, target_map, affine_params):
     return fixed_map
 
 
-def warn_user_of_separation(reference_map,target_map):
+def _warn_user_of_separation(reference_map,target_map):
     """
     Issues a warning if the separation between the reference and target maps is
     large.
@@ -152,4 +152,4 @@ def coalign(reference_map, target_map, method='match_template'):
     warn_user_of_separation(reference_map, target_map)
 
     AffineParams = registered_methods[method](reference_array, target_array)
-    return update_fits_wcs_metadata(reference_map, target_map, AffineParams)
+    return _update_fits_wcs_metadata(reference_map, target_map, AffineParams)
