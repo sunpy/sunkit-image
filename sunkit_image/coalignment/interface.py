@@ -3,6 +3,7 @@ from typing import NamedTuple
 
 import numpy as np
 
+import astropy
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
@@ -94,7 +95,10 @@ def _warn_user_of_separation(reference_map,target_map):
     tolerable_angular_separation = 1*u.deg
     ref_coord = SkyCoord(reference_map.observer_coordinate)
     target_coord = SkyCoord(target_map.observer_coordinate)
-    angular_separation = ref_coord.separation(target_coord, origin_mismatch="ignore")
+    if astropy.__version__ >= "6.1.0":
+        angular_separation = ref_coord.separation(target_coord, origin_mismatch="ignore")
+    else:
+        angular_separation = ref_coord.separation(target_coord)
     if angular_separation > tolerable_angular_separation:
         warnings.warn(
             "The angular separation between the reference and target maps is large. "
