@@ -36,7 +36,6 @@ The goal of ``sunkit-image`` is to provide access to image processing routines t
 3. Widely used throughout the solar physics community.
    Examples include co-alignment routines that compensate for incorrect pointing, solar feature identification algorithms, and filtering functions.
 
-As this is a SunPy affiliated package, the inputs to these routines are required to be Maps (sunpy) or NDCubes (ndcube).
 
 If the code is already in a released package, we will wrap calls to the existing package in a way that makes it easy to use with `sunpy.map.Map` or `ndcube.NDCube` objects.
 Additional modifications to such packages are outside the scope of ``sunkit-image``. 
