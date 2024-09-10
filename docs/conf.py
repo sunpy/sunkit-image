@@ -100,6 +100,7 @@ intersphinx_mapping = {
     ),
     "matplotlib": ("https://matplotlib.org/stable", None),
     "sunpy": ("https://docs.sunpy.org/en/stable/", None),
+    "ndcube": ('https://docs.sunpy.org/projects/ndcube/en/stable/', None),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "dask": ("https://docs.dask.org/en/latest", None),
     "skimage": ("https://scikit-image.org/docs/stable/", None),
