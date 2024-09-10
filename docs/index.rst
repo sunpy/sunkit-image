@@ -23,6 +23,23 @@ sunkit-image
           generated/gallery/index
           changelog
 
+Mission Statement
+=================
+
+The goal of ``sunkit-image`` is **not** to be a general purpose image processing library.
+
+The goal of ``sunkit-image`` is to provide access to image processing routines that are:
+
+1. Focused on being applied to solar image data.
+2. Are published in the literature or in preparation to be published.
+   If for any reason, there is doubt to the publication status, the code will only be merged when it's close to actual publication i.e., after approval from the referees.
+3. Widely used throughout the solar physics community.
+   Examples include co-alignment routines that compensate for incorrect pointing, solar feature identification algorithms, and filtering functions.
+
+If the code is already in a released package, we will wrap calls to the existing package in a way that makes it easy to use with `sunpy.map.Map` or `ndcube.NDCube` objects.
+Additional modifications to such packages are outside the scope of ``sunkit-image``.
+We will not copy code from other packages into this one.
+
 Installation
 ============
 
