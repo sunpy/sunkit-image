@@ -81,6 +81,7 @@ provides = ["sunkit_image"]
 license-files = ["LICENSE.rst"]
 
 [tool.setuptools.packages.find]
+include = ["sunkit_image*"]
 exclude = ["sunkit_image._dev*"]
 namespaces = false
 

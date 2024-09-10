@@ -78,6 +78,10 @@ jobs:
     needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
     with:
+<<<<<<<
+=======
+      default_python: '3.12'
+>>>>>>>
       submodules: false
       coverage: codecov
       toxdeps: tox-pypi-filter
@@ -87,6 +91,30 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+<<<<<<<
+=======
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  publish:
+    needs: [test, docs]
+    # Build wheels on PRs only when labelled. Releases will only be published if tagged ^v.*
+    # see https://github-actions-workflows.openastronomy.org/en/latest/publish.html#upload-to-pypi
+    if: |
+      github.event_name != 'pull_request' ||
+      (
+        github.event_name == 'pull_request' &&
+        contains(github.event.pull_request.labels.*.name, 'Run publish')
+      )
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@main
+    with:
+      python-version: '3.12'
+      test_extras: 'tests'
+      test_command: 'pytest -p no:warnings --doctest-rst --pyargs sunkit_image'
+      submodules: false
+    secrets:
+      pypi_token: ${{ secrets.pypi_token }}
+>>>>>>>
   devdeps:
     needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
