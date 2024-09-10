@@ -6,13 +6,16 @@ As solar imaging data continues to grow in complexity, the existing coalignment 
 **New Features:**
 
 - **Coalignment Interface** (`sunkit_image.coalignment.interface`):
+
   - ``coalign`` function: A high-level function for image coalignment with a specified method. Default method: :func:`~sunkit_image.coalignment.match_template.match_template_coalign`.
   - ``AffineParams`` NamedTuple: Stores and passes affine transformation parameters.
 
 - **Template Matching Coalignment** (`sunkit_image.coalignment.match_template`):
+
   - ``match_template_coalign`` function: A coalignment method that uses template matching.
 
 - **Decorator Utility** (`sunkit_image.coalignment.decorators`):
+
   - ``register_coalignment_method`` decorator: Enables easy registration of coalignment methods.
   - Global Registry: Maintains a dictionary of registered coalignment methods.
 
@@ -27,5 +30,4 @@ As solar imaging data continues to grow in complexity, the existing coalignment 
 
 **Examples**
 
-- Please find the examples related to the :ref:`adding of coalignment method <sunkit-image-how-to-guide-add-a-new-coalignment-method>` and using a 
-coalignment method here :ref:`sphx_glr_generated_gallery_aligning_aia_with_eis_maps.py`
+- Please find the examples related to the :ref:`adding of coalignment method <sunkit-image-how-to-guide-add-a-new-coalignment-method>` and using a coalignment method here :ref:`sphx_glr_generated_gallery_aligning_aia_with_eis_maps.py`

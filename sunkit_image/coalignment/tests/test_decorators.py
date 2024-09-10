@@ -1,4 +1,4 @@
-from sunkit_image.coalignment.decorators import register_coalignment_method, registered_methods
+from sunkit_image.coalignment.decorators import REGISTERED_METHODS, register_coalignment_method
 
 
 def test_register_coalignment_method():
@@ -6,6 +6,6 @@ def test_register_coalignment_method():
     def test_func():
         return "Test function"
 
-    assert "test_method" in registered_methods
-    assert registered_methods["test_method"] == test_func
+    assert "test_method" in REGISTERED_METHODS
+    assert REGISTERED_METHODS["test_method"] == test_func
     assert test_func() == "Test function"

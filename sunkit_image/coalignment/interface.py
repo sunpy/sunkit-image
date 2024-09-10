@@ -10,7 +10,7 @@ from astropy.coordinates import SkyCoord
 from sunpy.sun.models import differential_rotation
 from sunpy.util.exceptions import SunpyUserWarning
 
-from sunkit_image.coalignment.decorators import registered_methods
+from sunkit_image.coalignment.decorators import REGISTERED_METHODS
 
 __all__ = ["AffineParams"]
 
@@ -34,7 +34,7 @@ class AffineParams(NamedTuple):
 
 def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
     """
-    Update the metadata of a sunpy Map object based on affine transformation
+    Update the metadata of a sunpy.map.Map` based on affine transformation
     parameters.
 
     Parameters
@@ -43,46 +43,39 @@ def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
         The reference map object to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
         The original map object whose metadata is to be updated.
-    affine_params : object
-        An object containing the affine transformation parameters. This object must
-        have attributes for translation (dx, dy), scale, and rotation.
+    affine_params : `NamedTuple`
+        A `NamedTuple` containing the affine transformation parameters.
+        If you want to use a custom object, it must have attributes for "translation" (dx, dy), "scale", and "rotation_matrix".
 
     Returns
     -------
     `sunpy.map.Map`
         A new sunpy map object with updated metadata reflecting the affine transformation.
     """
-    # Extacting the affine parameters
-    pc_matrix = target_map.rotation_matrix
-    translation = affine_params.translation
-    scale = affine_params.scale
-    rotation_matrix = affine_params.rotation_matrix
-    # Updating the PC matrix
-    new_pc_matrix = pc_matrix @ rotation_matrix
+    # Updating the PC_ij matrix
+    new_pc_matrix = target_map.rotation_matrix @ affine_params.rotation_matrix
     # Calculate the new reference pixel.
-    old_reference_pixel = np.array([target_map.reference_pixel.x.value, target_map.reference_pixel.y.value])
-    new_reference_pixel = scale*rotation_matrix @ old_reference_pixel + translation
+    old_reference_pixel = np.asarray([target_map.reference_pixel.x.value, target_map.reference_pixel.y.value])
+    new_reference_pixel = affine_params.scale * affine_params.rotation_matrix @ old_reference_pixel + affine_params.translation
     reference_coord = reference_map.wcs.pixel_to_world(new_reference_pixel[0],new_reference_pixel[1])
     Txshift = reference_coord.Tx - target_map.reference_coordinate.Tx
     Tyshift = reference_coord.Ty - target_map.reference_coordinate.Ty
+
     # Create a new map with the updated metadata
     fixed_map = target_map.shift_reference_coord(Txshift, Tyshift)
-
     fixed_map.meta["PC1_1"] = new_pc_matrix[0, 0]
     fixed_map.meta["PC1_2"] = new_pc_matrix[0, 1]
     fixed_map.meta["PC2_1"] = new_pc_matrix[1, 0]
     fixed_map.meta["PC2_2"] = new_pc_matrix[1, 1]
-
-    fixed_map.meta['cdelt1'] = (target_map.scale[0] / scale[0]).value
-    fixed_map.meta['cdelt2'] = (target_map.scale[1] / scale[1]).value
-
+    fixed_map.meta['cdelt1'] = (target_map.scale[0] / affine_params.scale[0]).value
+    fixed_map.meta['cdelt2'] = (target_map.scale[1] / affine_params.scale[1]).value
     return fixed_map
 
 
-def _warn_user_of_separation(reference_map,target_map):
+def _warn_user_of_separation(reference_map, target_map):
     """
-    Issues a warning if the separation between the reference and target maps is
-    large.
+    Issues a warning if the separation between the ``reference_map`` and
+    ``target_map`` is large.
 
     Parameters
     ----------
@@ -124,15 +117,16 @@ def _warn_user_of_separation(reference_map,target_map):
 
 def coalign(reference_map, target_map, method='match_template'):
     """
-    Performs image coalignment using a specified method (defaults to
-    `~sunkit_image.coalignment.match_template.match_template_coalign`). This
-    function updates the metadata of the target map to align it with the
-    reference map.
+    Performs image coalignment using the specified method.
+
+    This function updates the metadata of the target map to align it with the reference map.
 
     .. note::
 
-        * This function is intended to correct maps with known incorrect metadata. It is not designed to address issues like differential rotation or changes in observer location, which are encoded in the coordinate metadata.
-        * The function modifies the metadata of the map, not the underlying array data. For adjustments that involve coordinate transformations, consider using `~sunpy.map.GenericMap.reproject_to` instead.
+        * This function is intended to correct maps with known incorrect metadata.
+          It is not designed to address issues like differential rotation or changes in observer location, which are encoded in the coordinate metadata.
+        * The function modifies the metadata of the map, not the underlying array data.
+          For adjustments that involve coordinate transformations, consider using `~sunpy.map.GenericMap.reproject_to` instead.
 
     Parameters
     ----------
@@ -153,14 +147,12 @@ def coalign(reference_map, target_map, method='match_template'):
     ValueError
         If the specified method is not registered.
     """
-    if method not in registered_methods:
-        msg = (f"Method {method} is not a registered method: {list(registered_methods.keys())}."
+    if method not in REGISTERED_METHODS:
+        msg = (f"Method {method} is not a registered method: {list(REGISTERED_METHODS.keys())}."
         "The method needs to be registered, with the correct import.")
         raise ValueError(msg)
     target_array = target_map.data
     reference_array = reference_map.data
-
     _warn_user_of_separation(reference_map, target_map)
-
-    AffineParams = registered_methods[method](reference_array, target_array)
-    return _update_fits_wcs_metadata(reference_map, target_map, AffineParams)
+    affine_params = REGISTERED_METHODS[method](reference_array, target_array)
+    return _update_fits_wcs_metadata(reference_map, target_map, affine_params)

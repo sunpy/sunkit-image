@@ -1,7 +1,7 @@
-__all__ = ["register_coalignment_method", "registered_methods"]
+__all__ = ["register_coalignment_method", "REGISTERED_METHODS"]
 
 # Global Dictionary to store the registered methods and their names
-registered_methods = {}
+REGISTERED_METHODS = {}
 
 
 def register_coalignment_method(name):
@@ -15,7 +15,7 @@ def register_coalignment_method(name):
     """
 
     def decorator(func):
-        registered_methods[name] = func
+        REGISTERED_METHODS[name] = func
         return func
 
     return decorator

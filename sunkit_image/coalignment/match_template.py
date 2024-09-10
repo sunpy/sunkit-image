@@ -94,28 +94,28 @@ def match_template_coalign(reference_array, target_array):
 
     Parameters
     ----------
-    input_array : numpy.ndarray
+    input_array : `numpy.ndarray`
         The input 2D array to be coaligned.
-    template_array : numpy.ndarray
+    template_array : `numpy.ndarray`
         The template 2D array to align to.
 
     Returns
     -------
-    AffineParams
-        A named tuple containing the following affine transformation parameters:
+    `sunkit_image.coalignment.interface.AffineParams`
+        A `NamedTuple` containing the following affine transformation parameters:
 
-        - scale : list
+        - scale : `list`
             A list of tuples representing the scale transformation as an identity matrix.
-        - rotation : float
+        - rotation : `float`
             The rotation angle in radians, which is fixed at 0.0 in this function.
-        - translation : tuple
+        - translation : `tuple`
             A tuple containing the x and y translation values.
-
     """
     corr = match_template(np.float64(reference_array), np.float64(target_array))
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
-    # Particularly for this method, there is no change in the rotation or scaling, hence the hardcoded values of scale to 1.0 & rotation to identity matrix
+    # Particularly for this method, there is no change in the rotation or scaling,
+    # hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = np.array([1.0, 1.0])
     rotation_matrix = np.eye(2)
     return AffineParams(scale=scale, rotation_matrix=rotation_matrix, translation=(x_shift , y_shift ))

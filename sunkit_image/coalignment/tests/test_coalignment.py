@@ -1,23 +1,21 @@
-import warnings
-import numpy as np
-from numpy.testing import assert_allclose
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
-from scipy.ndimage import shift as sp_shift
+from numpy.testing import assert_allclose
 
 import astropy.units as u
-from astropy.io import fits
 from astropy.coordinates import SkyCoord
+from astropy.io import fits
 
 import sunpy.map
-from sunpy.net import Fido, attrs as a
-from sunpy.util.exceptions import SunpyUserWarning
+from sunpy.net import Fido
+from sunpy.net import attrs as a
 
 from sunkit_image.coalignment import coalign
-from sunkit_image.coalignment.decorators import register_coalignment_method, registered_methods
+from sunkit_image.coalignment.decorators import register_coalignment_method
 from sunkit_image.coalignment.interface import AffineParams
-from sunkit_image.data.test import get_test_filepath
 from sunkit_image.tests.helpers import figure_test
+
 
 @pytest.fixture()
 def eis_test_map():
@@ -32,10 +30,10 @@ def test_coalignment(eis_test_map):
     nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
     ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / eis_test_map.scale[1]
     aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
-    coaligned_is_map = coalign(aia193_test_downsampled_map, eis_test_map, "match_template")
-    assert coaligned_is_map.data.shape == eis_test_map.data.shape
-    assert_allclose(coaligned_is_map.wcs.wcs.crval[0], aia193_test_downsampled_map.wcs.wcs.crval[0],rtol = 1e-2, atol = 0.13)
-    assert_allclose(coaligned_is_map.wcs.wcs.crval[1], aia193_test_downsampled_map.wcs.wcs.crval[1],rtol = 1e-2, atol = 0.13)
+    coaligned_eis_map = coalign(aia193_test_downsampled_map, eis_test_map, "match_template")
+    assert coaligned_eis_map.data.shape == eis_test_map.data.shape
+    assert_allclose(coaligned_eis_map.wcs.wcs.crval[0], aia193_test_downsampled_map.wcs.wcs.crval[0],rtol = 1e-2, atol = 0.13)
+    assert_allclose(coaligned_eis_map.wcs.wcs.crval[1], aia193_test_downsampled_map.wcs.wcs.crval[1],rtol = 1e-2, atol = 0.13)
 
 
 @pytest.fixture()
@@ -48,7 +46,10 @@ def cutout_map(aia171_test_map):
 
 
 def test_coalignment_reflects_pixel_shifts(cutout_map, aia171_test_map):
-    """Check if coalignment adjusts world coordinates as expected based on reference coordinate shifts."""
+    """
+    Check if coalignment adjusts world coordinates as expected based on
+    reference coordinate shifts.
+    """
     messed_map = cutout_map.shift_reference_coord(25 * u.arcsec, 50 * u.arcsec)
     original_world_coords = cutout_map.reference_coordinate
     fixed_cutout_map = coalign(aia171_test_map, messed_map)
@@ -71,7 +72,7 @@ def test_coalignment_figure(cutout_map, aia171_test_map):
     # Messed up map
     ax2 = fig.add_subplot(132, projection=messed_map)
     messed_map.plot(axes=ax2, title='Messed Cutout')
-    cutout_map.draw_contours(levels, axes=ax2, alpha=0.3) 
+    cutout_map.draw_contours(levels, axes=ax2, alpha=0.3)
     # After coalignment
     ax3 = fig.add_subplot(133, projection=fixed_cutout_map)
     fixed_cutout_map.plot(axes=ax3, title='Fixed Cutout')
