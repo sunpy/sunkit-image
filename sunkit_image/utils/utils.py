@@ -194,7 +194,9 @@ def reform2d(array, factor=1):
         msg = "Input array must be 2d!"
         raise ValueError(msg)
     if factor > 1:
-        congridx = RectBivariateSpline(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1)
+        congridx = RectBivariateSpline(
+            np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1
+        )
         return congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
     return array
 
@@ -392,7 +394,7 @@ def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
     mask = map_r > radius_limit
 
     # Apply the mask to the map data
-    masked_data = np.where(mask, 0, smap.data)
+    masked_data = np.where(mask, np.NAN, smap.data)
 
     # Create a new map with the masked data
     return sunpy.map.Map(masked_data, smap.meta)
