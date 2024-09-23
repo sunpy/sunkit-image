@@ -3,7 +3,6 @@ This module contains functions that can be used to enhance the regions above a
 radius.
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
