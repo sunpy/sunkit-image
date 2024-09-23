@@ -394,7 +394,7 @@ def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
     mask = map_r > radius_limit
 
     # Apply the mask to the map data
-    masked_data = np.where(mask, np.NAN, smap.data)
+    masked_data = np.where(mask, np.nan, smap.data)
 
     # Create a new map with the masked data
     return sunpy.map.Map(masked_data, smap.meta)

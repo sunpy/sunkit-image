@@ -106,7 +106,7 @@ def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
 
 def intensity_enhance(
     smap,
-    radial_bin_edges,
+    radial_bin_edges=None,
     scale=None,
     summarize_bin_edges="center",
     summary=np.mean,
@@ -171,8 +171,8 @@ def intensity_enhance(
     `sunpy.map.Map`
         A SunPy map that has the emission above the normalization radius enhanced.
     """
-    # Get the radii for every pixel
-    map_r = find_pixel_radii(smap).to(u.R_sun)
+    # Handle the bin edges and radius array
+    radial_bin_edges, map_r = find_radial_bin_edges(smap, radial_bin_edges)
 
     # Get the radial intensity distribution
     radial_intensity = get_radial_intensity_summary(
@@ -218,7 +218,7 @@ def intensity_enhance(
 
 def nrgf(
     smap,
-    radial_bin_edges,
+    radial_bin_edges=None,
     scale=None,
     intensity_summary=np.nanmean,
     intensity_summary_kwargs=None,
@@ -285,15 +285,9 @@ def nrgf(
         width_function_kwargs = {}
     if intensity_summary_kwargs is None:
         intensity_summary_kwargs = {}
-    map_r = find_pixel_radii(smap).to(u.R_sun)
 
-    # To make sure bins are in the map.
-    if radial_bin_edges[1, -1] > np.max(map_r):
-        radial_bin_edges = equally_spaced_bins(
-            inner_value=radial_bin_edges[0, 0],
-            outer_value=np.max(map_r),
-            nbins=radial_bin_edges.shape[1],
-        )
+    # Handle the bin edges and radius array
+    radial_bin_edges, map_r = find_radial_bin_edges(smap, radial_bin_edges)
 
     # Radial intensity
     radial_intensity = get_radial_intensity_summary(
@@ -470,16 +464,8 @@ def fnrgf(
         msg = "Minimum value of order is 1"
         raise ValueError(msg)
 
-    # Get the radii for every pixel
-    map_r = find_pixel_radii(smap).to(u.R_sun)
-
-    # To make sure bins are in the map.
-    if radial_bin_edges[1, -1] > np.max(map_r):
-        radial_bin_edges = equally_spaced_bins(
-            inner_value=radial_bin_edges[0, 0],
-            outer_value=np.max(map_r),
-            nbins=radial_bin_edges.shape[1],
-        )
+    # Handle the bin edges and radius
+    radial_bin_edges, map_r = find_radial_bin_edges(smap, radial_bin_edges)
 
     # Get the Helioprojective coordinates of each pixel
     x, y = np.meshgrid(*[np.arange(v.value) for v in smap.dimensions]) * u.pix
@@ -627,6 +613,26 @@ def _select_rank_method(method):
     return ranking_func
 
 
+def find_radial_bin_edges(smap, radial_bin_edges=None):
+    # Get the radii for every pixel, ensuring units are correct (in terms of pixels or solar radii)
+    map_r = find_pixel_radii(smap)
+    # Automatically generate radial bin edges if none are provided
+    if radial_bin_edges is None:
+        radial_bin_edges = equally_spaced_bins(0, 10 * np.max(map_r.value), smap.data.shape[0] // 2) * u.R_sun
+
+    # Ensure radial_bin_edges are within the bounds of the map_r values
+    if radial_bin_edges[1, -1] > np.max(map_r):
+        radial_bin_edges = (
+            equally_spaced_bins(
+                inner_value=radial_bin_edges[0, 0].to(u.R_sun).value,
+                outer_value=np.max(map_r.to(u.R_sun)).value,
+                nbins=radial_bin_edges.shape[1] // 2,
+            )
+            * u.R_sun
+        )
+    return radial_bin_edges, map_r
+
+
 @u.quantity_input(application_radius=u.R_sun, vignette=u.R_sun)
 def rhef(
     smap,
@@ -635,7 +641,7 @@ def rhef(
     application_radius=0 * u.R_sun,
     upsilon=0.35,
     method="numpy",
-    vignette=None,  # 1.5 * u.R_sun,
+    vignette=None,
     progress=True,
 ):
     """
@@ -664,9 +670,9 @@ def rhef(
     upsilon : float or None, optional
         A double-sided gamma function to apply to modify the equalized histograms. Defaults to 0.35.
     method : str, optional
-        Method used to rank the pixels for equalization. Defaults to 'inplace'.
+        Method used to rank the pixels for equalization. Defaults to 'inplace', with 'scipy' and 'numpy' as other options.
     vignette : `astropy.units.Quantity`, optional
-        Radius beyond which pixels will be set to black. Defaults to ``1.5*u.R_sun``. Set to None to disable vignetting.
+        Radius beyond which pixels will be set to NAN. Defaults to None, must be in units that are compatible with "R_sun" as the value will be transformed.
     progress : bool, optional
         If True, display a progress bar during the filtering process. Defaults to True.
 
@@ -684,29 +690,9 @@ def rhef(
       https://www.proquest.com/docview/2759080511
     """
 
-    # Get the radii for every pixel, ensuring units are correct (in terms of pixels or solar radii)
-    map_r = find_pixel_radii(smap)
+    radial_bin_edges, map_r = find_radial_bin_edges(smap, radial_bin_edges)
 
-    # Automatically generate radial bin edges if none are provided
-    if radial_bin_edges is None:
-        radial_bin_edges = equally_spaced_bins(0, 10 * np.max(map_r.value), smap.data.shape[0] // 2) * u.R_sun
-
-    # Ensure radial_bin_edges are within the bounds of the map_r values
-    if radial_bin_edges[1, -1] > np.max(map_r):
-        radial_bin_edges = (
-            equally_spaced_bins(
-                inner_value=radial_bin_edges[0, 0].to(u.R_sun).value,
-                outer_value=np.max(map_r.to(u.R_sun)).value,
-                nbins=radial_bin_edges.shape[1],
-            )
-            * u.R_sun
-        )
-    # Allocate storage for the filtered data
     data = np.zeros_like(smap.data)
-
-    # Enable progress bar for large numbers of bins
-    if radial_bin_edges.shape[1] > 2000:
-        progress = True
 
     # Select the ranking method
     ranking_func = _select_rank_method(method)
@@ -724,7 +710,6 @@ def rhef(
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
 
-    # Final update to the map
     new_map = Map(data, smap.meta)
 
     if vignette is not None:
