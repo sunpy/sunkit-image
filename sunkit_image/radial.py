@@ -351,7 +351,7 @@ def set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=
 
     .. note::
 
-    The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
+        The returned maps have their ``plot_settings`` changed to remove the extra normalization step.
 
     Parameters
     ----------
@@ -637,7 +637,6 @@ def rhef(
     method="numpy",
     vignette=None,  # 1.5 * u.R_sun,
     progress=True,
-    animate=False,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -670,8 +669,6 @@ def rhef(
         Radius beyond which pixels will be set to black. Defaults to ``1.5*u.R_sun``. Set to None to disable vignetting.
     progress : bool, optional
         If True, display a progress bar during the filtering process. Defaults to True.
-    animate : bool, optional
-        If True, display an animated plot during the filtering process. Defaults to False.
 
     Returns
     -------
@@ -711,12 +708,6 @@ def rhef(
     if radial_bin_edges.shape[1] > 2000:
         progress = True
 
-    # Create figure and axis for animation if enabled
-    if animate:
-        fig, ax = plt.subplots(1, 1)
-        im = ax.imshow(data, origin="lower", cmap="gray", vmin=0, vmax=1)
-        plt.show(block=False)
-
     # Select the ranking method
     ranking_func = _select_rank_method(method)
 
@@ -733,21 +724,15 @@ def rhef(
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
 
-        # If animation is enabled, update the image data in the figure
-        if animate:
-            im.set_data(data)
-            plt.pause(0.0001)  # Pause to refresh the plot
-    if animate:
-        plt.show(block=True)
-
     # Final update to the map
-    new_map = Map(data, smap.meta, autoalign=True)
-    # Apply the vignette if specified
+    new_map = Map(data, smap.meta)
+
     if vignette is not None:
         new_map = blackout_pixels_above_radius(new_map, vignette.to(u.R_sun))
 
     # Adjust plot settings to remove extra normalization
-    # This must be done whenever one is adjusting the overall statistical distribution of values
+    # This must be done whenever one is adjusting
+    # the overall statistical distribution of values
 
     new_map.plot_settings["norm"] = None
 
