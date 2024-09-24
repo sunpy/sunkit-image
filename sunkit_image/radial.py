@@ -10,7 +10,7 @@ import astropy.units as u
 
 import sunpy.map
 from sunpy.coordinates import frames
-from sunpy.map import Map
+
 
 from sunkit_image.utils import (
     apply_upsilon,
@@ -224,6 +224,7 @@ def nrgf(
     width_function=np.std,
     width_function_kwargs=None,
     application_radius=1 * u.R_sun,
+    progress=True,
 ):
     """
     Implementation of the normalizing radial gradient filter (NRGF).
@@ -267,6 +268,8 @@ def nrgf(
     application_radius : `astropy.units.Quantity`, optional
         The NRGF is applied to emission at radii above the application_radius.
         Defaults to 1 solar radii.
+    progress : ``bool``, optional
+        Show a progressbar while computing
 
     Returns
     -------
@@ -310,7 +313,7 @@ def nrgf(
     data = np.zeros_like(smap.data)
 
     # Calculate the filter value for each radial bin.
-    for i in tqdm(range(radial_bin_edges.shape[1]), desc="NRGF: "):
+    for i in tqdm(range(radial_bin_edges.shape[1]), desc="NRGF: ", disable=not progress):
         here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         here = np.logical_and(here, map_r > application_radius)
         data[here] = smap.data[here] - radial_intensity[i]
@@ -395,6 +398,7 @@ def fnrgf(
     width_function=np.std,
     application_radius=1 * u.R_sun,
     number_angular_segments=130,
+    progress=True,
 ):
     """
     Implementation of the fourier normalizing radial gradient filter (FNRGF).
@@ -442,6 +446,8 @@ def fnrgf(
     number_angular_segments : `int`
         Number of angular segments in a circular annulus.
         Defaults to 130.
+    progress : ``bool``, optional
+        Show a progressbar while computing
 
     Returns
     -------
@@ -483,7 +489,7 @@ def fnrgf(
     data = np.zeros_like(smap.data)
 
     # Iterate over each circular ring
-    for i in tqdm(range(nbins), desc="FNRGF: "):
+    for i in tqdm(range(nbins), desc="FNRGF: ", disable=not progress):
         # Finding the pixels which belong to a certain circular ring
         annulus = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
         annulus = np.logical_and(annulus, map_r > application_radius)
@@ -617,7 +623,7 @@ def find_radial_bin_edges(smap, radial_bin_edges=None):
     map_r = find_pixel_radii(smap)
     # Automatically generate radial bin edges if none are provided
     if radial_bin_edges is None:
-        radial_bin_edges = equally_spaced_bins(0, 10 * np.max(map_r.value), smap.data.shape[0] // 2) * u.R_sun
+        radial_bin_edges = equally_spaced_bins(0, np.max(map_r.value), smap.data.shape[0] // 2) * u.R_sun
 
     # Ensure radial_bin_edges are within the bounds of the map_r values
     if radial_bin_edges[1, -1] > np.max(map_r):
@@ -709,7 +715,7 @@ def rhef(
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
 
-    new_map = Map(data, smap.meta)
+    new_map = sunpy.map.Map(data, smap.meta)
 
     if vignette is not None:
         new_map = blackout_pixels_above_radius(new_map, vignette.to(u.R_sun))
