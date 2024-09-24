@@ -225,6 +225,7 @@ def nrgf(
     width_function_kwargs=None,
     application_radius=1 * u.R_sun,
     progress=True,
+    fill=np.nan,
 ):
     """
     Implementation of the normalizing radial gradient filter (NRGF).
@@ -270,6 +271,9 @@ def nrgf(
         Defaults to 1 solar radii.
     progress : ``bool``, optional
         Show a progressbar while computing
+    fill : ``any``, optional
+        The value to be placed outside of the bounds of the algorithm
+        Defaults to NAN.
 
     Returns
     -------
@@ -310,7 +314,7 @@ def nrgf(
     )
 
     # Storage for the filtered data
-    data = np.zeros_like(smap.data)
+    data = np.ones_like(smap.data) * fill
 
     # Calculate the filter value for each radial bin.
     for i in tqdm(range(radial_bin_edges.shape[1]), desc="NRGF: ", disable=not progress):
@@ -399,6 +403,7 @@ def fnrgf(
     application_radius=1 * u.R_sun,
     number_angular_segments=130,
     progress=True,
+    fill=np.nan,
 ):
     """
     Implementation of the fourier normalizing radial gradient filter (FNRGF).
@@ -448,6 +453,9 @@ def fnrgf(
         Defaults to 130.
     progress : ``bool``, optional
         Show a progressbar while computing
+    fill : ``any``, optional
+        The value to be placed outside of the bounds of the algorithm
+        Defaults to NAN.
 
     Returns
     -------
@@ -486,7 +494,7 @@ def fnrgf(
     nbins = radial_bin_edges.shape[1]
 
     # Storage for the filtered data
-    data = np.zeros_like(smap.data)
+    data = np.ones_like(smap.data) * fill
 
     # Iterate over each circular ring
     for i in tqdm(range(nbins), desc="FNRGF: ", disable=not progress):
@@ -648,6 +656,7 @@ def rhef(
     method="numpy",
     vignette=None,
     progress=True,
+    fill=np.nan,
 ):
     """
     Implementation of the Radial Histogram Equalizing Filter (RHEF).
@@ -680,7 +689,9 @@ def rhef(
         Radius beyond which pixels will be set to NAN. Defaults to None, must be in units that are compatible with "R_sun" as the value will be transformed.
     progress : bool, optional
         If True, display a progress bar during the filtering process. Defaults to True.
-
+    fill : ``any``, optional
+        The value to be placed outside of the bounds of the algorithm
+        Defaults to NAN.
     Returns
     -------
     `sunpy.map.Map`
@@ -697,7 +708,7 @@ def rhef(
 
     radial_bin_edges, map_r = find_radial_bin_edges(smap, radial_bin_edges)
 
-    data = np.zeros_like(smap.data)
+    data = np.ones_like(smap.data) * fill
 
     # Select the ranking method
     ranking_func = _select_rank_method(method)
