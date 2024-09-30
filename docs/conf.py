@@ -8,26 +8,29 @@ import pathlib
 import warnings
 from pathlib import Path
 
+from packaging.version import Version
+
 from astropy.utils.exceptions import AstropyDeprecationWarning
 from matplotlib import MatplotlibDeprecationWarning
 from packaging.version import Version
 from sunpy.util.exceptions import SunpyDeprecationWarning, SunpyPendingDeprecationWarning
 from sunpy_sphinx_theme import PNG_ICON
 
-<<<<<<<
-=======
-import datetime
+# -- Read the Docs Specific Configuration --------------------------------------
 
-from packaging.version import Version
+os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+if on_rtd:
+    os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
+    os.environ["HOME"] = "/home/docs/"
+    os.environ["LANG"] = "C"
+    os.environ["LC_ALL"] = "C"
 
 # -- Project information -----------------------------------------------------
 
 # The full version, including alpha/beta/rc tags
->>>>>>>
 from sunkit_image import __version__
 
-<<<<<<<
-=======
 _version = Version(__version__)
 version = release = str(_version)
 # Avoid "post" appearing in version string in rendered docs
@@ -38,25 +41,9 @@ elif _version.is_devrelease:
     version = release = f'{_version.base_version}.dev{_version.dev}'
 is_development = _version.is_devrelease
 
-project = "sunkit-image"
-author = "The SunPy Community"
->>>>>>>
-# -- Read the Docs Specific Configuration --------------------------------------
-os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
-if on_rtd:
-    os.environ["SUNPY_CONFIGDIR"] = "/home/docs/"
-    os.environ["HOME"] = "/home/docs/"
-    os.environ["LANG"] = "C"
-    os.environ["LC_ALL"] = "C"
-
 project = "sunkit_image"
 author = "The SunPy Community"
 copyright = f"{datetime.datetime.now(datetime.UTC).year}, {author}"  # NOQA: A001
-
-release = __version__
-sunkit_image_version = Version(__version__)
-is_release = not (sunkit_image_version.is_prerelease or sunkit_image_version.is_devrelease)
 
 # We want to make sure all the following warnings fail the build
 warnings.filterwarnings("error", category=SunpyDeprecationWarning)
@@ -103,13 +90,46 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
 ]
-html_extra_path = ["robots.txt"]
+
+# Add any paths that contain templates here, relative to this directory.
+# templates_path = ["_templates"]
+
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+# This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+# The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
 source_suffix = ".rst"
+
+# The master toctree document.
 master_doc = "index"
-default_role = "obj"
+
+# Treat everything in single ` as a Python reference.
+default_role = 'py:obj'
+
+html_extra_path = ["robots.txt"]
+
 napoleon_use_rtype = False
+
 napoleon_google_docstring = False
+
+# Enable nitpicky mode, which forces links to be non-broken
+nitpicky = True
+
+# This is not used. See docs/nitpick-exceptions file for the actual listing.
+nitpick_ignore = []
+with Path("nitpick-exceptions").open() as f:
+    for line in f.readlines():
+        if line.strip() == "" or line.startswith("#"):
+            continue
+        dtype, target = line.split(None, 1)
+        target = target.strip()
+        nitpick_ignore.append((dtype, target))
+
+# -- Options for intersphinx extension ---------------------------------------
+
 intersphinx_mapping = {
     "python": (
         "https://docs.python.org/3/",
@@ -131,20 +151,28 @@ intersphinx_mapping = {
     "skimage": ("https://scikit-image.org/docs/stable/", None),
 }
 
-# Enable nitpicky mode, which forces links to be non-broken
-nitpicky = True
-# This is not used. See docs/nitpick-exceptions file for the actual listing.
-nitpick_ignore = []
-with Path("nitpick-exceptions").open() as f:
-    for line in f.readlines():
-        if line.strip() == "" or line.startswith("#"):
-            continue
-        dtype, target = line.split(None, 1)
-        target = target.strip()
-        nitpick_ignore.append((dtype, target))
-
 # -- Options for HTML output ---------------------------------------------------
+
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
 html_theme = "sunpy"
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+# html_static_path = ["_static"]
+
+# By default, when rendering docstrings for classes, sphinx.ext.autodoc will
+# make docs with the class-level docstring and the class-method docstrings,
+# but not the __init__ docstring, which often contains the parameters to
+# class constructors across the scientific Python ecosystem. The option below
+# will append the __init__ docstring to the class-level docstring when rendering
+# the docs. For more options, see:
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autoclass_content
+autoclass_content = "both"
+
+# -- Graphviz Output ------------------------------------------------------------
+
 graphviz_output_format = "svg"
 graphviz_dot_args = [
     "-Nfontsize=10",
@@ -156,6 +184,7 @@ graphviz_dot_args = [
 ]
 
 # -- Options for the Sphinx gallery -------------------------------------------
+
 path = pathlib.Path.cwd()
 example_dir = path.parent.joinpath("examples")
 sphinx_gallery_conf = {
@@ -169,3 +198,5 @@ sphinx_gallery_conf = {
     "remove_config_comments": True,
     "only_warn_on_example_error": True,
 }
+
+# -- Other options ----------------------------------------------------------
