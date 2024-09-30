@@ -14,8 +14,33 @@ from packaging.version import Version
 from sunpy.util.exceptions import SunpyDeprecationWarning, SunpyPendingDeprecationWarning
 from sunpy_sphinx_theme import PNG_ICON
 
+<<<<<<<
+=======
+import datetime
+
+from packaging.version import Version
+
+# -- Project information -----------------------------------------------------
+
+# The full version, including alpha/beta/rc tags
+>>>>>>>
 from sunkit_image import __version__
 
+<<<<<<<
+=======
+_version = Version(__version__)
+version = release = str(_version)
+# Avoid "post" appearing in version string in rendered docs
+if _version.is_postrelease:
+    version = release = _version.base_version
+# Avoid long githashes in rendered Sphinx docs
+elif _version.is_devrelease:
+    version = release = f'{_version.base_version}.dev{_version.dev}'
+is_development = _version.is_devrelease
+
+project = "sunkit-image"
+author = "The SunPy Community"
+>>>>>>>
 # -- Read the Docs Specific Configuration --------------------------------------
 os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
