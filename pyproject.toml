@@ -29,6 +29,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
   "astropy>=5.3.0",
   "numpy>=1.23.5",
