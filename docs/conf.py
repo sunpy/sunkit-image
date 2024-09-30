@@ -12,7 +12,6 @@ from packaging.version import Version
 
 from astropy.utils.exceptions import AstropyDeprecationWarning
 from matplotlib import MatplotlibDeprecationWarning
-from packaging.version import Version
 from sunpy.util.exceptions import SunpyDeprecationWarning, SunpyPendingDeprecationWarning
 from sunpy_sphinx_theme import PNG_ICON
 
