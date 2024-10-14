@@ -27,7 +27,7 @@ aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 radial_bin_edges = equally_spaced_bins(0, 2, aia_map.data.shape[0] // 2)
 radial_bin_edges *= u.R_sun
 
-rhef_map = radial.rhef(aia_map, radial_bin_edges, progress=False)
+rhef_map = radial.rhef(aia_map, radial_bin_edges=radial_bin_edges, progress=False)
 
 fig = plt.figure(figsize=(15, 10))
 
