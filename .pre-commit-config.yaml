@@ -29,7 +29,7 @@ repos:
     rev: v2.3.0
     hooks:
       - id: codespell
-        args: [ "--write-changes" ]  
+        args: [ "--write-changes" ]
   - repo: https://github.com/crate-ci/typos
     rev: v1.23.1
     hooks:
