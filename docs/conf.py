@@ -45,34 +45,8 @@ project = "sunkit_image"
 author = "The SunPy Community"
 copyright = f"{datetime.datetime.now(datetime.UTC).year}, {author}"  # NOQA: A001
 
-# We want to make sure all the following warnings fail the build
-warnings.filterwarnings("error", category=SunpyDeprecationWarning)
-warnings.filterwarnings("error", category=SunpyPendingDeprecationWarning)
-warnings.filterwarnings("error", category=MatplotlibDeprecationWarning)
-warnings.filterwarnings("error", category=AstropyDeprecationWarning)
-
-# For the linkcheck
-linkcheck_ignore = [
-    r"https://doi.org/\d+",
-    r"https://element.io/\d+",
-    r"https://github.com/\d+",
-    r"https://docs.sunpy.org/\d+",
-]
-linkcheck_anchors = False
-
-# This is added to the end of RST files - a good place to put substitutions to
-# be used globally.
-rst_epilog = """
-.. SunPy
-.. _SunPy: https://sunpy.org
-.. _`SunPy mailing list`: https://groups.google.com/group/sunpy
-.. _`SunPy dev mailing list`: https://groups.google.com/group/sunpy-dev
-"""
-
 # -- General configuration -----------------------------------------------------
-suppress_warnings = [
-    "app.add_directive",
-]
+
 extensions = [
     "matplotlib.sphinxext.plot_directive",
     "sphinx_automodapi.automodapi",
@@ -109,25 +83,6 @@ master_doc = "index"
 # Treat everything in single ` as a Python reference.
 default_role = "py:obj"
 
-html_extra_path = ["robots.txt"]
-
-napoleon_use_rtype = False
-
-napoleon_google_docstring = False
-
-# Enable nitpicky mode, which forces links to be non-broken
-nitpicky = True
-
-# This is not used. See docs/nitpick-exceptions file for the actual listing.
-nitpick_ignore = []
-with Path("nitpick-exceptions").open() as f:
-    for line in f.readlines():
-        if line.strip() == "" or line.startswith("#"):
-            continue
-        dtype, target = line.split(None, 1)
-        target = target.strip()
-        nitpick_ignore.append((dtype, target))
-
 # -- Options for intersphinx extension ---------------------------------------
 
 intersphinx_mapping = {
@@ -157,6 +112,18 @@ intersphinx_mapping = {
 # a list of builtin themes.
 html_theme = "sunpy"
 
+# Render inheritance diagrams in SVG
+graphviz_output_format = "svg"
+
+graphviz_dot_args = [
+    "-Nfontsize=10",
+    "-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Efontsize=10",
+    "-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Gfontsize=10",
+    "-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+]
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -171,19 +138,52 @@ html_theme = "sunpy"
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autoclass_content
 autoclass_content = "both"
 
-# -- Graphviz Output ------------------------------------------------------------
+# -- Other options ----------------------------------------------------------
 
-graphviz_output_format = "svg"
-graphviz_dot_args = [
-    "-Nfontsize=10",
-    "-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
-    "-Efontsize=10",
-    "-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif",
-    "-Gfontsize=10",
-    "-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+html_extra_path = ["robots.txt"]
+
+napoleon_use_rtype = False
+
+napoleon_google_docstring = False
+
+# Enable nitpicky mode, which forces links to be non-broken
+nitpicky = True
+
+# This is not used. See docs/nitpick-exceptions file for the actual listing.
+nitpick_ignore = []
+with Path("nitpick-exceptions").open() as f:
+    for line in f.readlines():
+        if line.strip() == "" or line.startswith("#"):
+            continue
+        dtype, target = line.split(None, 1)
+        target = target.strip()
+        nitpick_ignore.append((dtype, target))
+
+# We want to make sure all the following warnings fail the build
+warnings.filterwarnings("error", category=SunpyDeprecationWarning)
+warnings.filterwarnings("error", category=SunpyPendingDeprecationWarning)
+warnings.filterwarnings("error", category=MatplotlibDeprecationWarning)
+warnings.filterwarnings("error", category=AstropyDeprecationWarning)
+
+# For the linkcheck
+linkcheck_ignore = [
+    r"https://doi.org/\d+",
+    r"https://element.io/\d+",
+    r"https://github.com/\d+",
+    r"https://docs.sunpy.org/\d+",
 ]
+linkcheck_anchors = False
 
-# -- Options for the Sphinx gallery -------------------------------------------
+# This is added to the end of RST files - a good place to put substitutions to
+# be used globally.
+rst_epilog = """
+.. SunPy
+.. _SunPy: https://sunpy.org
+.. _`SunPy mailing list`: https://groups.google.com/group/sunpy
+.. _`SunPy dev mailing list`: https://groups.google.com/group/sunpy-dev
+"""
+
+# -- Options for the Sphinx gallery -----------------------------------------
 
 path = pathlib.Path.cwd()
 example_dir = path.parent.joinpath("examples")
@@ -198,5 +198,3 @@ sphinx_gallery_conf = {
     "remove_config_comments": True,
     "only_warn_on_example_error": True,
 }
-
-# -- Other options ----------------------------------------------------------
