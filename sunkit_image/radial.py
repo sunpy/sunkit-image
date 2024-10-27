@@ -507,7 +507,6 @@ def fnrgf(
     # Storage for the filtered data
     data = np.zeros_like(smap.data)
 
-    # Set attenuation coefficients
     attenuation_coefficients = _set_attenuation_coefficients(order, range_mean, range_std, cutoff)
 
     # Iterate over each circular ring
