@@ -20,12 +20,12 @@ from sunkit_image.utils import (
     get_radial_intensity_summary,
 )
 
-__all__ = ["fnrgf", "intensity_enhance", "set_attenuation_coefficients", "nrgf", "rhef"]
+__all__ = ["fnrgf", "intensity_enhance", "nrgf", "rhef"]
 
 
 def _fit_polynomial_to_log_radial_intensity(radii, intensity, degree):
     """
-    Fits a polynomial of  a given degree to the log of the radial intensity.
+    Fits a polynomial of a given degree to the log of the radial intensity.
 
     Parameters
     ----------
@@ -329,7 +329,7 @@ def nrgf(
     return new_map
 
 
-def set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=0):
+def _set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=0):
     """
     This is a helper function to Fourier Normalizing Radial Gradient Filter
     (`sunkit_image.radial.fnrgf`).
@@ -396,7 +396,9 @@ def fnrgf(
     smap,
     radial_bin_edges,
     order,
-    attenuation_coefficients,
+    range_mean=None,
+    range_std=None,
+    cutoff=0,
     ratio_mix=None,
     intensity_summary=np.nanmean,
     width_function=np.std,
@@ -430,10 +432,14 @@ def fnrgf(
         A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is the number of bins.
     order : `int`
         Order (number) of fourier coefficients and it can not be lower than 1.
-    attenuation_coefficients : `float`
-        A two dimensional array of shape ``[2, order + 1]``. The first row contain attenuation
-        coefficients for mean calculations. The second row contains attenuation coefficients
-        for standard deviation calculation.
+    range_mean : `list`, optional
+        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
+        mean approximation be calculated in a linearly decreasing manner.
+    range_std : `list`, optional
+        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
+        standard deviation approximation be calculated in a linearly decreasing manner.
+    cutoff : `int`, optional
+        The numbers of coefficients from the last that should be set to ``zero``.
     ratio_mix : `float`, optional
         A one dimensional array of shape ``[2, 1]`` with values equal to ``[K1, K2]``.
         The ratio in which the original image and filtered image are mixed.
@@ -500,6 +506,9 @@ def fnrgf(
 
     # Storage for the filtered data
     data = np.zeros_like(smap.data)
+
+    # Set attenuation coefficients
+    attenuation_coefficients = _set_attenuation_coefficients(order, range_mean, range_std, cutoff)
 
     # Iterate over each circular ring
     for i in tqdm(range(nbins), desc="FNRGF: ", disable=not progress):
