@@ -329,7 +329,7 @@ def nrgf(
     return new_map
 
 
-def _set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=0):
+def _set_attenuation_coefficients(order, mean_attenuation_range=None, std_attenuation_range=None, cutoff=0):
     """
     This is a helper function to Fourier Normalizing Radial Gradient Filter
     (`sunkit_image.radial.fnrgf`).
@@ -337,7 +337,7 @@ def _set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff
     This function sets the attenuation coefficients in the one of the following two manners:
 
     If ``cutoff`` is ``0``, then it will set the attenuation coefficients as linearly decreasing between
-    the range ``range_mean`` for the attenuation coefficients for mean approximation and ``range_std`` for
+    the range ``mean_attenuation_range`` for the attenuation coefficients for mean approximation and ``std_attenuation_range`` for
     the attenuation coefficients for standard deviation approximation.
 
     If ``cutoff`` is not ``0``, then it will set the last ``cutoff`` number of coefficients equal to zero
@@ -357,11 +357,11 @@ def _set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff
     ----------
     order : `int`
         The order of the Fourier approximation.
-    range_mean : `list`, optional
-        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
+    mean_attenuation_range : `tuple`, optional
+        A tuple of length ``2`` which contains the highest and lowest values between which the coefficients for
         mean approximation be calculated in a linearly decreasing manner.
-    range_std : `list`, optional
-        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
+    std_attenuation_range : `tuple`, optional
+        A tuple of length ``2`` which contains the highest and lowest values between which the coefficients for
         standard deviation approximation be calculated in a linearly decreasing manner.
     cutoff : `int`, optional
         The numbers of coefficients from the last that should be set to ``zero``.
@@ -374,13 +374,17 @@ def _set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff
         the mean approximation. The second row contains the attenuation coefficients for the Fourier coefficients
         of the standard deviation approximation.
     """
-    if range_std is None:
-        range_std = [1.0, 0.0]
-    if range_mean is None:
-        range_mean = [1.0, 0.0]
+    if std_attenuation_range is None:
+        std_attenuation_range = (1.0, 0.0)
+    if mean_attenuation_range is None:
+        mean_attenuation_range = (1.0, 0.0)
     attenuation_coefficients = np.zeros((2, order + 1))
-    attenuation_coefficients[0, :] = np.linspace(range_mean[0], range_mean[1], order + 1)
-    attenuation_coefficients[1, :] = np.linspace(range_std[0], range_std[1], order + 1)
+    attenuation_coefficients[0, :] = np.linspace(mean_attenuation_range[0], mean_attenuation_range[1], order + 1)
+    attenuation_coefficients[1, :] = np.linspace(std_attenuation_range[0], std_attenuation_range[1], order + 1)
+
+    # A two dimensional array of shape ``[2, order + 1]``. The first row contains attenuation
+    # coefficients for mean calculations. The second row contains attenuation coefficients
+    # for standard deviation calculation.
 
     if cutoff > (order + 1):
         msg = "Cutoff cannot be greater than order + 1."
@@ -396,8 +400,8 @@ def fnrgf(
     smap,
     radial_bin_edges,
     order,
-    range_mean=None,
-    range_std=None,
+    mean_attenuation_range=None,
+    std_attenuation_range=None,
     cutoff=0,
     ratio_mix=None,
     intensity_summary=np.nanmean,
@@ -432,11 +436,11 @@ def fnrgf(
         A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is the number of bins.
     order : `int`
         Order (number) of fourier coefficients and it can not be lower than 1.
-    range_mean : `list`, optional
-        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
+    mean_attenuation_range : `tuple`, optional
+        A tuple of length ``2`` which contains the highest and lowest values between which the coefficients for
         mean approximation be calculated in a linearly decreasing manner.
-    range_std : `list`, optional
-        A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
+    std_attenuation_range : `tuple`, optional
+        A tuple of length ``2`` which contains the highest and lowest values between which the coefficients for
         standard deviation approximation be calculated in a linearly decreasing manner.
     cutoff : `int`, optional
         The numbers of coefficients from the last that should be set to ``zero``.
@@ -507,7 +511,8 @@ def fnrgf(
     # Storage for the filtered data
     data = np.zeros_like(smap.data)
 
-    attenuation_coefficients = _set_attenuation_coefficients(order, range_mean, range_std, cutoff)
+    # Set attenuation coefficients
+    attenuation_coefficients = _set_attenuation_coefficients(order, mean_attenuation_range, std_attenuation_range, cutoff)
 
     # Iterate over each circular ring
     for i in tqdm(range(nbins), desc="FNRGF: ", disable=not progress):
