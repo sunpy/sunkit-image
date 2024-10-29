@@ -1,0 +1,1 @@
+All functions under (`sunkit_image.radial`) now have a settable fill value which now defaults to NaN instead of 0.

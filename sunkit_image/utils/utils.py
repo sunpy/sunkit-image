@@ -24,6 +24,7 @@ __all__ = [
     "remove_duplicate",
     "apply_upsilon",
     "blackout_pixels_above_radius",
+    "find_radial_bin_edges"
 ]
 
 
@@ -194,7 +195,9 @@ def reform2d(array, factor=1):
         msg = "Input array must be 2d!"
         raise ValueError(msg)
     if factor > 1:
-        congridx = RectBivariateSpline(np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1)
+        congridx = RectBivariateSpline(
+            np.arange(0, array.shape[0]), np.arange(0, array.shape[1]), array, kx=1, ky=1
+        )
         return congridx(np.arange(0, array.shape[0], 1 / factor), np.arange(0, array.shape[1], 1 / factor))
     return array
 
@@ -369,7 +372,7 @@ def apply_upsilon(data, upsilon=(0.5, 0.5)):
     return out_curve
 
 
-def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
+def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun, fill=np.nan):
     """
     Black out any pixels above a certain radius in a SunPy map.
 
@@ -379,6 +382,9 @@ def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
         The input sunpy map.
     radius_limit : `astropy.units.Quantity`
         The radius limit above which to black out pixels.
+    fill : ``Any``, optional
+        The value to use above the ``radius_limit``.
+        Defaults to Nan.
 
     Returns
     -------
@@ -392,7 +398,49 @@ def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun):
     mask = map_r > radius_limit
 
     # Apply the mask to the map data
-    masked_data = np.where(mask, 0, smap.data)
+    masked_data = np.where(mask, fill, smap.data)
 
     # Create a new map with the masked data
     return sunpy.map.Map(masked_data, smap.meta)
+
+
+def find_radial_bin_edges(smap, radial_bin_edges=None):
+    """
+    Calculate radial bin edges for a solar map, either using provided edges or
+    generating them automatically.
+
+    Parameters
+    ----------
+    smap : `sunpy.map.Map`
+        A sunpy Map containing the data to be binned.
+    radial_bin_edges : `astropy.units.Quantity`, optional
+        Pre-defined bin edges for radial binning. Should be a Quantity array with units
+        of solar radii (u.R_sun) or pixels. If `None` (the default), bin edges
+        will be automatically generated based on the map dimensions.
+
+    Returns
+    -------
+    `astropy.units.Quantity`
+        The final bin edges used for radial binning.
+    `astropy.units.Quantity`
+        Array of radial distances for each pixel in the map, matching the input
+        map dimensions.
+    """
+    # Get the radii for every pixel, ensuring units are correct (in terms of pixels or solar radii)
+    map_r = find_pixel_radii(smap)
+
+    # Automatically generate radial bin edges if none are provided
+    if radial_bin_edges is None:
+        radial_bin_edges = equally_spaced_bins(0, np.max(map_r.value), smap.data.shape[0] // 2) * u.R_sun
+
+    # Ensure radial_bin_edges are within the bounds of the map_r values
+    if radial_bin_edges[1, -1] < np.max(map_r):
+        radial_bin_edges = (
+            equally_spaced_bins(
+                inner_value=radial_bin_edges[0, 0].to(u.R_sun).value,
+                outer_value=np.max(map_r.to(u.R_sun)).value,
+                nbins=radial_bin_edges.shape[1] // 2,
+            )
+            * u.R_sun
+        )
+    return radial_bin_edges, map_r

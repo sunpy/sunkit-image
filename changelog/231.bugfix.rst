@@ -1,0 +1,1 @@
+Improved the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`) to work with images outside of SDO/AIA.
