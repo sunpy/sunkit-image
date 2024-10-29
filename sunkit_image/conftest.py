@@ -1,6 +1,7 @@
 import os
 import logging
 import tempfile
+import warnings
 import importlib.util
 
 import numpy as np
@@ -9,6 +10,7 @@ import skimage
 
 import astropy
 import astropy.config.paths
+from astropy.io.fits.verify import VerifyWarning
 from astropy.utils.data import get_pkg_data_filename
 
 import sunpy.data.sample
@@ -170,13 +172,25 @@ def granule_minimap3():
     )
     return sunpy.map.GenericMap(arr, header)
 
-
 @pytest.fixture(params=["array", "map"])
 def aia_171(request):
-    smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
+    # VerifyWarning: Invalid 'BLANK' keyword in header.
+    # The 'BLANK' keyword is only applicable to integer data, and will be ignored in this HDU.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=VerifyWarning)
+        smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
     if request.param == "map":
         return smap
     return smap.data if request.param == "array" else None
+
+
+@pytest.fixture()
+def aia_171_map():
+    # VerifyWarning: Invalid 'BLANK' keyword in header.
+    # The 'BLANK' keyword is only applicable to integer data, and will be ignored in this HDU.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=VerifyWarning)
+        return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 
 @pytest.fixture()

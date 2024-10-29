@@ -11,13 +11,11 @@ import astropy.units as u
 import sunpy.map
 from sunpy.coordinates import frames
 
-
 from sunkit_image.utils import (
     apply_upsilon,
     bin_edge_summary,
     blackout_pixels_above_radius,
-    equally_spaced_bins,
-    find_pixel_radii,
+    find_radial_bin_edges,
     get_radial_intensity_summary,
 )
 
@@ -102,9 +100,39 @@ def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
         polynomial,
     )
 
+def _select_rank_method(method):
+    # For now, we have more than one option for ranking the values
+    def _percentile_ranks_scipy(arr):
+        from scipy import stats
+
+        return stats.rankdata(arr, method="average") / len(arr)
+
+    def _percentile_ranks_numpy(arr):
+        sorted_indices = np.argsort(arr)
+        ranks = np.empty_like(sorted_indices)
+        ranks[sorted_indices] = np.arange(1, len(arr) + 1)
+        return ranks / float(len(arr))
+
+    def _percentile_ranks_numpy_inplace(arr):
+        sorted_indices = np.argsort(arr)
+        arr[sorted_indices] = np.arange(1, len(arr) + 1)
+        return arr / float(len(arr))
+
+    # Select the sort method
+    if method == "inplace":
+        ranking_func = _percentile_ranks_numpy_inplace
+    elif method == "numpy":
+        ranking_func = _percentile_ranks_numpy
+    elif method == "scipy":
+        ranking_func = _percentile_ranks_scipy
+    else:
+        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
+        raise NotImplementedError(msg)
+    return ranking_func
 
 def intensity_enhance(
     smap,
+    *,
     radial_bin_edges=None,
     scale=None,
     summarize_bin_edges="center",
@@ -136,9 +164,10 @@ def intensity_enhance(
     ----------
     smap : `sunpy.map.Map`
         The sunpy map to enhance.
-    radial_bin_edges : `astropy.units.Quantity`
+    radial_bin_edges : `astropy.units.Quantity`, optional
         A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is
         the number of bins.
+        Defaults to `None` which will use equally spaced bins.
     scale : `astropy.units.Quantity`, optional
         The radius of the Sun expressed in map units.
         For example, in typical Helioprojective Cartesian maps the solar radius is expressed in
@@ -209,7 +238,6 @@ def intensity_enhance(
 
     # Return a map with the intensity enhanced above the normalization radius
     # and the same meta data as the input map.
-
     new_map = sunpy.map.Map(smap.data * enhancement, smap.meta)
     new_map.plot_settings["norm"] = None
     return new_map
@@ -217,6 +245,7 @@ def intensity_enhance(
 
 def nrgf(
     smap,
+    *,
     radial_bin_edges=None,
     scale=None,
     intensity_summary=np.nanmean,
@@ -224,7 +253,7 @@ def nrgf(
     width_function=np.std,
     width_function_kwargs=None,
     application_radius=1 * u.R_sun,
-    progress=True,
+    progress=False,
     fill=np.nan,
 ):
     """
@@ -247,9 +276,10 @@ def nrgf(
     ----------
     smap : `sunpy.map.Map`
         The sunpy map to enhance.
-    radial_bin_edges : `astropy.units.Quantity`
+    radial_bin_edges : `astropy.units.Quantity`, optional
         A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is
         the number of bins.
+        Defaults to `None` which will use equally spaced bins.
     scale : None or `astropy.units.Quantity`, optional
         The radius of the Sun expressed in map units.
         For example, in typical Helioprojective Cartesian maps the solar radius is expressed in
@@ -269,11 +299,12 @@ def nrgf(
     application_radius : `astropy.units.Quantity`, optional
         The NRGF is applied to emission at radii above the application_radius.
         Defaults to 1 solar radii.
-    progress : ``bool``, optional
-        Show a progressbar while computing
-    fill : ``any``, optional
-        The value to be placed outside of the bounds of the algorithm
-        Defaults to NAN.
+    progress : `bool`, optional
+        Show a progressbar while computing.
+        Defaults to `False`.
+    fill : Any, optional
+        The value to be placed outside of the bounds of the algorithm.
+        Defaults to NaN.
 
     Returns
     -------
@@ -394,15 +425,16 @@ def set_attenuation_coefficients(order, range_mean=None, range_std=None, cutoff=
 
 def fnrgf(
     smap,
-    radial_bin_edges,
-    order,
+    *,
     attenuation_coefficients,
+    radial_bin_edges=None,
+    order=3,
     ratio_mix=None,
     intensity_summary=np.nanmean,
     width_function=np.std,
     application_radius=1 * u.R_sun,
     number_angular_segments=130,
-    progress=True,
+    progress=False,
     fill=np.nan,
 ):
     """
@@ -427,10 +459,13 @@ def fnrgf(
     ----------
     smap : `sunpy.map.Map`
         A SunPy map.
-    radial_bin_edges : `astropy.units.Quantity`
-        A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is the number of bins.
-    order : `int`
+    radial_bin_edges : `astropy.units.Quantity`, optional
+        A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is
+        the number of bins.
+        Defaults to `None` which will use equally spaced bins.
+    order : `int`, optional
         Order (number) of fourier coefficients and it can not be lower than 1.
+        Defaults to 3.
     attenuation_coefficients : `float`
         A two dimensional array of shape ``[2, order + 1]``. The first row contain attenuation
         coefficients for mean calculations. The second row contains attenuation coefficients
@@ -451,11 +486,12 @@ def fnrgf(
     number_angular_segments : `int`
         Number of angular segments in a circular annulus.
         Defaults to 130.
-    progress : ``bool``, optional
-        Show a progressbar while computing
-    fill : ``any``, optional
-        The value to be placed outside of the bounds of the algorithm
-        Defaults to NAN.
+    progress : `bool`, optional
+        Show a progressbar while computing.
+        Defaults to `False`.
+    fill : Any, optional
+        The value to be placed outside of the bounds of the algorithm.
+        Defaults to NaN.
 
     Returns
     -------
@@ -595,57 +631,6 @@ def fnrgf(
     return new_map
 
 
-def _select_rank_method(method):
-    # For now, we have more than one option for ranking the values
-    def _percentile_ranks_scipy(arr):
-        from scipy import stats
-
-        return stats.rankdata(arr, method="average") / len(arr)
-
-    def _percentile_ranks_numpy(arr):
-        sorted_indices = np.argsort(arr)
-        ranks = np.empty_like(sorted_indices)
-        ranks[sorted_indices] = np.arange(1, len(arr) + 1)
-        return ranks / float(len(arr))
-
-    def _percentile_ranks_numpy_inplace(arr):
-        sorted_indices = np.argsort(arr)
-        arr[sorted_indices] = np.arange(1, len(arr) + 1)
-        return arr / float(len(arr))
-
-    # Select the sort method
-    if method == "inplace":
-        ranking_func = _percentile_ranks_numpy_inplace
-    elif method == "numpy":
-        ranking_func = _percentile_ranks_numpy
-    elif method == "scipy":
-        ranking_func = _percentile_ranks_scipy
-    else:
-        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
-        raise NotImplementedError(msg)
-    return ranking_func
-
-
-def find_radial_bin_edges(smap, radial_bin_edges=None):
-    # Get the radii for every pixel, ensuring units are correct (in terms of pixels or solar radii)
-    map_r = find_pixel_radii(smap)
-    # Automatically generate radial bin edges if none are provided
-    if radial_bin_edges is None:
-        radial_bin_edges = equally_spaced_bins(0, np.max(map_r.value), smap.data.shape[0] // 2) * u.R_sun
-
-    # Ensure radial_bin_edges are within the bounds of the map_r values
-    if radial_bin_edges[1, -1] > np.max(map_r):
-        radial_bin_edges = (
-            equally_spaced_bins(
-                inner_value=radial_bin_edges[0, 0].to(u.R_sun).value,
-                outer_value=np.max(map_r.to(u.R_sun)).value,
-                nbins=radial_bin_edges.shape[1] // 2,
-            )
-            * u.R_sun
-        )
-    return radial_bin_edges, map_r
-
-
 @u.quantity_input(application_radius=u.R_sun, vignette=u.R_sun)
 def rhef(
     smap,
@@ -655,7 +640,7 @@ def rhef(
     upsilon=0.35,
     method="numpy",
     vignette=None,
-    progress=True,
+    progress=False,
     fill=np.nan,
 ):
     """
@@ -677,21 +662,27 @@ def rhef(
         The SunPy map to enhance using the RHEF algorithm.
     radial_bin_edges : `astropy.units.Quantity`, optional
         A two-dimensional array of bin edges of size ``[2, nbins]`` where ``nbins`` is the number of bins.
-        These define the radial segments where filtering is applied. If None, radial bins will be generated automatically.
+        These define the radial segments where filtering is applied.
+        If None, radial bins will be generated automatically.
     application_radius : `astropy.units.Quantity`, optional
         The radius above which to apply the RHEF. Only regions with radii above this value will be filtered.
         Defaults to 0 solar radii.
     upsilon : float or None, optional
         A double-sided gamma function to apply to modify the equalized histograms. Defaults to 0.35.
-    method : str, optional
-        Method used to rank the pixels for equalization. Defaults to 'inplace', with 'scipy' and 'numpy' as other options.
+    method : ``{"inplace", "numpy", "scipy"}``, optional
+        Method used to rank the pixels for equalization.
+        Defaults to 'inplace'.
     vignette : `astropy.units.Quantity`, optional
-        Radius beyond which pixels will be set to NAN. Defaults to None, must be in units that are compatible with "R_sun" as the value will be transformed.
-    progress : bool, optional
-        If True, display a progress bar during the filtering process. Defaults to True.
-    fill : ``any``, optional
-        The value to be placed outside of the bounds of the algorithm
-        Defaults to NAN.
+        Radius beyond which pixels will be set to NaN.
+        Must be in units that are compatible with "R_sun" as the value will be transformed.
+        Defaults to `None`.
+    progress : `bool`, optional
+        Show a progressbar while computing.
+        Defaults to `False`.
+    fill : Any, optional
+        The value to be placed outside of the bounds of the algorithm.
+        Defaults to NaN.
+
     Returns
     -------
     `sunpy.map.Map`
@@ -734,7 +725,6 @@ def rhef(
     # Adjust plot settings to remove extra normalization
     # This must be done whenever one is adjusting
     # the overall statistical distribution of values
-
     new_map.plot_settings["norm"] = None
 
     # Return the new SunPy map with RHEF applied
