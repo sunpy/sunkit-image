@@ -63,7 +63,6 @@ docs = [
   "sphinx-changelog",
   "sphinx-design",
   "sphinx-gallery",
-  "sunpy-sphinx-theme",
   "sunpy[data,net]>=6.0.0",
 ]
 dev = ["sunkit_image[all,tests,docs]"]
