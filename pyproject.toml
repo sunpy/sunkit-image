@@ -54,6 +54,7 @@ tests = [
 docs = [
   "sphinx",
   "sphinx-automodapi",
+  "sunpy-sphinx-theme",
   "packaging",
   "sunkit_image[all]",
   "astroscrappy",
