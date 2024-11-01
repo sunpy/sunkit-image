@@ -78,12 +78,13 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         [96.0, 224.0, 288.0, 224.0, 96.0],
         [-0.0, 96.0, 128.0, 96.0, -0.0],
     ]
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     expect = rad.fnrgf(
         map_test1,
-        attenuation_coefficients=attenuation_coefficients,
         radial_bin_edges=radial_bin_edges,
         order=order,
+        range_mean=[1.0, 0.0],
+        range_std=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
         fill=0,
@@ -102,7 +103,9 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         map_test2,
         radial_bin_edges=radial_bin_edges,
         order=order,
-        attenuation_coefficients=attenuation_coefficients,
+        range_mean=[1.0, 0.0],
+        range_std=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
         fill=0,
@@ -120,12 +123,13 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         [0.0, 90.52799999986772, 124.46862915010152, 90.52799999989331, -0.0],
     ]
 
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     expect2 = rad.fnrgf(
         map_test1,
         radial_bin_edges=radial_bin_edges,
         order=order,
-        attenuation_coefficients=attenuation_coefficients,
+        range_mean=[1.0, 0.0],
+        range_std=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
         fill=0,
@@ -142,12 +146,13 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         [0.0, 120.55347470601022, 124.46862915010152, 90.67852529370734, -0.0],
     ]
 
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     expect3 = rad.fnrgf(
         map_test2,
         radial_bin_edges=radial_bin_edges,
         order=order,
-        attenuation_coefficients=attenuation_coefficients,
+        range_mean=[1.0, 0.0],
+        range_std=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
         fill=0,
@@ -162,7 +167,9 @@ def test_fnrgf_errors(map_test1):
         rad.fnrgf(
             map_test1,
             order=0,
-            attenuation_coefficients=rad.set_attenuation_coefficients(0),
+            range_mean=[1.0, 0.0],
+            range_std=[1.0, 0.0],
+            cutoff=0,
         )
 
 @figure_test
@@ -180,8 +187,7 @@ def test_fig_fnrgf(aia_171_map):
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
     order = 20
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
-    out = rad.fnrgf(aia_171_map, radial_bin_edges=radial_bin_edges, order=order, attenuation_coefficients=attenuation_coefficients)
+    out = rad.fnrgf(aia_171_map, radial_bin_edges=radial_bin_edges, order=order, range_mean=[1.0, 0.0], range_std=[1.0, 0.0], cutoff=0)
     out.plot()
 
 
@@ -231,30 +237,6 @@ def test_multifig_rhef(aia_171_map):
     fig.tight_layout()
 
     return fig
-
-
-def test_set_attenuation_coefficients():
-    order = 1
-    # Hand calculated
-    expect1 = [[1, 0.0], [1, 0.0]]
-
-    result1 = rad.set_attenuation_coefficients(order)
-    assert np.allclose(expect1, result1)
-
-    order = 3
-    # Hand calculated
-    expect2 = [[1.0, 0.66666667, 0.33333333, 0.0], [1.0, 0.66666667, 0.33333333, 0.0]]
-
-    result2 = rad.set_attenuation_coefficients(order)
-    assert np.allclose(expect2, result2)
-
-    expect3 = [[1.0, 0.66666667, 0.0, 0.0], [1.0, 0.66666667, 0.0, 0.0]]
-
-    result3 = rad.set_attenuation_coefficients(order, cutoff=2)
-    assert np.allclose(expect3, result3)
-
-    with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
-        rad.set_attenuation_coefficients(order, cutoff=5)
 
 
 def test_fit_polynomial_to_log_radial_intensity():
