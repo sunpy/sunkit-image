@@ -309,3 +309,27 @@ def test_intensity_enhance_errors(map_test1):
     scale = 1 * map_test1.rsun_obs
     with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
         rad.intensity_enhance(map_test1, scale=scale, fit_range=fit_range[::-1])
+
+
+def test_set_attenuation_coefficients():
+    order = 1
+    # Hand calculated
+    expect1 = [[1, 0.0], [1, 0.0]]
+
+    result1 = rad._set_attenuation_coefficients(order)
+    assert np.allclose(expect1, result1)
+
+    order = 3
+    # Hand calculated
+    expect2 = [[1.0, 0.66666667, 0.33333333, 0.0], [1.0, 0.66666667, 0.33333333, 0.0]]
+
+    result2 = rad._set_attenuation_coefficients(order)
+    assert np.allclose(expect2, result2)
+
+    expect3 = [[1.0, 0.66666667, 0.0, 0.0], [1.0, 0.66666667, 0.0, 0.0]]
+
+    result3 = rad._set_attenuation_coefficients(order, cutoff=2)
+    assert np.allclose(expect3, result3)
+
+    with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
+        rad._set_attenuation_coefficients(order, cutoff=5)
