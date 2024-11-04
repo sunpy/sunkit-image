@@ -131,8 +131,6 @@ def _select_rank_method(method):
     return ranking_func
 
 
-
-
 def intensity_enhance(
     smap,
     *,
