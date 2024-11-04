@@ -471,11 +471,14 @@ def fnrgf(
     range_mean : `list`, optional
         A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
         mean approximation be calculated in a linearly decreasing manner.
+        Defaults to `None`.
     range_std : `list`, optional
         A list of length of ``2`` which contains the highest and lowest values between which the coefficients for
         standard deviation approximation be calculated in a linearly decreasing manner.
+        Defaults to `None`.
     cutoff : `int`, optional
         The numbers of coefficients from the last that should be set to ``zero``.
+        Defaults to 0.
     ratio_mix : `float`, optional
         A one dimensional array of shape ``[2, 1]`` with values equal to ``[K1, K2]``.
         The ratio in which the original image and filtered image are mixed.
