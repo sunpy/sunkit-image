@@ -238,6 +238,29 @@ def test_multifig_rhef(aia_171_map):
 
     return fig
 
+def test_set_attenuation_coefficients():
+    order = 1
+    # Hand calculated
+    expect1 = [[1, 0.0], [1, 0.0]]
+
+    result1 = rad._set_attenuation_coefficients(order)
+    assert np.allclose(expect1, result1)
+
+    order = 3
+    # Hand calculated
+    expect2 = [[1.0, 0.66666667, 0.33333333, 0.0], [1.0, 0.66666667, 0.33333333, 0.0]]
+
+    result2 = rad._set_attenuation_coefficients(order)
+    assert np.allclose(expect2, result2)
+
+    expect3 = [[1.0, 0.66666667, 0.0, 0.0], [1.0, 0.66666667, 0.0, 0.0]]
+
+    result3 = rad._set_attenuation_coefficients(order, cutoff=2)
+    assert np.allclose(expect3, result3)
+
+    with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
+        rad._set_attenuation_coefficients(order, cutoff=5)
+
 
 def test_fit_polynomial_to_log_radial_intensity():
     radii = (0.001, 0.002) * u.R_sun
@@ -311,25 +334,3 @@ def test_intensity_enhance_errors(map_test1):
         rad.intensity_enhance(map_test1, scale=scale, fit_range=fit_range[::-1])
 
 
-def test_set_attenuation_coefficients():
-    order = 1
-    # Hand calculated
-    expect1 = [[1, 0.0], [1, 0.0]]
-
-    result1 = rad._set_attenuation_coefficients(order)
-    assert np.allclose(expect1, result1)
-
-    order = 3
-    # Hand calculated
-    expect2 = [[1.0, 0.66666667, 0.33333333, 0.0], [1.0, 0.66666667, 0.33333333, 0.0]]
-
-    result2 = rad._set_attenuation_coefficients(order)
-    assert np.allclose(expect2, result2)
-
-    expect3 = [[1.0, 0.66666667, 0.0, 0.0], [1.0, 0.66666667, 0.0, 0.0]]
-
-    result3 = rad._set_attenuation_coefficients(order, cutoff=2)
-    assert np.allclose(expect3, result3)
-
-    with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
-        rad._set_attenuation_coefficients(order, cutoff=5)
