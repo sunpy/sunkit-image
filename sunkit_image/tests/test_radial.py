@@ -82,8 +82,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         map_test1,
         radial_bin_edges=radial_bin_edges,
         order=order,
-        range_mean=[1.0, 0.0],
-        range_std=[1.0, 0.0],
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
         cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
@@ -103,8 +103,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         map_test2,
         radial_bin_edges=radial_bin_edges,
         order=order,
-        range_mean=[1.0, 0.0],
-        range_std=[1.0, 0.0],
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
         cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
@@ -127,8 +127,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         map_test1,
         radial_bin_edges=radial_bin_edges,
         order=order,
-        range_mean=[1.0, 0.0],
-        range_std=[1.0, 0.0],
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
         cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
@@ -150,8 +150,8 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         map_test2,
         radial_bin_edges=radial_bin_edges,
         order=order,
-        range_mean=[1.0, 0.0],
-        range_std=[1.0, 0.0],
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
         cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
@@ -167,8 +167,8 @@ def test_fnrgf_errors(map_test1):
         rad.fnrgf(
             map_test1,
             order=0,
-            range_mean=[1.0, 0.0],
-            range_std=[1.0, 0.0],
+            mean_attenuation_range=[1.0, 0.0],
+            std_attenuation_range=[1.0, 0.0],
             cutoff=0,
         )
 
@@ -187,7 +187,7 @@ def test_fig_fnrgf(aia_171_map):
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
     order = 20
-    out = rad.fnrgf(aia_171_map, radial_bin_edges=radial_bin_edges, order=order, range_mean=[1.0, 0.0], range_std=[1.0, 0.0], cutoff=0)
+    out = rad.fnrgf(aia_171_map, radial_bin_edges=radial_bin_edges, order=order, mean_attenuation_range=[1.0, 0.0], std_attenuation_range=[1.0, 0.0], cutoff=0)
     out.plot()
 
 
