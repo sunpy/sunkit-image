@@ -332,5 +332,3 @@ def test_intensity_enhance_errors(map_test1):
     scale = 1 * map_test1.rsun_obs
     with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
         rad.intensity_enhance(map_test1, scale=scale, fit_range=fit_range[::-1])
-
-
