@@ -48,7 +48,7 @@ base_nrgf = radial.nrgf(aia_map, radial_bin_edges=radial_bin_edges, application_
 # choose them according to your requirements.
 
 order = 20
-attenuation_coefficients = radial.set_attenuation_coefficients(order)
+attenuation_coefficients = radial._set_attenuation_coefficients(order)
 
 base_fnrgf = radial.fnrgf(aia_map, radial_bin_edges=radial_bin_edges, order=order, attenuation_coefficients=attenuation_coefficients, application_radius=1 * u.R_sun)
 
