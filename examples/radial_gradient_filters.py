@@ -13,12 +13,9 @@ These are:
 """
 
 import matplotlib.pyplot as plt
-
 import astropy.units as u
-
 import sunpy.data.sample
 import sunpy.map
-
 import sunkit_image.radial as radial
 from sunkit_image.utils import equally_spaced_bins
 
@@ -50,7 +47,17 @@ base_nrgf = radial.nrgf(aia_map, radial_bin_edges=radial_bin_edges, application_
 order = 20
 attenuation_coefficients = [1.0 - i / order for i in range(order)]
 
-base_fnrgf = radial.fnrgf(aia_map, radial_bin_edges=radial_bin_edges, order=order, attenuation_coefficients=attenuation_coefficients, application_radius=1 * u.R_sun)
+# Generate attenuation coefficients using _set_attenuation_coefficients
+mean_attenuation_range, std_attenuation_range = radial._set_attenuation_coefficients(order, attenuation_coefficients)
+
+base_fnrgf = radial.fnrgf(
+    aia_map,
+    radial_bin_edges=radial_bin_edges,
+    order=order,
+    mean_attenuation_range=mean_attenuation_range,
+    std_attenuation_range=std_attenuation_range,
+    application_radius=1 * u.R_sun
+)
 
 ###########################################################################
 # Now we will also use the final filter, RHEF.
