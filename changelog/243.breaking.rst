@@ -1,29 +1,9 @@
-The function ``set_attenuation_coefficients`` was renamed to ``_set_attenuation_coefficients`` to indicate that it is a helper function and not intended to be part of the public API in ``radial.py``.
-The function ``set_attenuation_coefficients`` was removed from the ``__all__`` list, indicating that it is not part of the public API ``radial.py``.
-The ``fnrgf`` function now calls ``_set_attenuation_coefficients`` to set the attenuation coefficients instead of using a separate parameter for ``attenuation_coefficients`` in ``radial.py``.
-The ``fnrgf`` function now accepts ``mean_attenuation_range`` and ``std_attenuation_range`` parameters, which are passed to ``_set_attenuation_coefficients`` in ``radial.py``.
-The ``attenuation_coefficients`` parameter was removed from the ``fnrgf`` function since it is now set internally using ``_set_attenuation_coefficients`` in ``radial.py``.
-The documentation for the ``fnrgf`` function was updated to reflect the changes in parameters and the internal use of ``_set_attenuation_coefficients`` in ``radial.py``.
-The ``fnrgf`` function now uses ``mean_attenuation_range`` and ``std_attenuation_range`` instead of ``attenuation_coefficients`` in ``test_radial.py``.
-The ``set_attenuation_coefficients`` function has been made private by renaming it to ``_set_attenuation_coefficients`` in ``test_radial.py``.
-The test functions ``test_fnrgf``, ``test_fnrgf_errors``, and ``test_fig_fnrgf`` have been updated to reflect the new parameter names and removed ``attenuation_coefficients``.
+The function ``set_attenuation_coefficients`` has been renamed to ``_set_attenuation_coefficients`` in ``radial.py`` and removed from the public API (``__all__``).
+This impacts if you were directly using ``set_attenuation_coefficients``, replace calls with ``fnrgf``, which now handles the setting attenuation coefficients internally.
 
-The following function is renamed in ``radial.py``:
--  ``set_attenuation_coefficients`` ->  ``_set_attenuation_coefficients``.
+``fnrgf`` no longer accepts ``attenuation_coefficients`` as parameter.
+New parameters ``mean_attenuation_range`` and ``std_attenuation_range`` are now used to control attenuation ranges, these are passed to the ``_set_attenuation_coefficients`` helper function internally.
+This impacts if your code was passing ``attenuation_coefficients`` to fnrgf, update it to use ``mean_attenuation_range`` and ``std_attenuation_range`` instead.
 
-The following variables are renamed in ``radial.py``:
--  ``range_mean`` -> ``mean_attenuation_range`` in ``_set_attenuation_coefficients``.
--  ``range_std`` -> ``std_attenuation_range`` in ``_set_attenuation_coefficients``.
--  ``range_mean`` -> ``mean_attenuation_range`` in ``fnrgf``.
--  ``range_std`` -> ``std_attenuation_range`` in ``fnrgf``.
-
-The following function is renamed in ``test_radial.py``:
--  ``set_attenuation_coefficients`` -> ``_set_attenuation_coefficients`` (made private).
-
-The following parameters are renamed  in ``test_radial.py``:
--  ``range_mean`` -> ``mean_attenuation_range`` in ``_set_attenuation_coefficients``.
--  ``range_std`` -> ``std_attenuation_range`` in ``_set_attenuation_coefficients``.
--  ``range_mean`` -> ``mean_attenuation_range`` in ``fnrgf``.
--  ``range_std`` -> ``std_attenuation_range`` in ``fnrgf``.
-
-Now the parameters could just be passed in as arguments to the main algorithm, rather than having an extra public function and Could also be handled by importing from the utils file, for ease of understanding.
+The tests ``test_fnrgf``, ``test_fnrgf_errors``, and ``test_fig_fnrgf`` in ``test_radial.py`` have been updated to reflect the mew parameter names and removal of ``attenuation_coefficients``.
+If you are mainatining custom tests based on these, rename ``range_mean`` to ``mean_attenuation_range`` and ``range_std`` to ``std_attenuation-range`` in your test suite as well.
