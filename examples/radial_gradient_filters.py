@@ -45,21 +45,13 @@ base_nrgf = radial.nrgf(aia_map, radial_bin_edges=radial_bin_edges, application_
 #
 # Order is the number of Fourier coefficients to be used in the approximation.
 # The attenuation coefficients are calculated to be linearly decreasing, you should
-# choose them according to your requirements.
+# choose them according to your requirements. These can be changed by tweaking the following keywords: ``mean_attenuation_range`` and ``std_attenuation_range``.
 
 order = 20
-attenuation_coefficients = [1.0 - i / order for i in range(order)]
-
-# Manually calculate mean_attenuation_range and std_attenuation_range
-mean_attenuation_range = [1.0, 0.0]
-std_attenuation_range = [1.0, 0.0]
-
 base_fnrgf = radial.fnrgf(
     aia_map,
     radial_bin_edges=radial_bin_edges,
     order=order,
-    mean_attenuation_range=mean_attenuation_range,
-    std_attenuation_range=std_attenuation_range,
     application_radius=1 * u.R_sun
 )
 
