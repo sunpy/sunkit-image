@@ -1,9 +1,3 @@
-The function ``set_attenuation_coefficients`` has been renamed to ``_set_attenuation_coefficients`` in ``radial.py`` and removed from the public API (``__all__``).
-This impacts if you were directly using ``set_attenuation_coefficients``, replace calls with ``fnrgf``, which now handles the setting attenuation coefficients internally.
+The function ``set_attenuation_coefficients`` has been removed from the public API.
 
-``fnrgf`` no longer accepts ``attenuation_coefficients`` as parameter.
-New parameters ``mean_attenuation_range`` and ``std_attenuation_range`` are now used to control attenuation ranges, these are passed to the ``_set_attenuation_coefficients`` helper function internally.
-This impacts if your code was passing ``attenuation_coefficients`` to fnrgf, update it to use ``mean_attenuation_range`` and ``std_attenuation_range`` instead.
-
-The tests ``test_fnrgf``, ``test_fnrgf_errors``, and ``test_fig_fnrgf`` in ``test_radial.py`` have been updated to reflect the mew parameter names and removal of ``attenuation_coefficients``.
-If you are mainatining custom tests based on these, rename ``range_mean`` to ``mean_attenuation_range`` and ``range_std`` to ``std_attenuation-range`` in your test suite as well.
+Now you can pass in the inputs used by ``set_attenuation_coefficients`` directly into `sunkit.radia.fnrgf`, which now accepts ``mean_attenuation_range`` and ``std_attenuation_range``.
