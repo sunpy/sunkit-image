@@ -50,8 +50,9 @@ base_nrgf = radial.nrgf(aia_map, radial_bin_edges=radial_bin_edges, application_
 order = 20
 attenuation_coefficients = [1.0 - i / order for i in range(order)]
 
-# Generate attenuation coefficients using _set_attenuation_coefficients
-mean_attenuation_range, std_attenuation_range = radial._set_attenuation_coefficients(order, attenuation_coefficients)
+# Manually calculate mean_attenuation_range and std_attenuation_range
+mean_attenuation_range = [1.0, 0.0]
+std_attenuation_range = [1.0, 0.0]
 
 base_fnrgf = radial.fnrgf(
     aia_map,
