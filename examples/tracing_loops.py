@@ -1,17 +1,18 @@
 """
 =====================
-Tracing Coronal Loops
+Tracing Coronal Loops and Extracting Intensities
 =====================
 
 This example traces out the coronal loops in a FITS image
-using `~sunkit_image.trace.occult2`.
+using `~sunkit_image.trace.occult2` and then extracts the intensities
+along the traced loops.
 
 In this example we will use the settings and the data from Markus Aschwanden's tutorial
 on his IDL implementation of the ``OCCULT2`` algorithm, which can be found
 `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
 
 The aim of this example is to demonstrate that `~sunkit_image.trace.occult2` provides similar
-results compared to the IDL version.
+results compared to the IDL version and how to extract intensities along the traced loops.
 """
 
 import matplotlib.pyplot as plt
@@ -69,5 +70,32 @@ for loop in loops:
     ax.plot_coord(coord_loops, color="b")
 
 fig.tight_layout()
+
+###############################################################################
+# Now, let's extract the intensities along the first detected loop and plot the intensity profile.
+
+# Convert the first loop to SkyCoord objects
+first_loop = np.array(loops[0])
+intensity_coords = trace_map.pixel_to_world(first_loop[:, 0] * u.pixel, first_loop[:, 1] * u.pixel)
+
+# Sample the intensity along the loop
+intensity = sunpy.map.sample_at_coords(trace_map, intensity_coords)
+
+# Calculate the angular separation along the loop
+angular_separation = intensity_coords.separation(intensity_coords[0]).to(u.arcsec)
+
+# Plot the intensity profile
+fig2 = plt.figure(figsize=(10, 4))
+ax2 = fig2.add_subplot(121, projection=trace_map)
+trace_map.plot(axes=ax2, clip_interval=(1, 99.99) * u.percent)
+ax2.plot_coord(intensity_coords, color="r")
+ax2.plot_coord(intensity_coords[0], marker="o", color="blue", label="start")
+ax2.plot_coord(intensity_coords[-1], marker="o", color="green", label="end")
+ax2.legend()
+
+ax3 = fig2.add_subplot(122)
+ax3.plot(angular_separation, intensity)
+ax3.set_xlabel("Angular distance along loop [arcsec]")
+ax3.set_ylabel(f"Intensity [{trace_map.unit}]")
 
 plt.show()
