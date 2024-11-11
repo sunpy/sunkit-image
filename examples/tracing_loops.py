@@ -1,19 +1,18 @@
 """
-=====================
+================================================
 Tracing Coronal Loops and Extracting Intensities
-=====================
+================================================
 
 This example traces out the coronal loops in a FITS image
-using `~sunkit_image.trace.occult2` and then extracts the intensities
-along the traced loops.
+using `~sunkit_image.trace.occult2` and then extracts the intensity
+along one traced loop.
 
 In this example we will use the settings and the data from Markus Aschwanden's tutorial
 on his IDL implementation of the ``OCCULT2`` algorithm, which can be found
 `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
 
-The aim of this example is to demonstrate that `~sunkit_image.trace.occult2` provides similar
-results compared to the IDL version and how to extract intensities along the traced loops.
 """
+# sphinx_gallery_thumbnail_number = 1  # NOQA: ERA001
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -72,30 +71,29 @@ for loop in loops:
 fig.tight_layout()
 
 ###############################################################################
-# Now, let's extract the intensities along the first detected loop and plot the intensity profile.
+# Finally, we can use the traced loops location information to extract the intensity values.
 
-# Convert the first loop to SkyCoord objects
+# Since we only currently get pixel locations, we need to get the word coordinates of the first loop.
 first_loop = np.array(loops[0])
-intensity_coords = trace_map.pixel_to_world(first_loop[:, 0] * u.pixel, first_loop[:, 1] * u.pixel)
+loop_coords = trace_map.pixel_to_world(first_loop[:, 0] * u.pixel, first_loop[:, 1] * u.pixel)
 
-# Sample the intensity along the loop
-intensity = sunpy.map.sample_at_coords(trace_map, intensity_coords)
+# Now we can extract the intensity along the loop
+intensity = sunpy.map.sample_at_coords(trace_map, loop_coords)
 
-# Calculate the angular separation along the loop
-angular_separation = intensity_coords.separation(intensity_coords[0]).to(u.arcsec)
+# Finally, we can calculate the angular separation along the loop
+angular_separation = loop_coords.separation(loop_coords[0]).to(u.arcsec)
 
-# Plot the intensity profile
-fig2 = plt.figure(figsize=(10, 4))
-ax2 = fig2.add_subplot(121, projection=trace_map)
-trace_map.plot(axes=ax2, clip_interval=(1, 99.99) * u.percent)
-ax2.plot_coord(intensity_coords, color="r")
-ax2.plot_coord(intensity_coords[0], marker="o", color="blue", label="start")
-ax2.plot_coord(intensity_coords[-1], marker="o", color="green", label="end")
-ax2.legend()
+# Plot the loop location and its intensity profile
+fig = plt.figure(figsize=(10, 4))
+ax = fig.add_subplot(121, projection=trace_map)
+trace_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
+ax.plot_coord(loop_coords, color="r")
 
-ax3 = fig2.add_subplot(122)
-ax3.plot(angular_separation, intensity)
-ax3.set_xlabel("Angular distance along loop [arcsec]")
-ax3.set_ylabel(f"Intensity [{trace_map.unit}]")
+ax = fig.add_subplot(122)
+ax.plot(angular_separation, intensity)
+ax.set_xlabel("Distance along loop [Arcsec]")
+ax.set_ylabel("Intensity")
+
+fig.tight_layout()
 
 plt.show()
