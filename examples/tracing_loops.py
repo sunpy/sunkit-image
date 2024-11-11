@@ -1,18 +1,18 @@
 """
-=====================
-Tracing Coronal Loops
-=====================
+================================================
+Tracing Coronal Loops and Extracting Intensities
+================================================
 
 This example traces out the coronal loops in a FITS image
-using `~sunkit_image.trace.occult2`.
+using `~sunkit_image.trace.occult2` and then extracts the intensity
+along one traced loop.
 
 In this example we will use the settings and the data from Markus Aschwanden's tutorial
 on his IDL implementation of the ``OCCULT2`` algorithm, which can be found
 `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
 
-The aim of this example is to demonstrate that `~sunkit_image.trace.occult2` provides similar
-results compared to the IDL version.
 """
+# sphinx_gallery_thumbnail_number = 1  # NOQA: ERA001
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -67,6 +67,32 @@ for loop in loops:
     loop = np.array(loop)  # convert to array as easier to index ``x`` and ``y`` coordinates
     coord_loops = trace_map.pixel_to_world(loop[:, 0] * u.pixel, loop[:, 1] * u.pixel)
     ax.plot_coord(coord_loops, color="b")
+
+fig.tight_layout()
+
+###############################################################################
+# Finally, we can use the traced loops location information to extract the intensity values.
+
+# Since we only currently get pixel locations, we need to get the word coordinates of the first loop.
+first_loop = np.array(loops[0])
+loop_coords = trace_map.pixel_to_world(first_loop[:, 0] * u.pixel, first_loop[:, 1] * u.pixel)
+
+# Now we can extract the intensity along the loop
+intensity = sunpy.map.sample_at_coords(trace_map, loop_coords)
+
+# Finally, we can calculate the angular separation along the loop
+angular_separation = loop_coords.separation(loop_coords[0]).to(u.arcsec)
+
+# Plot the loop location and its intensity profile
+fig = plt.figure(figsize=(10, 4))
+ax = fig.add_subplot(121, projection=trace_map)
+trace_map.plot(axes=ax, clip_interval=(1, 99.99) * u.percent)
+ax.plot_coord(loop_coords, color="r")
+
+ax = fig.add_subplot(122)
+ax.plot(angular_separation, intensity)
+ax.set_xlabel("Distance along loop [Arcsec]")
+ax.set_ylabel("Intensity")
 
 fig.tight_layout()
 
