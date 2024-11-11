@@ -14,8 +14,34 @@ from packaging.version import Version
 from sunpy.util.exceptions import SunpyDeprecationWarning, SunpyPendingDeprecationWarning
 from sunpy_sphinx_theme import PNG_ICON
 
+<<<<<<<
+=======
+import datetime
+
+from packaging.version import Version
+
+# -- Project information -----------------------------------------------------
+
+# The full version, including alpha/beta/rc tags
+>>>>>>>
 from sunkit_image import __version__
 
+<<<<<<<
+=======
+_version = Version(__version__)
+version = release = str(_version)
+# Avoid "post" appearing in version string in rendered docs
+if _version.is_postrelease:
+    version = release = _version.base_version
+# Avoid long githashes in rendered Sphinx docs
+elif _version.is_devrelease:
+    version = release = f"{_version.base_version}.dev{_version.dev}"
+is_development = _version.is_devrelease
+is_release = not(_version.is_prerelease or _version.is_devrelease)
+
+project = "sunkit-image"
+author = "The SunPy Community"
+>>>>>>>
 # -- Read the Docs Specific Configuration --------------------------------------
 os.environ["PARFIVE_HIDE_PROGRESS"] = "True"
 on_rtd = os.environ.get("READTHEDOCS", None) == "True"
@@ -46,7 +72,16 @@ linkcheck_ignore = [
     r"https://github.com/\d+",
     r"https://docs.sunpy.org/\d+",
 ]
+<<<<<<<
 linkcheck_anchors = False
+=======
+master_doc = "index"
+
+# Treat everything in single ` as a Python reference.
+default_role = "py:obj"
+
+# -- Options for intersphinx extension ---------------------------------------
+>>>>>>>
 
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
@@ -55,7 +90,26 @@ rst_epilog = """
 .. _SunPy: https://sunpy.org
 .. _`SunPy mailing list`: https://groups.google.com/group/sunpy
 .. _`SunPy dev mailing list`: https://groups.google.com/group/sunpy-dev
+<<<<<<<
 """
+=======
+
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+html_theme = "sunpy"
+
+# Render inheritance diagrams in SVG
+graphviz_output_format = "svg"
+
+graphviz_dot_args = [
+    "-Nfontsize=10",
+    "-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Efontsize=10",
+    "-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+    "-Gfontsize=10",
+    "-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif",
+]
+>>>>>>>
 
 # -- General configuration -----------------------------------------------------
 suppress_warnings = [
