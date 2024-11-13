@@ -1,5 +1,5 @@
 # This will register the function
-import sunkit_image.coalignment_match_template  # NOQA: F401
+import sunkit_image.coalignment.match_template
 from sunkit_image.coalignment.interface import coalign
 
 __all__ = ["coalign"]

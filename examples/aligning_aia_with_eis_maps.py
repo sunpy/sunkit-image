@@ -5,7 +5,7 @@ Coaligning EIS to AIA
 
 This example shows how to EIS data to AIA using cross-correlation which is implemented as the "match_template" method.
 """
-# sphinx_gallery_thumbnail_number = 2 # NOQA: ERA001
+# sphinx_gallery_thumbnail_number = 2
 
 import matplotlib.pyplot as plt
 
