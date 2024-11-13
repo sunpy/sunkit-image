@@ -14,6 +14,8 @@ import sunkit_image.radial as rad
 import sunkit_image.utils as utils
 from sunkit_image.tests.helpers import figure_test, skip_windows
 
+pytestmark = [pytest.mark.filterwarnings("ignore:Missing metadata for observer"), pytest.mark.filterwarnings("ignore:Missing metadata for observation time")]
+
 
 @pytest.fixture()
 def map_test1():
@@ -49,13 +51,13 @@ def radial_bin_edges():
 
 def test_nrgf(map_test1, map_test2, radial_bin_edges):
     result = np.zeros_like(map_test1.data)
-    expect = rad.nrgf(map_test1, radial_bin_edges, application_radius=0.001 * u.R_sun)
+    expect = rad.nrgf(map_test1, radial_bin_edges=radial_bin_edges, application_radius=0.001 * u.R_sun, fill=0)
 
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
 
     # Hand calculated
-    result = [
+    result1 = [
         [0.0, 1.0, 0.0, -1.0, 0.0],
         [1.0, 0.0, 0.0, 0.0, -1.0],
         [0.0, 0.0, 0.0, 0.0, 0.0],
@@ -63,16 +65,14 @@ def test_nrgf(map_test1, map_test2, radial_bin_edges):
         [0.0, 1.0, 0.0, -1.0, 0.0],
     ]
 
-    expect = rad.nrgf(map_test2, radial_bin_edges, application_radius=0.001 * u.R_sun)
+    expect1 = rad.nrgf(map_test2, radial_bin_edges=radial_bin_edges, application_radius=0.001 * u.R_sun, fill=0)
 
-    assert np.allclose(expect.data.shape, map_test2.data.shape)
-    assert np.allclose(expect.data, result)
+    assert np.allclose(expect1.data.shape, map_test2.data.shape)
+    assert np.allclose(expect1.data, result1)
 
 
 def test_fnrgf(map_test1, map_test2, radial_bin_edges):
     order = 1
-
-    # Hand calculated
     result = [
         [-0.0, 96.0, 128.0, 96.0, -0.0],
         [96.0, 224.0, 288.0, 224.0, 96.0],
@@ -80,44 +80,44 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         [96.0, 224.0, 288.0, 224.0, 96.0],
         [-0.0, 96.0, 128.0, 96.0, -0.0],
     ]
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
     expect = rad.fnrgf(
         map_test1,
-        radial_bin_edges,
-        order,
-        attenuation_coefficients,
+        radial_bin_edges=radial_bin_edges,
+        order=order,
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
+        fill=0,
     )
     assert np.allclose(expect.data.shape, map_test1.data.shape)
     assert np.allclose(expect.data, result)
 
-    # Hand calculated
-    result = [
+    result1 = [
         [-0.0, 128.0, 128.0, 96.0, -0.0],
         [128.0, 224.0, 288.0, 224.0, 96.0],
         [128.0, 288.0, 0.0, 288.0, 128.0],
         [128.0, 224.0, 288.0, 224.0, 96.0],
         [-0.0, 128.0, 128.0, 96.0, -0.0],
     ]
-    expect = rad.fnrgf(
+    expect1 = rad.fnrgf(
         map_test2,
-        radial_bin_edges,
-        order,
-        attenuation_coefficients,
+        radial_bin_edges=radial_bin_edges,
+        order=order,
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
+        fill=0,
     )
 
-    assert np.allclose(expect.data.shape, map_test2.data.shape)
-    assert np.allclose(expect.data, result)
+    assert np.allclose(expect1.data.shape, map_test2.data.shape)
+    assert np.allclose(expect1.data, result1)
 
-    # The below tests are dummy tests.
-    # These values were not verified by hand rather they were
-    # generated using the code itself.
     order = 5
-
-    result = [
+    result2 = [
         [-0.0, 90.52799999982116, 126.73137084989847, 90.52799999984676, -0.0],
         [90.52800000024544, 207.2, 285.14558441227155, 207.2, 90.5280000001332],
         [126.73137084983244, 285.1455844119744, 0.0, 280.05441558770406, 124.4686291500961],
@@ -125,20 +125,22 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         [0.0, 90.52799999986772, 124.46862915010152, 90.52799999989331, -0.0],
     ]
 
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
-    expect = rad.fnrgf(
+    expect2 = rad.fnrgf(
         map_test1,
-        radial_bin_edges,
-        order,
-        attenuation_coefficients,
+        radial_bin_edges=radial_bin_edges,
+        order=order,
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
+        fill=0,
     )
 
-    assert np.allclose(expect.data.shape, map_test1.data.shape)
-    assert np.allclose(expect.data, result)
+    assert np.allclose(expect2.data.shape, map_test1.data.shape)
+    assert np.allclose(expect2.data, result2)
 
-    result = [
+    result3 = [
         [-0.0, 120.55347470594926, 126.73137084989847, 90.67852529365966, -0.0],
         [120.70526403418884, 207.2, 285.14558441227155, 207.2, 90.52673596626707],
         [126.73137084983244, 285.1455844119744, 0.0, 280.05441558770406, 124.4686291500961],
@@ -146,73 +148,64 @@ def test_fnrgf(map_test1, map_test2, radial_bin_edges):
         [0.0, 120.55347470601022, 124.46862915010152, 90.67852529370734, -0.0],
     ]
 
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
-    expect = rad.fnrgf(
+    expect3 = rad.fnrgf(
         map_test2,
-        radial_bin_edges,
-        order,
-        attenuation_coefficients,
+        radial_bin_edges=radial_bin_edges,
+        order=order,
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
+        cutoff=0,
         application_radius=0.001 * u.R_sun,
         number_angular_segments=4,
+        fill=0,
     )
 
-    assert np.allclose(expect.data.shape, map_test2.data.shape)
-    assert np.allclose(expect.data, result)
+    assert np.allclose(expect3.data.shape, map_test2.data.shape)
+    assert np.allclose(expect3.data, result3)
 
-    order = 0
 
+def test_fnrgf_errors(map_test1):
     with pytest.raises(ValueError, match="Minimum value of order is 1"):
         rad.fnrgf(
-            map_test2,
-            radial_bin_edges,
-            order,
-            attenuation_coefficients,
-            application_radius=0.001 * u.R_sun,
-            number_angular_segments=4,
+            map_test1,
+            order=0,
+            mean_attenuation_range=[1.0, 0.0],
+            std_attenuation_range=[1.0, 0.0],
+            cutoff=0,
         )
 
-
-@pytest.fixture()
-def smap():
-    return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
-
-
 @figure_test
 @pytest.mark.remote_data()
-def test_fig_nrgf(smap):
+def test_fig_nrgf(aia_171_map):
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
-    out = rad.nrgf(smap, radial_bin_edges)
-
+    out = rad.nrgf(aia_171_map, radial_bin_edges=radial_bin_edges)
     out.plot()
 
 
 @figure_test
 @pytest.mark.remote_data()
-def test_fig_fnrgf(smap):
+def test_fig_fnrgf(aia_171_map):
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
-
     order = 20
-    attenuation_coefficients = rad.set_attenuation_coefficients(order)
-    out = rad.fnrgf(smap, radial_bin_edges, order, attenuation_coefficients)
-
+    out = rad.fnrgf(aia_171_map, radial_bin_edges=radial_bin_edges, order=order, mean_attenuation_range=[1.0, 0.0], std_attenuation_range=[1.0, 0.0], cutoff=0)
     out.plot()
 
 
 @figure_test
 @pytest.mark.remote_data()
-def test_fig_rhef(smap):
-    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+def test_fig_rhef(aia_171_map):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, aia_171_map.data.shape[1])
     radial_bin_edges *= u.R_sun
-    out = rad.rhef(smap, radial_bin_edges=radial_bin_edges, upsilon=0.35, method="scipy")
+    out = rad.rhef(aia_171_map, radial_bin_edges=radial_bin_edges, upsilon=None, method="scipy")
     out.plot()
 
 
 @figure_test
 @pytest.mark.remote_data()
-def test_multifig_rhef(smap):
-    radial_bin_edges = utils.equally_spaced_bins(0, 2, smap.data.shape[1])
+def test_multifig_rhef(aia_171_map):
+    radial_bin_edges = utils.equally_spaced_bins(0, 2, aia_171_map.data.shape[1])
     radial_bin_edges *= u.R_sun
 
     # Define the list of upsilon pairs where the first number affects dark components and the second number affects bright ones
@@ -225,9 +218,9 @@ def test_multifig_rhef(smap):
     ]
 
     # Crop the figures to see better detail
-    top_right = SkyCoord(1200 * u.arcsec, 0 * u.arcsec, frame=smap.coordinate_frame)
-    bottom_left = SkyCoord(0 * u.arcsec, -1200 * u.arcsec, frame=smap.coordinate_frame)
-    aia_map_cropped = smap.submap(bottom_left, top_right=top_right)
+    top_right = SkyCoord(1200 * u.arcsec, 0 * u.arcsec, frame=aia_171_map.coordinate_frame)
+    bottom_left = SkyCoord(0 * u.arcsec, -1200 * u.arcsec, frame=aia_171_map.coordinate_frame)
+    aia_map_cropped = aia_171_map.submap(bottom_left, top_right=top_right)
     fig, axes = plt.subplots(
         2, 3, figsize=(15, 10), sharex="all", sharey="all", subplot_kw={"projection": aia_map_cropped}
     )
@@ -238,7 +231,7 @@ def test_multifig_rhef(smap):
 
     # Loop through the upsilon_list and plot each filtered map
     for i, upsilon in enumerate(upsilon_list):
-        out_map = rad.rhef(smap, upsilon=upsilon, method="scipy")
+        out_map = rad.rhef(aia_171_map, upsilon=upsilon, method="scipy")
         out_map_crop = out_map.submap(bottom_left, top_right=top_right)
         out_map_crop.plot(axes=axes[i + 1])
         axes[i + 1].set_title(f"Upsilon = {upsilon}")
@@ -247,29 +240,28 @@ def test_multifig_rhef(smap):
 
     return fig
 
-
 def test_set_attenuation_coefficients():
     order = 1
     # Hand calculated
     expect1 = [[1, 0.0], [1, 0.0]]
 
-    result1 = rad.set_attenuation_coefficients(order)
+    result1 = rad._set_attenuation_coefficients(order)
     assert np.allclose(expect1, result1)
 
     order = 3
     # Hand calculated
     expect2 = [[1.0, 0.66666667, 0.33333333, 0.0], [1.0, 0.66666667, 0.33333333, 0.0]]
 
-    result2 = rad.set_attenuation_coefficients(order)
+    result2 = rad._set_attenuation_coefficients(order)
     assert np.allclose(expect2, result2)
 
     expect3 = [[1.0, 0.66666667, 0.0, 0.0], [1.0, 0.66666667, 0.0, 0.0]]
 
-    result3 = rad.set_attenuation_coefficients(order, cutoff=2)
+    result3 = rad._set_attenuation_coefficients(order, cutoff=2)
     assert np.allclose(expect3, result3)
 
     with pytest.raises(ValueError, match="Cutoff cannot be greater than order \\+ 1"):
-        rad.set_attenuation_coefficients(order, cutoff=5)
+        rad._set_attenuation_coefficients(order, cutoff=5)
 
 
 def test_fit_polynomial_to_log_radial_intensity():
@@ -278,7 +270,7 @@ def test_fit_polynomial_to_log_radial_intensity():
     degree = 1
     expected = np.polyfit(radii.to(u.R_sun).value, np.log(intensity), degree)
 
-    assert np.allclose(rad._fit_polynomial_to_log_radial_intensity(radii, intensity, degree), expected)  # NOQA: SLF001
+    assert np.allclose(rad._fit_polynomial_to_log_radial_intensity(radii, intensity, degree), expected)
 
 
 def test_calculate_fit_radial_intensity():
@@ -286,19 +278,19 @@ def test_calculate_fit_radial_intensity():
     radii = (0.001, 0.002) * u.R_sun
     expected = np.exp(np.poly1d(polynomial)(radii.to(u.R_sun).value))
 
-    assert np.allclose(rad._calculate_fit_radial_intensity(radii, polynomial), expected)  # NOQA: SLF001
+    assert np.allclose(rad._calculate_fit_radial_intensity(radii, polynomial), expected)
 
 
 def test_normalize_fit_radial_intensity():
     polynomial = np.asarray([1, 2, 3])
     radii = (0.001, 0.002) * u.R_sun
     normalization_radii = (0.003, 0.004) * u.R_sun
-    expected = rad._calculate_fit_radial_intensity(radii, polynomial) / rad._calculate_fit_radial_intensity(  # NOQA: SLF001
+    expected = rad._calculate_fit_radial_intensity(radii, polynomial) / rad._calculate_fit_radial_intensity(
         normalization_radii,
         polynomial,
     )
 
-    assert np.allclose(rad._normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)  # NOQA: SLF001
+    assert np.allclose(rad._normalize_fit_radial_intensity(radii, polynomial, normalization_radii), expected)
 
 
 @skip_windows
@@ -321,19 +313,24 @@ def test_intensity_enhance(map_test1):
         radial_bin_summary.to(u.R_sun).value <= fit_range[1].to(u.R_sun).value,
     )
 
-    polynomial = rad._fit_polynomial_to_log_radial_intensity(  # NOQA: SLF001
+    polynomial = rad._fit_polynomial_to_log_radial_intensity(
         radial_bin_summary[fit_here],
         radial_intensity[fit_here],
         degree,
     )
 
-    enhancement = 1 / rad._normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)  # NOQA: SLF001
+    enhancement = 1 / rad._normalize_fit_radial_intensity(map_r, polynomial, normalization_radius)
     enhancement[map_r < normalization_radius] = 1
-
-    with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
-        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale, fit_range=fit_range[::-1])
 
     assert np.allclose(
         enhancement * map_test1.data,
-        rad.intensity_enhance(smap=map_test1, radial_bin_edges=radial_bin_edges, scale=scale).data,
+        rad.intensity_enhance(map_test1, radial_bin_edges=radial_bin_edges, scale=scale).data,
     )
+
+
+@skip_windows
+def test_intensity_enhance_errors(map_test1):
+    fit_range = [1, 1.5] * u.R_sun
+    scale = 1 * map_test1.rsun_obs
+    with pytest.raises(ValueError, match="The fit range must be strictly increasing."):
+        rad.intensity_enhance(map_test1, scale=scale, fit_range=fit_range[::-1])

@@ -1,6 +1,7 @@
 import os
 import logging
 import tempfile
+import warnings
 import importlib.util
 from pathlib import Path
 
@@ -10,6 +11,7 @@ import skimage
 
 import astropy
 import astropy.config.paths
+from astropy.io.fits.verify import VerifyWarning
 from astropy.utils.data import get_pkg_data_filename
 
 import sunpy.data.sample
@@ -41,22 +43,22 @@ console_logger.setLevel("INFO")
 
 
 @pytest.fixture(scope="session", autouse=True)
-def _tmp_config_dir(request):  # NOQA: ARG001
+def _tmp_config_dir(request):
     """
     Globally set the default config for all tests.
     """
     tmpdir = tempfile.TemporaryDirectory()
 
     os.environ["SUNPY_CONFIGDIR"] = str(tmpdir.name)
-    astropy.config.paths.set_temp_config._temp_path = str(tmpdir.name)  # NOQA: SLF001
-    astropy.config.paths.set_temp_cache._temp_path = str(tmpdir.name)  # NOQA: SLF001
+    astropy.config.paths.set_temp_config._temp_path = str(tmpdir.name)
+    astropy.config.paths.set_temp_cache._temp_path = str(tmpdir.name)
 
     yield
 
     del os.environ["SUNPY_CONFIGDIR"]
     tmpdir.cleanup()
-    astropy.config.paths.set_temp_config._temp_path = None  # NOQA: SLF001
-    astropy.config.paths.set_temp_cache._temp_path = None  # NOQA: SLF001
+    astropy.config.paths.set_temp_config._temp_path = None
+    astropy.config.paths.set_temp_cache._temp_path = None
 
 
 @pytest.fixture()
@@ -71,7 +73,7 @@ def _undo_config_dir_patch():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def tmp_dl_dir(request):  # NOQA: ARG001
+def tmp_dl_dir(request):
     """
     Globally set the default download directory for the test run to a tmp dir.
     """
@@ -93,7 +95,7 @@ def _undo_download_dir_patch():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def _hide_parfive_progress(request):  # NOQA: ARG001
+def _hide_parfive_progress(request):
     """
     Set the PARFIVE_HIDE_PROGRESS to hide the parfive progress bar in tests.
     """
@@ -172,13 +174,28 @@ def granule_minimap3():
     )
     return sunpy.map.GenericMap(arr, header)
 
-
 @pytest.fixture(params=["array", "map"])
 def aia_171(request):
-    smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
-    if request.param == "map":
-        return smap
-    return smap.data if request.param == "array" else None
+    # VerifyWarning: Invalid 'BLANK' keyword in header.
+    # The 'BLANK' keyword is only applicable to integer data, and will be ignored in this HDU.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=VerifyWarning)
+        smap = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
+    return smap if request.param == "map" else smap.data
+
+
+@pytest.fixture()
+def aia_171_cutout():
+    return sunpy.map.Map(get_test_filepath("aia_171_cutout.fits"))
+
+
+@pytest.fixture()
+def aia_171_map():
+    # VerifyWarning: Invalid 'BLANK' keyword in header.
+    # The 'BLANK' keyword is only applicable to integer data, and will be ignored in this HDU.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=VerifyWarning)
+        return sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 
 
 @pytest.fixture()

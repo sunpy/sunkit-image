@@ -1,22 +1,6 @@
 repos:
-  - repo: https://github.com/PyCQA/docformatter
-    rev: master
-    hooks:
-      - id: docformatter
-        args: ["--in-place", "--pre-summary-newline", "--make-summary-multi"]
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
-    hooks:
-      - id: autoflake
-        args:
-          [
-            "--in-place",
-            "--remove-all-unused-imports",
-            "--remove-unused-variable",
-          ]
-        exclude: ".*(.fits|.fts|.fit|.txt|tca.*|extern.*|.rst|.md|docs/conf.py)$"
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.6.3"
+    rev: "v0.7.3"
     hooks:
       - id: ruff
         args: ["--fix"]
@@ -26,16 +10,12 @@ repos:
       - id: isort
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|sunkit_image/extern)$"
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-ast
       - id: check-case-conflict
       - id: trailing-whitespace
-        exclude: ".*(.fits|.fts|.fit|.txt|.header|.csv)$"
-      - id: mixed-line-ending
-        exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
-      - id: end-of-file-fixer
-        exclude: ".*(.fits|.fts|.fit|.txt|.csv)$"
+        exclude: ".*(.fits|.fts|.fit|.header|.txt)$"
       - id: check-yaml
       - id: debug-statements
       - id: check-added-large-files
@@ -45,12 +25,17 @@ repos:
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.json)$|^CITATION.rst$"
       - id: mixed-line-ending
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*)$"
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        args: [ "--write-changes" ]
   - repo: https://github.com/crate-ci/typos
-    rev: v1.23.1
+    rev: typos-dict-v0.11.35
     hooks:
       - id: typos
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.10.1"
+    rev: "v1.13.0"
     hooks:
       - id: mypy
         additional_dependencies: ["types-setuptools"]

@@ -12,6 +12,8 @@ from sunkit_image.granule import (
     segments_overlap_fraction,
 )
 
+pytestmark = [pytest.mark.filterwarnings("ignore:Missing metadata for observer")]
+
 
 def test_segment(granule_map):
     segmented = segment(granule_map, skimage_method="li", mark_dim_centers=True)

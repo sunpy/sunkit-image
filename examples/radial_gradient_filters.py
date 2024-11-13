@@ -38,24 +38,27 @@ aia_map = sunpy.map.Map(sunpy.data.sample.AIA_171_IMAGE)
 radial_bin_edges = equally_spaced_bins(1, 2, aia_map.data.shape[0] // 4)
 radial_bin_edges *= u.R_sun
 
-base_nrgf = radial.nrgf(aia_map, radial_bin_edges, application_radius=1 * u.R_sun, progress=False)
+base_nrgf = radial.nrgf(aia_map, radial_bin_edges=radial_bin_edges, application_radius=1 * u.R_sun)
 
 ###########################################################################
-# We will need to work out  a few parameters for the FNRGF.
+# We will need to work out a few parameters for the FNRGF.
 #
 # Order is the number of Fourier coefficients to be used in the approximation.
-# The attenuation coefficient are calculated to be linearly decreasing, you should
-# choose them according to your requirements.
+# The attenuation coefficients are calculated to be linearly decreasing, you should
+# choose them according to your requirements. These can be changed by tweaking the following keywords: ``mean_attenuation_range`` and ``std_attenuation_range``.
 
 order = 20
-attenuation_coefficients = radial.set_attenuation_coefficients(order)
-
-base_fnrgf = radial.fnrgf(aia_map, radial_bin_edges, order, attenuation_coefficients, application_radius=1 * u.R_sun, progress=False)
+base_fnrgf = radial.fnrgf(
+    aia_map,
+    radial_bin_edges=radial_bin_edges,
+    order=order,
+    application_radius=1 * u.R_sun
+)
 
 ###########################################################################
 # Now we will also use the final filter, RHEF.
 
-base_rhef = radial.rhef(aia_map, radial_bin_edges, application_radius=1 * u.R_sun, progress=False)
+base_rhef = radial.rhef(aia_map, radial_bin_edges=radial_bin_edges, application_radius=1 * u.R_sun)
 
 ###########################################################################
 # Finally we will plot the filtered maps with the original to demonstrate the effect of each.

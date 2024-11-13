@@ -9,7 +9,7 @@ This example demonstrates the use of Automated Swirl Detection Algorithm (ASDA) 
 
 Unfortunately, currently ASDA within sunkit-image only works on arrays.
 """
-# sphinx_gallery_thumbnail_number = 3 # NOQA: ERA001
+# sphinx_gallery_thumbnail_number = 3
 
 import matplotlib.pyplot as plt
 import numpy as np
