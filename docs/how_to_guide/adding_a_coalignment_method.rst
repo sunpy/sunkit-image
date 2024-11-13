@@ -12,7 +12,7 @@ If you want to register a new coalignment method that can be used by :func:`~sun
     from sunkit_image.coalignment.interface import AffineParams
 
     @register_coalignment_method("my_coalign")
-    def my_coalignment_method(input_array, template_array):
+    def my_coalignment_method(input_array, target_array):
         # Your coalignment code goes here
         # This should encompass calculating the shifts,
         # handling NaN values appropriately.

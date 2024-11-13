@@ -19,7 +19,7 @@ from sunpy.net import attrs as a
 from sunkit_image.coalignment import coalign
 
 ###################################################################################
-# Firstly, let us acquire the IS and AIA data we need for this example.
+# Firstly, let us acquire the EIS and AIA data we need for this example.
 #
 # For this example, we will use the IS data from the sunpy data repository.
 # This is a preprocessed IS raster data.
