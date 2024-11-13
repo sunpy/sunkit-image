@@ -12,7 +12,7 @@ If you wish to perform analysis over a large period of time we suggest to refer
 `this <https://gitlab.com/wtbarnes/aia-on-pleiades/-/blob/master/notebooks/tidy/finding_sunspots.ipynb>`__
 notebook implementation of the same algorithm using dask arrays.
 """
-# sphinx_gallery_thumbnail_number = 2 # NOQA: ERA001
+# sphinx_gallery_thumbnail_number = 2
 
 import matplotlib.pyplot as plt
 from skimage.measure import label, regionprops_table
