@@ -1,8 +1,7 @@
 import numpy as np
 from skimage.feature import match_template
 
-from sunkit_image.coalignment.decorators import register_coalignment_method
-from sunkit_image.coalignment.interface import AffineParams
+from sunkit_image.coalignment.interface import AffineParams, register_coalignment_method
 
 __all__ = ["match_template_coalign"]
 
@@ -88,7 +87,7 @@ def _find_best_match_location(corr):
 
 
 @register_coalignment_method("match_template")
-def match_template_coalign(reference_array, target_array):
+def match_template_coalign(input_array, target_array, **kwargs):
     """
     Perform coalignment by matching the template array to the input array.
 
@@ -111,11 +110,11 @@ def match_template_coalign(reference_array, target_array):
         - translation : `tuple`
             A tuple containing the x and y translation values.
     """
-    corr = match_template(np.float64(reference_array), np.float64(target_array))
+    corr = match_template(np.float64(input_array), np.float64(target_array))
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
     # Particularly for this method, there is no change in the rotation or scaling,
     # hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = np.array([1.0, 1.0])
     rotation_matrix = np.eye(2)
-    return AffineParams(scale=scale, rotation_matrix=rotation_matrix, translation=(x_shift , y_shift ))
+    return AffineParams(scale=scale, rotation_matrix=rotation_matrix, translation=(x_shift, y_shift))

@@ -12,8 +12,7 @@ from sunpy.net import Fido
 from sunpy.net import attrs as a
 
 from sunkit_image.coalignment import coalign
-from sunkit_image.coalignment.decorators import register_coalignment_method
-from sunkit_image.coalignment.interface import AffineParams
+from sunkit_image.coalignment.interface import REGISTERED_METHODS, AffineParams, register_coalignment_method
 from sunkit_image.tests.helpers import figure_test
 
 
@@ -41,8 +40,7 @@ def cutout_map(aia171_test_map):
     aia_map = sunpy.map.Map(aia171_test_map)
     bottom_left = SkyCoord(-300 * u.arcsec, -300 * u.arcsec, frame = aia_map.coordinate_frame)
     top_right = SkyCoord(800 * u.arcsec, 600 * u.arcsec, frame = aia_map.coordinate_frame)
-    cutout_map = aia_map.submap(bottom_left, top_right=top_right)
-    return cutout_map
+    return aia_map.submap(bottom_left, top_right=top_right)
 
 
 def test_coalignment_reflects_pixel_shifts(cutout_map, aia171_test_map):
@@ -108,3 +106,13 @@ def test_coalignment_reflects_rotation(cutout_map, aia171_test_map):
     fixed_cutout_map = coalign(aia171_test_map, rotated_map, method="rotation")
     assert_allclose(fixed_cutout_map.rotation_matrix[0, 0], cutout_map.rotation_matrix[0, 0], rtol=1e-4, atol=0)
     assert_allclose(fixed_cutout_map.rotation_matrix[1, 1], cutout_map.rotation_matrix[1, 1], rtol=1e-4, atol=0)
+
+
+def test_register_coalignment_method():
+    @register_coalignment_method("test_method")
+    def test_func():
+        return "Test function"
+
+    assert "test_method" in REGISTERED_METHODS
+    assert REGISTERED_METHODS["test_method"] == test_func
+    assert test_func() == "Test function"

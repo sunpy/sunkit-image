@@ -10,9 +10,10 @@ from astropy.coordinates import SkyCoord
 from sunpy.sun.models import differential_rotation
 from sunpy.util.exceptions import SunpyUserWarning
 
-from sunkit_image.coalignment.decorators import REGISTERED_METHODS
+__all__ = ["AffineParams", "register_coalignment_method", "REGISTERED_METHODS"]
 
-__all__ = ["AffineParams"]
+# Global Dictionary to store the registered methods and their names
+REGISTERED_METHODS = {}
 
 
 class AffineParams(NamedTuple):
@@ -30,6 +31,23 @@ class AffineParams(NamedTuple):
     axes.
     """
     translation: tuple[float, float]
+
+
+def register_coalignment_method(name):
+    """
+    Registers a coalignment method to be used by the coalignment interface.
+
+    Parameters
+    ----------
+    name : str
+        The name of the coalignment method.
+    """
+
+    def decorator(func):
+        REGISTERED_METHODS[name] = func
+        return func
+
+    return decorator
 
 
 def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
@@ -115,7 +133,7 @@ def _warn_user_of_separation(reference_map, target_map):
         )
 
 
-def coalign(reference_map, target_map, method='match_template'):
+def coalign(reference_map, target_map, method='match_template', **kwargs):
     """
     Performs image coalignment using the specified method.
 
@@ -134,8 +152,11 @@ def coalign(reference_map, target_map, method='match_template'):
         The reference map to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
         The target map to be coaligned to the reference map.
-    method : `str`
+    method : {{{coalignment_function_names}}}, optional
         The name of the registered coalignment method to use.
+        Defaults to 'match_template'.
+    kwargs : `dict`
+        Additional keyword arguments to pass to the registered method.
 
     Returns
     -------
@@ -154,5 +175,12 @@ def coalign(reference_map, target_map, method='match_template'):
     target_array = target_map.data
     reference_array = reference_map.data
     _warn_user_of_separation(reference_map, target_map)
-    affine_params = REGISTERED_METHODS[method](reference_array, target_array)
+    affine_params = REGISTERED_METHODS[method](reference_array, target_array, **kwargs)
     return _update_fits_wcs_metadata(reference_map, target_map, affine_params)
+
+
+# Generate the string with allowable coalignment-function names for use in docstrings
+_coalignment_function_names = ", ".join([f"``'{name}'``" for name in REGISTERED_METHODS])
+# Insert into the docstring for coalign. We cannot use the add_common_docstring decorator
+# due to what would be a circular loop in definitions.
+coalign.__doc__ = coalign.__doc__.format(coalignment_function_names=_coalignment_function_names)  # type: ignore

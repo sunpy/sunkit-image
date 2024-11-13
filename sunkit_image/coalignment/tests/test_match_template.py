@@ -5,7 +5,7 @@ from skimage.feature import match_template
 
 import astropy.units as u
 
-from sunkit_image.coalignment.decorators import REGISTERED_METHODS
+from sunkit_image.coalignment.interface import REGISTERED_METHODS
 from sunkit_image.coalignment.match_template import (
     _find_best_match_location,
     _get_correlation_shifts,
