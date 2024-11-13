@@ -14,6 +14,8 @@ import sunkit_image.radial as rad
 import sunkit_image.utils as utils
 from sunkit_image.tests.helpers import figure_test, skip_windows
 
+pytestmark = [pytest.mark.filterwarnings("ignore:Missing metadata for observer"), pytest.mark.filterwarnings("ignore:Missing metadata for observation time")]
+
 
 @pytest.fixture()
 def map_test1():
