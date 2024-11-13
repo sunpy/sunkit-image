@@ -12,7 +12,7 @@ on his IDL implementation of the ``OCCULT2`` algorithm, which can be found
 `here <http://www.lmsal.com/~aschwand/software/tracing/tracing_tutorial1.html>`__.
 
 """
-# sphinx_gallery_thumbnail_number = 1  # NOQA: ERA001
+# sphinx_gallery_thumbnail_number = 1
 
 import matplotlib.pyplot as plt
 import numpy as np
