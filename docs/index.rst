@@ -6,7 +6,14 @@ sunkit-image
 
     .. grid-item::
 
+<<<<<<<
         A toolbox of useful image processing routines applicable to solar physics data.
+=======
+   whatsnew/index
+
+Indices and tables
+==================
+>>>>>>>
 
     .. grid-item-card:: API Reference
 
