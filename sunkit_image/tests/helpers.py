@@ -10,7 +10,7 @@ import astropy
 import sunpy
 from sunpy.tests.helpers import skip_windows
 
-__all__ = ["get_hash_library_name", "figure_test", "skip_windows"]
+__all__ = ["figure_test", "get_hash_library_name", "skip_windows"]
 
 
 def get_hash_library_name():

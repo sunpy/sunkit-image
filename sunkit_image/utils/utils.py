@@ -14,17 +14,17 @@ import sunpy
 from sunpy.map import all_coordinates_from_map
 
 __all__ = [
+    "apply_upsilon",
     "bin_edge_summary",
+    "blackout_pixels_above_radius",
     "calculate_gamma",
     "equally_spaced_bins",
     "find_pixel_radii",
+    "find_radial_bin_edges",
     "get_radial_intensity_summary",
     "points_in_poly",
     "reform2d",
-    "remove_duplicate",
-    "apply_upsilon",
-    "blackout_pixels_above_radius",
-    "find_radial_bin_edges"
+    "remove_duplicate"
 ]
 
 

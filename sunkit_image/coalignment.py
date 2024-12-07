@@ -18,10 +18,10 @@ from sunpy.map.mapbase import GenericMap
 from sunpy.util.exceptions import SunpyUserWarning
 
 __all__ = [
-    "match_template_to_layer",
     "apply_shifts",
-    "mapsequence_coalign_by_match_template",
     "calculate_match_template_shift",
+    "mapsequence_coalign_by_match_template",
+    "match_template_to_layer",
 ]
 
 

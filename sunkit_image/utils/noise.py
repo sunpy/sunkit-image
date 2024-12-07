@@ -7,7 +7,7 @@ from scipy.ndimage import correlate
 from scipy.stats import gamma
 from skimage.util import view_as_windows
 
-__all__ = ["noise_estimation", "noiselevel", "conv2d_matrix", "weak_texture_mask"]
+__all__ = ["conv2d_matrix", "noise_estimation", "noiselevel", "weak_texture_mask"]
 
 
 def noise_estimation(img, patchsize=7, decim=0, confidence=1 - 1e-6, iterations=3):
