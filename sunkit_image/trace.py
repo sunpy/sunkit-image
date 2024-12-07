@@ -9,8 +9,8 @@ from scipy import interpolate
 from sunkit_image.utils.decorators import accept_array_or_map
 
 __all__ = [
-    "occult2",
     "bandpass_filter",
+    "occult2",
     "smooth",
 ]
 

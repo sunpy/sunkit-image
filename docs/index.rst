@@ -21,7 +21,7 @@ sunkit-image
           :maxdepth: 1
 
           generated/gallery/index
-          changelog
+          whatsnew/index
 
 Mission Statement
 =================
