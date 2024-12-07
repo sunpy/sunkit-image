@@ -104,7 +104,7 @@ write_to = "sunkit_image/_version.py"
 # TODO: This should be in towncrier.toml but Giles currently only works looks in
 # pyproject.toml we should move this back when it's fixed.
 [tool.towncrier]
-  package = "sunkit-image"
+  package = "sunkit_image"
   filename = "CHANGELOG.rst"
   directory = "changelog/"
     issue_format = "`#{issue} <https://github.com/sunpy/sunkit-image/pull/{issue}>`__"
