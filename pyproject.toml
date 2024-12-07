@@ -57,22 +57,10 @@ docs = [
   "sphinx-changelog",
   "sunpy-sphinx-theme",
   "packaging",
-<<<<<<<
-=======
-]
-
-[project.urls]
-Homepage = "https://sunpy.org"
-Download = "https://pypi.org/project/sunkit-image"
-
-[tool.setuptools]
-zip-safe = false
->>>>>>>
   "sunkit_image[all]",
   "astroscrappy",
   "dask",
   "matplotlib",
-  "sphinx-changelog",
   "sphinx-design",
   "sphinx-gallery",
   "sunpy[data,net]>=6.0.0",
@@ -100,71 +88,6 @@ namespaces = false
 [tool.setuptools_scm]
 write_to = "sunkit_image/_version.py"
 
-[ tool.gilesbot ]
-  [ tool.gilesbot.circleci_artifacts ]
-    enabled = true
-
-  [ tool.gilesbot.pull_requests ]
-    enabled = true
-
-  [ tool.gilesbot.towncrier_changelog ]
-    enabled = true
-    verify_pr_number = true
-    changelog_skip_label = "No Changelog Entry Needed"
-    help_url = "https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst"
-
-    changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst)."
-
-    type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst)"
-
-    number_incorrect_long = "The number in the changelog file you added does not match the number of this pull request. Please rename the file."
-
-[tool.towncrier]
-    package = "sunkit_image"
-    filename = "CHANGELOG.rst"
-    directory = "changelog/"
-    issue_format = "`#{issue} <https://github.com/sunpy/sunkit-image/pull/{issue}>`__"
-    title_format = "{version} ({project_date})"
-
-    [[tool.towncrier.type]]
-        directory = "breaking"
-        name = "Backwards Incompatible Changes"
-        showcontent = true
-
-    [[tool.towncrier.type]]
-        directory = "api"
-        name = "API Changes"
-        showcontent = true
-
-    [[tool.towncrier.type]]
-      directory = "removal"
-      name = "Deprecations and Removals"
-      showcontent = true
-
-    [[tool.towncrier.type]]
-      directory = "feature"
-      name = "Features"
-      showcontent = true
-
-    [[tool.towncrier.type]]
-      directory = "bugfix"
-      name = "Bug Fixes"
-      showcontent = true
-
-    [[tool.towncrier.type]]
-      directory = "doc"
-      name = "Improved Documentation"
-      showcontent = true
-
-<<<<<<<
-    [[tool.towncrier.type]]
-      directory = "trivial"
-      name = "Trivial/Internal Changes"
-      showcontent = true
-=======
-[tool.setuptools_scm]
-write_to = "sunkit_image/_version.py"
-
 [tool.gilesbot]
   [tool.gilesbot.pull_requests]
   enabled = true
@@ -173,12 +96,9 @@ write_to = "sunkit_image/_version.py"
   enabled = true
   verify_pr_number = true
   changelog_skip_label = "No Changelog Entry Needed"
-  help_url = "https://github.com//blob/main/changelog/README.rst"
-
+  help_url = "https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst"
   changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com//blob/main/changelog/README.rst)."
-
   type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com//blob/main/changelog/README.rst)"
-
   number_incorrect_long = "The number in the changelog file you added does not match the number of this pull request. Please rename the file."
 
 # TODO: This should be in towncrier.toml but Giles currently only works looks in
@@ -187,7 +107,7 @@ write_to = "sunkit_image/_version.py"
   package = "sunkit-image"
   filename = "CHANGELOG.rst"
   directory = "changelog/"
-  issue_format = "`#{issue} https:github.com//changelog/pull/{issue}>`__"
+    issue_format = "`#{issue} <https://github.com/sunpy/sunkit-image/pull/{issue}>`__"
   title_format = "{version} ({project_date})"
 
   [[tool.towncrier.type]]
@@ -224,4 +144,3 @@ write_to = "sunkit_image/_version.py"
   directory = "trivial"
   name = "Internal Changes"
   showcontent = true
->>>>>>>
