@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/sunpy/package-template",
-  "commit": "3737aa309d2a695ada046c7868c5683213003f3d",
+  "commit": "5446d70263fff597b33ca7b0833aaeb5f3c3ac59",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -10,12 +10,12 @@
       "author_name": "The SunPy Community",
       "author_email": "sunpy@googlegrouups.com",
       "project_url": "https://sunpy.org",
-      "github_repo": "",
-      "sourcecode_url": "",
+      "github_repo": "sunpy/sunkit-image",
+      "sourcecode_url": "https://github.com/sunpy/sunkit-image",
       "download_url": "https://pypi.org/project/sunkit-image",
-      "documentation_url": "",
-      "changelog_url": "",
-      "issue_tracker_url": "",
+      "documentation_url": "https://docs.sunpy.org/projects/sunkit-image",
+      "changelog_url": "https://docs.sunpy.org/projects/sunkit-image/en/stable/whatsnew/changelog.html",
+      "issue_tracker_url": "https://github.com/sunpy/sunkit-image/issues",
       "license": "BSD 2-Clause",
       "minimum_python_version": "3.10",
       "use_compiled_extensions": "n",
