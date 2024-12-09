@@ -68,8 +68,6 @@ docs = [
 dev = ["sunkit_image[all,tests,docs]"]
 
 [project.urls]
-<<<<<<<
-=======
 Homepage = "https://sunpy.org"
 "Source Code" = "https://github.com/sunpy/sunkit-image"
 Download = "https://pypi.org/project/sunkit-image"
@@ -79,18 +77,7 @@ Changelog = "https://docs.sunpy.org/projects/sunkit-image/en/stable/whatsnew/cha
 
 [tool.setuptools]
 zip-safe = false
->>>>>>>
-changelog = "https://docs.sunpy.org/projects/sunkit-image/en/latest/changelog.html"
-documentation = "https://docs.sunpy.org/projects/sunkit-image/"
-homepage = "https://sunpy.org/"
-issue_tracker = "https://github.com/sunpy/sunkit-image/issues"
-repository = "https://github.com/sunpy/sunkit-image/"
-
-[tool.setuptools]
 include-package-data = true
-platforms = ["any"]
-provides = ["sunkit_image"]
-license-files = ["LICENSE.rst"]
 
 [tool.setuptools.packages.find]
 include = ["sunkit_image*"]
@@ -109,16 +96,11 @@ write_to = "sunkit_image/_version.py"
   verify_pr_number = true
   changelog_skip_label = "No Changelog Entry Needed"
   help_url = "https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst"
-<<<<<<<
-  changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com//blob/main/changelog/README.rst)."
-  type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com//blob/main/changelog/README.rst)"
-=======
 
   changelog_missing_long = "There isn't a changelog file in this pull request. Please add a changelog file to the `changelog/` directory following the instructions in the changelog [README](https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst)."
 
   type_incorrect_long = "The changelog file you added is not one of the allowed types. Please use one of the types described in the changelog [README](https://github.com/sunpy/sunkit-image/blob/main/changelog/README.rst)"
 
->>>>>>>
   number_incorrect_long = "The number in the changelog file you added does not match the number of this pull request. Please rename the file."
 
 # TODO: This should be in towncrier.toml but Giles currently only works looks in
@@ -127,11 +109,7 @@ write_to = "sunkit_image/_version.py"
   package = "sunkit_image"
   filename = "CHANGELOG.rst"
   directory = "changelog/"
-<<<<<<<
-    issue_format = "`#{issue} <https://github.com/sunpy/sunkit-image/pull/{issue}>`__"
-=======
   issue_format = "`#{issue} <https://github.com/sunpy/sunkit-image/pull/{issue}>`__"
->>>>>>>
   title_format = "{version} ({project_date})"
 
   [[tool.towncrier.type]]
