@@ -5,7 +5,7 @@ Algorithm (STARA).
 
 import numpy as np
 from skimage.filters import median
-from skimage.morphology import disk, square, white_tophat
+from skimage.morphology import disk, white_tophat
 from skimage.util import invert
 
 import astropy.units as u
@@ -70,7 +70,16 @@ def stara(
 
     # Median filter to remove detections based on hot pixels
     m_pix = int((median_box / smap.scale[0]).to_value(u.pix))
-    med = median(data, square(m_pix), behavior="ndimage")
+
+    # Need to account for https://github.com/scikit-image/scikit-image/pull/7566/files
+    import skimage
+    if skimage.__version__ < "0.25.0":
+        from skimage.morphology.morphology import square
+        function = square(m_pix)
+    else:
+        from skimage.morphology import footprint_rectangle
+        function = footprint_rectangle((m_pix, m_pix))
+    med = median(data, function, behavior="ndimage")
 
     # Construct the pixel structuring element
     c_pix = int((circle_radius / smap.scale[0]).to_value(u.pix))
