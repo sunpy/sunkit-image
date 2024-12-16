@@ -74,7 +74,7 @@ def stara(
     # Need to account for https://github.com/scikit-image/scikit-image/pull/7566/files
     import skimage
     if skimage.__version__ < "0.25.0":
-        from skimage.morphology.morphology import square
+        from skimage.morphology import square
         function = square(m_pix)
     else:
         from skimage.morphology import footprint_rectangle
