@@ -102,16 +102,17 @@ def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
 
 def _select_rank_method(method):
     # For now, we have more than one option for ranking the values
-    def _percentile_ranks_scipy(arr):
+    def _percentile_ranks_scipy(arr):   
         from scipy import stats
 
         return stats.rankdata(arr, method="average") / len(arr)
 
     def _percentile_ranks_numpy(arr):
+        ranks = arr.copy()
         sorted_indices = np.argsort(arr)
-        ranks = np.empty_like(sorted_indices)
-        ranks[sorted_indices] = np.arange(1, len(arr) + 1)
-        return ranks / float(len(arr))
+        sorted_indices =sorted_indices[~np.isnan(arr[sorted_indices])]
+        ranks[sorted_indices] = np.arange(1, len(sorted_indices) + 1)
+        return ranks / float(len(sorted_indices))
 
     def _percentile_ranks_numpy_inplace(arr):
         sorted_indices = np.argsort(arr)
@@ -726,6 +727,7 @@ def rhef(
         if application_radius is not None and application_radius > 0:
             here = np.logical_and(here, map_r >= application_radius)
         # Apply ranking function
+         
         data[here] = ranking_func(smap.data[here])
         if upsilon is not None:
             data[here] = apply_upsilon(data[here], upsilon)
