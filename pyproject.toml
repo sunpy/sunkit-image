@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=62.1",
-  "setuptools_scm[toml]>=6.2",
+  "setuptools_scm[toml]>=8.0.0",
   "wheel",
 ]
 build-backend = "setuptools.build_meta"
@@ -85,7 +85,7 @@ exclude = ["sunkit_image._dev*"]
 namespaces = false
 
 [tool.setuptools_scm]
-write_to = "sunkit_image/_version.py"
+version_file = "sunkit_image/_version.py"
 
 [tool.gilesbot]
   [tool.gilesbot.pull_requests]

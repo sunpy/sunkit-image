@@ -32,6 +32,7 @@ select = [
   "RUF",
 ]
 extend-ignore = [
+  "A005", # Module `trace` shadows a Python standard-library module
   # pycodestyle (E, W)
   "E501", # ignore line length will use a formatter instead
   # pyupgrade (UP)
