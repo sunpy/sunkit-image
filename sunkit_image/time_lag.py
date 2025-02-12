@@ -160,8 +160,15 @@ def _dask_check(lags, indices):
     #    preserve the laziness of the array evaluation.
     if DASK_INSTALLED and isinstance(indices, dask.array.Array):
         lags_lazy = dask.array.from_array(lags.value, chunks=lags.shape)
-        lags_unit = lags.unit
-        return lags_lazy[indices.flatten()].reshape(indices.shape) * lags_unit
+        lags_select = lags_lazy[indices.flatten()].reshape(indices.shape)
+        # NOTE: Reset array priority to force multiplication to defer to Dask
+        # rather than Quantity. See https://github.com/sunpy/sunkit-image/issues/260
+        # for more information.
+        old_priority = lags_select.__array_priority__
+        lags_select.__array_priority__ = lags.unit.__array_priority__ + 1
+        lags_select = lags_select * lags.unit
+        lags_select.__array_priority__ = old_priority
+        return lags_select
     return lags[indices]
 
 
