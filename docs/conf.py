@@ -27,15 +27,6 @@ if on_rtd:
 
 # -- Project information -----------------------------------------------------
 
-<<<<<<<
-=======
-# Wrap large function/method signatures
-maximum_signature_line_length = 80
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
-# ones.
->>>>>>>
 # The full version, including alpha/beta/rc tags
 from sunkit_image import __version__
 
@@ -56,6 +47,12 @@ copyright = f"{datetime.datetime.now(datetime.UTC).year}, {author}"  # NOQA: A00
 
 # -- General configuration -----------------------------------------------------
 
+# Wrap large function/method signatures
+maximum_signature_line_length = 80
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
+# ones.
 extensions = [
     "matplotlib.sphinxext.plot_directive",
     "sphinx_design",
