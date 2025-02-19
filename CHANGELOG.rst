@@ -1,3 +1,80 @@
+0.6.0 (2025-02-19)
+==================
+
+Breaking Changes
+----------------
+
+- The ``Asda`` and ``Lamb_Oseen`` classes have been removed and replaced with functions that replicate the original process.
+
+  The following function were renamed:
+  - ``gen_vel`` -> ``generate_velocity_field``
+  - ``gamma_values`` -> ``calculate_gamma_values``
+  - ``vortex_property`` -> ``get_vortex_properties``
+  - ``get_grid`` -> ``get_vortex_meshgrid``
+  - ``center_edge`` -> ``get_vortex_edges``
+  - ``get_vtheta`` -> ``get_rotational_velocity``
+  - ``get_vradial`` -> ``get_radial_velocity``
+  - ``get_vxvy`` -> ``get_velocity_field``
+
+  Now to use, the properties that were previously stored within the class should now be passed through the arguments of the methods in case the method used these arguments.
+
+  Example:
+
+  ``lo.gen_vel(index[1], index[0])`` -> ``asda.generate_velocity_field(vx, vy, index[1], index[0], r)`` (`#185 <https://github.com/sunpy/sunkit-image/pull/185>`__)
+- Now all inputs to `sunkit_image.enhance.mgn` beyond the input array are keyword arguments. (`#194 <https://github.com/sunpy/sunkit-image/pull/194>`__)
+- Increased the minimum version of Python to 3.10.
+  This comes along with an increase in the dependencies versions. (`#194 <https://github.com/sunpy/sunkit-image/pull/194>`__)
+- Increased the minimum required version of ``sunpy`` to the latest LTS version 6.0.0 (`#223 <https://github.com/sunpy/sunkit-image/pull/223>`__)
+- All functions under (`sunkit_image.radial`) now have a settable fill value which now defaults to NaN instead of 0. (`#231 <https://github.com/sunpy/sunkit-image/pull/231>`__)
+- The function ``set_attenuation_coefficients`` has been removed from the public API.
+
+  Now you can pass in the inputs used by ``set_attenuation_coefficients`` directly into `sunkit_image.radial.fnrgf`, which now accepts ``mean_attenuation_range`` and ``std_attenuation_range``. (`#243 <https://github.com/sunpy/sunkit-image/pull/243>`__)
+
+
+Removals
+--------
+
+- The coalignment methods ``calculate_solar_rotate_shift`` and ``mapsequence_coalign_by_rotation`` present in the `sunkit_image.coalignment` have been removed, with no replacement.
+  Correspondingly the gallery example ``Compensating for Solar Rotation`` making use of these methods are removed.
+
+  If you wish to coalign differentially rotated maps, refer to this `example <https://docs.sunpy.org/en/stable/generated/gallery/differential_rotation/reprojected_map.html>`__ in sunpy (`#206 <https://github.com/sunpy/sunkit-image/pull/206>`__)
+
+
+New Features
+------------
+
+- Added the ability to call a Wavelets Optimized Whitening (WOW) algorithm from the `watroo <https://pypi.org/project/watroo/>`__ package. (`#188 <https://github.com/sunpy/sunkit-image/pull/188>`__)
+- Added the `sunkit_image.stara` module which is an implementation of Sunspot Tracking And Recognition (STARA).
+  Added an example of plotting sunspots using the STARA :ref:`sphx_glr_generated_gallery_finding_sunspots_using_stara.py`. (`#195 <https://github.com/sunpy/sunkit-image/pull/195>`__)
+- Added the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`) to the `sunkit_image.radial` package. (`#205 <https://github.com/sunpy/sunkit-image/pull/205>`__)
+- Added a gallery example :ref:`sphx_glr_generated_gallery_detecting_swirls.py` demonstrating the usage of the `sunkit_image.asda` module for detecting swirls in the solar atmosphere. (`#218 <https://github.com/sunpy/sunkit-image/pull/218>`__)
+
+
+Bug Fixes
+---------
+
+- Removed the default normalization of the output maps from `sunkit_image.radial.nrgf` and `sunkit_image.radial.fnrgf`. (`#205 <https://github.com/sunpy/sunkit-image/pull/205>`__)
+- Within `sunkit_image.enhance.mgn`, the input data is now cast to float32 to work around int/float being cast to each other causing an error. (`#215 <https://github.com/sunpy/sunkit-image/pull/215>`__)
+- Improved the Radial Histogram Equalizing Filter (RHEF) (`sunkit_image.radial.rhef`) to work with images outside of SDO/AIA. (`#231 <https://github.com/sunpy/sunkit-image/pull/231>`__)
+
+
+Documentation
+-------------
+
+- Added a new example for `sunkit_image.radial.rhef` at :ref:`sphx_glr_generated_gallery_radial_histogram_equalization.py`
+
+  Added RHEF to :ref:`sphx_glr_generated_gallery_radial_gradient_filters.py` as a comparison to the other filters. (`#205 <https://github.com/sunpy/sunkit-image/pull/205>`__)
+- Updated all of the examples with cleaner plots and some minor english style tweaks. (`#212 <https://github.com/sunpy/sunkit-image/pull/212>`__)
+- Added a new example showcasing advanced usage of Wavelets Optimized Whitening (WOW) at :ref:`sphx_glr_generated_gallery_advanced_wow.py` (`#238 <https://github.com/sunpy/sunkit-image/pull/238>`__)
+
+
+Internal Changes
+----------------
+
+- Added explicit support for numpy 2.0. (`#209 <https://github.com/sunpy/sunkit-image/pull/209>`__)
+- Added unit tests with a JSOC cutout file. (`#215 <https://github.com/sunpy/sunkit-image/pull/215>`__)
+
+
 0.5.1 (2023-11-17)
 ==================
 

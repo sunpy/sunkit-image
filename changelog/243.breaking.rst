@@ -1,3 +1,0 @@
-The function ``set_attenuation_coefficients`` has been removed from the public API.
-
-Now you can pass in the inputs used by ``set_attenuation_coefficients`` directly into `sunkit_image.radial.fnrgf`, which now accepts ``mean_attenuation_range`` and ``std_attenuation_range``.
