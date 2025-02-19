@@ -1,1 +1,0 @@
-Added a gallery example :ref:`sphx_glr_generated_gallery_detecting_swirls.py` demonstrating the usage of the `sunkit_image.asda` module for detecting swirls in the solar atmosphere.

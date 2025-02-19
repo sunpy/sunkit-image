@@ -1,1 +1,0 @@
-Now all inputs to `sunkit_image.enhance.mgn` beyond the input array are keyword arguments.
