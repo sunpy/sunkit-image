@@ -118,6 +118,11 @@ def _select_rank_method(method):
         arr[sorted_indices] = np.arange(1, len(arr) + 1)
         return arr / float(len(arr))
 
+    def _pass_without_filtering(arr):
+        return arr
+
+    method = str(method).casefold()
+    
     # Select the sort method
     if method == "inplace":
         ranking_func = _percentile_ranks_numpy_inplace
@@ -125,8 +130,10 @@ def _select_rank_method(method):
         ranking_func = _percentile_ranks_numpy
     elif method == "scipy":
         ranking_func = _percentile_ranks_scipy
+    elif method == "none":
+        ranking_func = _pass_without_filtering
     else:
-        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
+        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy', or 'none'"
         raise NotImplementedError(msg)
     return ranking_func
 
@@ -651,7 +658,7 @@ def rhef(
     radial_bin_edges=None,
     application_radius=0 * u.R_sun,
     upsilon=0.35,
-    method="numpy",
+    method="scipy",
     vignette=None,
     progress=False,
     fill=np.nan,
