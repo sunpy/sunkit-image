@@ -121,9 +121,7 @@ def _select_rank_method(method):
     def _pass_without_filtering(arr):
         return arr
 
-    method = str(method).casefold()
-    
-    # Select the sort method
+    method = method.lower()
     if method == "inplace":
         ranking_func = _percentile_ranks_numpy_inplace
     elif method == "numpy":
