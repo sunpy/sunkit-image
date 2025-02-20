@@ -1,0 +1,1 @@
+Fixed NaN handling in `sunkit_image.radial.rhef`.

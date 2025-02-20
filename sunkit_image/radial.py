@@ -101,11 +101,13 @@ def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     )
 
 def _select_rank_method(method):
-    # For now, we have more than one option for ranking the values
     def _percentile_ranks_scipy(arr):
         from scipy import stats
 
-        return stats.rankdata(arr, method="average") / len(arr)
+        mask = ~np.isnan(arr)
+        ranks = np.full(arr.shape, np.nan)
+        ranks[mask] = stats.rankdata(arr[mask], method="average") / np.sum(mask)
+        return ranks
 
     def _percentile_ranks_numpy(arr):
         ranks = arr.copy()
@@ -114,25 +116,18 @@ def _select_rank_method(method):
         ranks[sorted_indices] = np.arange(1, len(sorted_indices) + 1)
         return ranks / float(len(sorted_indices))
 
-    def _percentile_ranks_numpy_inplace(arr):
-        sorted_indices = np.argsort(arr)
-        arr[sorted_indices] = np.arange(1, len(arr) + 1)
-        return arr / float(len(arr))
-
     def _pass_without_filtering(arr):
         return arr
 
     method = method.lower()
-    if method == "inplace":
-        ranking_func = _percentile_ranks_numpy_inplace
-    elif method == "numpy":
+    if method == "numpy":
         ranking_func = _percentile_ranks_numpy
     elif method == "scipy":
         ranking_func = _percentile_ranks_scipy
     elif method == "none":
         ranking_func = _pass_without_filtering
     else:
-        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy', or 'none'"
+        msg = f"{method} is invalid. Allowed values are 'numpy', 'scipy', or 'none'"
         raise NotImplementedError(msg)
     return ranking_func
 
