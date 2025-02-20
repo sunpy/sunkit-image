@@ -1,1 +1,0 @@
-Changed the default rank method for `sunkit_image.radial.rhef` from 'numpy' to 'scipy'.

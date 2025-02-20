@@ -1,1 +1,0 @@
-Removed "inplace" method for `sunkit_image.radial.rhef`.

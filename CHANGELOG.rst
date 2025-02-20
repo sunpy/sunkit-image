@@ -1,3 +1,25 @@
+0.6.1 (2025-02-20)
+==================
+
+Breaking Changes
+----------------
+
+- Removed "inplace" method for `sunkit_image.radial.rhef`. (`#254 <https://github.com/sunpy/sunkit-image/pull/254>`__)
+- Changed the default rank method for `sunkit_image.radial.rhef` from 'numpy' to 'scipy'. (`#266 <https://github.com/sunpy/sunkit-image/pull/266>`__)
+
+
+New Features
+------------
+
+- Added a method called "none" to `sunkit_image.radial.rhef` to allow for the bypassing of the radial filter. (`#266 <https://github.com/sunpy/sunkit-image/pull/266>`__)
+
+
+Bug Fixes
+---------
+
+- Fixed NaN handling in `sunkit_image.radial.rhef`. (`#254 <https://github.com/sunpy/sunkit-image/pull/254>`__)
+
+
 0.6.0 (2025-02-19)
 ==================
 
