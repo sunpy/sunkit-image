@@ -1,0 +1,1 @@
+Added a method called "none" to `sunkit_image.radial.rhef` to allow for the bypassing of the radial filter.
