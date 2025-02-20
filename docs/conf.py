@@ -47,11 +47,14 @@ copyright = f"{datetime.datetime.now(datetime.UTC).year}, {author}"  # NOQA: A00
 
 # -- General configuration -----------------------------------------------------
 
+# Wrap large function/method signatures
+maximum_signature_line_length = 80
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named "sphinx.ext.*") or your custom
+# ones.
 extensions = [
     "matplotlib.sphinxext.plot_directive",
-    "sphinx_automodapi.automodapi",
-    "sphinx_automodapi.smart_resolver",
-    "sphinx_changelog",
     "sphinx_design",
     "sphinx_gallery.gen_gallery",
     "sphinx.ext.autodoc",
@@ -59,10 +62,13 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.inheritance_diagram",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
+    "sphinx_automodapi.automodapi",
+    "sphinx_automodapi.smart_resolver",
+    "sphinx_changelog",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

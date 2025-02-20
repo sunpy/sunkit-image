@@ -50,8 +50,8 @@ def _tmp_config_dir(request):
     tmpdir = tempfile.TemporaryDirectory()
 
     os.environ["SUNPY_CONFIGDIR"] = str(tmpdir.name)
-    astropy.config.paths.set_temp_config._temp_path = str(tmpdir.name)
-    astropy.config.paths.set_temp_cache._temp_path = str(tmpdir.name)
+    astropy.config.paths.set_temp_config._temp_path = Path(tmpdir.name)
+    astropy.config.paths.set_temp_cache._temp_path = Path(tmpdir.name)
 
     yield
 
@@ -79,7 +79,7 @@ def tmp_dl_dir(request):
     """
     with tempfile.TemporaryDirectory() as tmpdir:
         os.environ["SUNPY_DOWNLOADDIR"] = tmpdir
-        yield tmpdir
+        yield Path(tmpdir)
         del os.environ["SUNPY_DOWNLOADDIR"]
 
 

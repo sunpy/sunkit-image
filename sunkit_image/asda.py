@@ -12,14 +12,14 @@ from skimage import measure
 from sunkit_image.utils import calculate_gamma, points_in_poly, reform2d, remove_duplicate
 
 __all__ = [
-    "generate_velocity_field",
     "calculate_gamma_values",
-    "get_vortex_edges",
-    "get_vortex_properties",
-    "get_vortex_meshgrid",
-    "get_rotational_velocity",
+    "generate_velocity_field",
     "get_radial_velocity",
+    "get_rotational_velocity",
     "get_velocity_field",
+    "get_vortex_edges",
+    "get_vortex_meshgrid",
+    "get_vortex_properties",
 ]
 
 

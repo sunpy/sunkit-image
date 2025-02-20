@@ -1,1 +1,0 @@
-Within `sunkit_image.enhance.mgn`, the input data is now cast to float32 to work around int/float being cast to each other causing an error.

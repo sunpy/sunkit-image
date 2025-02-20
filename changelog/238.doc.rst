@@ -1,1 +1,0 @@
-Added a new example showcasing advanced usage of Wavelets Optimized Whitening (WOW) at :ref:`sphx_glr_generated_gallery_advanced_wow.py`
