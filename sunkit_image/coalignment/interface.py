@@ -169,7 +169,7 @@ def coalign(reference_map, target_map, method='match_template', **kwargs):
         If the specified method is not registered.
     """
     if method not in REGISTERED_METHODS:
-        msg = (f"Method {method} is not a registered method: {",".join(REGISTERED_METHODS.keys())}. "
+        msg = (f"Method {method} is not a registered method: {','.join(REGISTERED_METHODS.keys())}. "
         "The method needs to be registered, with the correct import.")
         raise ValueError(msg)
     _warn_user_of_separation(reference_map, target_map)
