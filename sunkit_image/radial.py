@@ -101,32 +101,33 @@ def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
     )
 
 def _select_rank_method(method):
-    # For now, we have more than one option for ranking the values
     def _percentile_ranks_scipy(arr):
         from scipy import stats
 
-        return stats.rankdata(arr, method="average") / len(arr)
+        mask = ~np.isnan(arr)
+        ranks = np.full(arr.shape, np.nan)
+        ranks[mask] = stats.rankdata(arr[mask], method="average") / np.sum(mask)
+        return ranks
 
     def _percentile_ranks_numpy(arr):
+        ranks = arr.copy()
         sorted_indices = np.argsort(arr)
-        ranks = np.empty_like(sorted_indices)
-        ranks[sorted_indices] = np.arange(1, len(arr) + 1)
-        return ranks / float(len(arr))
+        sorted_indices = sorted_indices[~np.isnan(arr[sorted_indices])]
+        ranks[sorted_indices] = np.arange(1, len(sorted_indices) + 1)
+        return ranks / float(len(sorted_indices))
 
-    def _percentile_ranks_numpy_inplace(arr):
-        sorted_indices = np.argsort(arr)
-        arr[sorted_indices] = np.arange(1, len(arr) + 1)
-        return arr / float(len(arr))
+    def _pass_without_filtering(arr):
+        return arr
 
-    # Select the sort method
-    if method == "inplace":
-        ranking_func = _percentile_ranks_numpy_inplace
-    elif method == "numpy":
+    method = method.lower()
+    if method == "numpy":
         ranking_func = _percentile_ranks_numpy
     elif method == "scipy":
         ranking_func = _percentile_ranks_scipy
+    elif method == "none":
+        ranking_func = _pass_without_filtering
     else:
-        msg = f"{method} is invalid. Allowed values are 'inplace', 'numpy', 'scipy'"
+        msg = f"{method} is invalid. Allowed values are 'numpy', 'scipy', or 'none'"
         raise NotImplementedError(msg)
     return ranking_func
 
@@ -651,7 +652,7 @@ def rhef(
     radial_bin_edges=None,
     application_radius=0 * u.R_sun,
     upsilon=0.35,
-    method="numpy",
+    method="scipy",
     vignette=None,
     progress=False,
     fill=np.nan,
