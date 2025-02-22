@@ -37,9 +37,7 @@ def phase_cross_correlation_coalign(input_array, target_array, **kwargs):
     if input_array.shape != target_array.shape:
         raise ValueError("Input and target arrays must be the same shape.")
     shift, _, _ = phase_cross_correlation(target_array, input_array, **kwargs)
-    # TODO: Check if the shift is correct
-    x_shift = shift[1]
-    y_shift = shift[0]
+    x_shift, y_shift = shift[1], shift[0]
     # Particularly for this method, there is no change in the rotation or scaling,
     # hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = np.array([1.0, 1.0])

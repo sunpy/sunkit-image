@@ -13,3 +13,5 @@ The module supports various transformation methods registered via the `~sunkit_i
 .. automodapi:: sunkit_image.coalignment.interface
 
 .. automodapi:: sunkit_image.coalignment.match_template
+
+.. automodapi:: sunkit_image.coalignment.phase_cross_correlation
