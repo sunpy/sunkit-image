@@ -10,7 +10,7 @@ from astropy.coordinates import SkyCoord
 from sunpy.sun.models import differential_rotation
 from sunpy.util.exceptions import SunpyUserWarning
 
-__all__ = ["AffineParams", "register_coalignment_method", "REGISTERED_METHODS"]
+__all__ = ["REGISTERED_METHODS", "AffineParams", "register_coalignment_method"]
 
 # Global Dictionary to store the registered methods and their names
 REGISTERED_METHODS = {}
@@ -93,7 +93,7 @@ def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
 def _warn_user_of_separation(reference_map, target_map):
     """
     Issues a warning if the separation between the ``reference_map`` and
-    ``target_map`` is large.
+    ``target_map`` is "large".
 
     Parameters
     ----------
@@ -121,7 +121,7 @@ def _warn_user_of_separation(reference_map, target_map):
     # Calculate time difference and convert to separation angle
     ref_time = reference_map.date
     target_time = target_map.date
-    time_diff = abs(ref_time - target_time)
+    time_diff = np.abs(ref_time - target_time)
     time_separation_angle = differential_rotation(time_diff.to(u.day), reference_map.center.Tx, model='howard')
     if time_separation_angle > tolerable_angular_separation:
         warnings.warn(
@@ -169,13 +169,11 @@ def coalign(reference_map, target_map, method='match_template', **kwargs):
         If the specified method is not registered.
     """
     if method not in REGISTERED_METHODS:
-        msg = (f"Method {method} is not a registered method: {list(REGISTERED_METHODS.keys())}."
+        msg = (f"Method {method} is not a registered method: {",".join(REGISTERED_METHODS.keys())}. "
         "The method needs to be registered, with the correct import.")
         raise ValueError(msg)
-    target_array = target_map.data
-    reference_array = reference_map.data
     _warn_user_of_separation(reference_map, target_map)
-    affine_params = REGISTERED_METHODS[method](reference_array, target_array, **kwargs)
+    affine_params = REGISTERED_METHODS[method](reference_map.data, target_map.data, **kwargs)
     return _update_fits_wcs_metadata(reference_map, target_map, affine_params)
 
 

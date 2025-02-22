@@ -72,31 +72,29 @@ def _find_best_match_location(corr):
     """
     ij = np.unravel_index(np.argmax(corr), corr.shape)
     cor_max_x, cor_max_y = ij[::-1]
-
     array_maximum = corr[
         max(0, cor_max_y - 1) : min(cor_max_y + 2, corr.shape[0] - 1),
         max(0, cor_max_x - 1) : min(cor_max_x + 2, corr.shape[1] - 1),
     ]
-
     y_shift_maximum, x_shift_maximum = _get_correlation_shifts(array_maximum)
-
     y_shift_correlation_array = y_shift_maximum + cor_max_y
     x_shift_correlation_array = x_shift_maximum + cor_max_x
-
     return y_shift_correlation_array, x_shift_correlation_array
 
 
 @register_coalignment_method("match_template")
 def match_template_coalign(input_array, target_array, **kwargs):
     """
-    Perform coalignment by matching the template array to the input array.
+    Perform coalignment by matching the input array to the target array.
 
     Parameters
     ----------
     input_array : `numpy.ndarray`
         The input 2D array to be coaligned.
-    template_array : `numpy.ndarray`
+    target_array : `numpy.ndarray`
         The template 2D array to align to.
+    kwargs: dict
+        Passed to `skimage.feature.match_template`.
 
     Returns
     -------
@@ -110,7 +108,10 @@ def match_template_coalign(input_array, target_array, **kwargs):
         - translation : `tuple`
             A tuple containing the x and y translation values.
     """
-    corr = match_template(np.float64(input_array), np.float64(target_array))
+    corr = match_template(np.float64(input_array), np.float64(target_array), **kwargs)
+    # TODO: Work out what is going on
+    if corr.ndim != input_array.ndim:
+        raise ValueError("The correlation output failed to work out a match.")
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
     # Particularly for this method, there is no change in the rotation or scaling,
