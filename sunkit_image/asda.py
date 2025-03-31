@@ -245,8 +245,8 @@ def get_vortex_properties(vx, vy, edge_prop, image=None):
         # Calculate velocity of the center
         vc += (
             [
-                vx[int(round(cen[1])), int(round(cen[0]))],
-                vy[int(round(cen[1])), int(round(cen[0]))],
+                vx[round(cen[1]), round(cen[0])],
+                vy[round(cen[1]), round(cen[0])],
             ],
         )
         # Calculate average the observational values
