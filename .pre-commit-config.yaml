@@ -1,11 +1,11 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.9.6"
+    rev: "v0.11.12"
     hooks:
       - id: ruff
-        args: ["--fix"]
+        args: ["--fix", "--unsafe-fixes"]
   - repo: https://github.com/PyCQA/isort
-    rev: 6.0.0
+    rev: 6.0.1
     hooks:
       - id: isort
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|extern.*|sunkit_image/extern)$"
@@ -31,11 +31,11 @@ repos:
       - id: codespell
         args: [ "--write-changes" ]
   - repo: https://github.com/crate-ci/typos
-    rev: dictgen-v0.3.1
+    rev: v1
     hooks:
       - id: typos
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.14.1"
+    rev: "v1.15.0"
     hooks:
       - id: mypy
         additional_dependencies: ["types-setuptools"]
