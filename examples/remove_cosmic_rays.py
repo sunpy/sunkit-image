@@ -35,7 +35,7 @@ detector = a.Detector("C2")
 result = Fido.search(time_range, instrument)
 print(result)
 
-downloaded_files = Fido.fetch(result[0])
+downloaded_files = Fido.fetch(result[0], site="NSO")
 data, header = fits.open(downloaded_files[0])[0].data, fits.open(downloaded_files[0])[0].header
 
 # Add the missing meta information to the header
