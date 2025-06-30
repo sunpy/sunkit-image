@@ -7,7 +7,7 @@ __all__ = ["phase_cross_correlation_coalign"]
 
 
 @register_coalignment_method("phase_cross_correlation")
-def phase_cross_correlation_coalign(input_array, target_array, **kwargs):
+def phase_cross_correlation_coalign(target_array, reference_array, **kwargs):
     """
     Perform coalignment by phase cross correlation input array to the target array.
 
@@ -15,9 +15,9 @@ def phase_cross_correlation_coalign(input_array, target_array, **kwargs):
 
     Parameters
     ----------
-    input_array : `numpy.ndarray`
-        The input 2D array to be coaligned.
     target_array : `numpy.ndarray`
+        The input 2D array to be coaligned.
+    reference_array : `numpy.ndarray`
         The template 2D array to align to.
     kwargs : dict
         Passed to `skimage.registration.phase_cross_correlation`.
@@ -34,9 +34,9 @@ def phase_cross_correlation_coalign(input_array, target_array, **kwargs):
         - translation : `tuple`
             A tuple containing the x and y translation values.
     """
-    if input_array.shape != target_array.shape:
+    if target_array.shape != reference_array.shape:
         raise ValueError("Input and target arrays must be the same shape.")
-    shift, _, _ = phase_cross_correlation(target_array, input_array, **kwargs)
+    shift, _, _ = phase_cross_correlation(reference_array, target_array, **kwargs)
     x_shift, y_shift = shift[1], shift[0]
     # Particularly for this method, there is no change in the rotation or scaling,
     # hence the hardcoded values of scale to 1.0 & rotation to identity matrix

@@ -50,17 +50,17 @@ def register_coalignment_method(name):
     return decorator
 
 
-def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
+def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
     """
     Update the metadata of a sunpy.map.Map` based on affine transformation
     parameters.
 
     Parameters
     ----------
-    reference_map : `sunpy.map.Map`
-        The reference map object to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
         The original map object whose metadata is to be updated.
+    reference_map : `sunpy.map.Map`
+        The reference map object to which the target map is to be coaligned.
     affine_params : `NamedTuple`
         A `NamedTuple` containing the affine transformation parameters.
         If you want to use a custom object, it must have attributes for "translation" (dx, dy), "scale", and "rotation_matrix".
@@ -90,17 +90,17 @@ def _update_fits_wcs_metadata(reference_map, target_map, affine_params):
     return fixed_map
 
 
-def _warn_user_of_separation(reference_map, target_map):
+def _warn_user_of_separation(target_map, reference_map):
     """
     Issues a warning if the separation between the ``reference_map`` and
     ``target_map`` is "large".
 
     Parameters
     ----------
-    reference_map : `sunpy.map.Map`
-        The reference map to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
         The target map to be coaligned to the reference map.
+    reference_map : `sunpy.map.Map`
+        The reference map to which the target map is to be coaligned.
     """
     # Maximum angular separation allowed between the reference and target maps
     tolerable_angular_separation = 1*u.deg
@@ -133,25 +133,34 @@ def _warn_user_of_separation(reference_map, target_map):
         )
 
 
-def coalign(reference_map, target_map, method='match_template', **kwargs):
+def coalign(target_map, reference_map, method='match_template', **kwargs):
     """
-    Performs image coalignment using the specified method.
-
-    This function updates the metadata of the target map to align it with the reference map.
+    Performs image coalignment using the specified method by updating the metadata of the
+    target map to align it with the reference map.
 
     .. note::
 
-        * This function is intended to correct maps with known incorrect metadata.
-          It is not designed to address issues like differential rotation or changes in observer location, which are encoded in the coordinate metadata.
-        * The function modifies the metadata of the map, not the underlying array data.
-          For adjustments that involve coordinate transformations, consider using `~sunpy.map.GenericMap.reproject_to` instead.
+        This function is intended to correct maps with known incorrect metadata.
+        It is not designed to address issues like differential rotation or changes in observer
+        location, which are encoded in the coordinate metadata.
+
+    .. note::
+
+        This function modifies the metadata of the map, not the underlying array data.
+        For adjustments that involve coordinate transformations, consider using
+        `~sunpy.map.GenericMap.reproject_to` instead.
 
     Parameters
     ----------
-    reference_map : `sunpy.map.Map`
-        The reference map to which the target map is to be coaligned.
     target_map : `sunpy.map.Map`
-        The target map to be coaligned to the reference map.
+        The map to be coaligned. The target map should be fully contained within the reference map and,
+        for best results, have approximately the same observer location. For coalignment methods which do
+        not account for different pixel scales or rotations, it is recommended that the target and reference
+        maps and target maps are resampled and/or rotated such that they have the same orientation and
+        resolution.
+    reference_map : `sunpy.map.Map`
+        The map to which the target map is to be coaligned. For best results, the pointing data of this
+        map should be well-known.
     method : {{{coalignment_function_names}}}, optional
         The name of the registered coalignment method to use.
         Defaults to 'match_template'.
@@ -172,9 +181,9 @@ def coalign(reference_map, target_map, method='match_template', **kwargs):
         msg = (f"Method {method} is not a registered method: {','.join(REGISTERED_METHODS.keys())}. "
         "The method needs to be registered, with the correct import.")
         raise ValueError(msg)
-    _warn_user_of_separation(reference_map, target_map)
-    affine_params = REGISTERED_METHODS[method](reference_map.data, target_map.data, **kwargs)
-    return _update_fits_wcs_metadata(reference_map, target_map, affine_params)
+    _warn_user_of_separation(target_map, reference_map)
+    affine_params = REGISTERED_METHODS[method](target_map.data, reference_map.data, **kwargs)
+    return _update_fits_wcs_metadata(target_map, reference_map, affine_params)
 
 
 # Generate the string with allowable coalignment-function names for use in docstrings

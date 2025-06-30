@@ -23,16 +23,33 @@ def eis_test_map():
         return sunpy.map.Map(hdul[0].data, hdul[0].header)
 
 
+@pytest.fixture()
+def aia193_test_map(eis_test_map):
+    query = Fido.search(
+        a.Time(start=eis_test_map.date-1*u.minute,
+               end=eis_test_map.date+1*u.minute,
+               near=eis_test_map.date),
+        a.Instrument.aia,
+        a.Wavelength(193*u.angstrom),
+    )
+    file = Fido.fetch(query)
+    return sunpy.map.Map(file)
+
+
 @pytest.mark.remote_data()
-def test_coalignment(eis_test_map):
-    aia193_test_map = sunpy.map.Map(Fido.fetch(Fido.search(a.Time(start=eis_test_map.meta["date_beg"], near=eis_test_map.meta["date_avg"], end=eis_test_map.meta["date_end"]), a.Instrument('aia'), a.Wavelength(193*u.angstrom))))
+def test_coalignment(eis_test_map, aia193_test_map):
     nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
     ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / eis_test_map.scale[1]
     aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
-    coaligned_eis_map = coalign(aia193_test_downsampled_map, eis_test_map, "match_template")
-    assert coaligned_eis_map.data.shape == eis_test_map.data.shape
-    assert_allclose(coaligned_eis_map.wcs.wcs.crval[0], aia193_test_downsampled_map.wcs.wcs.crval[0],rtol = 1e-2, atol = 0.13)
-    assert_allclose(coaligned_eis_map.wcs.wcs.crval[1], aia193_test_downsampled_map.wcs.wcs.crval[1],rtol = 1e-2, atol = 0.13)
+    coaligned_eis_map = coalign(eis_test_map, aia193_test_downsampled_map, "match_template")
+    assert_allclose(coaligned_eis_map.wcs.wcs.crval[0],
+                    aia193_test_downsampled_map.wcs.wcs.crval[0],
+                    rtol = 1e-2,
+                    atol = 0.13)
+    assert_allclose(coaligned_eis_map.wcs.wcs.crval[1],
+                    aia193_test_downsampled_map.wcs.wcs.crval[1],
+                    rtol = 1e-2,
+                    atol = 0.13)
 
 
 @pytest.fixture()
@@ -43,14 +60,18 @@ def cutout_map(aia171_test_map):
     return aia_map.submap(bottom_left, top_right=top_right)
 
 
-def test_coalignment_reflects_pixel_shifts(cutout_map, aia171_test_map):
+@pytest.fixture()
+def incorrect_pointing_map(cutout_map):
+    return cutout_map.shift_reference_coord(25 * u.arcsec, 50 * u.arcsec)
+
+
+def test_coalignment_reflects_pixel_shifts(incorrect_pointing_map, aia171_test_map):
     """
     Check if coalignment adjusts world coordinates as expected based on
     reference coordinate shifts.
     """
-    messed_map = cutout_map.shift_reference_coord(25 * u.arcsec, 50 * u.arcsec)
     original_world_coords = cutout_map.reference_coordinate
-    fixed_cutout_map = coalign(aia171_test_map, messed_map)
+    fixed_cutout_map = coalign(incorrect_pointing_map, aia171_test_map)
     fixed_world_coords = fixed_cutout_map.reference_coordinate
     # The actual shifts applied by coalignment should be equal to the expected shifts
     assert_allclose(original_world_coords.Tx, fixed_world_coords.Tx, rtol=1e-2, atol=0.4)
@@ -58,18 +79,17 @@ def test_coalignment_reflects_pixel_shifts(cutout_map, aia171_test_map):
 
 
 @figure_test
-def test_coalignment_figure(cutout_map, aia171_test_map):
+def test_coalignment_figure(incorrect_pointing_map, aia171_test_map):
     levels = [200, 400, 500, 700, 800] * cutout_map.unit
-    messed_map = cutout_map.shift_reference_coord(25*u.arcsec, 50*u.arcsec)
-    fixed_cutout_map = coalign(aia171_test_map, messed_map)
+    fixed_cutout_map = coalign(aia171_test_map, incorrect_pointing_map)
     fig = plt.figure(figsize=(15, 7.5))
     # Before coalignment
     ax1 = fig.add_subplot(131, projection=cutout_map)
     cutout_map.plot(axes=ax1, title='Original Cutout')
     cutout_map.draw_contours(levels, axes=ax1, alpha=0.3)
     # Messed up map
-    ax2 = fig.add_subplot(132, projection=messed_map)
-    messed_map.plot(axes=ax2, title='Messed Cutout')
+    ax2 = fig.add_subplot(132, projection=incorrect_pointing_map)
+    incorrect_pointing_map.plot(axes=ax2, title='Messed Cutout')
     cutout_map.draw_contours(levels, axes=ax2, alpha=0.3)
     # After coalignment
     ax3 = fig.add_subplot(133, projection=fixed_cutout_map)

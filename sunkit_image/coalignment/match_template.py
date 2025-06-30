@@ -83,15 +83,15 @@ def _find_best_match_location(corr):
 
 
 @register_coalignment_method("match_template")
-def match_template_coalign(input_array, target_array, **kwargs):
+def match_template_coalign(target_array, reference_array, **kwargs):
     """
     Perform coalignment by matching the input array to the target array.
 
     Parameters
     ----------
-    input_array : `numpy.ndarray`
-        The input 2D array to be coaligned.
     target_array : `numpy.ndarray`
+        The input 2D array to be coaligned.
+    reference_array : `numpy.ndarray`
         The template 2D array to align to.
     kwargs: dict
         Passed to `skimage.feature.match_template`.
@@ -108,9 +108,9 @@ def match_template_coalign(input_array, target_array, **kwargs):
         - translation : `tuple`
             A tuple containing the x and y translation values.
     """
-    corr = match_template(np.float64(input_array), np.float64(target_array), **kwargs)
+    corr = match_template(np.float64(target_array), np.float64(reference_array), **kwargs)
     # TODO: Work out what is going on
-    if corr.ndim != input_array.ndim:
+    if corr.ndim != target_array.ndim:
         raise ValueError("The correlation output failed to work out a match.")
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
