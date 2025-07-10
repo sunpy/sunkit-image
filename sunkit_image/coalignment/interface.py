@@ -9,7 +9,12 @@ import astropy.units as u
 from sunpy.sun.models import differential_rotation
 from sunpy.util.exceptions import SunpyUserWarning
 
-__all__ = ["REGISTERED_METHODS", "AffineParams", "register_coalignment_method"]
+__all__ = [
+    "REGISTERED_METHODS",
+    "AffineParams",
+    "coalign",
+    "register_coalignment_method",
+]
 
 # Global Dictionary to store the registered methods and their names
 REGISTERED_METHODS = {}
