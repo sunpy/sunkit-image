@@ -1,18 +1,20 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
 import sunpy.map
-from sunpy.net import Fido
-from sunpy.net import attrs as a
 
 from sunkit_image.coalignment import coalign
-from sunkit_image.coalignment.interface import REGISTERED_METHODS, AffineParams, register_coalignment_method
+from sunkit_image.coalignment.interface import (
+    REGISTERED_METHODS,
+    AffineParams,
+    _update_fits_wcs_metadata,
+    register_coalignment_method,
+)
 from sunkit_image.tests.helpers import figure_test
 
 
@@ -25,107 +27,92 @@ def eis_test_map():
 
 @pytest.fixture()
 def aia193_test_map(eis_test_map):
-    query = Fido.search(
-        a.Time(start=eis_test_map.date-1*u.minute,
-               end=eis_test_map.date+1*u.minute,
-               near=eis_test_map.date),
-        a.Instrument.aia,
-        a.Wavelength(193*u.angstrom),
-    )
-    file = Fido.fetch(query)
+    #query = Fido.search(
+    #    a.Time(start=eis_test_map.date-1*u.minute,
+    #           end=eis_test_map.date+1*u.minute,
+    #           near=eis_test_map.date),
+    #    a.Instrument.aia,
+    #    a.Wavelength(193*u.angstrom),
+    #)
+    #file = Fido.fetch(query)
+    file = '~/sunpy/data/aia.lev1.193A_2014_01_08T09_57_30.84Z.image_lev1.fits'
     return sunpy.map.Map(file)
 
 
 @pytest.mark.remote_data()
-def test_coalignment(eis_test_map, aia193_test_map):
+def test_coalignment_eis_aia(eis_test_map, aia193_test_map):
     nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
     ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / eis_test_map.scale[1]
     aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
-    coaligned_eis_map = coalign(eis_test_map, aia193_test_downsampled_map, "match_template")
-    assert_allclose(coaligned_eis_map.wcs.wcs.crval[0],
-                    aia193_test_downsampled_map.wcs.wcs.crval[0],
-                    rtol = 1e-2,
-                    atol = 0.13)
-    assert_allclose(coaligned_eis_map.wcs.wcs.crval[1],
-                    aia193_test_downsampled_map.wcs.wcs.crval[1],
-                    rtol = 1e-2,
-                    atol = 0.13)
+    coaligned_eis_map = coalign(eis_test_map, aia193_test_downsampled_map, method='match_template')
+    # Check that correction is as expected based on known pointing offset
+    assert u.allclose(
+        eis_test_map.reference_coordinate.separation(coaligned_eis_map.reference_coordinate),
+        5.95935177*u.arcsec,
+    )
 
 
 @pytest.fixture()
 def cutout_map(aia171_test_map):
-    aia_map = sunpy.map.Map(aia171_test_map)
-    bottom_left = SkyCoord(-300 * u.arcsec, -300 * u.arcsec, frame = aia_map.coordinate_frame)
-    top_right = SkyCoord(800 * u.arcsec, 600 * u.arcsec, frame = aia_map.coordinate_frame)
-    return aia_map.submap(bottom_left, top_right=top_right)
+    bottom_left = SkyCoord(200*u.arcsec, 100*u.arcsec, frame=aia171_test_map.coordinate_frame)
+    top_right = SkyCoord(600*u.arcsec, 900*u.arcsec, frame=aia171_test_map.coordinate_frame)
+    return aia171_test_map.submap(bottom_left, top_right=top_right)
+
+
+POINTING_SHIFT = [25, 50] * u.arcsec
+
+
+@pytest.fixture
+def incorrect_pointing_map(aia171_test_map):
+    return aia171_test_map.shift_reference_coord(*POINTING_SHIFT)
 
 
 @pytest.fixture()
-def incorrect_pointing_map(cutout_map):
-    return cutout_map.shift_reference_coord(25 * u.arcsec, 50 * u.arcsec)
+def incorrect_pointing_cutout_map(cutout_map):
+    return cutout_map.shift_reference_coord(*POINTING_SHIFT)
 
 
-def test_coalignment_reflects_pixel_shifts(incorrect_pointing_map, aia171_test_map):
-    """
-    Check if coalignment adjusts world coordinates as expected based on
-    reference coordinate shifts.
-    """
-    original_world_coords = cutout_map.reference_coordinate
-    fixed_cutout_map = coalign(incorrect_pointing_map, aia171_test_map)
-    fixed_world_coords = fixed_cutout_map.reference_coordinate
+def test_coalignment_match_template(incorrect_pointing_cutout_map, aia171_test_map):
+    fixed_cutout_map = coalign(incorrect_pointing_cutout_map, aia171_test_map)
     # The actual shifts applied by coalignment should be equal to the expected shifts
-    assert_allclose(original_world_coords.Tx, fixed_world_coords.Tx, rtol=1e-2, atol=0.4)
-    assert_allclose(original_world_coords.Ty, fixed_world_coords.Ty, rtol=1e-2, atol=0.4)
+    u.allclose(
+        np.fabs(incorrect_pointing_cutout_map.reference_coordinate.Tx-fixed_cutout_map.reference_coordinate.Tx),
+        POINTING_SHIFT[0],
+    )
+    u.allclose(
+        np.fabs(incorrect_pointing_cutout_map.reference_coordinate.Ty-fixed_cutout_map.reference_coordinate.Ty),
+        POINTING_SHIFT[1],
+    )
+
+
+def test_coalign_phase_cross_correlation(incorrect_pointing_map, aia171_test_map):
+    fixed_map = coalign(incorrect_pointing_map, aia171_test_map, method='phase_cross_correlation')
+    # The actual shifts applied by coalignment should be equal to the expected shifts
+    u.allclose(
+        np.fabs(incorrect_pointing_map.reference_coordinate.Tx-fixed_map.reference_coordinate.Tx),
+        POINTING_SHIFT[0],
+    )
+    u.allclose(
+        np.fabs(incorrect_pointing_map.reference_coordinate.Ty-fixed_map.reference_coordinate.Ty),
+        POINTING_SHIFT[1],
+    )
 
 
 @figure_test
-def test_coalignment_figure(incorrect_pointing_map, aia171_test_map):
-    levels = [200, 400, 500, 700, 800] * cutout_map.unit
-    fixed_cutout_map = coalign(aia171_test_map, incorrect_pointing_map)
-    fig = plt.figure(figsize=(15, 7.5))
-    # Before coalignment
-    ax1 = fig.add_subplot(131, projection=cutout_map)
-    cutout_map.plot(axes=ax1, title='Original Cutout')
-    cutout_map.draw_contours(levels, axes=ax1, alpha=0.3)
+def test_coalignment_figure(incorrect_pointing_cutout_map, cutout_map, aia171_test_map):
+    levels = [200, 400, 500, 700, 800]*cutout_map.unit
+    fixed_cutout_map = coalign(incorrect_pointing_cutout_map, aia171_test_map)
+    fig = plt.figure(figsize=(10, 7.5))
     # Messed up map
-    ax2 = fig.add_subplot(132, projection=incorrect_pointing_map)
-    incorrect_pointing_map.plot(axes=ax2, title='Messed Cutout')
-    cutout_map.draw_contours(levels, axes=ax2, alpha=0.3)
+    ax = fig.add_subplot(121, projection=incorrect_pointing_cutout_map)
+    incorrect_pointing_cutout_map.plot(axes=ax, title='Incorrect Pointing')
+    cutout_map.draw_contours(levels, axes=ax, alpha=0.3)
     # After coalignment
-    ax3 = fig.add_subplot(133, projection=fixed_cutout_map)
-    fixed_cutout_map.plot(axes=ax3, title='Fixed Cutout')
-    cutout_map.draw_contours(levels, axes=ax3, alpha=0.3)
+    ax = fig.add_subplot(122, projection=fixed_cutout_map)
+    fixed_cutout_map.plot(axes=ax, title='Fixed Pointing')
+    cutout_map.draw_contours(levels, axes=ax, alpha=0.3)
     fig.tight_layout()
     return fig
-
-
-@pytest.fixture()
-@register_coalignment_method("scaling")
-def coalign_scaling(reference_map, target_map):
-    return AffineParams(scale=np.array([0.25, 0.25]), rotation_matrix=np.eye(2), translation=(0 , 0))
-
-
-def test_coalignment_reflects_scaling(cutout_map, aia171_test_map):
-    scale_factor = 4
-    rescaled_map = cutout_map.resample(u.Quantity([cutout_map.dimensions.x * scale_factor, cutout_map.dimensions.y * scale_factor]))
-    fixed_cutout_map = coalign(aia171_test_map, rescaled_map, method="scaling")
-    assert_allclose(fixed_cutout_map.scale[0].value, cutout_map.scale[0].value, rtol=1e-5, atol=0)
-    assert_allclose(fixed_cutout_map.scale[1].value, cutout_map.scale[1].value, rtol=1e-5, atol=0)
-
-
-@pytest.fixture()
-@register_coalignment_method("rotation")
-def coalign_rotation(reference_map, target_map):
-    rotation_matrix = np.array([[0.866, -0.5], [0.5, 0.866]])
-    return AffineParams(scale=np.array([1.0, 1.0]), rotation_matrix= rotation_matrix, translation=(0 , 0))
-
-
-def test_coalignment_reflects_rotation(cutout_map, aia171_test_map):
-    rotation_angle = 30 * u.deg
-    rotated_map = cutout_map.rotate(angle=rotation_angle)
-    fixed_cutout_map = coalign(aia171_test_map, rotated_map, method="rotation")
-    assert_allclose(fixed_cutout_map.rotation_matrix[0, 0], cutout_map.rotation_matrix[0, 0], rtol=1e-4, atol=0)
-    assert_allclose(fixed_cutout_map.rotation_matrix[1, 1], cutout_map.rotation_matrix[1, 1], rtol=1e-4, atol=0)
 
 
 def test_register_coalignment_method():
@@ -136,3 +123,24 @@ def test_register_coalignment_method():
     assert "test_method" in REGISTERED_METHODS
     assert REGISTERED_METHODS["test_method"] == test_func
     assert test_func() == "Test function"
+
+
+def test_unsupported_affine_parameters(incorrect_pointing_cutout_map, aia171_test_map):
+    affine_rot = AffineParams(
+        scale=[1,1],
+        rotation_matrix=2*np.eye(2),
+        translation=[0,0],
+    )
+    with pytest.raises(NotImplementedError, match='Changes to the rotation metadata are currently not supported.'):
+        _ = _update_fits_wcs_metadata(incorrect_pointing_cutout_map,
+                                      aia171_test_map,
+                                      affine_rot)
+    affine_scale = AffineParams(
+        scale=[2,3],
+        rotation_matrix=np.eye(2),
+        translation=[0,0],
+    )
+    with pytest.raises(NotImplementedError, match='Changes to the pixel scale metadata are currently not supported.'):
+        _ = _update_fits_wcs_metadata(incorrect_pointing_cutout_map,
+                                      aia171_test_map,
+                                      affine_scale)

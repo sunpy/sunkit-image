@@ -108,7 +108,7 @@ def match_template_coalign(target_array, reference_array, **kwargs):
         - translation : `tuple`
             A tuple containing the x and y translation values.
     """
-    corr = match_template(np.float64(target_array), np.float64(reference_array), **kwargs)
+    corr = match_template(np.float64(reference_array), np.float64(target_array), **kwargs)
     # TODO: Work out what is going on
     if corr.ndim != target_array.ndim:
         raise ValueError("The correlation output failed to work out a match.")

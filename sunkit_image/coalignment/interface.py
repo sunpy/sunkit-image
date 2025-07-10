@@ -5,7 +5,6 @@ import numpy as np
 
 import astropy
 import astropy.units as u
-from astropy.coordinates import SkyCoord
 
 from sunpy.sun.models import differential_rotation
 from sunpy.util.exceptions import SunpyUserWarning
@@ -63,31 +62,30 @@ def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
         The reference map object to which the target map is to be coaligned.
     affine_params : `NamedTuple`
         A `NamedTuple` containing the affine transformation parameters.
-        If you want to use a custom object, it must have attributes for "translation" (dx, dy), "scale", and "rotation_matrix".
+        If you want to use a custom object, it must have attributes for "translation", "scale", and "rotation_matrix".
 
     Returns
     -------
     `sunpy.map.Map`
         A new sunpy map object with updated metadata reflecting the affine transformation.
     """
-    # Updating the PC_ij matrix
-    new_pc_matrix = target_map.rotation_matrix @ affine_params.rotation_matrix
+    # NOTE: Currently, the only metadata updates that are currently supported are shifts in
+    # the reference coordinate. Once other updates are supported, this check can be removed.
+    if not (affine_params.rotation_matrix == np.eye(2)).all():
+        raise NotImplementedError('Changes to the rotation metadata are currently not supported.')
+    if not (affine_params.scale == np.array([1,1])).all():
+        raise NotImplementedError('Changes to the pixel scale metadata are currently not supported.')
     # Calculate the new reference pixel.
-    old_reference_pixel = np.asarray([target_map.reference_pixel.x.value, target_map.reference_pixel.y.value])
+    old_reference_pixel = u.Quantity(target_map.reference_pixel).to_value('pixel')
     new_reference_pixel = affine_params.scale * affine_params.rotation_matrix @ old_reference_pixel + affine_params.translation
-    reference_coord = reference_map.wcs.pixel_to_world(new_reference_pixel[0],new_reference_pixel[1])
-    Txshift = reference_coord.Tx - target_map.reference_coordinate.Tx
-    Tyshift = reference_coord.Ty - target_map.reference_coordinate.Ty
-
+    new_reference_coordinate = reference_map.wcs.pixel_to_world(*new_reference_pixel)
     # Create a new map with the updated metadata
-    fixed_map = target_map.shift_reference_coord(Txshift, Tyshift)
-    fixed_map.meta["PC1_1"] = new_pc_matrix[0, 0]
-    fixed_map.meta["PC1_2"] = new_pc_matrix[0, 1]
-    fixed_map.meta["PC2_1"] = new_pc_matrix[1, 0]
-    fixed_map.meta["PC2_2"] = new_pc_matrix[1, 1]
-    fixed_map.meta['cdelt1'] = (target_map.scale[0] / affine_params.scale[0]).value
-    fixed_map.meta['cdelt2'] = (target_map.scale[1] / affine_params.scale[1]).value
-    return fixed_map
+    return target_map.shift_reference_coord(
+        new_reference_coordinate.Tx - target_map.reference_coordinate.Tx,
+        new_reference_coordinate.Ty - target_map.reference_coordinate.Ty,
+    )
+    # TODO: Support metadata updates to PCij/CDij and CDELT for non-unity scaling and
+    # rotation in the affine transform
 
 
 def _warn_user_of_separation(target_map, reference_map):
@@ -104,12 +102,14 @@ def _warn_user_of_separation(target_map, reference_map):
     """
     # Maximum angular separation allowed between the reference and target maps
     tolerable_angular_separation = 1*u.deg
-    ref_coord = SkyCoord(reference_map.observer_coordinate)
-    target_coord = SkyCoord(target_map.observer_coordinate)
     if astropy.__version__ >= "6.1.0":
-        angular_separation = ref_coord.separation(target_coord, origin_mismatch="ignore")
+        angular_separation = reference_map.observer_coordinate.separation(
+            target_map.observer_coordinate, origin_mismatch="ignore"
+        )
     else:
-        angular_separation = ref_coord.separation(target_coord)
+        angular_separation = reference_map.observer_coordinate.separation(
+            target_map.observer_coordinate
+        )
     if angular_separation > tolerable_angular_separation:
         warnings.warn(
             "The angular separation between the reference and target maps is large. "
@@ -119,10 +119,12 @@ def _warn_user_of_separation(target_map, reference_map):
             stacklevel=3,
         )
     # Calculate time difference and convert to separation angle
-    ref_time = reference_map.date
-    target_time = target_map.date
-    time_diff = np.abs(ref_time - target_time)
-    time_separation_angle = differential_rotation(time_diff.to(u.day), reference_map.center.Tx, model='howard')
+    time_diff = np.abs((reference_map.date - target_map.date).to('s'))
+    time_separation_angle = differential_rotation(
+        time_diff,
+        reference_map.center.transform_to('heliographic_stonyhurst').lat,
+        model='howard'
+    )
     if time_separation_angle > tolerable_angular_separation:
         warnings.warn(
             "The time difference between the reference and target maps in time is large. "
@@ -155,8 +157,8 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
     target_map : `sunpy.map.Map`
         The map to be coaligned. The target map should be fully contained within the reference map and,
         for best results, have approximately the same observer location. For coalignment methods which do
-        not account for different pixel scales or rotations, it is recommended that the target and reference
-        maps and target maps are resampled and/or rotated such that they have the same orientation and
+        not account for different pixel scales or rotations, it is recommended that the reference
+        map and target map are resampled and/or rotated such that they have the same orientation and
         resolution.
     reference_map : `sunpy.map.Map`
         The map to which the target map is to be coaligned. For best results, the pointing data of this
