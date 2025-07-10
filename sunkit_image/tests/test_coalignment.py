@@ -90,20 +90,15 @@ def test_check_for_nonfinite_entries():
             a[i] = non_number
             b = a.reshape(3, 3)
 
-            with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries.") as warning_list:
+            with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries."):
                 _check_for_nonfinite_entries(b, np.ones((3, 3)))
 
-            assert len(warning_list) == 1
-
-            with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries.") as warning_list:
+            with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries."):
                 _check_for_nonfinite_entries(np.ones((3, 3)), b)
 
-            assert len(warning_list) == 1
-
-            with pytest.warns(Warning) as warning_list:
-                _check_for_nonfinite_entries(b, b)
-
-            assert len(warning_list) == 2
+            with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries."):
+                with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries."):
+                    _check_for_nonfinite_entries(b, b)
 
 
 def test_match_template_to_layer(

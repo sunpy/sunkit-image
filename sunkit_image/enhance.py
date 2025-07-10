@@ -264,7 +264,7 @@ def wow(
       `doi:10.1051/0004-6361/202245345 <https://doi.org/10.1051/0004-6361/202245345>`__
     """
     try:
-        from watroo import B3spline, utils
+        from watroo import B3spline, utils  # NOQA: PLC0415
     except ImportError as e:
         msg = "The `watroo` package is required to use the `wow` function. Please install it first."
         raise ImportError(msg) from e

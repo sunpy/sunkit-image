@@ -100,8 +100,8 @@ rng = np.random.default_rng()
 means_a = np.tile(rng.standard_normal((10, 10)), (*time.shape, 1, 1)) * u.s
 means_b = np.tile(rng.standard_normal((10, 10)), (*time.shape, 1, 1)) * u.s
 noise = 0.2 * (-0.5 + rng.random(means_a.shape))
-s_a = gaussian_pulse(np.tile(time, means_a.shape[1:] + (1,)).T, means_a, 0.02 * u.s) + noise
-s_b = gaussian_pulse(np.tile(time, means_b.shape[1:] + (1,)).T, means_b, 0.02 * u.s) + noise
+s_a = gaussian_pulse(np.tile(time, (*means_a.shape[1:], 1)).T, means_a, 0.02 * u.s) + noise
+s_b = gaussian_pulse(np.tile(time, (*means_b.shape[1:], 1)).T, means_b, 0.02 * u.s) + noise
 
 ###################################################################
 # We can now compute a map of the time lag and maximum cross correlation.
@@ -134,8 +134,8 @@ fig.tight_layout()
 # from the as creating a Dask array from an `~astropy.units.Quantity` may
 # result in undefined behavior.
 
-s_a = dask.array.from_array(s_a.value, chunks=s_a.shape[:1] + (5, 5))
-s_b = dask.array.from_array(s_b.value, chunks=s_b.shape[:1] + (5, 5))
+s_a = dask.array.from_array(s_a.value, chunks=(*s_a.shape[:1], 5, 5))
+s_b = dask.array.from_array(s_b.value, chunks=(*s_b.shape[:1], 5, 5))
 tl_map = time_lag(s_a, s_b, time)
 print(tl_map)
 

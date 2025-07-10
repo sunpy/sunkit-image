@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 import astropy.units as u
@@ -32,8 +33,6 @@ def test_stara_threshold_adjustment(hmi_map):
 
 @figure_test
 def test_stara_plot(hmi_map):
-    import matplotlib.pyplot as plt
-
     hmi_upscaled = hmi_map.resample((1024, 1024) * u.pixel)
     segmentation = stara(hmi_upscaled)
     fig = plt.figure()
