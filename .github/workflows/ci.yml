@@ -84,7 +84,7 @@ jobs:
   online:
     if: "!startsWith(github.event.ref, 'refs/tags/v')"
     needs: [test]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v2
     with:
       default_python: '3.12'
       submodules: false
