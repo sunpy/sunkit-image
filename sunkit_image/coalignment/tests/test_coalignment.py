@@ -7,6 +7,8 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
 import sunpy.map
+from sunpy.net import Fido
+from sunpy.net import attrs as a
 
 from sunkit_image.coalignment import coalign
 from sunkit_image.coalignment.interface import (
@@ -27,15 +29,14 @@ def eis_test_map():
 
 @pytest.fixture()
 def aia193_test_map(eis_test_map):
-    #query = Fido.search(
-    #    a.Time(start=eis_test_map.date-1*u.minute,
-    #           end=eis_test_map.date+1*u.minute,
-    #           near=eis_test_map.date),
-    #    a.Instrument.aia,
-    #    a.Wavelength(193*u.angstrom),
-    #)
-    #file = Fido.fetch(query)
-    file = '~/sunpy/data/aia.lev1.193A_2014_01_08T09_57_30.84Z.image_lev1.fits'
+    query = Fido.search(
+        a.Time(start=eis_test_map.date-1*u.minute,
+               end=eis_test_map.date+1*u.minute,
+               near=eis_test_map.date),
+        a.Instrument.aia,
+        a.Wavelength(193*u.angstrom),
+    )
+    file = Fido.fetch(query, site='NSO')
     return sunpy.map.Map(file)
 
 
