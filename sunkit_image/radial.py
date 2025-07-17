@@ -4,6 +4,7 @@ radius.
 """
 
 import numpy as np
+from scipy import stats
 from tqdm import tqdm
 
 import astropy.units as u
@@ -102,8 +103,6 @@ def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
 
 def _select_rank_method(method):
     def _percentile_ranks_scipy(arr):
-        from scipy import stats
-
         mask = ~np.isnan(arr)
         ranks = np.full(arr.shape, np.nan)
         ranks[mask] = stats.rankdata(arr[mask], method="average") / np.sum(mask)
