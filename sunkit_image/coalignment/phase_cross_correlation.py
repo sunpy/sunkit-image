@@ -1,6 +1,8 @@
 import numpy as np
 from skimage.registration import phase_cross_correlation
 
+from sunpy import log
+
 from sunkit_image.coalignment.interface import AffineParams, register_coalignment_method
 
 __all__ = ["phase_cross_correlation_coalign"]
@@ -36,8 +38,14 @@ def phase_cross_correlation_coalign(target_array, reference_array, **kwargs):
     """
     if target_array.shape != reference_array.shape:
         raise ValueError("Input and target arrays must be the same shape.")
+    if "upsample_factor" not in kwargs:
+        kwargs["upsample_factor"] = 20
     shift, _, _ = phase_cross_correlation(reference_array, target_array, **kwargs)
-    x_shift, y_shift = shift[1], shift[0]
+    # Shift has axis ordering which is consistent with the axis order of the input arrays, so y, x
+    # These are negative based on the example provided in the scikit-image documentation
+    # https://scikit-image.org/docs/stable/auto_examples/registration/plot_register_translation.html
+    x_shift, y_shift = -shift[1], -shift[0]
+    log.debug(f"Phase cross correlation shift: x: {x_shift}, y: {y_shift}")
     # Particularly for this method, there is no change in the rotation or scaling,
     # hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = np.array([1.0, 1.0])

@@ -6,6 +6,7 @@ import numpy as np
 import astropy
 import astropy.units as u
 
+from sunpy import log
 from sunpy.sun.models import differential_rotation
 from sunpy.util.exceptions import SunpyUserWarning
 
@@ -85,6 +86,7 @@ def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
     new_reference_pixel = affine_params.scale * affine_params.rotation_matrix @ old_reference_pixel + affine_params.translation
     new_reference_coordinate = reference_map.wcs.pixel_to_world(*new_reference_pixel)
     # Create a new map with the updated metadata
+    log.debug(f"Shifting reference coordinate from {target_map.reference_coordinate} to {new_reference_coordinate} by {new_reference_coordinate.Tx - target_map.reference_coordinate.Tx}, {new_reference_coordinate.Ty - target_map.reference_coordinate.Ty}")
     return target_map.shift_reference_coord(
         new_reference_coordinate.Tx - target_map.reference_coordinate.Tx,
         new_reference_coordinate.Ty - target_map.reference_coordinate.Ty,

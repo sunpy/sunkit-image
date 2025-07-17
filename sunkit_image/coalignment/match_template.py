@@ -1,6 +1,8 @@
 import numpy as np
 from skimage.feature import match_template
 
+from sunpy import log
+
 from sunkit_image.coalignment.interface import AffineParams, register_coalignment_method
 
 __all__ = ["match_template_coalign"]
@@ -114,6 +116,7 @@ def match_template_coalign(target_array, reference_array, **kwargs):
         raise ValueError("The correlation output failed to work out a match.")
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
+    log.debug(f"Match template shift: x: {x_shift}, y: {y_shift}")
     # Particularly for this method, there is no change in the rotation or scaling,
     # hence the hardcoded values of scale to 1.0 & rotation to identity matrix
     scale = np.array([1.0, 1.0])
