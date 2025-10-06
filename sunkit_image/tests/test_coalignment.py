@@ -90,14 +90,14 @@ def test_check_for_nonfinite_entries():
             a[i] = non_number
             b = a.reshape(3, 3)
 
-            with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries."):
+            with pytest.warns(SunpyUserWarning, match=r"The layer image has nonfinite entries."):
                 _check_for_nonfinite_entries(b, np.ones((3, 3)))
 
-            with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries."):
+            with pytest.warns(SunpyUserWarning, match=r"The template image has nonfinite entries."):
                 _check_for_nonfinite_entries(np.ones((3, 3)), b)
 
-            with pytest.warns(SunpyUserWarning, match="The layer image has nonfinite entries."):
-                with pytest.warns(SunpyUserWarning, match="The template image has nonfinite entries."):
+            with pytest.warns(SunpyUserWarning, match=r"The layer image has nonfinite entries."):
+                with pytest.warns(SunpyUserWarning, match=r"The template image has nonfinite entries."):
                     _check_for_nonfinite_entries(b, b)
 
 
@@ -141,11 +141,11 @@ def test_get_correlation_shifts():
 
     # Input array is too big in either direction
     test_array = np.zeros((4, 3))
-    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
+    with pytest.raises(ValueError, match=r"Input array dimension should not be greater than 3 in any dimension."):
         _get_correlation_shifts(test_array)
 
     test_array = np.zeros((3, 4))
-    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
+    with pytest.raises(ValueError, match=r"Input array dimension should not be greater than 3 in any dimension."):
         _get_correlation_shifts(test_array)
 
 
@@ -246,7 +246,7 @@ def test_calculate_match_template_shift(
 
     # Test setting the template as something other than a ndarray and a
     # GenericMap. This should throw a ValueError.
-    with pytest.raises(ValueError, match="Invalid template."):
+    with pytest.raises(ValueError, match=r"Invalid template."):
         calculate_match_template_shift(aia171_test_mc, template="broken")
 
 

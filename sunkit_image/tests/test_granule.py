@@ -28,7 +28,7 @@ def test_segment(granule_map):
 
 
 def test_segment_errors(granule_map):
-    with pytest.raises(TypeError, match="Input must be an instance of a sunpy.map.GenericMap"):
+    with pytest.raises(TypeError, match=r"Input must be an instance of a sunpy.map.GenericMap"):
         segment(np.array([[1, 2, 3], [1, 2, 3]]))
     with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
         segment(granule_map, skimage_method="banana")
@@ -51,7 +51,7 @@ def test_get_threshold_range():
 
 
 def test_get_threshold_errors():
-    with pytest.raises(TypeError, match="Input data must be an instance of a np.ndarray"):
+    with pytest.raises(TypeError, match=r"Input data must be an instance of a np.ndarray"):
         _get_threshold([], "li")
     with pytest.raises(ValueError, match="Method must be one of: li, otsu, yen, mean, minimum, triangle, isodata"):
         _get_threshold(np.array([[1, 2], [1, 2]]), "banana")
@@ -82,7 +82,7 @@ def test_trim_intergranules_errors():
     rng = np.random.default_rng()
     # Check that raises error if passed array is not binary.
     data = rng.integers(low=0, high=10, size=(10, 10))
-    with pytest.raises(ValueError, match="segmented_image must only have values of 1 and 0."):
+    with pytest.raises(ValueError, match=r"segmented_image must only have values of 1 and 0."):
         _trim_intergranules(data)
 
 
