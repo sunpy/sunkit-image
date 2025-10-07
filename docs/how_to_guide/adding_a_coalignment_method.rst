@@ -4,7 +4,7 @@
 Add a New Coalignment Method
 ****************************
 
-If you want to register a new coalignment method that can be used by :func:`~sunkit_image.coalignment.coalign`, you can use :func:`~sunkit_image.coalignment.interface.register_coalignment_method`:
+If you want to register a new coalignment method that can be used by :func:`~sunkit_image.coalignment.coalign`, you can use :func:`~sunkit_image.coalignment.register.register_coalignment_method`:
 
 .. code-block:: python
 

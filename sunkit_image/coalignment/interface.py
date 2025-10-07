@@ -11,14 +11,9 @@ from sunpy.sun.models import differential_rotation
 from sunpy.util.exceptions import SunpyUserWarning
 
 __all__ = [
-    "REGISTERED_METHODS",
     "AffineParams",
     "coalign",
-    "register_coalignment_method",
 ]
-
-# Global Dictionary to store the registered methods and their names
-REGISTERED_METHODS = {}
 
 
 class AffineParams(NamedTuple):
@@ -38,21 +33,7 @@ class AffineParams(NamedTuple):
     translation: tuple[float, float]
 
 
-def register_coalignment_method(name):
-    """
-    Registers a coalignment method to be used by the coalignment interface.
 
-    Parameters
-    ----------
-    name : str
-        The name of the coalignment method.
-    """
-
-    def decorator(func):
-        REGISTERED_METHODS[name] = func
-        return func
-
-    return decorator
 
 
 def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
@@ -193,8 +174,9 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
     return _update_fits_wcs_metadata(target_map, reference_map, affine_params)
 
 
+from sunkit_image.coalignment.register import REGISTERED_METHODS  # isort:skip # NOQA: E402
 # Generate the string with allowable coalignment-function names for use in docstrings
 _coalignment_function_names = ", ".join([f"``'{name}'``" for name in REGISTERED_METHODS])
 # Insert into the docstring for coalign. We cannot use the add_common_docstring decorator
 # due to what would be a circular loop in definitions.
-coalign.__doc__ = coalign.__doc__.format(coalignment_function_names=_coalignment_function_names)  # TYPE: IGNORE
+coalign.__doc__ = coalign.__doc__.format(coalignment_function_names=_coalignment_function_names)  # type: ignore

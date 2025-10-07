@@ -3,7 +3,7 @@ from skimage.registration import phase_cross_correlation
 
 from sunpy import log
 
-from sunkit_image.coalignment.interface import AffineParams, register_coalignment_method
+from sunkit_image.coalignment.register import register_coalignment_method
 
 __all__ = ["phase_cross_correlation_coalign"]
 
@@ -36,6 +36,8 @@ def phase_cross_correlation_coalign(target_array, reference_array, **kwargs):
         - translation : `tuple`
             A tuple containing the x and y translation values.
     """
+    from sunkit_image.coalignment.interface import AffineParams  # NOQA: PLC0415
+
     if target_array.shape != reference_array.shape:
         raise ValueError("Input and target arrays must be the same shape.")
     shift, _, _ = phase_cross_correlation(reference_array, target_array, **kwargs)

@@ -3,7 +3,7 @@ from skimage.feature import match_template
 
 from sunpy import log
 
-from sunkit_image.coalignment.interface import AffineParams, register_coalignment_method
+from sunkit_image.coalignment.register import register_coalignment_method
 
 __all__ = ["match_template_coalign"]
 
@@ -110,6 +110,8 @@ def match_template_coalign(target_array, reference_array, **kwargs):
         - translation : `tuple`
             A tuple containing the x and y translation values.
     """
+    from sunkit_image.coalignment.interface import AffineParams  # NOQA: PLC0415
+
     corr = match_template(np.float64(reference_array), np.float64(target_array), **kwargs)
     # TODO: Work out what is going on
     if corr.ndim != target_array.ndim:
