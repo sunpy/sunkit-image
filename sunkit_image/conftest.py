@@ -15,6 +15,7 @@ from astropy.io.fits.verify import VerifyWarning
 from astropy.utils.data import get_pkg_data_filename
 
 import sunpy.data.sample
+import sunpy.data.test
 import sunpy.map
 from sunpy.coordinates import Helioprojective, get_earth
 from sunpy.map.header_helper import make_fitswcs_header
@@ -199,5 +200,35 @@ def aia_171_map():
 
 @pytest.fixture()
 def hmi_map():
-    hmi_file = get_test_filepath("hmi_continuum_test_lowres_data.fits")
-    return sunpy.map.Map(hmi_file)
+    return sunpy.map.Map(get_test_filepath("hmi_continuum_test_lowres_data.fits"))
+
+
+@pytest.fixture()
+def aia171_test_clipping():
+    return np.asarray([0.2, -0.3, -1.0001])
+
+
+@pytest.fixture()
+def aia171_test_map():
+    testpath = sunpy.data.test.rootdir
+    return sunpy.map.Map(Path(testpath) / "aia_171_level1.fits")
+
+
+@pytest.fixture()
+def aia171_test_map_layer_shape(aia171_test_map_layer):
+    return aia171_test_map_layer.shape
+
+
+@pytest.fixture()
+def aia171_test_shift():
+    return np.array([3, 5])
+
+
+@pytest.fixture()
+def aia171_test_template(aia171_test_shift, aia171_test_map):
+    a1 = aia171_test_shift[0] + aia171_test_map.data.shape[0] // 4
+    a2 = aia171_test_shift[0] + 3 * aia171_test_map.data.shape[0] // 4
+    b1 = aia171_test_shift[1] + aia171_test_map.data.shape[1] // 4
+    b2 = aia171_test_shift[1] + 3 * aia171_test_map.data.shape[1] // 4
+    # Requires at least 32-bit floats to pass.
+    return aia171_test_map.data[a1:a2, b1:b2].astype("float32")
