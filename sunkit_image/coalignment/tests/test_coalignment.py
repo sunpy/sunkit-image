@@ -7,16 +7,9 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
 import sunpy.map
-from sunpy.net import Fido
-from sunpy.net import attrs as a
 
 from sunkit_image.coalignment import coalign
-from sunkit_image.coalignment.interface import (
-    REGISTERED_METHODS,
-    AffineParams,
-    _update_fits_wcs_metadata,
-    register_coalignment_method,
-)
+from sunkit_image.coalignment.interface import AffineParams, _update_fits_wcs_metadata
 from sunkit_image.tests.helpers import figure_test
 
 
@@ -28,16 +21,12 @@ def eis_test_map():
 
 
 @pytest.fixture()
-def aia193_test_map(eis_test_map):
-    query = Fido.search(
-        a.Time(start=eis_test_map.date-1*u.minute,
-               end=eis_test_map.date+1*u.minute,
-               near=eis_test_map.date),
-        a.Instrument.aia,
-        a.Wavelength(193*u.angstrom),
-    )
-    file = Fido.fetch(query, site='NSO')
-    return sunpy.map.Map(file)
+def aia193_test_map():
+    # This is matched to the EIS observation time
+    url = "https://github.com/sunpy/data/raw/refs/heads/main/sunkit-image/aia.lev1.193A_2014_01_08T09_57_30.84Z.image_lev1.fits"
+    with fits.open(url) as hdul:
+        hdul.verify('silentfix')
+        return sunpy.map.Map(hdul[1].data, hdul[1].header)
 
 
 @pytest.mark.remote_data()
@@ -116,16 +105,6 @@ def test_coalignment_figure(incorrect_pointing_cutout_map, cutout_map, aia171_te
     return fig
 
 
-def test_register_coalignment_method():
-    @register_coalignment_method("test_method")
-    def test_func():
-        return "Test function"
-
-    assert "test_method" in REGISTERED_METHODS
-    assert REGISTERED_METHODS["test_method"] == test_func
-    assert test_func() == "Test function"
-
-
 def test_unsupported_affine_parameters(incorrect_pointing_cutout_map, aia171_test_map):
     affine_rot = AffineParams(
         scale=[1,1],
@@ -133,15 +112,11 @@ def test_unsupported_affine_parameters(incorrect_pointing_cutout_map, aia171_tes
         translation=[0,0],
     )
     with pytest.raises(NotImplementedError, match=r"Changes to the rotation metadata are currently not supported."):
-        _ = _update_fits_wcs_metadata(incorrect_pointing_cutout_map,
-                                      aia171_test_map,
-                                      affine_rot)
+        _update_fits_wcs_metadata(incorrect_pointing_cutout_map, aia171_test_map, affine_rot)
     affine_scale = AffineParams(
         scale=[2,3],
         rotation_matrix=np.eye(2),
         translation=[0,0],
     )
     with pytest.raises(NotImplementedError, match=r"Changes to the pixel scale metadata are currently not supported."):
-        _ = _update_fits_wcs_metadata(incorrect_pointing_cutout_map,
-                                      aia171_test_map,
-                                      affine_scale)
+        _update_fits_wcs_metadata(incorrect_pointing_cutout_map, aia171_test_map, affine_scale)

@@ -91,8 +91,6 @@ def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
         new_reference_coordinate.Tx - target_map.reference_coordinate.Tx,
         new_reference_coordinate.Ty - target_map.reference_coordinate.Ty,
     )
-    # TODO: Support metadata updates to PCij/CDij and CDELT for non-unity scaling and
-    # rotation in the affine transform
 
 
 def _warn_user_of_separation(target_map, reference_map):
@@ -199,4 +197,4 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
 _coalignment_function_names = ", ".join([f"``'{name}'``" for name in REGISTERED_METHODS])
 # Insert into the docstring for coalign. We cannot use the add_common_docstring decorator
 # due to what would be a circular loop in definitions.
-coalign.__doc__ = coalign.__doc__.format(coalignment_function_names=_coalignment_function_names)  # type: ignore
+coalign.__doc__ = coalign.__doc__.format(coalignment_function_names=_coalignment_function_names)  # TYPE: IGNORE

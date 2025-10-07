@@ -11,6 +11,7 @@ The module supports various transformation methods registered via the `~sunkit_i
 .. automodapi:: sunkit_image.coalignment
 
 .. automodapi:: sunkit_image.coalignment.interface
+    :skip: coalign
 
 .. automodapi:: sunkit_image.coalignment.match_template
 

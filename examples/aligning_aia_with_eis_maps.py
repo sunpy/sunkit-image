@@ -6,24 +6,19 @@ Coaligning EIS to AIA
 This example shows how to coalign EIS rasters to AIA images in order correct for the pointing
 uncertainty in EIS.
 """
-# sphinx_gallery_thumbnail_number = 2
-
-
 import matplotlib.pyplot as plt
 
 import astropy.units as u
 from astropy.visualization import AsinhStretch, ImageNormalize
 
 import sunpy.map
-from sunpy.net import Fido
-from sunpy.net import attrs as a
 
 from sunkit_image.coalignment import coalign
 
 ###################################################################################
 # For this example, we will use a preprocessed EIS raster image of the Fe XII
-# 195.119 Å line. This raster image was prepared using the `eispac <https://eispac.readthedocs.io/en/latest/>`_ package.
-
+# 195.119 Å line.
+# This raster image was prepared using the `eispac <https://eispac.readthedocs.io/en/latest/>`__ package.
 
 eis_map = sunpy.map.Map("https://github.com/sunpy/data/raw/main/sunkit-image/eis_20140108_095727.fe_12_195_119.2c-0.int.fits")
 
@@ -33,13 +28,17 @@ eis_map = sunpy.map.Map("https://github.com/sunpy/data/raw/main/sunkit-image/eis
 # 193 Å channel of AIA as it sees plasma at approximately the same temperature as
 # the 195.119 Å line in our EIS raster.
 
-query = Fido.search(
-    a.Time(start=eis_map.date-1*u.minute, near=eis_map.date, end=eis_map.date+1*u.minute),
-    a.Instrument.aia,
-    a.Wavelength(193*u.angstrom)
-)
-aia_file = Fido.fetch(query, site='NSO')
-aia_map = sunpy.map.Map(aia_file)
+# Below is the Fido query to search and download the AIA data.
+# from sunpy.net import Fido
+# from sunpy.net import attrs as a
+# query = Fido.search(
+#     a.Time(start=eis_map.date-1*u.minute, near=eis_map.date, end=eis_map.date+1*u.minute),
+#     a.Instrument.aia,
+#     a.Wavelength(193*u.angstrom)
+# )
+# aia_file = Fido.fetch(query, site='NSO')
+# For now though we have stored this file on Github so we can download it directly.
+aia_map = sunpy.map.Map("https://github.com/sunpy/data/raw/refs/heads/main/sunkit-image/aia.lev1.193A_2014_01_08T09_57_30.84Z.image_lev1.fits")
 
 ####################################################################################
 # Before coaligning the images, we first resample the AIA image to the same plate
