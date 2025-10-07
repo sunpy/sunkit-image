@@ -42,11 +42,7 @@ jobs:
   sdist_verify:
     runs-on: ubuntu-latest
     steps:
-<<<<<<<
       - uses: actions/checkout@v5
-=======
-      - uses: actions/checkout@v4
->>>>>>>
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
@@ -91,26 +87,13 @@ jobs:
     needs: [test]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v2
     with:
-      default_python: '3.12'
+      default_python: '3.13'
       submodules: false
       coverage: codecov
       toxdeps: tox-pypi-filter
       posargs: -n 1
       envs: |
-        - linux: py312-online
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  devdeps:
-    needs: [test]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@main
-    with:
-      submodules: false
-      coverage: codecov
-      toxdeps: tox-pypi-filter
-      posargs: -n auto
-      envs: |
-        - linux: py312-devdeps
+        - linux: py313-online
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -124,15 +107,15 @@ jobs:
           lfs: true
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          installer-url: https://github.com/conda-forge/miniforge/releases/download/24.3.0-0/Miniforge3-24.3.0-0-Linux-x86_64.sh
-          python-version: "3.12"
+          installer-url: https://github.com/conda-forge/miniforge/releases/download/25.3.1-0/Miniforge3-25.3.1-0-Linux-x86_64.sh
+          python-version: "3.13"
           activate-environment: sunkit_image_test
           environment-file: sunkit-test-env.yaml
       - name: Run tests
         shell: bash -el {0}
         run: |
           conda list
-          tox -e py312
+          tox -e py313
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
