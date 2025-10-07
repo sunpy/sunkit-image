@@ -132,7 +132,7 @@ def test_unsupported_affine_parameters(incorrect_pointing_cutout_map, aia171_tes
         rotation_matrix=2*np.eye(2),
         translation=[0,0],
     )
-    with pytest.raises(NotImplementedError, match='Changes to the rotation metadata are currently not supported.'):
+    with pytest.raises(NotImplementedError, match=r"Changes to the rotation metadata are currently not supported."):
         _ = _update_fits_wcs_metadata(incorrect_pointing_cutout_map,
                                       aia171_test_map,
                                       affine_rot)
@@ -141,7 +141,7 @@ def test_unsupported_affine_parameters(incorrect_pointing_cutout_map, aia171_tes
         rotation_matrix=np.eye(2),
         translation=[0,0],
     )
-    with pytest.raises(NotImplementedError, match='Changes to the pixel scale metadata are currently not supported.'):
+    with pytest.raises(NotImplementedError, match=r"Changes to the pixel scale metadata are currently not supported."):
         _ = _update_fits_wcs_metadata(incorrect_pointing_cutout_map,
                                       aia171_test_map,
                                       affine_scale)

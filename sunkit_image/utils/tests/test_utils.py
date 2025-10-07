@@ -41,12 +41,12 @@ def test_equally_spaced_bins():
     assert esb2[0, 999] == 1.999
     assert esb2[1, 999] == 2.000
     # The radii have the correct relative sizes
-    with pytest.raises(ValueError, match="The inner value must be strictly less than the outer value."):
+    with pytest.raises(ValueError, match=r"The inner value must be strictly less than the outer value."):
         utils.equally_spaced_bins(inner_value=1.0, outer_value=1.0)
-    with pytest.raises(ValueError, match="The inner value must be strictly less than the outer value."):
+    with pytest.raises(ValueError, match=r"The inner value must be strictly less than the outer value."):
         utils.equally_spaced_bins(inner_value=1.5, outer_value=1.0)
     # The number of bins is strictly greater than 0
-    with pytest.raises(ValueError, match="The number of bins must be strictly greater than 0."):
+    with pytest.raises(ValueError, match=r"The number of bins must be strictly greater than 0."):
         utils.equally_spaced_bins(nbins=0)
 
 

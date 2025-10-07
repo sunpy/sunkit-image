@@ -39,11 +39,11 @@ def test_get_correlation_shifts():
 
     # Input array is too big in either direction
     test_array = np.zeros((4, 3))
-    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
+    with pytest.raises(ValueError, match=r"Input array dimension should not be greater than 3 in any dimension."):
         _get_correlation_shifts(test_array)
 
     test_array = np.zeros((3, 4))
-    with pytest.raises(ValueError, match="Input array dimension should not be greater than 3 in any dimension."):
+    with pytest.raises(ValueError, match=r"Input array dimension should not be greater than 3 in any dimension."):
         _get_correlation_shifts(test_array)
 
 

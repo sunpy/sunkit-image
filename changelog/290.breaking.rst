@@ -1,0 +1,8 @@
+Increased the minimum required versions:
+
+- Python 3.12 (from 3.10)
+- Matplotlib 3.8.0 (from 3.5.0)
+- sunpy 7.0.0 (from 6.0.0)
+- NumPy 1.26.0 (from 1.23.5)
+- Astropy 6.1.0 (from 5.3.0)
+- SciPy 1.11.0 (from 1.10.1)
