@@ -12,15 +12,14 @@ dynamic = ["version"]
 description = "An image processing toolbox for Solar Physics."
 requires-python = ">=3.12"
 readme = { file = "README.rst", content-type = "text/x-rst" }
-license = { file = "LICENSE.txt" }
 keywords = ["solar physics", "solar", "science", "image analysis"]
+license-files = ["licenses/LICENSE.rst"]
 authors = [
   { name = "The SunPy Community", email = "sunpy@googlegrouups.com" },
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: BSD License",
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
