@@ -12,8 +12,8 @@ dynamic = ["version"]
 description = "An image processing toolbox for Solar Physics."
 requires-python = ">=3.12"
 readme = { file = "README.rst", content-type = "text/x-rst" }
-license = { file = "LICENSE.txt" }
 keywords = ["solar physics", "solar", "science", "image analysis"]
+license-files = ["licenses/LICENSE.rst"]
 authors = [
   { name = "The SunPy Community", email = "sunpy@googlegrouups.com" },
 ]
@@ -33,7 +33,7 @@ dependencies = [
   "astropy>=6.1.0",
   "numpy>=1.26.0",
   "matplotlib>=3.8.0",
-  "scipy>=1.11.0",
+  "scipy>=1.12.0",
   "scikit-image>=0.20.0",
   "sunpy[map]>=7.0.0",
 ]
