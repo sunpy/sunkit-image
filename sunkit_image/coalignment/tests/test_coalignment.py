@@ -45,8 +45,8 @@ def test_coalignment_eis_aia(eis_test_map, aia193_test_map):
 
 @pytest.fixture()
 def cutout_map(aia171_test_map):
-    bottom_left = SkyCoord(200*u.arcsec, 100*u.arcsec, frame=aia171_test_map.coordinate_frame)
-    top_right = SkyCoord(600*u.arcsec, 900*u.arcsec, frame=aia171_test_map.coordinate_frame)
+    bottom_left = SkyCoord(0*u.arcsec, 0*u.arcsec, frame=aia171_test_map.coordinate_frame)
+    top_right = SkyCoord(900*u.arcsec, 900*u.arcsec, frame=aia171_test_map.coordinate_frame)
     return aia171_test_map.submap(bottom_left, top_right=top_right)
 
 
@@ -88,17 +88,17 @@ def test_coalign_phase_cross_correlation(incorrect_pointing_map, aia171_test_map
 
 @figure_test
 def test_coalignment_figure(incorrect_pointing_cutout_map, cutout_map, aia171_test_map):
-    levels = [200, 400, 500, 700, 800]*cutout_map.unit
+    levels = [200, 800]*cutout_map.unit
     fixed_cutout_map = coalign(incorrect_pointing_cutout_map, aia171_test_map)
     fig = plt.figure(figsize=(10, 7.5))
     # Messed up map
     ax = fig.add_subplot(121, projection=incorrect_pointing_cutout_map)
     incorrect_pointing_cutout_map.plot(axes=ax, title='Incorrect Pointing')
-    cutout_map.draw_contours(levels, axes=ax, alpha=0.3)
+    cutout_map.draw_contours(levels, axes=ax)
     # After coalignment
     ax = fig.add_subplot(122, projection=fixed_cutout_map)
     fixed_cutout_map.plot(axes=ax, title='Fixed Pointing')
-    cutout_map.draw_contours(levels, axes=ax, alpha=0.3)
+    cutout_map.draw_contours(levels, axes=ax)
     fig.tight_layout()
     return fig
 
