@@ -33,9 +33,6 @@ class AffineParams(NamedTuple):
     translation: tuple[float, float]
 
 
-
-
-
 def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
     """
     Update the metadata of a sunpy.map.Map` based on affine transformation

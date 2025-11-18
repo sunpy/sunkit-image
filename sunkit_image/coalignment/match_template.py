@@ -48,13 +48,10 @@ def _get_correlation_shifts(array):
     if nx > 3 or ny > 3:
         msg = "Input array dimension should not be greater than 3 in any dimension."
         raise ValueError(msg)
-
     ij = np.unravel_index(np.argmax(array), array.shape)
     x_max_location, y_max_location = ij[::-1]
-
     y_location = _parabolic_turning_point(array[:, x_max_location]) if ny == 3 else 1.0 * y_max_location
     x_location = _parabolic_turning_point(array[y_max_location, :]) if nx == 3 else 1.0 * x_max_location
-
     return y_location, x_location
 
 

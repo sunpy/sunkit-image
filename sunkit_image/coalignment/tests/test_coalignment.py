@@ -12,6 +12,7 @@ from sunkit_image.coalignment import coalign
 from sunkit_image.coalignment.interface import AffineParams, _update_fits_wcs_metadata
 from sunkit_image.tests.helpers import figure_test
 
+POINTING_SHIFT = [25, 50] * u.arcsec
 
 @pytest.fixture()
 def eis_test_map():
@@ -47,9 +48,6 @@ def cutout_map(aia171_test_map):
     bottom_left = SkyCoord(200*u.arcsec, 100*u.arcsec, frame=aia171_test_map.coordinate_frame)
     top_right = SkyCoord(600*u.arcsec, 900*u.arcsec, frame=aia171_test_map.coordinate_frame)
     return aia171_test_map.submap(bottom_left, top_right=top_right)
-
-
-POINTING_SHIFT = [25, 50] * u.arcsec
 
 
 @pytest.fixture

@@ -62,18 +62,22 @@ coaligned_eis_map = coalign(eis_map, aia_downsampled)
 
 fig = plt.figure(figsize=(15, 7.5))
 ax = fig.add_subplot(121, projection=eis_map)
-eis_map.plot(axes=ax,
-             title='Before coalignment',
-             aspect=eis_map.meta['cdelt2'] / eis_map.meta['cdelt1'],
-             cmap='Blues_r',
-             norm=ImageNormalize(stretch=AsinhStretch()))
+eis_map.plot(
+    axes=ax,
+    title='Before coalignment',
+    aspect=eis_map.meta['cdelt2'] / eis_map.meta['cdelt1'],
+    cmap='Blues_r',
+    norm=ImageNormalize(stretch=AsinhStretch())
+)
 aia_map.draw_contours([800]*aia_map.unit, axes=ax)
-ax = fig.add_subplot(122, projection=coaligned_eis_map)
-coaligned_eis_map.plot(axes=ax,
-                       title='After coalignment',
-                       aspect=coaligned_eis_map.meta['cdelt2'] / coaligned_eis_map.meta['cdelt1'],
-                       cmap='Blues_r',
-                       norm=ImageNormalize(stretch=AsinhStretch()))
+ax = fig.add_subplot(122, projection=coaligned_eis_map, sharex=ax, sharey=ax)
+coaligned_eis_map.plot(
+    axes=ax,
+    title='After coalignment',
+    aspect=coaligned_eis_map.meta['cdelt2'] / coaligned_eis_map.meta['cdelt1'],
+    cmap='Blues_r',
+    norm=ImageNormalize(stretch=AsinhStretch())
+)
 aia_map.draw_contours([800]*aia_map.unit, axes=ax)
 
 plt.show()
