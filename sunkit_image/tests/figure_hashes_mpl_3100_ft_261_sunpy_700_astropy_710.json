@@ -1,5 +1,7 @@
 {
-  "sunkit_image.coalignment.tests.test_coalignment.test_coalignment_figure": "8d25cd83565991eff3ab88a789a33ac9b1c0b9edc0f63cc0414fe4ba6c1d50f3",
+  "sunkit_image.coalignment.tests.test_coalignment.test_coalignment_figure[incorrect_pointing_cutout_map_and_shift0]": "ce40f5667e62443a8a48f7fac2ea320d159f6026572e7c879d7746da800ae17e",
+  "sunkit_image.coalignment.tests.test_coalignment.test_coalignment_figure[incorrect_pointing_cutout_map_and_shift1]": "2b8134d3d32cc38f0855b4aca96e8a04219bd4205def9af0e87877232029f634",
+  "sunkit_image.coalignment.tests.test_coalignment.test_coalignment_figure[incorrect_pointing_cutout_map_and_shift2]": "f2c3574c80d36e0e0cd8c365aae037c5e5ef5fe74a4232663d1b8bc8db705f81",
   "sunkit_image.tests.test_enhance.test_mgn[array]": "d3ed034e34d03288aad08c06447fde42a8eb5c7ce4c0543a2090bb04c75fad1a",
   "sunkit_image.tests.test_enhance.test_mgn[map]": "50bb490a6cc2408befe13c7f2a54f7433df80c2473dd21b619ace35de7e8f250",
   "sunkit_image.tests.test_enhance.test_mgn_submap": "cf3948d3ffa8ed4eacc500bee170db68bb1a96d2cec1c92e48f74c01827dc397",

@@ -7,12 +7,15 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 
 import sunpy.map
+from sunpy.util.exceptions import SunpyUserWarning
 
 from sunkit_image.coalignment import coalign
 from sunkit_image.coalignment.interface import AffineParams, _update_fits_wcs_metadata
 from sunkit_image.tests.helpers import figure_test
 
-POINTING_SHIFT = [25, 50] * u.arcsec
+POSITIVE_POINTING_SHIFT = [25, 50] * u.arcsec
+NEGATIVE_POINTING_SHIFT = [-25, -50] * u.arcsec
+MIXED_POINTING_SHIFT = [25, -50] * u.arcsec
 
 @pytest.fixture()
 def eis_test_map():
@@ -30,6 +33,36 @@ def aia193_test_map():
         return sunpy.map.Map(hdul[1].data, hdul[1].header)
 
 
+@pytest.fixture()
+def incorrect_shifted_once_map(aia171_test_map):
+    return aia171_test_map.shift_reference_coord(30*u.arcsec, -40*u.arcsec)
+
+
+@pytest.fixture()
+def cutout_map(aia171_test_map):
+    bottom_left = SkyCoord(0*u.arcsec, 0*u.arcsec, frame=aia171_test_map.coordinate_frame)
+    top_right = SkyCoord(900*u.arcsec, 900*u.arcsec, frame=aia171_test_map.coordinate_frame)
+    return aia171_test_map.submap(bottom_left, top_right=top_right)
+
+
+@pytest.fixture(params=[
+    POSITIVE_POINTING_SHIFT,
+    NEGATIVE_POINTING_SHIFT,
+    MIXED_POINTING_SHIFT,
+])
+def incorrect_pointing_map_and_shift(request, aia171_test_map):
+    return aia171_test_map.shift_reference_coord(*request.param), request.param
+
+
+@pytest.fixture(params=[
+    POSITIVE_POINTING_SHIFT,
+    NEGATIVE_POINTING_SHIFT,
+    MIXED_POINTING_SHIFT,
+])
+def incorrect_pointing_cutout_map_and_shift(request, cutout_map):
+    return cutout_map.shift_reference_coord(*request.param), request.param
+
+
 @pytest.mark.remote_data()
 def test_coalignment_eis_aia(eis_test_map, aia193_test_map):
     nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
@@ -43,52 +76,39 @@ def test_coalignment_eis_aia(eis_test_map, aia193_test_map):
     )
 
 
-@pytest.fixture()
-def cutout_map(aia171_test_map):
-    bottom_left = SkyCoord(0*u.arcsec, 0*u.arcsec, frame=aia171_test_map.coordinate_frame)
-    top_right = SkyCoord(900*u.arcsec, 900*u.arcsec, frame=aia171_test_map.coordinate_frame)
-    return aia171_test_map.submap(bottom_left, top_right=top_right)
-
-
-@pytest.fixture
-def incorrect_pointing_map(aia171_test_map):
-    return aia171_test_map.shift_reference_coord(*POINTING_SHIFT)
-
-
-@pytest.fixture()
-def incorrect_pointing_cutout_map(cutout_map):
-    return cutout_map.shift_reference_coord(*POINTING_SHIFT)
-
-
-def test_coalignment_match_template(incorrect_pointing_cutout_map, aia171_test_map):
+def test_coalignment_match_template_cutout(incorrect_pointing_cutout_map_and_shift, aia171_test_map):
+    incorrect_pointing_cutout_map, pointing_shift = incorrect_pointing_cutout_map_and_shift
     fixed_cutout_map = coalign(incorrect_pointing_cutout_map, aia171_test_map)
     # The actual shifts applied by coalignment should be equal to the expected shifts
     u.allclose(
         np.fabs(incorrect_pointing_cutout_map.reference_coordinate.Tx-fixed_cutout_map.reference_coordinate.Tx),
-        POINTING_SHIFT[0],
+        pointing_shift[0],
     )
     u.allclose(
         np.fabs(incorrect_pointing_cutout_map.reference_coordinate.Ty-fixed_cutout_map.reference_coordinate.Ty),
-        POINTING_SHIFT[1],
+        pointing_shift[1],
     )
 
 
-def test_coalign_phase_cross_correlation(incorrect_pointing_map, aia171_test_map):
+def test_coalign_phase_cross_correlation(incorrect_pointing_map_and_shift, aia171_test_map):
+    incorrect_pointing_map, pointing_shift = incorrect_pointing_map_and_shift
     fixed_map = coalign(incorrect_pointing_map, aia171_test_map, method='phase_cross_correlation')
     # The actual shifts applied by coalignment should be equal to the expected shifts
     u.allclose(
         np.fabs(incorrect_pointing_map.reference_coordinate.Tx-fixed_map.reference_coordinate.Tx),
-        POINTING_SHIFT[0],
+        pointing_shift[0],
     )
     u.allclose(
         np.fabs(incorrect_pointing_map.reference_coordinate.Ty-fixed_map.reference_coordinate.Ty),
-        POINTING_SHIFT[1],
+        pointing_shift[1],
     )
 
 
 @figure_test
-def test_coalignment_figure(incorrect_pointing_cutout_map, cutout_map, aia171_test_map):
+def test_coalignment_figure(incorrect_pointing_cutout_map_and_shift, cutout_map, aia171_test_map):
+    # This is three separate figure tests
     levels = [200, 800]*cutout_map.unit
+    incorrect_pointing_cutout_map, _ = incorrect_pointing_cutout_map_and_shift
     fixed_cutout_map = coalign(incorrect_pointing_cutout_map, aia171_test_map)
     fig = plt.figure(figsize=(10, 7.5))
     # Messed up map
@@ -103,18 +123,30 @@ def test_coalignment_figure(incorrect_pointing_cutout_map, cutout_map, aia171_te
     return fig
 
 
-def test_unsupported_affine_parameters(incorrect_pointing_cutout_map, aia171_test_map):
+def test_unsupported_affine_parameters(incorrect_shifted_once_map, aia171_test_map):
     affine_rot = AffineParams(
         scale=[1,1],
         rotation_matrix=2*np.eye(2),
         translation=[0,0],
     )
     with pytest.raises(NotImplementedError, match=r"Changes to the rotation metadata are currently not supported."):
-        _update_fits_wcs_metadata(incorrect_pointing_cutout_map, aia171_test_map, affine_rot)
+        _update_fits_wcs_metadata(incorrect_shifted_once_map, aia171_test_map, affine_rot)
     affine_scale = AffineParams(
         scale=[2,3],
         rotation_matrix=np.eye(2),
         translation=[0,0],
     )
     with pytest.raises(NotImplementedError, match=r"Changes to the pixel scale metadata are currently not supported."):
-        _update_fits_wcs_metadata(incorrect_pointing_cutout_map, aia171_test_map, affine_scale)
+        _update_fits_wcs_metadata(incorrect_shifted_once_map, aia171_test_map, affine_scale)
+
+
+def test_warnings_coalign(incorrect_shifted_once_map, aia171_test_map):
+    time_shift_meta = incorrect_shifted_once_map.meta.copy()
+    time_shift_meta['DATE-OBS'] = '2014-01-08T09:57:30.84'
+    time_shift = sunpy.map.Map(incorrect_shifted_once_map.data, time_shift_meta)
+    with pytest.warns(SunpyUserWarning, match=r"The time difference between the reference and target maps in time is large."):
+        coalign(time_shift, aia171_test_map)
+
+    resampled_map = incorrect_shifted_once_map.resample([100,100]*u.pix)
+    with pytest.warns(SunpyUserWarning, match=r"There is a plate scale difference between the reference and target maps."):
+        coalign(resampled_map, aia171_test_map)

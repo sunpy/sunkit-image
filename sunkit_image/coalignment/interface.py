@@ -117,6 +117,26 @@ def _warn_user_of_separation(target_map, reference_map):
             stacklevel=3,
         )
 
+def _warn_user_of_plate_scale_difference(target_map, reference_map):
+    """
+    Issues a warning if there is a plate scale difference between the
+    ``reference_map`` and ``target_map``.
+
+    Parameters
+    ----------
+    target_map : `sunpy.map.Map`
+        The target map to be coaligned to the reference map.
+    reference_map : `sunpy.map.Map`
+        The reference map to which the target map is to be coaligned.
+    """
+    if target_map.scale.axis1 != reference_map.scale.axis1 or target_map.scale.axis2 != reference_map.scale.axis2:
+        warnings.warn(
+            "There is a plate scale difference between the reference and target maps. "
+            "This could cause errors when calculating shift between two "
+            "images. Please resample the maps to have the same plate scales.",
+            SunpyUserWarning,
+            stacklevel=3,
+        )
 
 def coalign(target_map, reference_map, method='match_template', **kwargs):
     """
@@ -167,6 +187,7 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
         "The method needs to be registered, with the correct import.")
         raise ValueError(msg)
     _warn_user_of_separation(target_map, reference_map)
+    _warn_user_of_plate_scale_difference(target_map, reference_map)
     affine_params = REGISTERED_METHODS[method](target_map.data, reference_map.data, **kwargs)
     return _update_fits_wcs_metadata(target_map, reference_map, affine_params)
 
