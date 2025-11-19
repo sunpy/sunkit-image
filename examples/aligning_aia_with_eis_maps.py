@@ -23,21 +23,11 @@ from sunkit_image.coalignment import coalign
 eis_map = sunpy.map.Map("https://github.com/sunpy/data/raw/main/sunkit-image/eis_20140108_095727.fe_12_195_119.2c-0.int.fits")
 
 ###################################################################################
-# Next, let's find the AIA data we will use as a reference image.
-# We will look for AIA data near the beginning of the EIS raster and we'll use the
+# Next, let's download the AIA data we will use as a reference image.
+# We want AIA data near the beginning of the EIS raster and we'll use the
 # 193 Å channel of AIA as it sees plasma at approximately the same temperature as
 # the 195.119 Å line in our EIS raster.
-
-# Below is the Fido query to search and download the AIA data.
-# from sunpy.net import Fido
-# from sunpy.net import attrs as a
-# query = Fido.search(
-#     a.Time(start=eis_map.date-1*u.minute, near=eis_map.date, end=eis_map.date+1*u.minute),
-#     a.Instrument.aia,
-#     a.Wavelength(193*u.angstrom)
-# )
-# aia_file = Fido.fetch(query, site='NSO')
-# For now though we have stored this file on Github so we can download it directly.
+# We have stored this file on Github so we can download it directly.
 aia_map = sunpy.map.Map("https://github.com/sunpy/data/raw/refs/heads/main/sunkit-image/aia.lev1.193A_2014_01_08T09_57_30.84Z.image_lev1.fits")
 
 ####################################################################################
