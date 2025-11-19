@@ -1,20 +1,11 @@
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
 from skimage.feature import match_template
 
 import astropy.units as u
 
 from sunkit_image.coalignment.interface import REGISTERED_METHODS
-from sunkit_image.coalignment.match_template import (
-    _find_best_match_location,
-    _get_correlation_shifts,
-    _parabolic_turning_point,
-)
-
-
-
-
+from sunkit_image.coalignment.match_template import _find_best_match_location
 
 
 def test_find_best_match_location(aia171_test_map, aia171_test_template, aia171_test_shift):

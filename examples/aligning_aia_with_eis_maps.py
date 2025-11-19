@@ -28,6 +28,7 @@ eis_map = sunpy.map.Map("https://github.com/sunpy/data/raw/main/sunkit-image/eis
 # 193 Å channel of AIA as it sees plasma at approximately the same temperature as
 # the 195.119 Å line in our EIS raster.
 # We have stored this file on Github so we can download it directly.
+
 aia_map = sunpy.map.Map("https://github.com/sunpy/data/raw/refs/heads/main/sunkit-image/aia.lev1.193A_2014_01_08T09_57_30.84Z.image_lev1.fits")
 
 ####################################################################################
