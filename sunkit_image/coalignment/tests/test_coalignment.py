@@ -76,6 +76,20 @@ def test_coalignment_eis_aia(eis_test_map, aia193_test_map):
     )
 
 
+def test_coalignment_match_template_full_map(incorrect_pointing_map_and_shift, aia171_test_map):
+    incorrect_pointing_map, pointing_shift = incorrect_pointing_map_and_shift
+    fixed_map = coalign(incorrect_pointing_map, aia171_test_map)
+    # The actual shifts applied by coalignment should be equal to the expected shifts
+    u.allclose(
+        np.fabs(incorrect_pointing_map.reference_coordinate.Tx-fixed_map.reference_coordinate.Tx),
+        pointing_shift[0],
+    )
+    u.allclose(
+        np.fabs(incorrect_pointing_map.reference_coordinate.Ty-fixed_map.reference_coordinate.Ty),
+        pointing_shift[1],
+    )
+
+
 def test_coalignment_match_template_cutout(incorrect_pointing_cutout_map_and_shift, aia171_test_map):
     incorrect_pointing_cutout_map, pointing_shift = incorrect_pointing_cutout_map_and_shift
     fixed_cutout_map = coalign(incorrect_pointing_cutout_map, aia171_test_map)
@@ -145,7 +159,8 @@ def test_warnings_coalign(incorrect_shifted_once_map, aia171_test_map):
     time_shift_meta['DATE-OBS'] = '2014-01-08T09:57:30.84'
     time_shift = sunpy.map.Map(incorrect_shifted_once_map.data, time_shift_meta)
     with pytest.warns(SunpyUserWarning, match=r"The time difference between the reference and target maps in time is large."):
-        coalign(time_shift, aia171_test_map)
+        with pytest.raises(ValueError, match=r"attempt to get argmax of an empty sequence"):
+            coalign(time_shift, aia171_test_map)
 
     resampled_map = incorrect_shifted_once_map.resample([100,100]*u.pix)
     with pytest.warns(SunpyUserWarning, match=r"There is a plate scale difference between the reference and target maps."):
