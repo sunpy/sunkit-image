@@ -144,9 +144,9 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
 
     .. note::
 
-        This function is intended to correct maps with known incorrect metadata.
-        It is not designed to address issues like differential rotation or changes in observer
-        location, which are encoded in the coordinate metadata.
+        This function is intended to correct maps with inaccurate metadata.
+        It is not designed to correct for differential rotation or changes in observer
+        location.
 
     .. note::
 
