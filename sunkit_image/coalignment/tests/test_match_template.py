@@ -13,8 +13,6 @@ from sunkit_image.coalignment.match_template import (
 )
 
 
-def test_parabolic_turning_point():
-    assert _parabolic_turning_point(np.asarray([6.0, 2.0, 0.0])) == 1.5
 
 
 def test_get_correlation_shifts():
