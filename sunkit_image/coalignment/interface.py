@@ -46,7 +46,6 @@ def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
         The reference map object to which the target map is to be coaligned.
     affine_params : `NamedTuple`
         A `NamedTuple` containing the affine transformation parameters.
-        If you want to use a custom object, it must have attributes for "translation", "scale", and "rotation_matrix".
 
     Returns
     -------
