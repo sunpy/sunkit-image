@@ -109,9 +109,9 @@ def _warn_user_of_separation(target_map, reference_map):
     )
     if time_separation_angle > tolerable_angular_separation:
         warnings.warn(
-            "The time difference between the reference and target maps in time is large. "
-            "This could cause errors when calculating shift between two "
-            "images. Please make sure the maps are close in time.",
+            "The difference in observation times of the reference and target maps is large. "
+            "This can lead to spurious results when calculating shifts between two images."
+            "Consider choosing a reference map with a similar observation time to your target map.",
             SunpyUserWarning,
             stacklevel=3,
         )
