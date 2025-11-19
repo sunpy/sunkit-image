@@ -158,14 +158,14 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
     Parameters
     ----------
     target_map : `sunpy.map.Map`
-        The map to be coaligned. The target map should be fully contained within the reference map and,
-        for best results, have approximately the same observer location. For coalignment methods which do
-        not account for different pixel scales or rotations, it is recommended that the reference
-        map and target map are resampled and/or rotated such that they have the same orientation and
-        resolution.
+        The map to be coaligned.
     reference_map : `sunpy.map.Map`
-        The map to which the target map is to be coaligned. For best results, the pointing data of this
-        map should be well-known.
+        The map to which the target map is to be coaligned. It is expected that the pointing data of this map
+        is accurate. For best results, ``reference_map`` and ``target_map`` should have approximately the 
+        same observer location and observation time. For coalignment methods which do
+        not account for different pixel scales or rotations, it is recommended that ``reference_map``
+        and ``target_map`` are resampled and/or rotated such that they have the same orientation and
+        resolution.
     method : {{{coalignment_function_names}}}, optional
         The name of the registered coalignment method to use.
         Defaults to 'match_template'.
