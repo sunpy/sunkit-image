@@ -130,9 +130,9 @@ def _warn_user_of_plate_scale_difference(target_map, reference_map):
     """
     if (u.Quantity(target_map.scale) != u.Quantity(reference_map.scale)).any():
         warnings.warn(
-            "There is a plate scale difference between the reference and target maps. "
-            "This could cause errors when calculating shift between two "
-            "images. Please resample the maps to have the same plate scales.",
+            "The reference and target maps have different plate scales. "
+            "This can lead to spurious results when calculating the shift between two arrays"
+            "Consider resampling the reference map to have the same plate scale as the target map.",
             SunpyUserWarning,
             stacklevel=3,
         )
