@@ -94,9 +94,10 @@ def _warn_user_of_separation(target_map, reference_map):
         )
     if angular_separation > tolerable_angular_separation:
         warnings.warn(
-            "The angular separation between the reference and target maps is large. "
-            "This could cause errors when calculating shift between two "
-            "images. Please make sure the maps are close in space.",
+            "The angular separation between the observer coordinates of "
+            "the reference and target maps is large. This can lead to spurious "
+            "results when calculating shift between two images. Consider choosing "
+            "a reference map with a similar observer position to your target map.",
             SunpyUserWarning,
             stacklevel=3,
         )
