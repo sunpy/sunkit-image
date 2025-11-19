@@ -129,7 +129,7 @@ def _warn_user_of_plate_scale_difference(target_map, reference_map):
     reference_map : `sunpy.map.Map`
         The reference map to which the target map is to be coaligned.
     """
-    if target_map.scale.axis1 != reference_map.scale.axis1 or target_map.scale.axis2 != reference_map.scale.axis2:
+    if (u.Quantity(target_map.scale) != u.Quantity(reference_map.scale)).any():
         warnings.warn(
             "There is a plate scale difference between the reference and target maps. "
             "This could cause errors when calculating shift between two "
