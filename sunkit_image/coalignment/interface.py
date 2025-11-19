@@ -53,7 +53,7 @@ def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
     `sunpy.map.Map`
         A new sunpy map object with updated metadata reflecting the affine transformation.
     """
-    # NOTE: Currently, the only metadata updates that are currently supported are shifts in
+    # NOTE: Currently, the only metadata updates that are supported are shifts in
     # the reference coordinate. Once other updates are supported, this check can be removed.
     if not (affine_params.rotation_matrix == np.eye(2)).all():
         raise NotImplementedError('Changes to the rotation metadata are currently not supported.')
