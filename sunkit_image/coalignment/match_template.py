@@ -106,15 +106,27 @@ def match_template_coalign(target_array, reference_array, **kwargs):
             The rotation angle in radians, which is fixed at 0.0 in this function.
         - translation : `tuple`
             A tuple containing the x and y translation values.
+
+    Notes
+    -----
+    This uses `skimage.feature.match_template` to perform the cross correlation.
+    Please check the documentation of that function for details on the available keyword arguments
+    and the details of the algorithm.
     """
     from sunkit_image.coalignment.interface import AffineParams  # NOQA: PLC0415
 
     corr = match_template(np.float64(reference_array), np.float64(target_array), **kwargs)
-    # TODO: Work out what is going on
-    if corr.ndim != target_array.ndim:
-        raise ValueError("The correlation output failed to work out a match.")
+    if len(corr) < 2:
+        raise ValueError(
+            "match_template returned an array with fewer than two values, and cannot be used for coalignment. "
+            "This implies the cross-correlation failed to find a match."
+            )
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
+    if kwargs.get("pad_input"):
+        # For pad_input=True matches correspond to the center
+        y_shift -= target_array.shape[0] // 2
+        x_shift -= target_array.shape[1] // 2
     log.debug(f"Match template shift: x: {x_shift}, y: {y_shift}")
     # Particularly for this method, there is no change in the rotation or scaling,
     # hence the hardcoded values of scale to 1.0 & rotation to identity matrix

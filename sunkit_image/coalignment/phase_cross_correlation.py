@@ -35,6 +35,12 @@ def phase_cross_correlation_coalign(target_array, reference_array, **kwargs):
             The rotation angle in radians, which is fixed at 0.0 in this function.
         - translation : `tuple`
             A tuple containing the x and y translation values.
+
+    Notes
+    -----
+    This uses `skimage.registration.phase_cross_correlation` to perform the cross correlation.
+    Please check the documentation of that function for details on the available keyword arguments
+    and the details of the algorithm.
     """
     from sunkit_image.coalignment.interface import AffineParams  # NOQA: PLC0415
 
