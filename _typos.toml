@@ -7,3 +7,6 @@ default.extend-ignore-identifiers-re = [
     "iy",
     "BA",
 ]
+
+[default.extend-words]
+eis = "eis"
