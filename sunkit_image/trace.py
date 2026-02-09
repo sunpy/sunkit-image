@@ -161,9 +161,9 @@ def occult2(image, nsm1, rmin, lmin, nstruc, ngap, qthresh1, qthresh2):
 
                 # This decides when to stop tracing the loop; when then last `ngap` pixels traced
                 # are below zero, the tracing will stop.
-                iz1 = max((ip + 1 - ngap), 0)
-                if np.max(zl[iz1 : ip + 2]) <= 0:
-                    ip = max(iz1 - 1, 0)
+                is1 = max((ip + 1 - ngap), 0)
+                if np.max(zl[is1 : ip + 2]) <= 0:
+                    ip = max(is1 - 1, 0)
                     break  # goto endsegm
 
             # ENDSEGM

@@ -1,9 +1,13 @@
-import pytest
 import numpy as np
+import pytest
+
 import astropy.units as u
+
 import sunpy.map
-from sunpy.map import GenericMap 
+from sunpy.map import GenericMap
+
 from sunkit_image.radial import rhef
+
 
 @pytest.fixture
 def map_test():
