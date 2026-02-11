@@ -1,6 +1,8 @@
 import numpy as np
 import pytest
 
+import astropy.io.fits
+
 from sunkit_image import asda
 from sunkit_image.data.test import get_test_filepath
 
@@ -95,11 +97,12 @@ def test_real_data():
     """
 
     # file which stores the velocity field data
-    vel_file = get_test_filepath("asda_vxvy.npz")
+    vel_file = get_test_filepath("asda_vxvy.fits")
     # file that stores the correct detection result
-    cor_file = get_test_filepath("asda_correct.npz")
+    cor_file = get_test_filepath("asda_correct.fits")
     # load velocity field and data
-    vxvy = np.load(vel_file, allow_pickle=True)
+    with astropy.io.fits.open(vel_file) as hdul:
+        vxvy = {hdu.name.lower(): hdu.data for hdu in hdul[1:]}
     vx = vxvy["vx"]
     vy = vxvy["vy"]
     data = vxvy["data"]
@@ -114,7 +117,8 @@ def test_real_data():
     # Properties of Swirls
     ve, vr, vc, ia = asda.get_vortex_properties(vx, vy, center_edge, data)
     # load correct detect results
-    correct = dict(np.load(cor_file, allow_pickle=True))
+    with astropy.io.fits.open(cor_file) as hdul:
+        correct = {hdu.name.lower(): hdu.data for hdu in hdul[1:]}
 
     # compare between detection result and correct detection result
     # number of swirls
