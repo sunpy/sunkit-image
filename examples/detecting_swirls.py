@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1.axes_divider import make_axes_locatable
 
+import astropy.io.fits
+
 from sunkit_image.asda import calculate_gamma_values, get_vortex_edges, get_vortex_properties
 from sunkit_image.data.test import get_test_filepath
 
@@ -26,7 +28,8 @@ from sunkit_image.data.test import get_test_filepath
 #
 # `pyflct <https://pyflct.readthedocs.io/en/latest/>`__ is a good tool to calculate the velocity field from your data.
 
-vxvy = np.load(get_test_filepath("asda_vxvy.npz"))
+with astropy.io.fits.open(get_test_filepath("asda_vxvy.fits")) as hdul:
+    vxvy = {hdu.name.lower(): hdu.data for hdu in hdul[1:]}
 # This is the original data used to calculate the velocity field
 data = vxvy["data"]
 # These are the velocity components in the x and y directions

@@ -20,7 +20,7 @@ repos:
       - id: debug-statements
       - id: check-added-large-files
         args: ["--enforce-all", "--maxkb=1054"]
-        exclude: "sunkit_image/data/test/asda_vxvy.npz"
+        exclude: "sunkit_image/data/test/asda_vxvy.fits"
       - id: end-of-file-fixer
         exclude: ".*(.fits|.fts|.fit|.header|.txt|tca.*|.json)$|^CITATION.rst$"
       - id: mixed-line-ending
