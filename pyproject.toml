@@ -44,6 +44,8 @@ all = ["sunkit_image[watroo]"]
 watroo = ["watroo"]
 tests = [
   "sunkit_image[all]",
+# NumPy>=2.4 not compatible with some helpers in astropy<7.2
+  "astropy>=7.2.0",
   "dask",
   "pytest-astropy",
   "pytest-mpl",
