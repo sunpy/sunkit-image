@@ -107,12 +107,12 @@ def test_coalignment_match_template_cutout(incorrect_pointing_cutout_map_and_shi
     assert_quantity_allclose(
         (incorrect_pointing_cutout_map.reference_coordinate.Tx-fixed_cutout_map.reference_coordinate.Tx),
         pointing_shift[0],
-        atol=1*u.arcsec,
+        atol=0.05*u.arcsec,
     )
     assert_quantity_allclose(
         (incorrect_pointing_cutout_map.reference_coordinate.Ty-fixed_cutout_map.reference_coordinate.Ty),
         pointing_shift[1],
-        atol=1*u.arcsec,
+        atol=0.05*u.arcsec,
     )
 
 
