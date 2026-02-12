@@ -117,6 +117,7 @@ def _warn_user_of_separation(target_map, reference_map):
             stacklevel=3,
         )
 
+
 def _warn_user_of_plate_scale_difference(target_map, reference_map):
     """
     Issues a warning if there is a plate scale difference between the
@@ -137,6 +138,7 @@ def _warn_user_of_plate_scale_difference(target_map, reference_map):
             SunpyUserWarning,
             stacklevel=3,
         )
+
 
 def coalign(target_map, reference_map, method='match_template', **kwargs):
     """
@@ -165,10 +167,10 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
         same observer location and observation time. For coalignment methods which do
         not account for different pixel scales or rotations, it is recommended that ``reference_map``
         and ``target_map`` are resampled and/or rotated such that they have the same orientation and
-        resolution.
+        plate scale.
     method : {{{coalignment_function_names}}}, optional
         The name of the registered coalignment method to use.
-        Defaults to 'match_template'.
+        Defaults to `~sunkit_image.coalignment.match_template.match_template_coalign`.
     kwargs : `dict`
         Additional keyword arguments to pass to the registered method.
 

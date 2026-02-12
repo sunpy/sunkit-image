@@ -13,7 +13,12 @@ def phase_cross_correlation_coalign(target_array, reference_array, **kwargs):
     """
     Perform coalignment by phase cross correlation input array to the target array.
 
-    This requires both the input and target arrays to be the same size.
+    .. note:: This requires both the input and target arrays to be the same size.
+
+    Coalign ``target_array`` to ``reference_array`` using phase cross-correlation
+    via `skimage.registration.phase_cross_correlation`. For more details on this approach,
+    please check the documentation of that function including the available keyword
+    arguments and the details of the algorithm.
 
     Parameters
     ----------
@@ -27,20 +32,8 @@ def phase_cross_correlation_coalign(target_array, reference_array, **kwargs):
     Returns
     -------
     `sunkit_image.coalignment.interface.AffineParams`
-        A `NamedTuple` containing the following affine transformation parameters:
-
-        - scale : `list`
-            A list of tuples representing the scale transformation as an identity matrix.
-        - rotation : `float`
-            The rotation angle in radians, which is fixed at 0.0 in this function.
-        - translation : `tuple`
-            A tuple containing the x and y translation values.
-
-    Notes
-    -----
-    This uses `skimage.registration.phase_cross_correlation` to perform the cross correlation.
-    Please check the documentation of that function for details on the available keyword arguments
-    and the details of the algorithm.
+        This method only returns a translation. The scale and rotation
+        parameters are unity.
     """
     from sunkit_image.coalignment.interface import AffineParams  # NOQA: PLC0415
 
