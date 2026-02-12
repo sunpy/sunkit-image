@@ -30,8 +30,8 @@ repos:
     hooks:
       - id: codespell
         args: [ "--write-changes" ]
-  - repo: https://github.com/crate-ci/typos
-    rev: v1
+  - repo: https://github.com/adhtruong/mirrors-typos
+    rev: v1.38.0
     hooks:
       - id: typos
   - repo: https://github.com/pre-commit/mirrors-mypy
