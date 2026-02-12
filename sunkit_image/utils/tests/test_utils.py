@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import pytest
 
+import astropy.io.fits
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
@@ -112,9 +113,9 @@ def test_get_radial_intensity_summary(aia_171):
 
 
 def test_calculate_gamma():
-    vel_file = get_test_filepath("asda_vxvy.npz")
-    get_test_filepath("asda_correct.npz")
-    vxvy = np.load(vel_file, allow_pickle=True)
+    vel_file = get_test_filepath("asda_vxvy.fits")
+    with astropy.io.fits.open(vel_file) as hdul:
+        vxvy = {hdu.name.lower(): hdu.data for hdu in hdul[1:]}
     vx = vxvy["vx"]
     vy = vxvy["vy"]
     vxvy["data"]
