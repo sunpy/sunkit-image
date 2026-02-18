@@ -1,8 +1,3 @@
-"""
-This module contains functions that can be used to enhance the regions above a
-radius.
-"""
-
 import numpy as np
 from scipy import stats
 from tqdm import tqdm

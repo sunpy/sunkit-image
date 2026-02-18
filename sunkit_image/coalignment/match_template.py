@@ -91,6 +91,11 @@ def match_template_coalign(target_array, reference_array, **kwargs):
     the documentation of that function including the available keyword arguments and the
     details of the algorithm.
 
+    .. warning::
+
+        This method only returns a translation. The scale and rotation
+        parameters are unity.
+
     Parameters
     ----------
     target_array : `numpy.ndarray`
@@ -103,8 +108,6 @@ def match_template_coalign(target_array, reference_array, **kwargs):
     Returns
     -------
     `sunkit_image.coalignment.interface.AffineParams`
-        This method only returns a translation. The scale and rotation
-        parameters are unity.
     """
     from sunkit_image.coalignment.interface import AffineParams  # NOQA: PLC0415
 

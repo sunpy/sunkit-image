@@ -1,4 +1,4 @@
-from sunkit_image.coalignment import coalign
+from sunkit_image.coalignment import coalign_map
 from sunkit_image.coalignment.register import REGISTERED_METHODS, register_coalignment_method
 
 
@@ -14,5 +14,5 @@ def test_register_coalignment_method():
 
 def test_coalignment_method_in_docstring():
     assert (
-        "phase_cross_correlation" in coalign.__doc__
+        "phase_cross_correlation" in coalign_map.__doc__
     )

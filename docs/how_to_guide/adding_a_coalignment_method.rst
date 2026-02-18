@@ -21,7 +21,7 @@ At a minimum, your new coalignment function should do the following:
 3. Return an instance of `~sunkit_image.coalignment.interface.AffineParams` with the results of your coalignment procedure.
 
 Additionally, registered methods are expected to handled NaNs and Infs should they arise as a result of your coalignment procedure.
-The :func:`~sunkit_image.coalignment.coalign` function does not make any attempt to filter out
+The :func:`~sunkit_image.coalignment.coalign_map` function does not make any attempt to filter out
 these non-finite values.
 
 To register your new coalignment method, you can use the :func:`~sunkit_image.coalignment.register.register_coalignment_method` decorator to register your new method with a custom name. An example of how to use this decorator is shown below:
@@ -48,8 +48,10 @@ To check if your method is registered, you can check if it is present in the reg
     print(REGISTERED_METHODS)
 
 If your coalignment method has been successfully registered, you should now be able to call it
-through the `~sunkit_image.coalignment.coalign` interface:
+through the `~sunkit_image.coalignment.coalign_map` interface:
 
 .. code-block:: python
 
-        coaligned_map = coalign(target_map, reference_map, method='my_custom_coalignment_method')
+    from sunkit_image.coalignment import coalign_map
+
+    coaligned_map = coalign_map(target_map, reference_map, method='my_custom_coalignment_method')

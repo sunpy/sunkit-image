@@ -13,7 +13,7 @@ from astropy.visualization import AsinhStretch, ImageNormalize
 
 import sunpy.map
 
-from sunkit_image.coalignment import coalign
+from sunkit_image.coalignment import coalign_map
 
 ###################################################################################
 # For this example, we will use a preprocessed EIS raster image of the Fe XII
@@ -45,7 +45,7 @@ aia_downsampled = aia_map.resample(u.Quantity([nx, ny]))
 # uses the "match_template" method. For details of the implementation refer to the
 # documentation of `skimage.feature.match_template`.
 
-coaligned_eis_map = coalign(eis_map, aia_downsampled)
+coaligned_eis_map = coalign_map(eis_map, aia_downsampled)
 
 ####################################################################################
 # To check now effective this has been, we will plot the EIS data and

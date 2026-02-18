@@ -1,8 +1,3 @@
-"""
-This module contains functions that will the trace out coronal loop-like
-structures in an image.
-"""
-
 import numpy as np
 from scipy import interpolate
 

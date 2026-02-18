@@ -1,5 +1,5 @@
 import warnings
-from typing import NamedTuple
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -12,31 +12,41 @@ from sunpy.util.exceptions import SunpyUserWarning
 
 __all__ = [
     "AffineParams",
-    "coalign",
+    "coalign_map",
+    "update_map_metadata",
 ]
 
 
-class AffineParams(NamedTuple):
+@dataclass
+class AffineParams:
     """
     A 2-element tuple containing scale values defining the image scaling along
     the x and y axes.
     """
-    scale: tuple[float, float]
+    scale: tuple[float, float] | list[float] | np.ndarray
     """
     A 2x2 matrix defining the rotation transformation of the image.
     """
-    rotation_matrix: tuple[tuple[float, float], tuple[float, float]]
+    rotation_matrix: tuple[tuple[float, float], tuple[float, float]] | np.ndarray
     """
     A 2-element tuple stores the translation of the image along the x and y
     axes.
     """
-    translation: tuple[float, float]
+    translation: tuple[float, float] | list[float] | np.ndarray
 
 
 def update_map_metadata(target_map, reference_map, affine_params):
     """
     Update the metadata of a sunpy.map.Map` based on affine transformation
     parameters.
+
+    .. warning::
+
+        This function is currently only designed to update the reference coordinate
+        metadata based on the translation component of the affine transformation.
+        Changes to the rotation and scale metadata are not currently supported.
+        If you have a use case that requires changes to the rotation or scale metadata
+        `please open an issue on the issue tracker <https://github.com/sunpy/sunkit-image/issues>`__.
 
     Parameters
     ----------
@@ -54,10 +64,15 @@ def update_map_metadata(target_map, reference_map, affine_params):
     """
     # NOTE: Currently, the only metadata updates that are supported are shifts in
     # the reference coordinate. Once other updates are supported, this check can be removed.
+    full_msg = (
+        "\nIf you have a use case that requires changes to the rotation or scale metadata, "
+        "please open an issue at https://github.com/sunpy/sunkit-image/issues with details "
+        "about your use case and the type of metadata changes you require."
+    )
     if not (affine_params.rotation_matrix == np.eye(2)).all():
-        raise NotImplementedError('Changes to the rotation metadata are currently not supported.')
+        raise NotImplementedError('Changes to the rotation metadata are currently not supported.'+ full_msg)
     if not (affine_params.scale == np.array([1,1])).all():
-        raise NotImplementedError('Changes to the pixel scale metadata are currently not supported.')
+        raise NotImplementedError('Changes to the pixel scale metadata are currently not supported.'+ full_msg)
     # Calculate the new reference pixel.
     old_reference_pixel = u.Quantity(target_map.reference_pixel).to_value('pixel')
     new_reference_pixel = affine_params.scale * affine_params.rotation_matrix @ old_reference_pixel + affine_params.translation
@@ -151,6 +166,14 @@ def coalign_map(target_map, reference_map, method='match_template', **kwargs):
         It is not designed to correct for differential rotation or changes in observer
         location.
 
+    .. warning::
+
+        This function is currently only designed to update the reference coordinate
+        metadata based on the translation component of the affine transformation.
+        Changes to the rotation and scale metadata are not currently supported.
+        If you have a use case that requires changes to the rotation or scale metadata
+        `please open an issue on the issue tracker <https://github.com/sunpy/sunkit-image/issues>`__.
+
     .. note::
 
         This function modifies the metadata of the map, not the underlying array data.
@@ -190,14 +213,14 @@ def coalign_map(target_map, reference_map, method='match_template', **kwargs):
         raise ValueError(msg)
     _warn_user_of_separation(target_map, reference_map)
     _warn_user_of_plate_scale_difference(target_map, reference_map)
-    
+
     affine_params = REGISTERED_METHODS[method](target_map.data, reference_map.data, **kwargs)
-    return _update_fits_wcs_metadata(target_map, reference_map, affine_params)
+    return update_map_metadata(target_map, reference_map, affine_params)
 
 
 from sunkit_image.coalignment.register import REGISTERED_METHODS  # isort:skip # NOQA: E402
 # Generate the string with allowable coalignment-function names for use in docstrings
 _coalignment_function_names = ", ".join([f"``'{name}'``" for name in REGISTERED_METHODS])
-# Insert into the docstring for coalign. We cannot use the add_common_docstring decorator
+# Insert into the docstring for coalign_map. We cannot use the add_common_docstring decorator
 # due to what would be a circular loop in definitions.
-coalign.__doc__ = coalign.__doc__.format(coalignment_function_names=_coalignment_function_names)  # type: ignore
+coalign_map.__doc__ = coalign_map.__doc__.format(coalignment_function_names=_coalignment_function_names)  # type: ignore

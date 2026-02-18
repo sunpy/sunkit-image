@@ -20,6 +20,11 @@ def phase_cross_correlation_coalign(target_array, reference_array, **kwargs):
     please check the documentation of that function including the available keyword
     arguments and the details of the algorithm.
 
+    .. warning::
+
+        This method only returns a translation. The scale and rotation
+        parameters are unity.
+
     Parameters
     ----------
     target_array : `numpy.ndarray`
