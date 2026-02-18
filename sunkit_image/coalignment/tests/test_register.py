@@ -13,6 +13,4 @@ def test_register_coalignment_method():
 
 
 def test_coalignment_method_in_docstring():
-    assert (
-        "phase_cross_correlation" in coalign_map.__doc__
-    )
+    assert "phase_cross_correlation" in coalign_map.__doc__

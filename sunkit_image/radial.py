@@ -96,6 +96,7 @@ def _normalize_fit_radial_intensity(radii, polynomial, normalization_radius):
         polynomial,
     )
 
+
 def _select_rank_method(method):
     def _percentile_ranks_scipy(arr):
         mask = ~np.isnan(arr)
@@ -538,7 +539,9 @@ def fnrgf(
     data = np.ones_like(smap.data) * fill
 
     # Set attenuation coefficients
-    attenuation_coefficients = _set_attenuation_coefficients(order, mean_attenuation_range, std_attenuation_range, cutoff)
+    attenuation_coefficients = _set_attenuation_coefficients(
+        order, mean_attenuation_range, std_attenuation_range, cutoff
+    )
 
     # Iterate over each circular ring
     for i in tqdm(range(nbins), desc="FNRGF: ", disable=not progress):
@@ -715,9 +718,7 @@ def rhef(
     # Loop over each radial bin to apply the filter
     for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=not progress):
         # Identify pixels within the current radial bin
-        here = np.logical_and(
-            map_r >= radial_bin_edges[0, i].to(u.R_sun), map_r < radial_bin_edges[1, i].to(u.R_sun)
-        )
+        here = np.logical_and(map_r >= radial_bin_edges[0, i].to(u.R_sun), map_r < radial_bin_edges[1, i].to(u.R_sun))
         if application_radius is not None and application_radius > 0:
             here = np.logical_and(here, map_r >= application_radius)
         # Apply ranking function

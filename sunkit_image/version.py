@@ -9,11 +9,9 @@ try:
 except Exception:  # NOQA: BLE001
     import warnings
 
-    warnings.warn(
-        f'could not determine {__name__.split(".")[0]} package version; this indicates a broken installation'
-    )
+    warnings.warn(f"could not determine {__name__.split('.')[0]} package version; this indicates a broken installation")
     del warnings
 
-    version = '0.0.0'
+    version = "0.0.0"
 
 __all__ = ["version"]

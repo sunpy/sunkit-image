@@ -108,7 +108,7 @@ def pytest_runtest_teardown(item):
     # Clear the pyplot figure stack if it is not empty after the test
     # You can see these log messages by passing "-o log_cli=true" to pytest on the command line
     if HAVE_MATPLOTLIB and plt.get_fignums():
-        msg = f"Removing {len(plt.get_fignums())} pyplot figure(s) " f"left open by {item.name}"
+        msg = f"Removing {len(plt.get_fignums())} pyplot figure(s) left open by {item.name}"
         console_logger.info(msg)
         plt.close("all")
 
@@ -173,6 +173,7 @@ def granule_minimap3():
         ref_coord,
     )
     return sunpy.map.GenericMap(arr, header)
+
 
 @pytest.fixture(params=["array", "map"])
 def aia_171(request):

@@ -9,7 +9,7 @@ from sunkit_image.coalignment.match_template import _find_best_match_location
 
 
 def test_find_best_match_location(aia171_test_map, aia171_test_template, aia171_test_shift):
-    with np.errstate(all='ignore'):
+    with np.errstate(all="ignore"):
         result = match_template(aia171_test_map.data, aia171_test_template)
     match_location = u.Quantity(_find_best_match_location(result))
     assert_allclose(match_location.value, np.array(result.shape) / 2.0 - 0.5 + aia171_test_shift, rtol=1e-3, atol=0)

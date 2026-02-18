@@ -14,7 +14,10 @@ import sunkit_image.radial as rad
 import sunkit_image.utils as utils
 from sunkit_image.tests.helpers import figure_test, skip_windows
 
-pytestmark = [pytest.mark.filterwarnings("ignore:Missing metadata for observer"), pytest.mark.filterwarnings("ignore:Missing metadata for observation time")]
+pytestmark = [
+    pytest.mark.filterwarnings("ignore:Missing metadata for observer"),
+    pytest.mark.filterwarnings("ignore:Missing metadata for observation time"),
+]
 
 
 @pytest.fixture()
@@ -174,6 +177,7 @@ def test_fnrgf_errors(map_test1):
             cutoff=0,
         )
 
+
 @figure_test
 @pytest.mark.remote_data()
 def test_fig_nrgf(aia_171_map):
@@ -189,7 +193,14 @@ def test_fig_fnrgf(aia_171_map):
     radial_bin_edges = utils.equally_spaced_bins()
     radial_bin_edges *= u.R_sun
     order = 20
-    out = rad.fnrgf(aia_171_map, radial_bin_edges=radial_bin_edges, order=order, mean_attenuation_range=[1.0, 0.0], std_attenuation_range=[1.0, 0.0], cutoff=0)
+    out = rad.fnrgf(
+        aia_171_map,
+        radial_bin_edges=radial_bin_edges,
+        order=order,
+        mean_attenuation_range=[1.0, 0.0],
+        std_attenuation_range=[1.0, 0.0],
+        cutoff=0,
+    )
     out.plot()
 
 
@@ -239,6 +250,7 @@ def test_multifig_rhef(aia_171_map):
     fig.tight_layout()
 
     return fig
+
 
 def test_set_attenuation_coefficients():
     order = 1

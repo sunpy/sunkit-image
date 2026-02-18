@@ -22,7 +22,7 @@ def _parabolic_turning_point(y):
     float
         The x-coordinate of the turning point.
     """
-    return (-0.5 * y.dot([-1, 0, 1]))/ y.dot([1, -2, 1])
+    return (-0.5 * y.dot([-1, 0, 1])) / y.dot([1, -2, 1])
 
 
 def _get_correlation_shifts(array):
@@ -116,7 +116,7 @@ def match_template_coalign(target_array, reference_array, **kwargs):
         raise ValueError(
             "match_template returned an array with fewer than two values, and cannot be used for coalignment. "
             "This implies the cross-correlation failed to find a match."
-            )
+        )
     # Find the best match location
     y_shift, x_shift = _find_best_match_location(corr)
     if kwargs.get("pad_input"):

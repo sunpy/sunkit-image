@@ -23,6 +23,7 @@ class AffineParams:
     A 2-element tuple containing scale values defining the image scaling along
     the x and y axes.
     """
+
     scale: tuple[float, float] | list[float] | np.ndarray
     """
     A 2x2 matrix defining the rotation transformation of the image.
@@ -70,15 +71,19 @@ def update_map_metadata(target_map, reference_map, affine_params):
         "about your use case and the type of metadata changes you require."
     )
     if not (affine_params.rotation_matrix == np.eye(2)).all():
-        raise NotImplementedError('Changes to the rotation metadata are currently not supported.'+ full_msg)
-    if not (affine_params.scale == np.array([1,1])).all():
-        raise NotImplementedError('Changes to the pixel scale metadata are currently not supported.'+ full_msg)
+        raise NotImplementedError("Changes to the rotation metadata are currently not supported." + full_msg)
+    if not (affine_params.scale == np.array([1, 1])).all():
+        raise NotImplementedError("Changes to the pixel scale metadata are currently not supported." + full_msg)
     # Calculate the new reference pixel.
-    old_reference_pixel = u.Quantity(target_map.reference_pixel).to_value('pixel')
-    new_reference_pixel = affine_params.scale * affine_params.rotation_matrix @ old_reference_pixel + affine_params.translation
+    old_reference_pixel = u.Quantity(target_map.reference_pixel).to_value("pixel")
+    new_reference_pixel = (
+        affine_params.scale * affine_params.rotation_matrix @ old_reference_pixel + affine_params.translation
+    )
     new_reference_coordinate = reference_map.wcs.pixel_to_world(*new_reference_pixel)
     # Create a new map with the updated metadata
-    log.debug(f"Shifting reference coordinate from {target_map.reference_coordinate} to {new_reference_coordinate} by {new_reference_coordinate.Tx - target_map.reference_coordinate.Tx}, {new_reference_coordinate.Ty - target_map.reference_coordinate.Ty}")
+    log.debug(
+        f"Shifting reference coordinate from {target_map.reference_coordinate} to {new_reference_coordinate} by {new_reference_coordinate.Tx - target_map.reference_coordinate.Tx}, {new_reference_coordinate.Ty - target_map.reference_coordinate.Ty}"
+    )
     return target_map.shift_reference_coord(
         new_reference_coordinate.Tx - target_map.reference_coordinate.Tx,
         new_reference_coordinate.Ty - target_map.reference_coordinate.Ty,
@@ -98,15 +103,13 @@ def _warn_user_of_separation(target_map, reference_map):
         The reference map to which the target map is to be coaligned.
     """
     # Maximum angular separation allowed between the reference and target maps
-    tolerable_angular_separation = 1*u.deg
+    tolerable_angular_separation = 1 * u.deg
     if astropy.__version__ >= "6.1.0":
         angular_separation = reference_map.observer_coordinate.separation(
             target_map.observer_coordinate, origin_mismatch="ignore"
         )
     else:
-        angular_separation = reference_map.observer_coordinate.separation(
-            target_map.observer_coordinate
-        )
+        angular_separation = reference_map.observer_coordinate.separation(target_map.observer_coordinate)
     if angular_separation > tolerable_angular_separation:
         warnings.warn(
             "The angular separation between the observer coordinates of "
@@ -117,11 +120,9 @@ def _warn_user_of_separation(target_map, reference_map):
             stacklevel=3,
         )
     # Calculate time difference and convert to separation angle
-    time_diff = np.abs((reference_map.date - target_map.date).to('s'))
+    time_diff = np.abs((reference_map.date - target_map.date).to("s"))
     time_separation_angle = differential_rotation(
-        time_diff,
-        reference_map.center.transform_to('heliographic_stonyhurst').lat,
-        model='howard'
+        time_diff, reference_map.center.transform_to("heliographic_stonyhurst").lat, model="howard"
     )
     if time_separation_angle > tolerable_angular_separation:
         warnings.warn(
@@ -155,7 +156,7 @@ def _warn_user_of_plate_scale_difference(target_map, reference_map):
         )
 
 
-def coalign_map(target_map, reference_map, method='match_template', **kwargs):
+def coalign_map(target_map, reference_map, method="match_template", **kwargs):
     """
     Performs image coalignment using the specified method by updating the metadata of the
     target map to align it with the reference map.
@@ -208,8 +209,10 @@ def coalign_map(target_map, reference_map, method='match_template', **kwargs):
         If the specified method is not registered.
     """
     if method not in REGISTERED_METHODS:
-        msg = (f"Method {method} is not a registered method: {','.join(REGISTERED_METHODS.keys())}. "
-        "If you expect this method to be present, ensure the method has been registered with the correct import.")
+        msg = (
+            f"Method {method} is not a registered method: {','.join(REGISTERED_METHODS.keys())}. "
+            "If you expect this method to be present, ensure the method has been registered with the correct import."
+        )
         raise ValueError(msg)
     _warn_user_of_separation(target_map, reference_map)
     _warn_user_of_plate_scale_difference(target_map, reference_map)
@@ -219,6 +222,7 @@ def coalign_map(target_map, reference_map, method='match_template', **kwargs):
 
 
 from sunkit_image.coalignment.register import REGISTERED_METHODS  # isort:skip # NOQA: E402
+
 # Generate the string with allowable coalignment-function names for use in docstrings
 _coalignment_function_names = ", ".join([f"``'{name}'``" for name in REGISTERED_METHODS])
 # Insert into the docstring for coalign_map. We cannot use the add_common_docstring decorator

@@ -10,7 +10,10 @@ import sunpy.map
 import sunkit_image.enhance as enhance
 from sunkit_image.tests.helpers import figure_test
 
-pytestmark = [pytest.mark.filterwarnings("ignore:Missing metadata for observer"), pytest.mark.filterwarnings("ignore:Missing metadata for observation time")]
+pytestmark = [
+    pytest.mark.filterwarnings("ignore:Missing metadata for observer"),
+    pytest.mark.filterwarnings("ignore:Missing metadata for observation time"),
+]
 
 
 @figure_test
