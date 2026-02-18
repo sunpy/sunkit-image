@@ -33,7 +33,7 @@ class AffineParams(NamedTuple):
     translation: tuple[float, float]
 
 
-def _update_fits_wcs_metadata(target_map, reference_map, affine_params):
+def update_map_metadata(target_map, reference_map, affine_params):
     """
     Update the metadata of a sunpy.map.Map` based on affine transformation
     parameters.
@@ -140,7 +140,7 @@ def _warn_user_of_plate_scale_difference(target_map, reference_map):
         )
 
 
-def coalign(target_map, reference_map, method='match_template', **kwargs):
+def coalign_map(target_map, reference_map, method='match_template', **kwargs):
     """
     Performs image coalignment using the specified method by updating the metadata of the
     target map to align it with the reference map.
@@ -159,9 +159,9 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
 
     Parameters
     ----------
-    target_map : `sunpy.map.Map`
+    target_map : `sunpy.map.GenericMap`
         The map to be coaligned.
-    reference_map : `sunpy.map.Map`
+    reference_map : `sunpy.map.GenericMap`
         The map to which the target map is to be coaligned. It is expected that the pointing data of this map
         is accurate. For best results, ``reference_map`` and ``target_map`` should have approximately the
         same observer location and observation time. For coalignment methods which do
@@ -176,7 +176,7 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
 
     Returns
     -------
-    `sunpy.map.Map`
+    `sunpy.map.GenericMap`
         The coaligned target map with the updated metadata.
 
     Raises
@@ -186,10 +186,11 @@ def coalign(target_map, reference_map, method='match_template', **kwargs):
     """
     if method not in REGISTERED_METHODS:
         msg = (f"Method {method} is not a registered method: {','.join(REGISTERED_METHODS.keys())}. "
-        "The method needs to be registered, with the correct import.")
+        "If you expect this method to be present, ensure the method has been registered with the correct import.")
         raise ValueError(msg)
     _warn_user_of_separation(target_map, reference_map)
     _warn_user_of_plate_scale_difference(target_map, reference_map)
+    
     affine_params = REGISTERED_METHODS[method](target_map.data, reference_map.data, **kwargs)
     return _update_fits_wcs_metadata(target_map, reference_map, affine_params)
 

@@ -18,7 +18,7 @@ At a minimum, your new coalignment function should do the following:
 
 2. Decide the values of the affine transformation - translation, scale and rotation. In most cases, this means calculating the shifts in the x- and y-directions needed to align ``input_array`` with ``target_array``.
 
-3. Return an instance of `~sunkit_image.coalignment.interface.AffineParams` with the results of your coalignemtn procedure.
+3. Return an instance of `~sunkit_image.coalignment.interface.AffineParams` with the results of your coalignment procedure.
 
 Additionally, registered methods are expected to handled NaNs and Infs should they arise as a result of your coalignment procedure.
 The :func:`~sunkit_image.coalignment.coalign` function does not make any attempt to filter out

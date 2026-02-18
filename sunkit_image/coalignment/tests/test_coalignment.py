@@ -90,7 +90,7 @@ def test_coalignment_match_template_full_map(incorrect_pointing_map_and_shift, a
     fixed_map = coalign(masked_map, aia171_test_map, pad_input=True)
 
     assert_quantity_allclose(
-        (incorrect_pointing_map.reference_coordinate.Tx-fixed_map.reference_coordinate.Tx),
+        (incorrect_pointing_map.reference_coordinate.Tx - fixed_map.reference_coordinate.Tx),
         pointing_shift[0],
         atol=1*u.arcsec,
     )
