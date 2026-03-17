@@ -63,7 +63,9 @@ bilateral_denoised_wow = enhance.wow(submap_193, bilateral=1, denoise_coefficien
 # gamma-stretched input, with weight "h".
 
 gamma = 4
-bilateral_denoised_merged_wow = enhance.wow(submap_193, bilateral=1, denoise_coefficients=denoise_coefficients, gamma=gamma, h=0.99)
+bilateral_denoised_merged_wow = enhance.wow(
+    submap_193, bilateral=1, denoise_coefficients=denoise_coefficients, gamma=gamma, h=0.99
+)
 
 ###########################################################################
 # Finally, we will plot the full set of outputs created and
@@ -71,19 +73,19 @@ bilateral_denoised_merged_wow = enhance.wow(submap_193, bilateral=1, denoise_coe
 
 fig = plt.figure(figsize=(8, 12))
 variations = {
-    f'Input | Gamma = {gamma} stretch': {'map': submap_193, 'stretch': PowerStretch(1 / gamma)},
-    'WOW | Linear stretch': {'map': default_wow, 'stretch': LinearStretch()},
-    'Denoised WOW': {'map': denoised_wow, 'stretch': LinearStretch()},
-    'Edge-aware WOW': {'map': bilateral_wow, 'stretch': LinearStretch()},
-    'Edge-aware & denoised WOW': {'map': bilateral_denoised_wow, 'stretch': LinearStretch()},
-    'Merged with input': {'map': bilateral_denoised_merged_wow, 'stretch': LinearStretch()}
+    f"Input | Gamma = {gamma} stretch": {"map": submap_193, "stretch": PowerStretch(1 / gamma)},
+    "WOW | Linear stretch": {"map": default_wow, "stretch": LinearStretch()},
+    "Denoised WOW": {"map": denoised_wow, "stretch": LinearStretch()},
+    "Edge-aware WOW": {"map": bilateral_wow, "stretch": LinearStretch()},
+    "Edge-aware & denoised WOW": {"map": bilateral_denoised_wow, "stretch": LinearStretch()},
+    "Merged with input": {"map": bilateral_denoised_merged_wow, "stretch": LinearStretch()},
 }
 interval = AsymmetricPercentileInterval(1, 99.9)
 for i, (title, image) in enumerate(variations.items()):
-    ax = fig.add_subplot(3, 2, i + 1, projection=image['map'])
-    image['map'].plot(norm=ImageNormalize(image['map'].data, interval=interval, stretch=image['stretch']))
+    ax = fig.add_subplot(3, 2, i + 1, projection=image["map"])
+    image["map"].plot(norm=ImageNormalize(image["map"].data, interval=interval, stretch=image["stretch"]))
     ax.set_title(title)
-    ax.axis('off')
+    ax.axis("off")
 
 fig.tight_layout()
 

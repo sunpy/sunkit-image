@@ -1,8 +1,3 @@
-"""
-This module contains an implementation of the Automated Swirl Detection
-Algorithm (ASDA).
-"""
-
 import warnings
 from itertools import product
 

@@ -1,8 +1,3 @@
-"""
-This module contains an implementation of the Sunspot Tracking And Recognition
-Algorithm (STARA).
-"""
-
 import numpy as np
 import skimage
 from skimage.filters import median

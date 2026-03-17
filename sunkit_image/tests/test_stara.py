@@ -26,9 +26,9 @@ def test_stara_threshold_adjustment(hmi_map):
     higher_limb_filtered_result = stara(hmi_upscaled, limb_filter=30 * u.percent)
     # Assert that the lower threshold results in more features detected
     assert lower_threshold_result.sum() > higher_threshold_result.sum(), "Lower threshold should detect more features"
-    assert (
-        lower_limb_filtered_result.sum() > higher_limb_filtered_result.sum()
-    ), "Lower Limb filter should detect more features"
+    assert lower_limb_filtered_result.sum() > higher_limb_filtered_result.sum(), (
+        "Lower Limb filter should detect more features"
+    )
 
 
 @figure_test

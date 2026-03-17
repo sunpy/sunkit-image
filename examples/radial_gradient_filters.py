@@ -48,12 +48,7 @@ base_nrgf = radial.nrgf(aia_map, radial_bin_edges=radial_bin_edges, application_
 # choose them according to your requirements. These can be changed by tweaking the following keywords: ``mean_attenuation_range`` and ``std_attenuation_range``.
 
 order = 20
-base_fnrgf = radial.fnrgf(
-    aia_map,
-    radial_bin_edges=radial_bin_edges,
-    order=order,
-    application_radius=1 * u.R_sun
-)
+base_fnrgf = radial.fnrgf(aia_map, radial_bin_edges=radial_bin_edges, order=order, application_radius=1 * u.R_sun)
 
 ###########################################################################
 # Now we will also use the final filter, RHEF.

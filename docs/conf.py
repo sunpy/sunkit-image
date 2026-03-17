@@ -39,7 +39,7 @@ if _version.is_postrelease:
 elif _version.is_devrelease:
     version = release = f"{_version.base_version}.dev{_version.dev}"
 is_development = _version.is_devrelease
-is_release = not(_version.is_prerelease or _version.is_devrelease)
+is_release = not (_version.is_prerelease or _version.is_devrelease)
 
 project = "sunkit_image"
 author = "The SunPy Community"
@@ -105,7 +105,7 @@ intersphinx_mapping = {
     ),
     "matplotlib": ("https://matplotlib.org/stable", None),
     "sunpy": ("https://docs.sunpy.org/en/stable/", None),
-    "ndcube": ('https://docs.sunpy.org/projects/ndcube/en/stable/', None),
+    "ndcube": ("https://docs.sunpy.org/projects/ndcube/en/stable/", None),
     "astropy": ("https://docs.astropy.org/en/stable/", None),
     "dask": ("https://docs.dask.org/en/latest", None),
     "skimage": ("https://scikit-image.org/docs/stable/", None),
