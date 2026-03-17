@@ -31,13 +31,4 @@ Code of Conduct
 
 When you are interacting with the SunPy community you are asked to follow our `code of conduct <https://sunpy.org/coc>`__.
 
-License
--------
-
-This project is Copyright (c) The SunPy Community and licensed under
-the terms of the BSD 2-Clause license. This package is based upon
-the `Openastronomy packaging guide <https://github.com/OpenAstronomy/packaging-guide>`__
-which is licensed under the BSD 3-clause licence. See the licenses folder for
-more information.
-
 .. _sunkit-image Documentation: https://docs.sunpy.org/projects/sunkit-image/en/stable/
