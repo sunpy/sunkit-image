@@ -202,7 +202,7 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
         else:
             cov = (X @ np.transpose(X)) / (X.shape[1] - 1)
             d = np.flip(np.linalg.eig(cov)[0], axis=0)
-            sig2 = d[0]
+            sig2 = d.real[0]
 
         for _ in range(1, iterations):
             # weak texture selection
@@ -217,7 +217,7 @@ def noiselevel(img, patchsize, decim, confidence, iterations):
 
             cov = (X @ np.transpose(X)) / (X.shape[1] - 1)
             d = np.flip(np.linalg.eig(cov)[0], axis=0)
-            sig2 = d[0]
+            sig2 = d.real[0]
 
         nlevel[cha] = np.sqrt(sig2)
         thresh[cha] = tau
