@@ -1,8 +1,17 @@
 repos:
+<<<<<<<
+=======
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.23.1
+    hooks:
+      - id: zizmor
+    # This should be before any formatting hooks like isort
+>>>>>>>
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "v0.15.4"
     hooks:
       - id: ruff
+<<<<<<<
         args: ["--fix", "--unsafe-fixes"]
   - repo: https://github.com/PyCQA/isort
     rev: 8.0.1
@@ -30,6 +39,54 @@ repos:
     hooks:
       - id: codespell
         args: [ "--write-changes" ]
+=======
+        args: ["--fix"]
+        types: [python]
+        # Define here once and then reference using YAML anchor
+        exclude: &exclude_dirs ^sunkit_image/(data|extern)/
+  - repo: https://github.com/PyCQA/isort
+    rev: 8.0.1
+    hooks:
+      - id: isort
+        types: [python]
+        exclude: *exclude_dirs
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-ast
+        types: [python]
+        exclude: *exclude_dirs
+      - id: check-case-conflict
+        types: [python]
+        exclude: *exclude_dirs
+      - id: trailing-whitespace
+        types_or: [python, rst]
+      - id: check-yaml
+        types: [yaml]
+        exclude: *exclude_dirs
+      - id: check-toml
+        types: [toml]
+        exclude: *exclude_dirs
+      - id: debug-statements
+        types: [python]
+        exclude: *exclude_dirs
+      - id: check-added-large-files
+        args: ["--enforce-all", "--maxkb=1054"]
+      - id: end-of-file-fixer
+        types_or: [python, rst]
+      - id: mixed-line-ending
+        types_or: [python, rst]
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: [ "--write-changes" ]
+        types_or: [python, rst]
+        exclude: *exclude_dirs
+ci:
+  autofix_prs: false
+  autoupdate_schedule: "quarterly"
+>>>>>>>
   - repo: https://github.com/adhtruong/mirrors-typos
     rev: v1.38.1
     hooks:
