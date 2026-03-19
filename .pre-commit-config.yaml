@@ -40,6 +40,7 @@ repos:
         exclude: *exclude_dirs
       - id: check-added-large-files
         args: ["--enforce-all", "--maxkb=1054"]
+        exclude: "sunkit_image/data/test/asda_vxvy.fits"
       - id: end-of-file-fixer
         types_or: [python, rst]
       - id: mixed-line-ending
