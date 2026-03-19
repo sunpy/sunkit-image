@@ -16,7 +16,7 @@
 Currently it is an experimental library for solar physics specific image processing routines.
 Ideally it will only contain routines that have been published in the literature.
 
-See `sunkit-image Documentation`_ for instructions on how to install and contribute.
+See `sunkit-image Documentation <https://docs.sunpy.org/projects/sunkit-image/en/stable/>`__ for instructions on how to install and contribute.
 
 Usage of Generative AI
 ----------------------
@@ -44,4 +44,3 @@ For more information on contributing to SunPy, please read our `Newcomers' guide
 .. _Newcomers' guide: https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html
 
 When you are interacting with the SunPy community you are asked at to follow our `code of conduct <https://sunpy.org/coc>`__.
-.. _sunkit-image Documentation: https://docs.sunpy.org/projects/sunkit-image/en/stable/

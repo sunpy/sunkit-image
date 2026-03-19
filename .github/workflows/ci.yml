@@ -88,7 +88,7 @@ jobs:
   online:
     if: "!startsWith(github.event.ref, 'refs/tags/v')"
     needs: [test]
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v2
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v2  # zizmor: ignore[unpinned-uses]
     with:
       default_python: '3.13'
       submodules: false
@@ -104,11 +104,12 @@ jobs:
     needs: [online]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6  # zizmor: ignore[unpinned-uses]
         with:
           fetch-depth: 0
           lfs: true
-      - uses: conda-incubator/setup-miniconda@v3
+          persist-credentials: false
+      - uses: conda-incubator/setup-miniconda@v3  # zizmor: ignore[unpinned-uses]
         with:
           installer-url: https://github.com/conda-forge/miniforge/releases/download/25.3.1-0/Miniforge3-25.3.1-0-Linux-x86_64.sh
           python-version: "3.13"
@@ -119,9 +120,9 @@ jobs:
         run: |
           conda list
           tox -e py313
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v5  # zizmor: ignore[unpinned-uses]
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}  # zizmor: ignore[secrets-outside-env]
           files: ./coverage.xml
 
   build_dists:
