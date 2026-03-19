@@ -1,3 +1,21 @@
+v0.7.0 (2026-03-19)
+===================
+
+Breaking Changes
+----------------
+
+- Increased the minimum required versions:
+
+  - Python 3.12 (from 3.10)
+  - Matplotlib 3.8.0 (from 3.5.0)
+  - sunpy 7.0.0 (from 6.0.0)
+  - NumPy 1.26.0 (from 1.23.5)
+  - Astropy 6.1.0 (from 5.3.0)
+  - SciPy 1.12.0 (from 1.10.1) (`#290 <https://github.com/sunpy/sunkit-image/pull/290>`__)
+- The previous coalignment API has been deleted and replaced with a new set of imports and functions.
+  Please see this example: :ref:`sphx_glr_generated_gallery_aligning_aia_with_eis_maps.py`. (`#293 <https://github.com/sunpy/sunkit-image/pull/293>`__)
+
+
 0.6.1 (2025-02-20)
 ==================
 
