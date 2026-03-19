@@ -140,10 +140,6 @@ jobs:
       test_extras: 'tests'
       test_command: 'pytest -p no:warnings --doctest-rst -m "not mpl_image_compare" --pyargs sunkit_image'
       submodules: false
-<<<<<<<
-    secrets:
-      pypi_token: ${{ secrets.pypi_token }}
-=======
       save_artifacts: true
       upload_to_pypi: false
 
@@ -168,6 +164,3 @@ jobs:
 
       - name: Run upload
         uses: pypa/gh-action-pypi-publish@v1.13.0  # zizmor: ignore[unpinned-uses]
-
-
->>>>>>>
