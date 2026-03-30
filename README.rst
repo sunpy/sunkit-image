@@ -1,5 +1,10 @@
 ``sunkit-image``
 ================
+<<<<<<<
+=======
+
+An image processing toolbox for Solar Physics.
+>>>>>>>
 
 |Latest Version| |codecov| |Powered by NumFOCUS| |Powered by Sunpy|
 
