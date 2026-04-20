@@ -5,7 +5,7 @@ repos:
       - id: zizmor
     # This should be before any formatting hooks like isort
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.15.4"
+    rev: "v0.15.8"
     hooks:
       - id: ruff
         args: ["--fix"]
@@ -45,6 +45,14 @@ repos:
         types_or: [python, rst]
       - id: mixed-line-ending
         types_or: [python, rst]
+<<<<<<<
+=======
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.2
+    hooks:
+      - id: codespell
+        args: [ "--write-changes" ]
+>>>>>>>
   - repo: https://github.com/adhtruong/mirrors-typos
     rev: v1.45.0
     hooks:
