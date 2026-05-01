@@ -120,7 +120,7 @@ jobs:
         run: |
           conda list
           tox -e py313
-      - uses: codecov/codecov-action@v5  # zizmor: ignore[unpinned-uses]
+      - uses: codecov/codecov-action@v6  # zizmor: ignore[unpinned-uses]
         with:
           token: ${{ secrets.CODECOV_TOKEN }}  # zizmor: ignore[secrets-outside-env]
           files: ./coverage.xml
