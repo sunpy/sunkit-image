@@ -109,7 +109,7 @@ jobs:
           fetch-depth: 0
           lfs: true
           persist-credentials: false
-      - uses: conda-incubator/setup-miniconda@v3  # zizmor: ignore[unpinned-uses]
+      - uses: conda-incubator/setup-miniconda@v4  # zizmor: ignore[unpinned-uses]
         with:
           installer-url: https://github.com/conda-forge/miniforge/releases/download/25.3.1-0/Miniforge3-25.3.1-0-Linux-x86_64.sh
           python-version: "3.13"
