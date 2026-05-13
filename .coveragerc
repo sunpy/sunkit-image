@@ -4,7 +4,12 @@ omit =
   sunkit_image/*setup_package*
   sunkit_image/extern/*
   sunkit_image/version*
+<<<<<<<
   sunkit_image/cython_version
+=======
+  sunkit_image/_dev/*
+  */sunkit_image/_dev/*
+>>>>>>>
   */sunkit_image/conftest.py
   */sunkit_image/*setup_package*
   */sunkit_image/extern/*
