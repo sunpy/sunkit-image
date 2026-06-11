@@ -90,7 +90,11 @@ def stara(
     c_pix = int((circle_radius / smap.scale[0]).to_value(u.pix))
     circle = disk(c_pix / 2)
 
-    finite = white_tophat(med, circle, mode='reflect')
+    try:
+        finite = white_tophat(med, circle, mode='reflect')
+    except TypeError:
+        finite = white_tophat(med, circle) # remove when scikit-image>0.20
+
     finite[np.isnan(finite)] = 0
 
     return finite > threshold
