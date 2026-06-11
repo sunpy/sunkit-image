@@ -1,7 +1,12 @@
 import numpy as np
 import skimage
 from skimage.filters import median
-from skimage.morphology import disk, white_tophat
+try:
+    from skimage.morphology.gray import white_tophat
+    from skimage.morphology import disk
+except ImportError:
+    from skimage.morphology import disk, white_tophat  # remove once scikit-image>0.20
+
 from skimage.util import invert
 
 import astropy.units as u
