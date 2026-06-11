@@ -1,12 +1,12 @@
 import numpy as np
 import skimage
 from skimage.filters import median
+from skimage.morphology import disk
 
 try:
-    from skimage.morphology import disk
     from skimage.morphology.gray import white_tophat
 except ImportError:
-    from skimage.morphology import disk  # remove once scikit-image>0.20
+    from skimage.morphology import white_tophat # remove once scikit-image>0.20
 
 from skimage.util import invert
 
