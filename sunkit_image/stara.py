@@ -6,7 +6,7 @@ try:
     from skimage.morphology import disk
     from skimage.morphology.gray import white_tophat
 except ImportError:
-    from skimage.morphology import disk, white_tophat  # remove once scikit-image>0.20
+    from skimage.morphology import disk  # remove once scikit-image>0.20
 
 from skimage.util import invert
 
@@ -90,7 +90,7 @@ def stara(
     c_pix = int((circle_radius / smap.scale[0]).to_value(u.pix))
     circle = disk(c_pix / 2)
 
-    finite = white_tophat(med, circle)
+    finite = white_tophat(med, circle, mode='reflect')
     finite[np.isnan(finite)] = 0
 
     return finite > threshold
