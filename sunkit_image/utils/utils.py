@@ -439,9 +439,9 @@ def blackout_pixels_above_radius(smap, radius_limit=1.5 * u.R_sun, fill=np.nan, 
     map_r : `astropy.units.Quantity`, optional
         Pre-computed pixel radii (output of `find_pixel_radii`) for ``smap``.
         When supplied, skips an internal `find_pixel_radii` call -- useful
-        for callers that already hold ``map_r`` (e.g. `rhef`), saving a
-        redundant WCS pass.  Must have the same shape as ``smap.data`` and
-        be in units convertible to solar radii.
+        for callers that already hold ``map_r`` (e.g. `~sunkit_image.radial.rhef`),
+        saving a redundant WCS pass.  Must have the same shape as ``smap.data``
+        and be in units convertible to solar radii.
 
     Returns
     -------
