@@ -729,7 +729,9 @@ def rhef(
     new_map = sunpy.map.Map(data, smap.meta)
 
     if vignette is not None:
-        new_map = blackout_pixels_above_radius(new_map, vignette.to(u.R_sun))
+        # Reuse the ``map_r`` find_radial_bin_edges already computed instead
+        # of paying for a second WCS pass inside blackout_pixels_above_radius.
+        new_map = blackout_pixels_above_radius(new_map, vignette.to(u.R_sun), map_r=map_r)
 
     # Adjust plot settings to remove extra normalization
     # This must be done whenever one is adjusting
