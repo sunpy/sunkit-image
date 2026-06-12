@@ -715,16 +715,50 @@ def rhef(
     # Select the ranking method
     ranking_func = _select_rank_method(method)
 
-    # Loop over each radial bin to apply the filter
-    for i in tqdm(range(radial_bin_edges.shape[1]), desc="RHEF: ", disable=not progress):
-        # Identify pixels within the current radial bin
-        here = np.logical_and(map_r >= radial_bin_edges[0, i].to(u.R_sun), map_r < radial_bin_edges[1, i].to(u.R_sun))
-        if application_radius is not None and application_radius > 0:
-            here = np.logical_and(here, map_r >= application_radius)
-        # Apply ranking function
-        data[here] = ranking_func(smap.data[here])
-        if upsilon is not None:
-            data[here] = apply_upsilon(data[here], upsilon)
+    nbins = radial_bin_edges.shape[1]
+
+    # Sort-and-group inner loop: digitise pixels into bins once via
+    # ``searchsorted``, group same-bin pixels with a single stable
+    # ``argsort``, then rank each bin's contiguous slice.  Equivalent
+    # output to a per-bin boolean-mask loop, but the bucketing is
+    # O(N log nbins) instead of O(N * nbins).
+    edges_lo = radial_bin_edges[0].to_value(u.R_sun)
+    edges_hi = radial_bin_edges[1].to_value(u.R_sun)
+    flat_r = map_r.to_value(u.R_sun).ravel()
+    flat_in = smap.data.ravel()
+    flat_out = data.reshape(-1)
+
+    # Largest i with edges_lo[i] <= r.  For sorted, non-overlapping bins
+    # this is the unique containing bin; on overlapping bins it selects
+    # the last (largest-index) match -- the same pixel the per-bin
+    # ``data[here] = ...`` loop would write last.
+    flat_b = np.searchsorted(edges_lo, flat_r, side="right") - 1
+    in_bin = (flat_b >= 0) & (flat_b < nbins)
+    # ``flat_b`` may be -1 outside any bin; clip before gathering edges_hi.
+    in_bin &= flat_r < edges_hi[np.clip(flat_b, 0, nbins - 1)]
+    if application_radius is not None and application_radius > 0:
+        in_bin &= flat_r >= application_radius.to_value(u.R_sun)
+
+    valid_idx = np.flatnonzero(in_bin)
+    if valid_idx.size:
+        order = np.argsort(flat_b[valid_idx], kind="stable")
+        sorted_idx = valid_idx[order]
+        sorted_bins = flat_b[sorted_idx]
+        bin_indices = np.arange(nbins)
+        bin_starts = np.searchsorted(sorted_bins, bin_indices, side="left")
+        bin_ends = np.searchsorted(sorted_bins, bin_indices, side="right")
+
+        for i in tqdm(range(nbins), desc="RHEF: ", disable=not progress):
+            s, e = bin_starts[i], bin_ends[i]
+            if e <= s:
+                continue
+            # Fancy-index gather is a copy, so an in-place ``ranking_func``
+            # cannot corrupt the source array -- same guarantee the old
+            # ``smap.data[here]`` indexing provided.
+            ranked = ranking_func(flat_in[sorted_idx[s:e]])
+            if upsilon is not None:
+                ranked = apply_upsilon(ranked, upsilon)
+            flat_out[sorted_idx[s:e]] = ranked
 
     new_map = sunpy.map.Map(data, smap.meta)
 
