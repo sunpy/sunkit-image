@@ -218,24 +218,28 @@ def _hpc_map(side=64, *, cdelt=50.0, crval=(0.0, 0.0), rotation=None):
 @pytest.mark.filterwarnings("ignore:Missing metadata for observer")
 @pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
 @pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
-def test_find_pixel_radii_fast_matches_slow():
-    """Fast path on a non-rotated HPC map must match the SkyCoord-based slow
-    path to better than the documented tolerance."""
-    smap = _hpc_map(side=64)
-    fast = utils.find_pixel_radii(smap).to(u.R_sun).value
-    # Force the slow path: a tiny non-trivial rotation triggers the
-    # identity check to fail and the SkyCoord path to run.
-    rotated = _hpc_map(side=64, rotation=((0.99, 0.01), (-0.01, 0.99)))
-    slow = utils.find_pixel_radii(rotated).to(u.R_sun).value
-    # Equivalent fixtures up to a sub-degree rotation; check shape only here.
-    assert fast.shape == slow.shape == (64, 64)
-    # Stronger equivalence: same fixture, force slow path by mocking the
-    # gate.  The values must be identical to within the floating-point
-    # noise of the SkyCoord round-trip (the fast path mimics it).
+def test_find_pixel_radii_defaults_to_exact_path():
+    """``find_pixel_radii`` must NOT use the approximate fast path unless the
+    caller explicitly opts in with ``fast=True`` -- even for a simple HPC map
+    that would otherwise be eligible."""
+    smap = _hpc_map(side=32)
+    with patch("sunkit_image.utils.utils._find_pixel_radii_fast") as fast_mock:
+        utils.find_pixel_radii(smap)
+    fast_mock.assert_not_called()
 
-    with patch("sunkit_image.utils.utils._is_simple_hpc", return_value=False):
-        slow_same = utils.find_pixel_radii(smap).to(u.R_sun).value
-    np.testing.assert_allclose(fast, slow_same, atol=2e-4)
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_find_pixel_radii_fast_matches_slow():
+    """With ``fast=True`` on a non-rotated HPC map the output must match the
+    exact SkyCoord-based path to better than the documented tolerance."""
+    smap = _hpc_map(side=64)
+    fast = utils.find_pixel_radii(smap, fast=True).to(u.R_sun).value
+    # The exact path is what ``fast=False`` (the default) runs on the same map.
+    slow = utils.find_pixel_radii(smap).to(u.R_sun).value
+    assert fast.shape == slow.shape == (64, 64)
+    np.testing.assert_allclose(fast, slow, atol=2e-4)
 
 
 @pytest.mark.filterwarnings("ignore:Missing metadata for observer")
@@ -245,9 +249,8 @@ def test_find_pixel_radii_fast_off_center_sun():
     """``CRVAL != 0`` (off-center Sun) is still handled by the fast path."""
 
     smap = _hpc_map(side=64, crval=(200.0, -150.0))
-    fast = utils.find_pixel_radii(smap).to(u.R_sun).value
-    with patch("sunkit_image.utils.utils._is_simple_hpc", return_value=False):
-        slow = utils.find_pixel_radii(smap).to(u.R_sun).value
+    fast = utils.find_pixel_radii(smap, fast=True).to(u.R_sun).value
+    slow = utils.find_pixel_radii(smap).to(u.R_sun).value
     np.testing.assert_allclose(fast, slow, atol=2e-4)
 
 
@@ -260,7 +263,7 @@ def test_find_pixel_radii_rotation_falls_through_to_slow_path():
 
     rotated = _hpc_map(side=32, rotation=((0.9, 0.1), (-0.1, 0.9)))
     with patch("sunkit_image.utils.utils._find_pixel_radii_fast") as fast_mock:
-        utils.find_pixel_radii(rotated)
+        utils.find_pixel_radii(rotated, fast=True)
     fast_mock.assert_not_called()
 
 
@@ -271,8 +274,8 @@ def test_find_pixel_radii_fast_honors_scale_kwarg():
     """The ``scale`` argument must rescale the fast-path output the same way
     the slow path does."""
     smap = _hpc_map(side=32)
-    default = utils.find_pixel_radii(smap).to(u.R_sun).value
-    scaled = utils.find_pixel_radii(smap, scale=2 * smap.rsun_obs).to(u.R_sun).value
+    default = utils.find_pixel_radii(smap, fast=True).to(u.R_sun).value
+    scaled = utils.find_pixel_radii(smap, scale=2 * smap.rsun_obs, fast=True).to(u.R_sun).value
     np.testing.assert_allclose(scaled, default / 2.0, rtol=1e-10)
 
 

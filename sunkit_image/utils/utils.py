@@ -139,7 +139,7 @@ def _find_pixel_radii_fast(smap, scale):
     return u.R_sun * (r_arcsec / s)
 
 
-def find_pixel_radii(smap, scale=None):
+def find_pixel_radii(smap, scale=None, *, fast=False):
     """
     Find the distance of every pixel in a map from the center of the Sun. The
     answer is returned in units of solar radii.
@@ -152,6 +152,11 @@ def find_pixel_radii(smap, scale=None):
         The radius of the Sun expressed in map units. For example, in typical
         helioprojective Cartesian maps the solar radius is expressed in units
         of arcseconds. If None then the map is queried for the scale.
+    fast : `bool`, optional
+        If `True`, use an analytic fast path for non-rotated
+        helioprojective-Cartesian maps that bypasses ``smap.wcs.pixel_to_world``'s
+        SkyCoord round-trip (see Notes). Defaults to `False`, which always uses
+        the exact WCS-based calculation.
 
     Returns
     -------
@@ -162,16 +167,19 @@ def find_pixel_radii(smap, scale=None):
 
     Notes
     -----
-    For non-rotated helioprojective-Cartesian maps an analytic fast path is
-    used that bypasses ``smap.wcs.pixel_to_world``'s SkyCoord round-trip.
-    The fast-path output matches the SkyCoord path to better than
-    ``2e-4 R_sun`` on a 4096^2 map at 2"/px (and floating-point precision on
-    typical AIA-scale maps).  Rotated maps and non-HPC frames fall through
-    to the SkyCoord path unchanged.
+    With ``fast=True`` and a non-rotated helioprojective-Cartesian map, an
+    analytic approximation is used in place of the exact ``smap.wcs.pixel_to_world``
+    SkyCoord round-trip. This is an *approximation*: it assumes the reference
+    coordinate lies close to Sun center and uses a tangent-plane treatment of the
+    sky offsets, so its accuracy degrades away from disk center and it should not
+    be relied on for high-accuracy off-disk work. On a 4096^2 map at 2"/px it
+    matches the exact path to better than ``2e-4 R_sun`` near disk center (and to
+    floating-point precision on typical AIA-scale maps). Rotated maps and non-HPC
+    frames always fall through to the exact path, even when ``fast=True``.
     """
-    if _is_simple_hpc(smap):
+    if fast and _is_simple_hpc(smap):
         return _find_pixel_radii_fast(smap, scale)
-    # Slow path: full SkyCoord round-trip via the map's WCS.  Handles
+    # Exact path: full SkyCoord round-trip via the map's WCS.  Handles
     # rotation, non-HPC frames, and arbitrary projections.
     coords = all_coordinates_from_map(smap)
     radii = np.sqrt(coords.Tx**2 + coords.Ty**2)
