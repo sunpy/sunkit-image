@@ -699,6 +699,15 @@ def rhef(
     `sunpy.map.Map`
         A SunPy map with the Radial Histogram Equalizing Filter applied to it.
 
+    Notes
+    -----
+    The radial bins produced by `~sunkit_image.utils.find_radial_bin_edges` are
+    sorted and contiguous (each bin's upper edge equals the next bin's lower
+    edge).  When bins overlap, each pixel is assigned to the highest-index bin
+    whose lower edge it lies above; if it also lies below that bin's upper edge
+    it is ranked there, otherwise it is left at ``fill``.  Pixels that fall in
+    no bin likewise keep ``fill``.
+
     References
     ----------
     * Gilly & Cranmer 2024, in prep.
@@ -719,22 +728,24 @@ def rhef(
 
     # Sort-and-group inner loop: digitise pixels into bins once via
     # ``searchsorted``, group same-bin pixels with a single stable
-    # ``argsort``, then rank each bin's contiguous slice.  Equivalent
-    # output to a per-bin boolean-mask loop, but the bucketing is
-    # O(N log nbins) instead of O(N * nbins).
+    # ``argsort``, then rank each bin's contiguous slice.  Bucketing is
+    # O(N log nbins) rather than O(N * nbins), so the per-frame cost no
+    # longer scales with the number of bins.
     edges_lo = radial_bin_edges[0].to_value(u.R_sun)
     edges_hi = radial_bin_edges[1].to_value(u.R_sun)
     flat_r = map_r.to_value(u.R_sun).ravel()
     flat_in = smap.data.ravel()
     flat_out = data.reshape(-1)
 
-    # Largest i with edges_lo[i] <= r.  For sorted, non-overlapping bins
-    # this is the unique containing bin; on overlapping bins it selects
-    # the last (largest-index) match -- the same pixel the per-bin
-    # ``data[here] = ...`` loop would write last.
+    # Largest i with edges_lo[i] <= r.  For sorted, non-overlapping bins this
+    # is the unique containing bin; on overlapping bins it selects the last
+    # (largest-index) match, per the overlap rule documented in the Notes above.
     flat_b = np.searchsorted(edges_lo, flat_r, side="right") - 1
     in_bin = (flat_b >= 0) & (flat_b < nbins)
-    # ``flat_b`` may be -1 outside any bin; clip before gathering edges_hi.
+    # ``flat_b`` is -1 for pixels below the smallest edge.  Clipping those to
+    # bin 0 just to read an ``edges_hi`` value is harmless: ``in_bin`` is
+    # already ``False`` for them (the ``flat_b >= 0`` test failed), so the
+    # clipped comparison can never flip a genuinely out-of-range pixel back in.
     in_bin &= flat_r < edges_hi[np.clip(flat_b, 0, nbins - 1)]
     if application_radius is not None and application_radius > 0:
         in_bin &= flat_r >= application_radius.to_value(u.R_sun)
@@ -752,9 +763,9 @@ def rhef(
             s, e = bin_starts[i], bin_ends[i]
             if e <= s:
                 continue
-            # Fancy-index gather is a copy, so an in-place ``ranking_func``
-            # cannot corrupt the source array -- same guarantee the old
-            # ``smap.data[here]`` indexing provided.
+            # Fancy-index gather returns a copy, so an in-place ``ranking_func``
+            # (e.g. ``method="inplace"``) operates on that copy and cannot
+            # corrupt the shared source array.
             ranked = ranking_func(flat_in[sorted_idx[s:e]])
             if upsilon is not None:
                 ranked = apply_upsilon(ranked, upsilon)

@@ -368,6 +368,18 @@ def _rhef_reference_loop(smap, radial_bin_edges, *, application_radius, method, 
     Pixels that land in no bin (e.g. the extreme corner where ``map_r``
     exactly equals the upper edge under ``< hi`` semantics) keep ``fill``,
     matching the way ``rhef`` initialises its output.
+
+    Why an inlined oracle?  This PR replaces ``rhef``'s original per-bin
+    boolean-mask loop with a sort-and-group kernel.  The two are intended to be
+    bit-identical, so the most direct way to prove that — and to keep proving it
+    against future refactors — is to keep a faithful copy of the original loop
+    here and assert equivalence across every ranking method plus the edge cases
+    that follow (empty bins, ``fill`` propagation, ``application_radius``,
+    overlapping bins, the ``upsilon`` correction).  It is inlined rather than
+    imported from the module so the oracle cannot silently drift to track the
+    very code it is meant to check.  The real-data figure test ``test_fig_rhef``
+    is the complementary backstop: any numerically significant change to the
+    kernel would alter the rendered AIA 171 image and fail its hash comparison.
     """
     radial_bin_edges, map_r = utils.find_radial_bin_edges(smap, radial_bin_edges)
     map_r = map_r.to(u.R_sun)
@@ -484,7 +496,8 @@ def test_rhef_matches_reference_with_upsilon():
     out = rad.rhef(smap, radial_bin_edges=edges, upsilon=0.35, method="scipy", vignette=10 * u.R_sun).data
     ref = _rhef_reference_loop(smap, edges, application_radius=0 * u.R_sun, method="scipy", upsilon=0.35)
     finite = np.isfinite(out) & np.isfinite(ref)
-    assert np.allclose(out[finite], ref[finite], rtol=0, atol=0)
+    # Exact, like the other equivalence tests (the finite mask already removed NaNs).
+    assert np.array_equal(out[finite], ref[finite])
 
 
 def test_rhef_empty_bins_left_at_zero():
