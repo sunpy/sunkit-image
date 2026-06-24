@@ -710,10 +710,13 @@ def rhef(
 
     References
     ----------
-    * Gilly & Cranmer 2024, in prep.
+    * Gilly, C. R., & Cranmer, S. R. 2025,
+      "Visualization of High Dynamic Range Solar Imagery and the Radial Histogram Equalizing Filter",
+      Solar Physics, 300, 174.
+      https://doi.org/10.1007/s11207-025-02578-x
 
-    * The implementation is highly inspired by this doctoral thesis:
-      Gilly, G. Spectroscopic Analysis and Image Processing of the Optically-Thin Solar Corona
+    * The implementation is also described in the first author's doctoral thesis:
+      Gilly, C. R. "Spectroscopic Analysis and Image Processing of the Optically-Thin Solar Corona"
       https://www.proquest.com/docview/2759080511
     """
 
