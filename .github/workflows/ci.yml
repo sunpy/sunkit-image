@@ -84,6 +84,14 @@ jobs:
           - graphviz
       envs: |
         - linux: build_docs
+  online:
+    needs: [core]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@8c8bb6c6c962542921f993d47d26df38dccd50b1  # v3.0.2
+    with:
+      submodules: false
+      toxdeps: tox-pypi-filter
+      envs: |
+  
 
   online:
     if: "!startsWith(github.event.ref, 'refs/tags/v')"
