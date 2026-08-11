@@ -1,13 +1,13 @@
 repos:
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.25.2
+    rev: v1.28.0
     hooks:
       - id: zizmor
     # This should be before any formatting hooks like isort
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.15.15"
+    rev: "v0.16.1"
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: ["--fix"]
         types: [python]
         # Define here once and then reference using YAML anchor
@@ -45,10 +45,11 @@ repos:
         types_or: [python, rst]
       - id: mixed-line-ending
         types_or: [python, rst]
-  - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.45.0
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
     hooks:
-      - id: typos
+      - id: codespell
+        args: [ "--write-changes" ]
         types_or: [python, rst]
         exclude: *exclude_dirs
   - repo: https://github.com/pre-commit/mirrors-mypy
