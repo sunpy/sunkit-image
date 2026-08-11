@@ -45,18 +45,11 @@ repos:
         types_or: [python, rst]
       - id: mixed-line-ending
         types_or: [python, rst]
-<<<<<<<
-=======
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
       - id: codespell
         args: [ "--write-changes" ]
->>>>>>>
-  - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.45.0
-    hooks:
-      - id: typos
         types_or: [python, rst]
         exclude: *exclude_dirs
   - repo: https://github.com/pre-commit/mirrors-mypy
