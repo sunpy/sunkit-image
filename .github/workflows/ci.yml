@@ -93,11 +93,8 @@ jobs:
     with:
       submodules: false
       toxdeps: tox-pypi-filter
-<<<<<<<
-      posargs: -n 1
-=======
       coverage: codecov-oidc
->>>>>>>
+      posargs: -n 1
       envs: |
         - linux: py313-online
     secrets:
