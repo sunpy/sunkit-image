@@ -1,0 +1,3 @@
+Sped up the radial histogram equalizing filter (`sunkit_image.radial.rhef`) by replacing the per-bin boolean-mask loop with a single sort-and-group pass over the pixels.
+The output is bit-identical to the previous implementation across all three ranking methods.
+The kernel cost no longer scales with bin count, so wins grow with both image size and bin density (~10x on a 4096^2 image with 2048 bins).

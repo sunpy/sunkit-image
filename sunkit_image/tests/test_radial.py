@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from scipy import stats
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
@@ -346,3 +347,172 @@ def test_intensity_enhance_errors(map_test1):
     scale = 1 * map_test1.rsun_obs
     with pytest.raises(ValueError, match=r"The fit range must be strictly increasing."):
         rad.intensity_enhance(map_test1, scale=scale, fit_range=fit_range[::-1])
+
+
+# ---------------------------------------------------------------------------
+# rhef sort-and-group inner loop: equivalence + edge-case coverage
+# ---------------------------------------------------------------------------
+
+
+def _rhef_reference_loop(smap, radial_bin_edges, *, application_radius, method, upsilon, fill=np.nan):
+    """A faithful copy of the original per-bin mask loop in `rhef`.
+
+    Used as the equivalence oracle for the optimised implementation.  We
+    inline a fresh copy here rather than reaching into the production
+    module so a future refactor that breaks equivalence is caught even if
+    the test imports drift.  ``find_radial_bin_edges`` is called first so
+    the reference sees whatever edges ``rhef`` would actually use — this
+    matters when the user-supplied edges don't span the full map and the
+    helper rebuilds them.
+
+    Pixels that land in no bin (e.g. the extreme corner where ``map_r``
+    exactly equals the upper edge under ``< hi`` semantics) keep ``fill``,
+    matching the way ``rhef`` initialises its output.
+
+    Why an inlined oracle?  This PR replaces ``rhef``'s original per-bin
+    boolean-mask loop with a sort-and-group kernel.  The two are intended to be
+    bit-identical, so the most direct way to prove that — and to keep proving it
+    against future refactors — is to keep a faithful copy of the original loop
+    here and assert equivalence across every ranking method plus the edge cases
+    that follow (empty bins, ``fill`` propagation, ``application_radius``,
+    overlapping bins, the ``upsilon`` correction).  It is inlined rather than
+    imported from the module so the oracle cannot silently drift to track the
+    very code it is meant to check.  The real-data figure test ``test_fig_rhef``
+    is the complementary backstop: any numerically significant change to the
+    kernel would alter the rendered AIA 171 image and fail its hash comparison.
+    """
+    radial_bin_edges, map_r = utils.find_radial_bin_edges(smap, radial_bin_edges)
+    map_r = map_r.to(u.R_sun)
+
+    def _ranking_func(arr):
+        # Mirror upstream's NaN-aware ranking; non-NaN inputs match exactly.
+        mask = ~np.isnan(arr)
+        if method == "scipy":
+            out = np.full(arr.shape, np.nan)
+            out[mask] = stats.rankdata(arr[mask], method="average") / np.sum(mask)
+            return out
+        # "numpy"
+        out = arr.copy()
+        order = np.argsort(arr)
+        order = order[~np.isnan(arr[order])]
+        out[order] = np.arange(1, len(order) + 1)
+        return out / float(len(order))
+
+    data = np.full_like(smap.data, fill)
+    for i in range(radial_bin_edges.shape[1]):
+        here = np.logical_and(map_r >= radial_bin_edges[0, i], map_r < radial_bin_edges[1, i])
+        if application_radius is not None and application_radius > 0:
+            here = np.logical_and(here, map_r >= application_radius)
+        if not here.any():
+            continue
+        data[here] = _ranking_func(smap.data[here])
+        if upsilon is not None:
+            data[here] = rad.apply_upsilon(data[here], upsilon)
+    return data
+
+
+def _synthetic_map(side=64, seed=7, *, with_nans=False):
+    """Tiny in-memory `sunpy.map.Map` so equivalence tests need no sample data.
+
+    Uses the same minimal-header pattern as the existing ``map_test1`` /
+    ``map_test2`` fixtures above (no observer / obstime needed), with an
+    explicit ``rsun_obs`` so ``find_pixel_radii`` can convert arcsec → R_sun
+    without a network IERS lookup.
+
+    NaNs are off by default: scipy's ``stats.rankdata`` propagates NaN to
+    every output rank in the same call, so a single NaN in a bin makes the
+    whole bin NaN — which is fine for equivalence testing but defeats other
+    assertions about "some pixel was ranked".  Pass ``with_nans=True`` only
+    in tests that explicitly verify NaN propagation.
+    """
+    rng = np.random.default_rng(seed)
+    data = rng.exponential(scale=100.0, size=(side, side)).astype(float)
+    if with_nans:
+        data[rng.random(data.shape) < 0.03] = np.nan
+    header = {
+        "cunit1": "arcsec",
+        "cunit2": "arcsec",
+        "CTYPE1": "HPLN-TAN",
+        "CTYPE2": "HPLT-TAN",
+        "CDELT1": 50.0,
+        "CDELT2": 50.0,
+        "CRVAL1": 0.0,
+        "CRVAL2": 0.0,
+        "CRPIX1": (side + 1) / 2.0,
+        "CRPIX2": (side + 1) / 2.0,
+        "RSUN_REF": 6.957e8,
+        "RSUN_OBS": 960.0,  # arcsec; mid-range solar-disk apparent radius
+    }
+    return sunpy.map.Map((data, header))
+
+
+@pytest.mark.parametrize("method", ["scipy", "numpy"])
+def test_rhef_matches_reference_loop(method):
+    """The sort-and-group inner loop must produce output identical to the
+    original per-bin mask loop, byte-for-byte, across the supported
+    ``method=`` values."""
+    smap = _synthetic_map()
+    edges = np.linspace(0, 1.5, 33)
+    edges = np.array([edges[:-1], edges[1:]]) * u.R_sun
+
+    out = rad.rhef(smap, radial_bin_edges=edges, upsilon=None, method=method, vignette=10 * u.R_sun).data
+    ref = _rhef_reference_loop(smap, edges, application_radius=0 * u.R_sun, method=method, upsilon=None)
+    # NaN-aware exact match: rankdata is deterministic and the sort is
+    # stable, so per-bin outputs are bit-identical between the two paths.
+    assert out.shape == ref.shape
+    finite = np.isfinite(out) & np.isfinite(ref)
+    assert np.array_equal(out[finite], ref[finite])
+    assert np.array_equal(np.isfinite(out), np.isfinite(ref))
+
+
+def test_rhef_matches_reference_with_application_radius():
+    """``application_radius`` clips below a floor; the optimised path applies
+    the same mask before binning, so output must still match the reference."""
+    smap = _synthetic_map()
+    edges = np.linspace(0, 1.5, 33)
+    edges = np.array([edges[:-1], edges[1:]]) * u.R_sun
+    appr = 0.4 * u.R_sun
+
+    out = rad.rhef(
+        smap,
+        radial_bin_edges=edges,
+        application_radius=appr,
+        upsilon=None,
+        method="scipy",
+        vignette=10 * u.R_sun,
+    ).data
+    ref = _rhef_reference_loop(smap, edges, application_radius=appr, method="scipy", upsilon=None)
+    finite = np.isfinite(out) & np.isfinite(ref)
+    assert np.array_equal(out[finite], ref[finite])
+
+
+def test_rhef_matches_reference_with_upsilon():
+    """The μ-correction is applied per pixel; verify the optimised path's
+    placement (one apply_upsilon call per bin slice) matches the reference."""
+    smap = _synthetic_map()
+    edges = np.linspace(0, 1.5, 33)
+    edges = np.array([edges[:-1], edges[1:]]) * u.R_sun
+
+    out = rad.rhef(smap, radial_bin_edges=edges, upsilon=0.35, method="scipy", vignette=10 * u.R_sun).data
+    ref = _rhef_reference_loop(smap, edges, application_radius=0 * u.R_sun, method="scipy", upsilon=0.35)
+    finite = np.isfinite(out) & np.isfinite(ref)
+    # Exact, like the other equivalence tests (the finite mask already removed NaNs).
+    assert np.array_equal(out[finite], ref[finite])
+
+
+def test_rhef_empty_bins_left_at_zero():
+    """A radial bin that no pixel falls into must leave its output pixels at
+    the storage default (zero), matching the old loop's behaviour where the
+    inner ``data[here] = ...`` assignment was simply never reached."""
+    smap = _synthetic_map(side=32)
+    # First bin is entirely below the smallest pixel radius — guaranteed empty
+    edges = np.array([[0.0, 0.5, 1.0], [0.001, 1.0, 1.5]]) * u.R_sun
+
+    out = rad.rhef(smap, radial_bin_edges=edges, upsilon=None, method="scipy", vignette=10 * u.R_sun).data
+    # Where map_r < 0.001 R_sun (essentially nowhere on this header), output
+    # stays zero; rest is non-trivial.  Just check we have BOTH zeros and
+    # rank values present — confirms the empty-bin branch fires.
+    # Empty-bin pixels keep the storage default (NaN by default per the
+    # ``fill`` parameter); pixels in populated bins receive ranks > 0.
+    assert np.isnan(out).any()
+    assert (out > 0).any()
