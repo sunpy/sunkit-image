@@ -1,7 +1,13 @@
 import numpy as np
 import skimage
 from skimage.filters import median
-from skimage.morphology import disk, white_tophat
+from skimage.morphology import disk
+
+try:
+    from skimage.morphology.gray import white_tophat
+except ImportError:
+    from skimage.morphology import white_tophat # remove once scikit-image>0.20
+
 from skimage.util import invert
 
 import astropy.units as u
@@ -84,7 +90,11 @@ def stara(
     c_pix = int((circle_radius / smap.scale[0]).to_value(u.pix))
     circle = disk(c_pix / 2)
 
-    finite = white_tophat(med, circle)
+    try:
+        finite = white_tophat(med, circle, mode='reflect')
+    except TypeError:
+        finite = white_tophat(med, circle) # remove when scikit-image>0.20
+
     finite[np.isnan(finite)] = 0
 
     return finite > threshold
