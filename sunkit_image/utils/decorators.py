@@ -1,6 +1,6 @@
 import inspect
-from functools import wraps
 from collections.abc import Callable
+from functools import wraps
 
 import numpy as np
 
