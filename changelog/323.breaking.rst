@@ -1,0 +1,8 @@
+Increased minimum versions for these dependencies:
+
+  - scikit-image>=0.20.0
+  - astropy>=7.0.0
+  - numpy>=2.1.0
+  - matplotlib>=3.10.0
+  - scipy>=1.14.0
+  - scikit-image>=0.25.0
