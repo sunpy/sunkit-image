@@ -1,3 +1,6 @@
+import inspect
+import warnings
+
 import numpy as np
 import skimage
 from skimage.filters import median
@@ -13,6 +16,12 @@ if skimage.__version__ < "0.25.0":
     from skimage.morphology import square
 else:
     from skimage.morphology import footprint_rectangle
+
+# ``mode`` was added to ``white_tophat`` after our minimum-supported skimage
+# (0.20).  Older builds don't accept the kwarg; newer dev builds (skimage 2.0)
+# emit a ``PendingSkimage2Change`` warning telling callers to pin it.  Detect
+# at import time so the call site stays one branch deep.
+_WHITE_TOPHAT_HAS_MODE = "mode" in inspect.signature(white_tophat).parameters
 
 __all__ = ["stara"]
 
@@ -84,7 +93,21 @@ def stara(
     c_pix = int((circle_radius / smap.scale[0]).to_value(u.pix))
     circle = disk(c_pix / 2)
 
-    finite = white_tophat(med, circle)
+    # On skimage>=0.25 pin ``mode='reflect'`` so the eventual skimage 2.0
+    # default flip to ``'ignore'`` does not change our output.  On older
+    # builds ``mode`` is not a kwarg yet but the (then-only) behaviour
+    # IS ``reflect``, so the unkwarg call is equivalent.  Wrap in
+    # ``catch_warnings`` to silence the skimage 2.0 namespace-migration
+    # nudge that fails downstream ``filterwarnings = error`` configs.
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message=r".*`skimage\.morphology\.white_tophat` is deprecated.*",
+        )
+        if _WHITE_TOPHAT_HAS_MODE:
+            finite = white_tophat(med, circle, mode="reflect")
+        else:
+            finite = white_tophat(med, circle)
     finite[np.isnan(finite)] = 0
 
     return finite > threshold

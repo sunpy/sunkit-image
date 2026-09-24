@@ -1,4 +1,5 @@
 import warnings
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -6,6 +7,8 @@ import pytest
 import astropy.io.fits
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
+
+import sunpy.map
 
 import sunkit_image.utils as utils
 from sunkit_image import asda
@@ -171,3 +174,137 @@ def test_reform_2d():
         ],
     )
     assert np.allclose(utils.reform2d(test_data, 2), expected)
+
+
+# ---------------------------------------------------------------------------
+# find_pixel_radii fast path + blackout_pixels_above_radius map_r reuse
+# ---------------------------------------------------------------------------
+
+# The synthetic ``_hpc_map`` fixtures below intentionally omit observer /
+# obstime to stay network-free; sunpy emits informational metadata warnings
+# in that case, which pytest's "warnings as errors" config promotes to
+# failures.  Each test below silences these explicitly via per-test
+# ``filterwarnings`` marks.
+
+
+def _hpc_map(side=64, *, cdelt=50.0, crval=(0.0, 0.0), rotation=None):
+    """Synthetic Helioprojective-Cartesian map with a known WCS.
+
+    Skipping observer / obstime keeps the fixture network-free.  Pass a 2x2
+    ``rotation`` to force the fast path's identity check to fail.
+    """
+
+    header = {
+        "cunit1": "arcsec",
+        "cunit2": "arcsec",
+        "CTYPE1": "HPLN-TAN",
+        "CTYPE2": "HPLT-TAN",
+        "CDELT1": cdelt,
+        "CDELT2": cdelt,
+        "CRVAL1": crval[0],
+        "CRVAL2": crval[1],
+        "CRPIX1": (side + 1) / 2.0,
+        "CRPIX2": (side + 1) / 2.0,
+        "RSUN_REF": 6.957e8,
+        "RSUN_OBS": 960.0,
+    }
+    if rotation is not None:
+        header["PC1_1"], header["PC1_2"] = rotation[0]
+        header["PC2_1"], header["PC2_2"] = rotation[1]
+    data = np.random.default_rng(0).normal(size=(side, side))
+    return sunpy.map.Map((data, header))
+
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_find_pixel_radii_defaults_to_exact_path():
+    """``find_pixel_radii`` must NOT use the approximate fast path unless the
+    caller explicitly opts in with ``fast=True`` -- even for a simple HPC map
+    that would otherwise be eligible."""
+    smap = _hpc_map(side=32)
+    with patch("sunkit_image.utils.utils._find_pixel_radii_fast") as fast_mock:
+        utils.find_pixel_radii(smap)
+    fast_mock.assert_not_called()
+
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_find_pixel_radii_fast_matches_slow():
+    """With ``fast=True`` on a non-rotated HPC map the output must match the
+    exact SkyCoord-based path to better than the documented tolerance."""
+    smap = _hpc_map(side=64)
+    fast = utils.find_pixel_radii(smap, fast=True).to(u.R_sun).value
+    # The exact path is what ``fast=False`` (the default) runs on the same map.
+    slow = utils.find_pixel_radii(smap).to(u.R_sun).value
+    assert fast.shape == slow.shape == (64, 64)
+    np.testing.assert_allclose(fast, slow, atol=2e-4)
+
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_find_pixel_radii_fast_off_center_sun():
+    """``CRVAL != 0`` (off-center Sun) is still handled by the fast path."""
+
+    smap = _hpc_map(side=64, crval=(200.0, -150.0))
+    fast = utils.find_pixel_radii(smap, fast=True).to(u.R_sun).value
+    slow = utils.find_pixel_radii(smap).to(u.R_sun).value
+    np.testing.assert_allclose(fast, slow, atol=2e-4)
+
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_find_pixel_radii_rotation_falls_through_to_slow_path():
+    """A non-identity rotation matrix must drop through to the slow
+    SkyCoord path."""
+
+    rotated = _hpc_map(side=32, rotation=((0.9, 0.1), (-0.1, 0.9)))
+    with patch("sunkit_image.utils.utils._find_pixel_radii_fast") as fast_mock:
+        utils.find_pixel_radii(rotated, fast=True)
+    fast_mock.assert_not_called()
+
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_find_pixel_radii_fast_honors_scale_kwarg():
+    """The ``scale`` argument must rescale the fast-path output the same way
+    the slow path does."""
+    smap = _hpc_map(side=32)
+    default = utils.find_pixel_radii(smap, fast=True).to(u.R_sun).value
+    scaled = utils.find_pixel_radii(smap, scale=2 * smap.rsun_obs, fast=True).to(u.R_sun).value
+    np.testing.assert_allclose(scaled, default / 2.0, rtol=1e-10)
+
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_blackout_pixels_above_radius_map_r_reuse():
+    """Supplying ``map_r=`` to ``blackout_pixels_above_radius`` must produce
+    output identical to letting the function recompute it internally."""
+    smap = _hpc_map(side=64)
+    map_r = utils.find_pixel_radii(smap)
+    blacked_internal = utils.blackout_pixels_above_radius(smap, 1.0 * u.R_sun).data
+    blacked_reuse = utils.blackout_pixels_above_radius(smap, 1.0 * u.R_sun, map_r=map_r).data
+    # NaN-aware byte equality
+    finite_a = np.isfinite(blacked_internal)
+    finite_b = np.isfinite(blacked_reuse)
+    assert np.array_equal(finite_a, finite_b)
+    np.testing.assert_array_equal(blacked_internal[finite_a], blacked_reuse[finite_b])
+
+
+@pytest.mark.filterwarnings("ignore:Missing metadata for observer")
+@pytest.mark.filterwarnings("ignore:Missing metadata for observation time")
+@pytest.mark.filterwarnings("ignore:Missing metadata for solar radius")
+def test_blackout_pixels_above_radius_map_r_skips_internal_lookup():
+    """When ``map_r`` is supplied, ``blackout_pixels_above_radius`` must NOT
+    call ``find_pixel_radii`` again (that's the whole point of the kwarg)."""
+
+    smap = _hpc_map(side=32)
+    map_r = utils.find_pixel_radii(smap)
+    with patch("sunkit_image.utils.utils.find_pixel_radii") as mock_find:
+        utils.blackout_pixels_above_radius(smap, 1.0 * u.R_sun, map_r=map_r)
+    mock_find.assert_not_called()
