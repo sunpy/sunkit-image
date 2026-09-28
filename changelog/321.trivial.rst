@@ -1,0 +1,1 @@
+Update imports in ``stara`` to account for change in scikit-image>0.20.
