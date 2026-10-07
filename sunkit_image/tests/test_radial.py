@@ -346,3 +346,62 @@ def test_intensity_enhance_errors(map_test1):
     scale = 1 * map_test1.rsun_obs
     with pytest.raises(ValueError, match=r"The fit range must be strictly increasing."):
         rad.intensity_enhance(map_test1, scale=scale, fit_range=fit_range[::-1])
+
+
+# Non-remote unit tests for the RHEF filter (gh issue #210). The existing rhef
+# tests are all figure/remote-data tests; these exercise the filter on the
+# synthetic fixtures above so its core behaviour is covered without network.
+
+
+def test_rhef_returns_map_same_shape(map_test1, map_test2):
+    for test_map in (map_test1, map_test2):
+        out = rad.rhef(test_map)
+        assert isinstance(out, sunpy.map.GenericMap)
+        assert out.data.shape == test_map.data.shape
+
+
+def test_rhef_with_and_without_bins(map_test1, radial_bin_edges):
+    # Auto-generated bins and explicitly supplied bins both work and keep shape.
+    auto = rad.rhef(map_test1)
+    given = rad.rhef(map_test1, radial_bin_edges=radial_bin_edges)
+    assert auto.data.shape == map_test1.data.shape
+    assert given.data.shape == map_test1.data.shape
+
+
+@pytest.mark.parametrize("upsilon", [None, 0.35, 0.5, (0.4, 0.6)])
+def test_rhef_upsilon_variations(map_test1, upsilon):
+    out = rad.rhef(map_test1, upsilon=upsilon)
+    assert out.data.shape == map_test1.data.shape
+
+
+@pytest.mark.parametrize("method", ["scipy", "numpy", "none"])
+def test_rhef_methods_run(map_test1, method):
+    # "scipy", "numpy" and "none" are the ranking methods the implementation
+    # accepts. (scipy and numpy can differ on tied values, so their outputs are
+    # not asserted equal here.)
+    out = rad.rhef(map_test1, method=method)
+    assert out.data.shape == map_test1.data.shape
+
+
+def test_rhef_invalid_method_raises(map_test1):
+    with pytest.raises(NotImplementedError):
+        rad.rhef(map_test1, method="not-a-method")
+
+
+def test_rhef_values_in_unit_range(map_test1):
+    # RHEF equalises each radial bin to normalised ranks, so every filtered
+    # (non-fill) pixel should lie within the unit interval.
+    out = rad.rhef(map_test1)
+    finite = out.data[~np.isnan(out.data)]
+    assert finite.size > 0
+    assert finite.min() >= -1e-6
+    assert finite.max() <= 1 + 1e-6
+
+
+def test_rhef_vignette_masks_outer_pixels(map_test1):
+    # A vignette sets pixels beyond the given radius to NaN, so it can only add
+    # NaNs relative to the same call without one.
+    without = rad.rhef(map_test1, vignette=None)
+    with_vignette = rad.rhef(map_test1, vignette=0.0015 * u.R_sun)
+    assert with_vignette.data.shape == map_test1.data.shape
+    assert np.isnan(with_vignette.data).sum() >= np.isnan(without.data).sum()
