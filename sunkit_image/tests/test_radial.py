@@ -374,12 +374,19 @@ def test_rhef_upsilon_variations(map_test1, upsilon):
     assert out.data.shape == map_test1.data.shape
 
 
-@pytest.mark.parametrize("method", ["scipy", "numpy", "none"])
+@pytest.mark.parametrize("method", ["scipy", "numpy"])
 def test_rhef_methods_run(map_test1, method):
-    # "scipy", "numpy" and "none" are the ranking methods the implementation
-    # accepts. (scipy and numpy can differ on tied values, so their outputs are
-    # not asserted equal here.)
+    # The two ranking methods. (scipy and numpy can differ on tied values, so
+    # their outputs are not asserted equal here.)
     out = rad.rhef(map_test1, method=method)
+    assert out.data.shape == map_test1.data.shape
+
+
+def test_rhef_method_none_without_upsilon(map_test1):
+    # "none" skips ranking and passes the raw values through, so it is only
+    # meaningful with upsilon=None: the upsilon curve expects ranks in [0, 1]
+    # and raw intensities above 1 would give NaN.
+    out = rad.rhef(map_test1, method="none", upsilon=None)
     assert out.data.shape == map_test1.data.shape
 
 
