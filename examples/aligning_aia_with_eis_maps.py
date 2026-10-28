@@ -40,8 +40,8 @@ aia_map = sunpy.map.Map(
 # Before coaligning the images, we first resample the AIA image to the same plate
 # scale as the EIS image. This will ensure better results from our coalignment.
 
-nx = (aia_map.scale.axis1 * aia_map.dimensions.x) / eis_map.scale.axis1
-ny = (aia_map.scale.axis2 * aia_map.dimensions.y) / eis_map.scale.axis2
+nx = (aia_map.scale.axis1 * aia_map.data.shape[1] * u.pix) / eis_map.scale.axis1
+ny = (aia_map.scale.axis2 * aia_map.data.shape[0] * u.pix) / eis_map.scale.axis2
 
 aia_downsampled = aia_map.resample(u.Quantity([nx, ny]))
 

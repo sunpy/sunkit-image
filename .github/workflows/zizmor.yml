@@ -1,0 +1,28 @@
+name: GitHub Actions Security Analysis with zizmor
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["**"]
+  # Rescan weekly: an action can be disclosed as vulnerable while the repository is quiet.
+  # Not on the hour: GitHub delays or drops scheduled runs at the start of each hour.
+  schedule:
+    - cron: "17 7 * * 1"
+
+permissions: {}
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor 🌈
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0

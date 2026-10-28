@@ -1,8 +1,8 @@
-import os
+import importlib.util
 import logging
+import os
 import tempfile
 import warnings
-import importlib.util
 from pathlib import Path
 
 import numpy as np
