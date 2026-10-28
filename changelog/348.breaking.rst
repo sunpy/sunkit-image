@@ -1,0 +1,1 @@
+Increased the minimum required version of ``scikit-image`` to 0.24.0, and replaced usage of the deprecated ``sunpy.map.GenericMap.dimensions`` property with ``sunpy.map.GenericMap.data.shape``, and removed use of ``skimage.morphology.footprint_rectangle``.
