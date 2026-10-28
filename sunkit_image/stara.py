@@ -66,7 +66,6 @@ def stara(
     # Median filter to remove detections based on hot pixels
     m_pix = int((median_box / smap.scale[0]).to_value(u.pix))
 
-
     footprint = np.ones((m_pix, m_pix), dtype=np.uint8)
     med = median(data, footprint, behavior="ndimage")
 
