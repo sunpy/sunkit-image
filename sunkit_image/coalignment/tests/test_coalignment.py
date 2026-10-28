@@ -71,8 +71,8 @@ def incorrect_pointing_cutout_map_and_shift(request, cutout_map):
 
 @pytest.mark.remote_data()
 def test_coalignment_eis_aia(eis_test_map, aia193_test_map):
-    nx = (aia193_test_map.scale.axis1 * aia193_test_map.dimensions.x) / eis_test_map.scale[0]
-    ny = (aia193_test_map.scale.axis2 * aia193_test_map.dimensions.y) / eis_test_map.scale[1]
+    nx = (aia193_test_map.scale.axis1 * aia193_test_map.data.shape[1] * u.pix) / eis_test_map.scale[0]
+    ny = (aia193_test_map.scale.axis2 * aia193_test_map.data.shape[0] * u.pix) / eis_test_map.scale[1]
     aia193_test_downsampled_map = aia193_test_map.resample(u.Quantity([nx, ny]))
     coaligned_eis_map = coalign_map(eis_test_map, aia193_test_downsampled_map, method="match_template")
     # Check that correction is as expected based on known pointing offset

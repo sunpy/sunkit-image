@@ -84,8 +84,7 @@ def test_find_pixel_radii(aia_171):
     # Calculate the pixel radii
     pixel_radii = utils.find_pixel_radii(aia_171)
     # The shape of the pixel radii is the same as the input map
-    assert pixel_radii.shape[0] == int(aia_171.dimensions[0].value)
-    assert pixel_radii.shape[1] == int(aia_171.dimensions[1].value)
+    assert pixel_radii.shape == aia_171.data.shape
     # Make sure the unit is solar radii
     assert pixel_radii.unit == u.R_sun
     # Make sure the maximum
