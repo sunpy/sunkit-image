@@ -523,7 +523,7 @@ def fnrgf(
     radial_bin_edges, map_r = find_radial_bin_edges(smap, radial_bin_edges)
 
     # Get the Helioprojective coordinates of each pixel
-    x, y = np.meshgrid(*[np.arange(n) for n in smap.data.shape[::-1]]) 
+    x, y = np.meshgrid(*[np.arange(n) for n in smap.data.shape[::-1]])
     coords = smap.wcs.pixel_to_world(x, y).transform_to(frames.Helioprojective)
 
     # Get angles associated with every pixel
