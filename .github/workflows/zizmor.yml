@@ -5,6 +5,10 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["**"]
+  # Rescan weekly: an action can be disclosed as vulnerable while the repository is quiet.
+  # Not on the hour: GitHub delays or drops scheduled runs at the start of each hour.
+  schedule:
+    - cron: "17 7 * * 1"
 
 permissions: {}
 
@@ -21,4 +25,4 @@ jobs:
           persist-credentials: false
 
       - name: Run zizmor 🌈
-        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        uses: zizmorcore/zizmor-action@53290badfa369cb0bf7ad16342cb62c2fa47ac7b # v0.8.0
