@@ -31,8 +31,8 @@ classifiers = [
 dependencies = [
   "astropy>=7.0.0",
   "numpy>=1.26.0",
-  "matplotlib>=3.8.0",
-  "scipy>=1.12.0",
+  "matplotlib>=3.10.0",
+  "scipy>=1.14.0",
   "scikit-image>=0.24.0",
   "sunpy[map]>=7.0.0",
 ]
