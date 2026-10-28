@@ -1,5 +1,4 @@
 import numpy as np
-import skimage
 from skimage.filters import median
 from skimage.morphology import disk, white_tophat
 from skimage.util import invert
@@ -8,11 +7,6 @@ import astropy.units as u
 
 import sunpy.map
 
-if skimage.__version__ < "0.25.0":
-    # Need to account for https://github.com/scikit-image/scikit-image/pull/7566/files
-    from skimage.morphology import square
-else:
-    from skimage.morphology import footprint_rectangle
 
 __all__ = ["stara"]
 
@@ -73,12 +67,9 @@ def stara(
     # Median filter to remove detections based on hot pixels
     m_pix = int((median_box / smap.scale[0]).to_value(u.pix))
 
-    if skimage.__version__ < "0.25.0":
-        function = square(m_pix)
-    else:
-        function = footprint_rectangle((m_pix, m_pix))
-
-    med = median(data, function, behavior="ndimage")
+    
+    footprint = np.ones((m_pix, m_pix), dtype=np.uint8)
+    med = median(data, footprint, behavior="ndimage")
 
     # Construct the pixel structuring element
     c_pix = int((circle_radius / smap.scale[0]).to_value(u.pix))
