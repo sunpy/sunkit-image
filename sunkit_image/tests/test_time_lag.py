@@ -1,3 +1,4 @@
+import dask
 import dask.array
 import numpy as np
 import pytest
@@ -158,9 +159,11 @@ def test_time_lag_distributed_client():
         tl_map = time_lag(s_a, s_b, time)
         assert isinstance(tl_map, dask.array.Array)
         result = tl_map.compute()
-    assert isinstance(result, u.Quantity)
-    assert result.unit.is_equivalent(u.s)
-    assert u.allclose(result, expected, rtol=0.0, atol=None)
+        (result_protocol,) = dask.compute(tl_map)
+    for got in (result, result_protocol):
+        assert isinstance(got, u.Quantity)
+        assert got.unit.is_equivalent(u.s)
+        assert u.allclose(got, expected, rtol=0.0, atol=None)
 
 
 def test_bounds():

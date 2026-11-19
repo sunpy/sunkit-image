@@ -5,10 +5,16 @@ import astropy.units as u
 DASK_INSTALLED = False
 try:
     import dask.array  # do this here so that Dask is not a hard requirement
+    from dask.array.core import finalize as _dask_finalize
 
     DASK_INSTALLED = True
 except ImportError:
     pass
+
+try:
+    from distributed.worker import get_worker as _get_distributed_worker
+except ImportError:
+    _get_distributed_worker = None
 
 __all__ = [
     "cross_correlation",
@@ -140,6 +146,46 @@ def _get_bounds_indices(lags, bounds):
     return start, stop
 
 
+def _mul_value_unit(value, unit):
+    return value * unit
+
+
+class _QuantityProxy:
+    """Pickle proxy so units survive distributed's numpy serializer.
+
+    ``Quantity`` is an ``ndarray`` subclass, so ``dask.distributed`` serializes
+    it as a bare array. This object is not an ndarray, so pickle rehydrates it
+    on the client as ``value * unit``.
+    """
+
+    __slots__ = ("unit", "value")
+
+    def __init__(self, value, unit):
+        self.value = np.asarray(value)
+        self.unit = unit
+
+    def __reduce__(self):
+        return _mul_value_unit, (self.value, self.unit)
+
+
+def _in_distributed_worker():
+    if _get_distributed_worker is None:
+        return False
+    try:
+        _get_distributed_worker()
+    except ValueError:
+        return False
+    return True
+
+
+def _finalize_with_unit(results, unit):
+    """Concatenate in-memory chunks, then attach ``unit`` on the client."""
+    value = _dask_finalize(results)
+    if _in_distributed_worker():
+        return _QuantityProxy(value, unit)
+    return value * unit
+
+
 def _attach_unit_after_compute(array, unit):
     """Keep ``array`` unitless in the task graph and re-attach ``unit`` after compute.
 
@@ -149,10 +195,10 @@ def _attach_unit_after_compute(array, unit):
     dimensionless and time chunks raises ``UnitConversionError``.
     """
 
-    def compute_with_unit(**kwargs):
-        return type(array).compute(array, **kwargs) * unit
+    def postcompute():
+        return _finalize_with_unit, (unit,)
 
-    array.compute = compute_with_unit
+    array.__dask_postcompute__ = postcompute
     return array
 
 
