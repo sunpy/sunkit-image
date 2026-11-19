@@ -43,7 +43,7 @@ all = ["sunkit_image[watroo]"]
 watroo = ["watroo"]
 tests = [
   "sunkit_image[all]",
-  "dask",
+  "dask[distributed]",
   "pytest-astropy",
   "pytest-mpl",
   "pytest-xdist",

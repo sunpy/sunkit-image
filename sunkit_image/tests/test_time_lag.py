@@ -140,6 +140,29 @@ def test_exceptions(shape_a, shape_b, lags, exception):
         cross_correlation(s_a, s_b, lags)
 
 
+def test_time_lag_distributed_client():
+    # Regression for sunpy/sunkit-image#276: multiplying lags by a unit inside the
+    # lazy Dask graph drops units on distributed process workers and raises
+    # UnitConversionError when chunks are concatenated. A thread-based client
+    # does not reproduce this, so use process workers.
+    distributed = pytest.importorskip("distributed")
+    time = np.linspace(0, 1, 500) * u.s
+    shape = (*time.shape, 10, 10)
+    rng = np.random.default_rng(0)
+    s_a = rng.random(shape)
+    s_b = rng.random(shape)
+    expected = time_lag(s_a, s_b, time)
+    s_a = dask.array.from_array(s_a, chunks=(*s_a.shape[:1], 5, 5))
+    s_b = dask.array.from_array(s_b, chunks=(*s_b.shape[:1], 5, 5))
+    with distributed.Client(n_workers=2, threads_per_worker=1, processes=True):
+        tl_map = time_lag(s_a, s_b, time)
+        assert isinstance(tl_map, dask.array.Array)
+        result = tl_map.compute()
+    assert isinstance(result, u.Quantity)
+    assert result.unit.is_equivalent(u.s)
+    assert u.allclose(result, expected, rtol=0.0, atol=None)
+
+
 def test_bounds():
     time = np.linspace(0, 1, 10) * u.s
     shape = (*time.shape, 5, 5)
