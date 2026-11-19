@@ -141,11 +141,13 @@ def test_exceptions(shape_a, shape_b, lags, exception):
         cross_correlation(s_a, s_b, lags)
 
 
-def test_time_lag_distributed_client():
+@pytest.mark.parametrize("processes", [True, False])
+def test_time_lag_distributed_client(processes):
     # Regression for sunpy/sunkit-image#276: multiplying lags by a unit inside the
     # lazy Dask graph drops units on distributed process workers and raises
-    # UnitConversionError when chunks are concatenated. A thread-based client
-    # does not reproduce this, so use process workers.
+    # UnitConversionError when chunks are concatenated. Process workers need a
+    # pickle proxy; inproc (processes=False) workers must still return Quantity
+    # directly because they pass the finalize result by reference.
     distributed = pytest.importorskip("distributed")
     time = np.linspace(0, 1, 500) * u.s
     shape = (*time.shape, 10, 10)
@@ -155,13 +157,19 @@ def test_time_lag_distributed_client():
     expected = time_lag(s_a, s_b, time)
     s_a = dask.array.from_array(s_a, chunks=(*s_a.shape[:1], 5, 5))
     s_b = dask.array.from_array(s_b, chunks=(*s_b.shape[:1], 5, 5))
-    with distributed.Client(n_workers=2, threads_per_worker=1, processes=True):
+    if not processes:
+        # Inproc address generation calls get_ip(), which tries to reach the
+        # public internet. Pytest blocks that unless the test is marked remote_data.
+        from distributed.comm.inproc import global_manager  # noqa: PLC0415
+
+        global_manager._ip = "127.0.0.1"
+    with distributed.Client(n_workers=2, threads_per_worker=1, processes=processes):
         tl_map = time_lag(s_a, s_b, time)
         assert isinstance(tl_map, dask.array.Array)
         result = tl_map.compute()
         (result_protocol,) = dask.compute(tl_map)
     for got in (result, result_protocol):
-        assert isinstance(got, u.Quantity)
+        assert type(got) is u.Quantity
         assert got.unit.is_equivalent(u.s)
         assert u.allclose(got, expected, rtol=0.0, atol=None)
 

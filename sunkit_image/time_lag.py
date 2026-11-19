@@ -168,20 +168,27 @@ class _QuantityProxy:
         return _mul_value_unit, (self.value, self.unit)
 
 
-def _in_distributed_worker():
+def _on_process_worker():
+    """True when finalize runs on a process worker that pickles results back.
+
+    Inproc / ``processes=False`` workers still report a worker via
+    ``get_worker()``, but they share objects by reference, so a pickle proxy
+    would leak to the caller. Their addresses start with ``inproc://``.
+    """
     if _get_distributed_worker is None:
         return False
     try:
-        _get_distributed_worker()
+        worker = _get_distributed_worker()
     except ValueError:
         return False
-    return True
+    address = getattr(worker, "address", "") or ""
+    return not address.startswith("inproc://")
 
 
 def _finalize_with_unit(results, unit):
     """Concatenate in-memory chunks, then attach ``unit`` on the client."""
     value = _dask_finalize(results)
-    if _in_distributed_worker():
+    if _on_process_worker():
         return _QuantityProxy(value, unit)
     return value * unit
 
