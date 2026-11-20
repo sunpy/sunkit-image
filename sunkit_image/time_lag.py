@@ -5,10 +5,16 @@ import astropy.units as u
 DASK_INSTALLED = False
 try:
     import dask.array  # do this here so that Dask is not a hard requirement
+    from dask.array.core import finalize as _dask_finalize
 
     DASK_INSTALLED = True
 except ImportError:
     pass
+
+try:
+    from distributed.worker import get_worker as _get_distributed_worker
+except ImportError:
+    _get_distributed_worker = None
 
 __all__ = [
     "cross_correlation",
@@ -140,28 +146,84 @@ def _get_bounds_indices(lags, bounds):
     return start, stop
 
 
+def _mul_value_unit(value, unit):
+    return value * unit
+
+
+class _QuantityProxy:
+    """Pickle proxy so units survive distributed's numpy serializer.
+
+    ``Quantity`` is an ``ndarray`` subclass, so ``dask.distributed`` serializes
+    it as a bare array. This object is not an ndarray, so pickle rehydrates it
+    on the client as ``value * unit``.
+    """
+
+    __slots__ = ("unit", "value")
+
+    def __init__(self, value, unit):
+        self.value = np.asarray(value)
+        self.unit = unit
+
+    def __reduce__(self):
+        return _mul_value_unit, (self.value, self.unit)
+
+
+def _on_process_worker():
+    """True when finalize runs on a process worker that pickles results back.
+
+    Inproc / ``processes=False`` workers still report a worker via
+    ``get_worker()``, but they share objects by reference, so a pickle proxy
+    would leak to the caller. Their addresses start with ``inproc://``.
+    """
+    if _get_distributed_worker is None:
+        return False
+    try:
+        worker = _get_distributed_worker()
+    except ValueError:
+        return False
+    address = getattr(worker, "address", "") or ""
+    return not address.startswith("inproc://")
+
+
+def _finalize_with_unit(results, unit):
+    """Concatenate in-memory chunks, then attach ``unit`` on the client."""
+    value = _dask_finalize(results)
+    if _on_process_worker():
+        return _QuantityProxy(value, unit)
+    return value * unit
+
+
+def _attach_unit_after_compute(array, unit):
+    """Keep ``array`` unitless in the task graph and re-attach ``unit`` after compute.
+
+    Multiplying a lazy Dask array by an :class:`~astropy.units.Unit` puts
+    ``Quantity`` chunks in the graph. Under ``dask.distributed`` those chunks
+    can be deserialized as dimensionless arrays, and concatenating mixed
+    dimensionless and time chunks raises ``UnitConversionError``.
+    """
+
+    def postcompute():
+        return _finalize_with_unit, (unit,)
+
+    array.__dask_postcompute__ = postcompute
+    return array
+
+
 def _dask_check(lags, indices):
     # In order for the time lag to be returned as a Dask array, the lags array,
     # which is, in general, a Quantity, must also be a Dask array.
     # This function is needed for two reasons:
-    # 1. astropy.units.Quantity do not play nice with each other and their behavior
-    #    seems to vary from one numpy version to the next. To avoid this ill-defined
-    #    behavior, we will do all of our Dask-ing on a Dask array created from the
-    #    bare numpy array and re-attach the units at the end.
+    # 1. astropy.units.Quantity do not play nice with Dask arrays. To avoid this
+    #    ill-defined behavior, we do all of our Dask-ing on a Dask array created
+    #    from the bare numpy array and re-attach the units after compute, on the
+    #    client, rather than inside the lazy graph.
     # 2. Dask arrays do not like "fancy" multidimensional indexing. Therefore, we must
     #    flatten the indices first and then reshape the time lag array in order to
     #    preserve the laziness of the array evaluation.
     if DASK_INSTALLED and isinstance(indices, dask.array.Array):
         lags_lazy = dask.array.from_array(lags.value, chunks=lags.shape)
         lags_select = lags_lazy[indices.flatten()].reshape(indices.shape)
-        # NOTE: Reset array priority to force multiplication to defer to Dask
-        # rather than Quantity. See https://github.com/sunpy/sunkit-image/issues/260
-        # for more information.
-        old_priority = lags_select.__array_priority__
-        lags_select.__array_priority__ = lags.unit.__array_priority__ + 1
-        lags_select = lags_select * lags.unit
-        lags_select.__array_priority__ = old_priority
-        return lags_select
+        return _attach_unit_after_compute(lags_select, lags.unit)
     return lags[indices]
 
 

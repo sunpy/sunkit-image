@@ -1,9 +1,13 @@
+import pickle
+
+import dask
 import dask.array
 import numpy as np
 import pytest
 
 import astropy.units as u
 
+from sunkit_image import time_lag as time_lag_mod
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
 
@@ -138,6 +142,57 @@ def test_exceptions(shape_a, shape_b, lags, exception):
     s_b = rng.random(shape_b)
     with pytest.raises(ValueError, match=exception):
         cross_correlation(s_a, s_b, lags)
+
+
+@pytest.mark.parametrize("processes", [True, False])
+def test_time_lag_distributed_client(processes):
+    # Regression for sunpy/sunkit-image#276: multiplying lags by a unit inside the
+    # lazy Dask graph drops units on distributed process workers and raises
+    # UnitConversionError when chunks are concatenated. Process workers need a
+    # pickle proxy; inproc (processes=False) workers must still return Quantity
+    # directly because they pass the finalize result by reference.
+    distributed = pytest.importorskip("distributed")
+    time = np.linspace(0, 1, 500) * u.s
+    shape = (*time.shape, 10, 10)
+    rng = np.random.default_rng(0)
+    s_a = rng.random(shape)
+    s_b = rng.random(shape)
+    expected = time_lag(s_a, s_b, time)
+    s_a = dask.array.from_array(s_a, chunks=(*s_a.shape[:1], 5, 5))
+    s_b = dask.array.from_array(s_b, chunks=(*s_b.shape[:1], 5, 5))
+    if not processes:
+        # Inproc address generation calls get_ip(), which tries to reach the
+        # public internet. Pytest blocks that unless the test is marked remote_data.
+        from distributed.comm.inproc import global_manager  # noqa: PLC0415
+
+        global_manager._ip = "127.0.0.1"
+    with distributed.Client(n_workers=2, threads_per_worker=1, processes=processes):
+        tl_map = time_lag(s_a, s_b, time)
+        assert isinstance(tl_map, dask.array.Array)
+        result = tl_map.compute()
+        (result_protocol,) = dask.compute(tl_map)
+    for got in (result, result_protocol):
+        assert type(got) is u.Quantity
+        assert got.unit.is_equivalent(u.s)
+        assert u.allclose(got, expected, rtol=0.0, atol=None)
+
+
+def test_quantity_proxy_pickle_roundtrip(monkeypatch):
+    # Process workers pickle the finalize result back to the client. Coverage is
+    # collected in the pytest process, so Client(processes=True) never sees
+    # _QuantityProxy or the process-worker branch of _finalize_with_unit.
+    # Exercise that pickle contract here, plus the fallback when distributed is
+    # not installed.
+    monkeypatch.setattr(time_lag_mod, "_get_distributed_worker", None)
+    assert time_lag_mod._on_process_worker() is False
+
+    value = np.array([0.2, -0.1])
+    monkeypatch.setattr(time_lag_mod, "_on_process_worker", lambda: True)
+    result = time_lag_mod._finalize_with_unit([value], u.s)
+    assert isinstance(result, time_lag_mod._QuantityProxy)
+    restored = pickle.loads(pickle.dumps(result))
+    assert type(restored) is u.Quantity
+    assert u.allclose(restored, value * u.s)
 
 
 def test_bounds():
