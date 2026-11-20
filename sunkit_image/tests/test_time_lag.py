@@ -1,3 +1,5 @@
+import pickle
+
 import dask
 import dask.array
 import numpy as np
@@ -5,6 +7,7 @@ import pytest
 
 import astropy.units as u
 
+from sunkit_image import time_lag as time_lag_mod
 from sunkit_image.time_lag import cross_correlation, get_lags, max_cross_correlation, time_lag
 
 
@@ -172,6 +175,24 @@ def test_time_lag_distributed_client(processes):
         assert type(got) is u.Quantity
         assert got.unit.is_equivalent(u.s)
         assert u.allclose(got, expected, rtol=0.0, atol=None)
+
+
+def test_quantity_proxy_pickle_roundtrip(monkeypatch):
+    # Process workers pickle the finalize result back to the client. Coverage is
+    # collected in the pytest process, so Client(processes=True) never sees
+    # _QuantityProxy or the process-worker branch of _finalize_with_unit.
+    # Exercise that pickle contract here, plus the fallback when distributed is
+    # not installed.
+    monkeypatch.setattr(time_lag_mod, "_get_distributed_worker", None)
+    assert time_lag_mod._on_process_worker() is False
+
+    value = np.array([0.2, -0.1])
+    monkeypatch.setattr(time_lag_mod, "_on_process_worker", lambda: True)
+    result = time_lag_mod._finalize_with_unit([value], u.s)
+    assert isinstance(result, time_lag_mod._QuantityProxy)
+    restored = pickle.loads(pickle.dumps(result))
+    assert type(restored) is u.Quantity
+    assert u.allclose(restored, value * u.s)
 
 
 def test_bounds():
