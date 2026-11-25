@@ -19,21 +19,14 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: Implementation :: CPython",
-]
-authors = [
-  { name = "The SunPy Community", email = "sunpy@googlegrouups.com" },
-]
-classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
   "Natural Language :: English",
   "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Physics",
+]
+authors = [
+  { name = "The SunPy Community", email = "sunpy@googlegrouups.com" },
 ]
 dependencies = [
   "astropy>=7.0.0",
