@@ -13,20 +13,20 @@ requires-python = ">=3.12"
 readme = { file = "README.rst", content-type = "text/x-rst" }
 keywords = ["solar physics", "solar", "science", "image analysis"]
 license-files = ["licenses/LICENSE.rst"]
-authors = [
-  { name = "The SunPy Community", email = "sunpy@googlegrouups.com" },
-]
 classifiers = [
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: Implementation :: CPython",
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
   "Natural Language :: English",
   "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Physics",
+]
+authors = [
+  { name = "The SunPy Community", email = "sunpy@googlegrouups.com" },
 ]
 dependencies = [
   "astropy>=7.0.0",
